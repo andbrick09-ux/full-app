@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Becca's Surrender | The Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;1,700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight-blue: #051024;
+            --deep-blue: #020814;
+            --luxury-gold: #d4af37;
+            --text-light: #e0e0e0;
+            --glass-bg: rgba(5, 16, 36, 0.7);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, var(--midnight-blue) 0%, var(--deep-blue) 100%);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-light);
+            overflow: hidden;
+        }
+
+        /* Subtle velvet texture overlay */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/black-linen.png');
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            z-index: 1;
+        }
+
+        .branding {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3rem;
+            color: var(--luxury-gold);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .pill-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .pill {
+            display: block;
+            padding: 16px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .pill:hover {
+            border-color: var(--luxury-gold);
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            transform: scale(1.02);
+            color: var(--luxury-gold);
+        }
+
+        .pill span {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            text-transform: none;
+            margin-top: 5px;
+            opacity: 0.5;
+            letter-spacing: 1px;
+        }
+
+        .seal-decoration {
+            margin-top: 4rem;
+            color: var(--luxury-gold);
+            font-size: 1.5rem;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="branding">Becca's Surrender</div>
+        <h1>Clarity in Submission</h1>
+
+        <div class="pill-wrapper">
+            <a href="#" class="pill">
+                Intent
+                <span>The foundations of desire</span>
+            </a>
+
+            <a href="#" class="pill">
+                Canvas
+                <span>Visualizing the map</span>
+            </a>
+
+            <a href="#" class="pill">
+                Ritual
+                <span>The practice of giving over</span>
+            </a>
+        </div>
+
+        <div class="seal-decoration">❦</div>
+    </div>
+
+</body>
+</html>
