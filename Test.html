@@ -1,0 +1,521 @@
+Try AI directly in your favorite apps … Use Gemini to generate drafts and refine content, plus get Gemini Pro with access to Google's next-gen AI for $19.99 $0 for 1 month
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Becca's Surrender v10.8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <style>
+        :root {
+            --midnight: #051024;
+            --deep-blue: #020814;
+            --gold: #d4af37;
+            --glass: rgba(5, 16, 36, 0.9);
+            --border: rgba(212, 175, 55, 0.25);
+            --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
+            --crimson: #8a1c1c;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            background-color: var(--midnight);
+            background-image: url('background.png');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: #f0f0f0; font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* --- SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #020814;
+            z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px 25px;
+            overflow-y: auto;
+            transition: opacity 0.8s ease;
+        }
+        .splash-content { max-width: 500px; text-align: left; animation: fadeIn 1s ease; }
+        .splash-title {
+            font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; text-align: center;
+            border-bottom: 1px solid var(--border); padding-bottom: 15px;
+        }
+        .splash-text { font-size: 13px; line-height: 1.8; color: #d0d0d0; margin-bottom: 20px; }
+        .splash-highlight { color: var(--gold); font-weight: bold; }
+        
+        .guide-section { margin-top: 30px; border-left: 2px solid var(--gold); padding-left: 15px; }
+        .guide-item { margin-bottom: 15px; }
+        .guide-title { font-family: 'Playfair Display'; color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .signature { font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--crimson); text-align: right; margin-top: 30px; margin-bottom: 40px; }
+
+        .enter-btn {
+            width: 100%; background: var(--luxury-gradient); border: none;
+            padding: 20px; border-radius: 50px; font-weight: 700; color: #051024;
+            text-transform: uppercase; letter-spacing: 3px; font-size: 14px;
+            cursor: pointer; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        /* --- APP STRUCTURE --- */
+        .app-header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(2, 8, 20, 0.95); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border); padding: 15px 0 10px;
+        }
+        .app-title { font-family: 'Great Vibes', cursive; font-size: 32px; text-align: center; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .progress-bar-container { width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin-top: 10px; }
+        #progress-fill { width: 25%; height: 100%; background: var(--luxury-gradient); transition: 0.5s ease; }
+
+        .tab-content { display: none; padding: 110px 15px 140px 15px; max-width: 600px; margin: 0 auto; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-content.active { display: block; }
+
+        .category-section { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; margin-bottom: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        h2 { font-family: 'Playfair Display'; font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 5px 0; display: flex; align-items: center; }
+        h2::before { content: ""; width: 20px; height: 1px; background: var(--gold); margin-right: 10px; opacity: 0.5; }
+        
+        .card-desc { 
+            font-size: 11px; color: rgba(255,255,255,0.7); font-style: italic; 
+            margin-bottom: 15px; margin-left: 30px; font-family: 'Montserrat', sans-serif; 
+            letter-spacing: 0.3px; line-height: 1.4;
+        }
+
+        .pill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+        .pill { 
+            padding: 12px 5px; border-radius: 12px; border: 1px solid var(--border);
+            font-size: 10px; font-weight: 600; cursor: pointer; background: rgba(0,0,0,0.2);
+            color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; text-align: center;
+            display: flex; align-items: center; justify-content: center; min-height: 40px;
+            position: relative;
+        }
+        .pill.active { background: var(--luxury-gradient); color: var(--deep-blue); border-color: transparent; box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); font-weight: 800; }
+
+        /* TOOLTIP CSS */
+        .pill[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 115%; left: 50%; transform: translateX(-50%);
+            background: var(--deep-blue); border: 1px solid var(--gold);
+            color: #fff; padding: 8px 12px; border-radius: 6px;
+            font-size: 10px; white-space: normal; width: 150px; z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            opacity: 1; visibility: visible;
+            font-family: 'Montserrat', sans-serif; font-weight: 400; text-transform: none; line-height: 1.3;
+        }
+        .pill[data-tooltip]::after {
+            content: ""; opacity: 0; visibility: hidden; transition: 0.2s ease-in-out;
+        }
+
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: rgba(2, 8, 20, 0.95); backdrop-filter: blur(25px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(212, 175, 55, 0.4); transition: 0.2s ease; flex: 1; }
+        .nav-item.active { color: var(--gold); transform: translateY(-5px); }
+        .nav-icon-wrapper { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .nav-label { font-size: 8px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-top: 4px; }
+
+        .primary-btn { width: 100%; background: var(--luxury-gradient); border: none; padding: 22px; border-radius: 18px; font-weight: 700; color: var(--deep-blue); text-transform: uppercase; letter-spacing: 3px; font-size: 11px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); margin-top: 15px; cursor: pointer; }
+        .secondary-btn { width: 100%; background: transparent; border: 1px solid var(--border); padding: 15px; border-radius: 18px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-size: 10px; margin-top: 10px; cursor: pointer; }
+        textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; color: white; padding: 15px; font-family: inherit; resize: none; margin-bottom: 10px; }
+
+        .preview-box { background: #fffafa; color: #111; padding: 30px; border-radius: 4px; font-family: 'Times New Roman', serif; line-height: 1.6; font-size: 13px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; margin-bottom: 20px; }
+        .preview-box::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--luxury-gradient); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-content">
+            <div class="splash-title">The Purpose: Clarity in Submission</div>
+            <p class="splash-text">
+                Your submission is a gift to me from you. <span class="splash-highlight">This app exists to strip away the hesitation and the "maybe."</span> It forces you to look inward and articulate exactly what you crave, what you fear, and what you are prepared to give. By picking each selection, you are creating a map for me to follow as I see fit. You are ensuring that when we enter that space, my focus is entirely on your subjection, not on guesswork.
+            </p>
+            <div class="guide-section">
+                <div class="splash-title" style="font-size:16px; border:none; text-align:left; margin-bottom:10px;">How It Guides My Hand</div>
+                <div class="guide-item"><div class="guide-title">The Intent</div><div class="splash-text" style="margin-bottom:5px;">You begin by grounding yourself. You tell me who you are today—a brat needing a reminder, a slave seeking service, or a toy ready for use.</div></div>
+                <div class="guide-item"><div class="guide-title">The Canvas</div><div class="splash-text" style="margin-bottom:5px;">Here, you map your body for me. You mark the erogenous zones and the sensory triggers that will break you down.</div></div>
+                <div class="guide-item"><div class="guide-title">The Ritual</div><div class="splash-text" style="margin-bottom:5px;">This is where you admit to the tools you need to feel. You are placing the instruments of your discipline into my hands.</div></div>
+                <div class="guide-item"><div class="guide-title">The Seal</div><div class="splash-text" style="margin-bottom:5px;">The final act. You define how we finish the scene together—the service, the deposit, and the cleanup.</div></div>
+            </div>
+            <div class="signature">- Your Sir</div>
+            <button class="enter-btn" onclick="enterApp()">Build Sir a Map</button>
+        </div>
+    </div>
+
+    <header class="app-header">
+        <h1 class="app-title">Becca's Surrender</h1>
+        <div class="progress-bar-container"><div id="progress-fill"></div></div>
+    </header>
+
+    <div id="intent" class="tab-content active">
+        <div class="category-section">
+            <h2>Identity & Role</h2>
+            <p class="card-desc">Establish the specific headspace you will inhabit and the hunger driving you to my feet.</p>
+            <div class="pill-grid">
+                <div class="pill" data-tooltip="Playfully defiant, seeking firm correction and attention." onclick="togglePill(this, 'role', 'Brat')">Brat</div>
+                <div class="pill" data-tooltip="Seeking validation through obedience and pleasing." onclick="togglePill(this, 'role', 'Good Girl')">Good Girl</div>
+                <div class="pill" data-tooltip="Living for my commands; your focus is purely on my needs." onclick="togglePill(this, 'role', 'Slave')">Slave</div>
+                <div class="pill" data-tooltip="Objectified and used purely for my physical pleasure." onclick="togglePill(this, 'role', 'Sex Toy')">Sex Toy</div>
+                <div class="pill" data-tooltip="Wholly owned; my mark is on you in every sense." onclick="togglePill(this, 'role', 'Claimed')">Claimed</div>
+                <div class="pill" data-tooltip="Yielding control and placing your will in my hands." onclick="togglePill(this, 'role', 'Submissive')">Submissive</div>
+                <div class="pill" data-tooltip="A lighthearted session focused on exploration and fun." onclick="togglePill(this, 'motivation', 'Fun Play')">Fun Play</div>
+                <div class="pill" data-tooltip="Seeking to grow and perfect your submissive abilities." onclick="togglePill(this, 'motivation', 'New Skill')">New Skill</div>
+                <div class="pill" data-tooltip="Placing me on a pedestal and existing for my ego." onclick="togglePill(this, 'motivation', 'Worship')">Worship</div>
+                <div class="pill" data-tooltip="Existing solely as a vessel for my release." onclick="togglePill(this, 'motivation', 'Pleasure')">Pleasure You</div>
+                <div class="pill" data-tooltip="Seeking an intense emotional release and mental reset." onclick="togglePill(this, 'motivation', 'Catharsis')">Catharsis</div>
+            </div>
+        </div>
+        
+        <div class="category-section">
+            <h2>The Vibe</h2>
+            <p class="card-desc">Dictate the atmospheric pressure of the room. Do you need soft sensory worship or the cold edge of discipline?</p>
+            <div class="pill-grid">
+                <div class="pill" data-tooltip="Focus on touch, warmth, and physical ecstasy." onclick="togglePill(this, 'vibe', 'Sensory Bliss')">Sensory Bliss</div>
+                <div class="pill" data-tooltip="High protocol, strict orders, and immediate correction." onclick="togglePill(this, 'vibe', 'Strict Discipline')">Strict Discipline</div>
+                <div class="pill" data-tooltip="Raw, animalistic, and uninhibited instincts." onclick="togglePill(this, 'vibe', 'Primal')">Primal</div>
+                <div class="pill" data-tooltip="Focus on utility, tasks, and domestic devotion." onclick="togglePill(this, 'vibe', 'Service')">Service</div>
+                <div class="pill" data-tooltip="Repetitive conditioning and behavioral alignment." onclick="togglePill(this, 'vibe', 'Training')">Training</div>
+                <div class="pill" data-tooltip="A scene designed for a specific visual or rhythmic display." onclick="togglePill(this, 'vibe', 'Performance')">Performance</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>Mind & Dynamics</h2>
+            <p class="card-desc">Articulate the level of control I shall exert, the names I will use to break you, and the depth of subspace you intend to reach.</p>
+            <div class="pill-grid">
+                <div class="pill" data-tooltip="I lead the scene." onclick="togglePill(this, 'dynamics', 'My Way')">My Way</div>
+                <div class="pill" data-tooltip="You have total control." onclick="togglePill(this, 'dynamics', 'Sir Way')">Sir's Way</div>
+                <div class="pill" data-tooltip="Overpower my will." onclick="togglePill(this, 'dynamics', 'Dominate')">Dominate Me</div>
+                <div class="pill" data-tooltip="Make me surrender." onclick="togglePill(this, 'dynamics', 'Force')">Force Submit</div>
+                <div class="pill" data-tooltip="High standards, zero tolerance." onclick="togglePill(this, 'dynamics', 'Strict')">Strict</div>
+                <div class="pill" data-tooltip="Soft, nurturing guidance." onclick="togglePill(this, 'dynamics', 'Gentle')">Gentle</div>
+                <div class="pill" data-tooltip="Rough physical manipulation." onclick="togglePill(this, 'dynamics', 'Manhandled')">Manhandled</div>
+                <div class="pill" data-tooltip="Immobilize me with weight." onclick="togglePill(this, 'dynamics', 'Pinned')">Held Down</div>
+                <div class="pill" data-tooltip="Examine every inch of me." onclick="togglePill(this, 'dynamics', 'Inspected')">Inspected</div>
+                <div class="pill" data-tooltip="Use my specific labels." onclick="togglePill(this, 'verbal', 'Names')">Call me Names</div>
+                <div class="pill" data-tooltip="Verbal humiliation." onclick="togglePill(this, 'verbal', 'Degrade')">Degrade Me</div>
+                <div class="pill" data-tooltip="Tell me I'm a good girl." onclick="togglePill(this, 'verbal', 'Praise')">Praise Me</div>
+                <div class="pill" data-tooltip="Functional speech only." onclick="togglePill(this, 'verbal', 'No Names')">No Names</div>
+                <div class="pill" data-tooltip="Floaty and relaxed." onclick="togglePill(this, 'subspace', 'Light')">Light Sub</div>
+                <div class="pill" data-tooltip="Heavy trance state." onclick="togglePill(this, 'subspace', 'Deep')">Deep Sub</div>
+                <div class="pill" data-tooltip="Push me until I shatter." onclick="togglePill(this, 'subspace', 'MAX')">MAX Break</div>
+                <div class="pill" data-tooltip="Emotionally open/raw." onclick="togglePill(this, 'psycho', 'Vulnerable')">Vulnerable</div>
+                <div class="pill" data-tooltip="Sensorily overloaded." onclick="togglePill(this, 'psycho', 'Overwhelmed')">Overwhelmed</div>
+                <div class="pill" data-tooltip="Complete helplessness." onclick="togglePill(this, 'psycho', 'No Control')">No Control</div>
+                <div class="pill" data-tooltip="Nowhere to hide." onclick="togglePill(this, 'psycho', 'Exposed')">Exposed</div>
+            </div>
+        </div>
+        <button class="primary-btn" onclick="showTab('canvas', 1)">Continue to Canvas</button>
+    </div>
+
+    <div id="canvas" class="tab-content">
+        <div class="category-section">
+            <h2>Dress Code</h2>
+            <p class="card-desc">Select how you shall present yourself for inspection.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'attire', 'Naked')">Naked</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Lingerie')">Lingerie</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Strappy')">Strappy Set</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Panties')">Just Panties</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Hoodie')">Just Hoodie</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Dress')">Skirt/Dress</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Heels')">Heels</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Stockings')">Stockings</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Pantyhose')">Pantyhose</div>
+                <div class="pill" onclick="togglePill(this, 'attire', 'Slutty')">Slutty</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>Focus Zones</h2>
+            <p class="card-desc">Map the geography of your body. Highlight the specific areas that crave my attention, my touch, or my pain.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'zones', 'Scalp')">Scalp</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Ears')">Ears</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Neck')">Neck</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Mouth')">Mouth</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Armpits')">Armpits</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Wrists')">Wrists/Hands</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Breasts')">Breasts</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Belly')">Belly Button</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Back')">Lower Back</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Thighs')">Inner Thighs</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Knees')">Behind Knees</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Feet')">Feet</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Genitals')">Genitals</div>
+                <div class="pill" onclick="togglePill(this, 'zones', 'Ass')">Ass</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>Sensory Experiences</h2>
+            <p class="card-desc">Curate the sights, sounds, and tactile sensations that will dismantle your defenses and overwhelm you.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Blindfold')">Blindfold</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Teasing')">Visual Teasing</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Mirrors')">Mirrors</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Headphones')">NC Headphones</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Earplugs')">Earplugs</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Whispering')">Whispering</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Ice')">Ice/Cold</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Wax')">Hot Wax</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Oil')">Warmed Oil</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Brush')">Makeup Brush</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Feathers')">Feathers</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Wartenberg')">Wheel</div>
+                <div class="pill" onclick="togglePill(this, 'touch', 'Scratching')">Scratching</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Biting')">Biting</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Taste Test')">Blind Taste</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Scent')">Scent Play</div>
+                <div class="pill" onclick="togglePill(this, 'sensory', 'Taste Sir')">Taste Sir</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>After-Effects</h2>
+            <p class="card-desc">Determine the persistence of my claim. Shall I leave temporary reminders, or marks that will linger for days?</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'marks', 'Hours')">Marks (Hours)</div>
+                <div class="pill" onclick="togglePill(this, 'marks', 'Days')">Marks (Days)</div>
+                <div class="pill" onclick="togglePill(this, 'marks', 'None')">No Marks</div>
+            </div>
+        </div>
+        <button class="primary-btn" onclick="showTab('ritual', 2)">Continue to Ritual</button>
+    </div>
+
+    <div id="ritual" class="tab-content">
+        <div class="category-section">
+            <h2>Restrictions & Bondage</h2>
+            <p class="card-desc">Choose the restraints that will render you helpless. Specify how you wish to be bound, gagged, and silenced.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Bed')">Bound to Bed</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Door')">Bound to Door</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Hogtied')">Hogtied</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Spreader')">Spreader Bars</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Armbinder')">Armbinder</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Belts')">Body Belts</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Wrapped')">Wrapped Fully</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Rope')">Rope Ties</div>
+                <div class="pill" onclick="togglePill(this, 'bondage', 'Try New')">Try New Ties</div>
+                <div class="pill" onclick="togglePill(this, 'gags', 'Ball')">Ball Gag</div>
+                <div class="pill" onclick="togglePill(this, 'gags', 'Ring')">Ring Gag</div>
+                <div class="pill" onclick="togglePill(this, 'gags', 'Bit')">Bit Gag</div>
+                <div class="pill" onclick="togglePill(this, 'gags', 'Tape')">Tape</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>The Toy Box</h2>
+            <p class="card-desc">Select the specific instruments of pleasure and torment you desire for this session.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Wand')">Wand</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Ferri')">Ferri</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Lush 4')">Lush 4</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Flexer')">Flexer</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Bullet Vib')">Bullet Vib</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Pinpoint')">Pinpoint Vib</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Liba Spreader')">Liba Spreader</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Nipple Clamps')">Nipple Clamps</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Pussy Clamp')">Pussy Clamp</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Nipple Pump')">Nipple Pump</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Clit Pump')">Clit Pump</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Pussy Pump')">Pussy Pump</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Penis Pump')">Penis Pump</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Dildo')">Dildo</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Glass Dildo')">Glass Dildo</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Double End')">Double Dildo</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Njoy Wand')">Njoy Wand</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Ben Wa')">Ben Wa Balls</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Hollow Plug')">Hollow Plug</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Inflatable')">Inflatable</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Fuck Saw')">Fuck Saw</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Anal Hook')">Anal Hook</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Ping Pong')">Ping Pong</div>
+                <div class="pill" onclick="togglePill(this, 'specific_toys', 'Tazapper')">Tazapper</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>The Heavy Hand</h2>
+            <p class="card-desc">Select the instruments of correction and sensation.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'impact', 'Hand')">Sir's Hand</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Crop')">Crop</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Flogger')">Flogger</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Cat O 9')">Cat O 9</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Dragons Tongue')">Dragons Tongue</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Paddle')">Wooden Paddle</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Cane')">Cane</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Slapper')">Leather Slapper</div>
+                <div class="pill" onclick="togglePill(this, 'impact', 'Whip')">Whip</div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>The Edge & Climax</h2>
+            <p class="card-desc">Calibrate the intensity of your struggle. Define the limits of your breath, the fight you will offer, and the terms of your release.</p>
+            <div class="pill-grid">
+                <div class="pill" onclick="togglePill(this, 'breath', 'Choking')">Light Choking</div>
+                <div class="pill" onclick="togglePill(this, 'breath', 'Hand Mouth')">Hand/Mouth</div>
+                <div class="pill" onclick="togglePill(this, 'breath', 'Control')">Breath Control</div>
+                <div class="pill" onclick="togglePill(this, 'struggle', 'Limits')">Push Limits</div>
+                <div class="pill" onclick="togglePill(this, 'struggle', 'Punish')">Punish Me</div>
+                <div class="pill" onclick="togglePill(this, 'struggle', 'Overwhelmed')">Overwhelmed</div>
+                <div class="pill" onclick="togglePill(this, 'struggle', 'Beg')">Make Me Beg</div>
+                <div class="pill" onclick="togglePill(this, 'forced', 'Tied Forced Orgasms')">Tied/Forced Orgasms</div>
+                <div class="pill" onclick="togglePill(this, 'forced', 'Free Forced Orgasms')">Free/Forced Orgasms</div>
+                <div class="pill" onclick="togglePill(this, 'forced', 'No Forced Orgasms')">No Forced Orgasms</div>
+                <div class="pill" onclick="togglePill(this, 'sex', 'Sex')">Have Sex</div>
+            </div>
+        </div>
+        <button class="primary-btn" onclick="showTab('seal', 3)">Proceed to Seal</button>
+    </div>
+
+    <div id="seal" class="tab-content">
+        <div id="submit-stage-1">
+            <div class="category-section">
+                <h2>Service to Sir</h2>
+                <p class="card-desc">List the specific acts of devotion you are prepared to perform. How will you use your body to pleasure your owner?</p>
+                <div class="pill-grid">
+                    <div class="pill" onclick="togglePill(this, 'service', 'Suck')">Suck Sir</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Worship')">Worship Sir</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Face Fuck')">Face Fucking</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Ride Face')">Ride Face</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Post Cum')">Play After Cum</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Suck Hard')">Suck Hard After</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Massage')">Full Body Massage</div>
+                    <div class="pill" onclick="togglePill(this, 'service', 'Ring')">Put Cock Ring On</div>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2>The Offering</h2>
+                <p class="card-desc">Designate the sacred vessel for my release. Indicate exactly where you desire to receive my final gift to you.</p>
+                <div class="pill-grid">
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Mouth')">Mouth</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Throat')">Down my Throat</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Face')">Face</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Glasses')">Glasses</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Chest')">Chest</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Stomach')">Stomach</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Pussy')">On My Pussy</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Panties')">In My Panties</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Ass')">Ass</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Back')">On my Back</div>
+                    <div class="pill" onclick="togglePill(this, 'deposit', 'Sir Stomach')">Sir's Stomach</div>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2>Final Service</h2>
+                <p class="card-desc">The rituals of return. Define the cleanup duties and the intimacy required to ground you back to reality.</p>
+                <div class="pill-grid">
+                    <div class="pill" onclick="togglePill(this, 'cleanup', 'Lick Clean')">Lick Sir Clean</div>
+                    <div class="pill" onclick="togglePill(this, 'cleanup', 'Wipe Clean')">Wipe Sir Clean</div>
+                    <div class="pill" onclick="togglePill(this, 'cleanup', 'Shower')">Shower Together</div>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h2>The Scribbles</h2>
+                <p class="card-desc">A space for the unspoken. Whisper your specific fantasies, hard limits, or final requests before the cage locks.</p>
+                <textarea id="scenario-text" rows="4" placeholder="Any final details or fantasies..."></textarea>
+            </div>
+            <button class="primary-btn" onclick="revealSubmission()">Ready to Submit to You Sir</button>
+        </div>
+
+        <div id="submit-stage-2" style="display:none;">
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+                <button class="secondary-btn" onclick="switchView('list')">Protocol</button>
+                <button class="secondary-btn" onclick="switchView('letter')">Letter</button>
+            </div>
+            <div id="review-display" class="preview-box"></div>
+            <button onclick="exportDoc()" class="primary-btn">Download .DOCX</button>
+            <button class="secondary-btn" onclick="location.reload()">Start New Session</button>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="showTab('intent', this)"><div class="nav-icon-wrapper">🧠</div><span class="nav-label">Intent</span></div>
+        <div class="nav-item" onclick="showTab('canvas', this)"><div class="nav-icon-wrapper">🧍</div><span class="nav-label">Canvas</span></div>
+        <div class="nav-item" onclick="showTab('ritual', this)"><div class="nav-icon-wrapper">🧸</div><span class="nav-label">Ritual</span></div>
+        <div class="nav-item" onclick="showTab('seal', this)"><div class="nav-icon-wrapper">📤</div><span class="nav-label">Seal</span></div>
+    </nav>
+
+    <script>
+        let state = { vibe:[], motivation:[], role:[], dynamics:[], verbal:[], psycho:[], subspace:[], zones:[], attire:[], sensory:[], touch:[], marks:[], bondage:[], specific_toys:[], impact:[], gags:[], breath:[], struggle:[], forced:[], sex:[], service:[], deposit:[], cleanup:[] };
+
+        function enterApp() {
+            const s = document.getElementById('splash-screen');
+            s.style.opacity = '0';
+            setTimeout(() => { s.style.display = 'none'; }, 800);
+        }
+
+        function showTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if (el) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+            } else {
+                const idx = ['intent','canvas','ritual','seal'].indexOf(id);
+                document.querySelectorAll('.nav-item')[idx].classList.add('active');
+            }
+            const idx = ['intent','canvas','ritual','seal'].indexOf(id);
+            document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%';
+            window.scrollTo(0,0);
+        }
+
+        function togglePill(el, cat, val) {
+            el.classList.toggle('active');
+            if(!state[cat]) state[cat] = [];
+            if(el.classList.contains('active')) state[cat].push(val);
+            else state[cat] = state[cat].filter(i => i !== val);
+            if(navigator.vibrate) navigator.vibrate(12);
+        }
+
+        function revealSubmission() {
+            document.getElementById('submit-stage-1').style.display = 'none';
+            document.getElementById('submit-stage-2').style.display = 'block';
+            switchView('list');
+        }
+
+        function switchView(type) {
+            const display = document.getElementById('review-display');
+            if (type === 'list') {
+                let h = "<b>BECCA'S SURRENDER PROTOCOL</b><br><br>";
+                for (let k in state) if(state[k].length) h += `<b>${k.toUpperCase().replace('_', ' ')}:</b> ${state[k].join(', ')}<br>`;
+                display.innerHTML = h;
+            } else {
+                const notes = document.getElementById('scenario-text').value;
+                display.innerHTML = `
+                    <div style="text-align:center; font-family:'Great Vibes'; font-size:32px; color:var(--crimson);">Becca's Surrender</div>
+                    <p>I place myself at your feet. I seek a <strong>${(state.vibe||[]).join(', ') || 'session'}</strong> motivated by <strong>${(state.motivation||[]).join(', ')}</strong>.</p>
+                    <p>I am your <strong>${(state.role||[]).join(', ')}</strong>. Dynamics: <strong>${(state.dynamics||[]).join(', ')}</strong>.</p>
+                    <p>Mind: <strong>${(state.verbal||[]).join(', ')}</strong> labels and <strong>${(state.subspace||[]).join(', ')}</strong> subspace.</p>
+                    <p>Body: Focus on <strong>${(state.zones||[]).join(', ')}</strong>. Attire: <strong>${(state.attire||[]).join(', ')}</strong>. Marks: <strong>${(state.marks||[]).join(', ')}</strong>.</p>
+                    <p>Toys: I need the <strong>${(state.specific_toys||[]).join(', ')}</strong>.</p>
+                    <p>Impact: <strong>${(state.impact||[]).join(', ')}</strong>.</p>
+                    <p>Bondage: <strong>${(state.bondage||[]).join(', ')}</strong>. Intensity: <strong>${(state.struggle||[]).join(', ')}</strong>.</p>
+                    <p>Deposit on my <strong>${(state.deposit||[]).join(', ')}</strong>.</p>
+                    ${notes ? `<p><em>Notes: ${notes}</em></p>` : ''}
+                    <div style="text-align:right; font-family:'Great Vibes'; font-size:24px; margin-top:20px;">I am yours,<br>Becca</div>
+                `;
+            }
+        }
+
+        async function exportDoc() {
+            const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
+            const sections = Object.entries(state).filter(([k,v]) => v.length > 0).map(([k,v]) => new Paragraph({ children: [new TextRun({ text: k.toUpperCase().replace('_', ' ') + ": ", bold: true }), new TextRun(v.join(', '))] }));
+            const doc = new Document({ sections: [{ children: [new Paragraph({ children: [new TextRun({ text: "Becca's Surrender", font: "Great Vibes", size: 48 })], alignment: "center" }), new Paragraph(""), ...sections] }] });
+            const blob = await Packer.toBlob(doc);
+            const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "Surrender.docx"; a.click();
+        }
+    </script>
+</body>
+</html>
