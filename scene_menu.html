@@ -242,7 +242,7 @@
             <div id="view-letter" class="view-content active"></div>
             <div id="view-list" class="view-content"></div>
             <button class="secondary-btn" onclick="returnToMap()">Return to Selections</button>
-            <button onclick="exportDoc()" class="primary-btn">Download Protocol (.docx)</button>
+            <button id="download-btn" onclick="exportDoc()" class="primary-btn">Download Letter (.docx)</button>
         </div>
     </div>
 
@@ -476,9 +476,20 @@
         }
 
         function switchFinalTab(tab) {
-            document.querySelectorAll('.final-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.view-content').forEach(c => c.classList.remove('active'));
-            if(tab === 'letter') { document.querySelectorAll('.final-tab')[0].classList.add('active'); document.getElementById('view-letter').classList.add('active'); }
-            else { document.querySelectorAll('.final-tab')[1].classList.add('active'); document.getElementById('view-list').classList.add('active'); }
+            document.querySelectorAll('.final-tab').forEach(t => t.classList.remove('active')); 
+            document.querySelectorAll('.view-content').forEach(c => c.classList.remove('active'));
+            
+            const downloadBtn = document.getElementById('download-btn');
+
+            if(tab === 'letter') { 
+                document.querySelectorAll('.final-tab')[0].classList.add('active'); 
+                document.getElementById('view-letter').classList.add('active'); 
+                downloadBtn.innerText = "Download Letter (.docx)";
+            } else { 
+                document.querySelectorAll('.final-tab')[1].classList.add('active'); 
+                document.getElementById('view-list').classList.add('active'); 
+                downloadBtn.innerText = "Download List (.docx)";
+            }
         }
       async function exportDoc() {
             const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
