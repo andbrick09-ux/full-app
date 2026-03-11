@@ -395,21 +395,62 @@
         function findPill(txt) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(txt)); }
         function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; window.scrollTo(0,0); }
 
-        function generateFinal() {
+       function generateFinal() {
             const letter = document.getElementById('view-letter'); const list = document.getElementById('view-list');
             const scribble = document.getElementById('scenario-text').value;
             let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
             
+            // Helper to format items that have custom intensity or refinement choices attached
+            const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
+
             let h = `<div class="letter-container"><div class="letter-header">To My Sir,</div>`;
-            h += `<div class="letter-body">I stand before you as your <strong>${state.role.join('/') || 'Submissive'}</strong>, craving a session with a <strong>${state.vibe[0] || 'classic'}</strong> vibe.</div>`;
-            if(finalAttire.length) h += `<div class="letter-body">I shall be prepared in ${finalAttire.join(', ')}.</div>`;
-            if(state.impact.length) h += `<div class="letter-body">I welcome your hand using ${state.impact.map(i => `${i} (${impactDetails[i]})`).join(', ')}.</div>`;
-            if(state.service.length) h += `<div class="letter-body">Service: ${state.service.map(s => refineDetails[s] ? `${s} (${refineDetails[s]})` : s).join(', ')}.</div>`;
-            if(state.deposit.length) h += `<div class="letter-body">I await your release in my ${state.deposit.join('/')}.</div>`;
+            
+            // I. The Intent
+            h += `<div class="letter-body">I stand before you as your <strong>${state.role.join('/') || 'Submissive'}</strong>, craving a session with a <strong>${state.vibe.join(', ') || 'classic'}</strong> vibe. `;
+            let intentArr = [];
+            if(state.handling.length) intentArr.push(`handle me <strong>${state.handling.join(', ')}</strong>`);
+            if(state.verbal.length) intentArr.push(`use <strong>${state.verbal.join(', ')}</strong>`);
+            if(state.subspace.length) intentArr.push(`push me into a <strong>${state.subspace.join(', ')}</strong> subspace`);
+            if(intentArr.length) h += `I need you to ${intentArr.join(', and ')}.`;
+            h += `</div>`;
+
+            // II. The Canvas
+            if(finalAttire.length || state.zones.length || state.sensory.length) {
+                h += `<div class="letter-body">`;
+                if(finalAttire.length) h += `I shall be prepared in <strong>${finalAttire.join(', ')}</strong>. `;
+                if(state.zones.length) h += `Please focus your attention on my <strong>${state.zones.join(', ')}</strong>`;
+                if(state.sensory.length) h += `${state.zones.length ? ', exploring' : 'Explore'} my senses with <strong>${state.sensory.join(', ')}</strong>.`;
+                else if(state.zones.length) h += `.`;
+                h += `</div>`;
+            }
+
+            // III. The Scene
+            if(state.bondage.length || state.toys.length || state.impact.length || state.edge.length) {
+                h += `<div class="letter-body">`;
+                let sceneArr = [];
+                if(state.bondage.length) sceneArr.push(`bind and restrict me using <strong>${state.bondage.join(', ')}</strong>`);
+                if(state.toys.length) sceneArr.push(`use the <strong>${state.toys.join(', ')}</strong> on me`);
+                if(state.impact.length) sceneArr.push(`bring your heavy hand using <strong>${formatItems(state.impact, impactDetails)}</strong>`);
+                if(sceneArr.length) h += `I want you to ${sceneArr.join(', and ')}. `;
+                if(state.edge.length) h += `Push me to my limits with <strong>${state.edge.join(', ')}</strong>.`;
+                h += `</div>`;
+            }
+
+            // IV. The Seal
+            if(state.service.length || state.deposit.length || state.cleanup.length) {
+                h += `<div class="letter-body">`;
+                if(state.service.length) h += `For your pleasure, I will provide <strong>${formatItems(state.service, refineDetails)}</strong>. `;
+                if(state.deposit.length) h += `I eagerly await your release in/on my <strong>${state.deposit.join('/')}</strong>`;
+                if(state.cleanup.length) h += `${state.deposit.length ? ', followed by ' : 'I will perform '}<strong>${state.cleanup.join(', ')}</strong> to seal our time together.`;
+                else if (state.deposit.length) h += `.`;
+                h += `</div>`;
+            }
+
             if(scribble) h += `<div class="letter-body" style="border-top:1px solid rgba(212,175,55,0.2); padding-top:15px; font-style:italic;">"${scribble}"</div>`;
             h += `<div class="signature" style="text-align:right; margin-top:20px;">- Becca</div></div>`;
             letter.innerHTML = h;
 
+            // List building logic remains the same below
             let lHTML = '';
             const masterMap = { 
                 "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
@@ -442,18 +483,12 @@
       async function exportDoc() {
             const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
             const children = [];
-            
-            // Check which tab is currently visible
             const isListTabActive = document.getElementById('view-list').classList.contains('active');
+            const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
             
             if (isListTabActive) {
                 // --- BUILD THE LIST EXPORT ---
-                children.push(new Paragraph({ 
-                    text: "Sirender Protocol - The List", 
-                    heading: HeadingLevel.HEADING_1, 
-                    spacing: { after: 200 } 
-                }));
-                
+                children.push(new Paragraph({ text: "Sirender Protocol - The List", heading: HeadingLevel.HEADING_1, spacing: { after: 200 } }));
                 const masterMap = { 
                     "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
                     "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
@@ -464,105 +499,90 @@
                 for(const [tab, cards] of Object.entries(masterMap)) {
                     let tabHasData = false;
                     const sectionChildren = [];
-                    
-                    // Main Category Heading
-                    sectionChildren.push(new Paragraph({ 
-                        text: tab, 
-                        heading: HeadingLevel.HEADING_2, 
-                        spacing: { before: 240, after: 120 } 
-                    }));
+                    sectionChildren.push(new Paragraph({ text: tab, heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
                     
                     for(const [card, key] of Object.entries(cards)) {
                         if(state[key] && state[key].length) {
                             tabHasData = true;
-                            
-                            // Sub-category Heading
-                            sectionChildren.push(new Paragraph({ 
-                                text: card, 
-                                heading: HeadingLevel.HEADING_3, 
-                                spacing: { before: 120, after: 60 } 
-                            }));
-                            
-                            // Get the items with their specific refinements/impacts
+                            sectionChildren.push(new Paragraph({ text: card, heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
                             const items = state[key].map(i => {
                                 let label = i === "Other-" ? customAttireValue : i;
                                 return impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label);
                             });
-                            
-                            // Add items as a comma-separated list
-                            sectionChildren.push(new Paragraph({ 
-                                text: items.join(' • '),
-                                spacing: { after: 120 }
-                            }));
+                            sectionChildren.push(new Paragraph({ text: items.join(' • '), spacing: { after: 120 } }));
                         }
                     }
-                    
-                    if(tabHasData) {
-                        children.push(...sectionChildren);
-                    }
+                    if(tabHasData) children.push(...sectionChildren);
                 }
-                
             } else {
                 // --- BUILD THE LETTER EXPORT ---
                 const scribble = document.getElementById('scenario-text').value;
                 let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
-                
                 children.push(new Paragraph({ text: "To My Sir,", heading: HeadingLevel.HEADING_2, spacing: { after: 200 } }));
                 
-                children.push(new Paragraph({
-                    children: [
-                        new TextRun("I stand before you as your "),
-                        new TextRun({ text: state.role.join('/') || 'Submissive', bold: true }),
-                        new TextRun(", craving a session with a "),
-                        new TextRun({ text: state.vibe[0] || 'classic', bold: true }),
-                        new TextRun(" vibe.")
-                    ],
-                    spacing: { after: 120 }
-                }));
+                // Helper to parse bold HTML tags into DOCX TextRuns automatically
+                const parseRuns = (htmlString) => {
+                    return htmlString.split(/(<strong>.*?<\/strong>)/g).map(part => {
+                        if (part.startsWith('<strong>') && part.endsWith('</strong>')) {
+                            return new TextRun({ text: part.replace(/<\/?strong>/g, ''), bold: true });
+                        }
+                        return new TextRun({ text: part });
+                    }).filter(run => run.text !== "");
+                };
 
-                if (finalAttire.length) {
-                    children.push(new Paragraph({ text: `I shall be prepared in ${finalAttire.join(', ')}.`, spacing: { after: 120 } }));
-                }
-                
-                if (state.impact.length) {
-                    const impactText = state.impact.map(i => `${i} (${impactDetails[i]})`).join(', ');
-                    children.push(new Paragraph({ text: `I welcome your hand using ${impactText}.`, spacing: { after: 120 } }));
+                // I. Intent
+                let intentStr = `I stand before you as your <strong>${state.role.join('/') || 'Submissive'}</strong>, craving a session with a <strong>${state.vibe.join(', ') || 'classic'}</strong> vibe. `;
+                let intentArr = [];
+                if(state.handling.length) intentArr.push(`handle me <strong>${state.handling.join(', ')}</strong>`);
+                if(state.verbal.length) intentArr.push(`use <strong>${state.verbal.join(', ')}</strong>`);
+                if(state.subspace.length) intentArr.push(`push me into a <strong>${state.subspace.join(', ')}</strong> subspace`);
+                if(intentArr.length) intentStr += `I need you to ${intentArr.join(', and ')}.`;
+                children.push(new Paragraph({ children: parseRuns(intentStr), spacing: { after: 120 } }));
+
+                // II. Canvas
+                if(finalAttire.length || state.zones.length || state.sensory.length) {
+                    let canvasStr = "";
+                    if(finalAttire.length) canvasStr += `I shall be prepared in <strong>${finalAttire.join(', ')}</strong>. `;
+                    if(state.zones.length) canvasStr += `Please focus your attention on my <strong>${state.zones.join(', ')}</strong>`;
+                    if(state.sensory.length) canvasStr += `${state.zones.length ? ', exploring' : 'Explore'} my senses with <strong>${state.sensory.join(', ')}</strong>.`;
+                    else if(state.zones.length) canvasStr += `.`;
+                    children.push(new Paragraph({ children: parseRuns(canvasStr), spacing: { after: 120 } }));
                 }
 
-                if (state.service.length) {
-                    const serviceText = state.service.map(s => refineDetails[s] ? `${s} (${refineDetails[s]})` : s).join(', ');
-                    children.push(new Paragraph({ text: `Service: ${serviceText}.`, spacing: { after: 120 } }));
+                // III. Scene
+                if(state.bondage.length || state.toys.length || state.impact.length || state.edge.length) {
+                    let sceneStr = "";
+                    let sceneArr = [];
+                    if(state.bondage.length) sceneArr.push(`bind and restrict me using <strong>${state.bondage.join(', ')}</strong>`);
+                    if(state.toys.length) sceneArr.push(`use the <strong>${state.toys.join(', ')}</strong> on me`);
+                    if(state.impact.length) sceneArr.push(`bring your heavy hand using <strong>${formatItems(state.impact, impactDetails)}</strong>`);
+                    if(sceneArr.length) sceneStr += `I want you to ${sceneArr.join(', and ')}. `;
+                    if(state.edge.length) sceneStr += `Push me to my limits with <strong>${state.edge.join(', ')}</strong>.`;
+                    children.push(new Paragraph({ children: parseRuns(sceneStr), spacing: { after: 120 } }));
                 }
 
-                if (state.deposit.length) {
-                    children.push(new Paragraph({ text: `I await your release in my ${state.deposit.join('/')}.`, spacing: { after: 120 } }));
+                // IV. Seal
+                if(state.service.length || state.deposit.length || state.cleanup.length) {
+                    let sealStr = "";
+                    if(state.service.length) sealStr += `For your pleasure, I will provide <strong>${formatItems(state.service, refineDetails)}</strong>. `;
+                    if(state.deposit.length) sealStr += `I eagerly await your release in/on my <strong>${state.deposit.join('/')}</strong>`;
+                    if(state.cleanup.length) sealStr += `${state.deposit.length ? ', followed by ' : 'I will perform '}<strong>${state.cleanup.join(', ')}</strong> to seal our time together.`;
+                    else if (state.deposit.length) sealStr += `.`;
+                    children.push(new Paragraph({ children: parseRuns(sealStr), spacing: { after: 120 } }));
                 }
 
                 if (scribble) {
-                    children.push(new Paragraph({ 
-                        children: [new TextRun({ text: `"${scribble}"`, italics: true })],
-                        spacing: { before: 200, after: 200 } 
-                    }));
+                    children.push(new Paragraph({ children: [new TextRun({ text: `"${scribble}"`, italics: true })], spacing: { before: 200, after: 200 } }));
                 }
                 
                 children.push(new Paragraph({ text: "- Becca", alignment: "right" }));
             }
 
-            // Generate the Document
             const doc = new Document({ sections: [{ children: children }] });
-
-            // Generate a clean date and time string for the filename
             const now = new Date();
-            const timestamp = now.getFullYear() + '-' + 
-                              String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                              String(now.getDate()).padStart(2, '0') + '_' + 
-                              String(now.getHours()).padStart(2, '0') + '-' + 
-                              String(now.getMinutes()).padStart(2, '0');
-                              
+            const timestamp = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + '_' + String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
             const prefix = isListTabActive ? "Scene List" : "Scene Letter";
-            const fileName = `${prefix} ${timestamp}.docx`;
-
-            Packer.toBlob(doc).then(blob => saveAs(blob, fileName));
+            Packer.toBlob(doc).then(blob => saveAs(blob, `${prefix} ${timestamp}.docx`));
         }
 }
     </script>
