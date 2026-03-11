@@ -38,6 +38,18 @@
             backdrop-filter: blur(25px); text-align: center; 
         }
 
+        .app-title { 
+            font-family: 'Great Vibes', cursive; 
+            font-size: 34px; 
+            text-align: center; 
+            background: var(--luxury-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin: 0 0 15px 0; 
+            padding-bottom: 5px; 
+            letter-spacing: 1px; 
+        }
+        
         .stats { display: flex; justify-content: center; gap: 30px; margin-bottom: 10px; flex-wrap: wrap; }
         .stat-item { text-align: center; }
         .stat-val { display: block; font-size: 1.3rem; font-weight: bold; color: #fff; }
@@ -112,6 +124,7 @@
 <body>
 
 <section class="dashboard">
+    <h1 class="app-title">Becca's Sirrender</h1>
     <div class="stats">
         <div class="stat-item"><span class="stat-val" id="stat-ok">0</span><span class="stat-lbl">OK</span></div>
         <div class="stat-item"><span class="stat-val" id="stat-maybe">0</span><span class="stat-lbl">MAYBE</span></div>
