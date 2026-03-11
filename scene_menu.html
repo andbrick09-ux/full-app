@@ -439,81 +439,131 @@
             if(tab === 'letter') { document.querySelectorAll('.final-tab')[0].classList.add('active'); document.getElementById('view-letter').classList.add('active'); }
             else { document.querySelectorAll('.final-tab')[1].classList.add('active'); document.getElementById('view-list').classList.add('active'); }
         }
-       async function exportDoc() {
-    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
-    
-    const scribble = document.getElementById('scenario-text').value;
-    let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
-    
-    const children = [];
-    
-    // Header
-    children.push(new Paragraph({ 
-        text: "To My Sir,", 
-        heading: HeadingLevel.HEADING_2, 
-        spacing: { after: 200 } 
-    }));
-    
-    // Opening statement with bolded selections
-    children.push(new Paragraph({
-        children: [
-            new TextRun("I stand before you as your "),
-            new TextRun({ text: state.role.join('/') || 'Submissive', bold: true }),
-            new TextRun(", craving a session with a "),
-            new TextRun({ text: state.vibe[0] || 'classic', bold: true }),
-            new TextRun(" vibe.")
-        ],
-        spacing: { after: 120 }
-    }));
+      async function exportDoc() {
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+            const children = [];
+            
+            // Check which tab is currently visible
+            const isListTabActive = document.getElementById('view-list').classList.contains('active');
+            
+            if (isListTabActive) {
+                // --- BUILD THE LIST EXPORT ---
+                children.push(new Paragraph({ 
+                    text: "Sirender Protocol - The List", 
+                    heading: HeadingLevel.HEADING_1, 
+                    spacing: { after: 200 } 
+                }));
+                
+                const masterMap = { 
+                    "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
+                    "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
+                    "III. THE SCENE": { "Bondage": "bondage", "The Toy Box": "toys", "The Heavy Hand": "impact", "Edge & Climax": "edge" },
+                    "IV. THE SEAL": { "Service to Sir": "service", "Sir's Release": "deposit", "Final Service": "cleanup" }
+                };
 
-    // Attire
-    if (finalAttire.length) {
-        children.push(new Paragraph({ text: `I shall be prepared in ${finalAttire.join(', ')}.`, spacing: { after: 120 } }));
-    }
-    
-    // Impact
-    if (state.impact.length) {
-        const impactText = state.impact.map(i => `${i} (${impactDetails[i]})`).join(', ');
-        children.push(new Paragraph({ text: `I welcome your hand using ${impactText}.`, spacing: { after: 120 } }));
-    }
+                for(const [tab, cards] of Object.entries(masterMap)) {
+                    let tabHasData = false;
+                    const sectionChildren = [];
+                    
+                    // Main Category Heading
+                    sectionChildren.push(new Paragraph({ 
+                        text: tab, 
+                        heading: HeadingLevel.HEADING_2, 
+                        spacing: { before: 240, after: 120 } 
+                    }));
+                    
+                    for(const [card, key] of Object.entries(cards)) {
+                        if(state[key] && state[key].length) {
+                            tabHasData = true;
+                            
+                            // Sub-category Heading
+                            sectionChildren.push(new Paragraph({ 
+                                text: card, 
+                                heading: HeadingLevel.HEADING_3, 
+                                spacing: { before: 120, after: 60 } 
+                            }));
+                            
+                            // Get the items with their specific refinements/impacts
+                            const items = state[key].map(i => {
+                                let label = i === "Other-" ? customAttireValue : i;
+                                return impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label);
+                            });
+                            
+                            // Add items as a comma-separated list
+                            sectionChildren.push(new Paragraph({ 
+                                text: items.join(' • '),
+                                spacing: { after: 120 }
+                            }));
+                        }
+                    }
+                    
+                    if(tabHasData) {
+                        children.push(...sectionChildren);
+                    }
+                }
+                
+            } else {
+                // --- BUILD THE LETTER EXPORT ---
+                const scribble = document.getElementById('scenario-text').value;
+                let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
+                
+                children.push(new Paragraph({ text: "To My Sir,", heading: HeadingLevel.HEADING_2, spacing: { after: 200 } }));
+                
+                children.push(new Paragraph({
+                    children: [
+                        new TextRun("I stand before you as your "),
+                        new TextRun({ text: state.role.join('/') || 'Submissive', bold: true }),
+                        new TextRun(", craving a session with a "),
+                        new TextRun({ text: state.vibe[0] || 'classic', bold: true }),
+                        new TextRun(" vibe.")
+                    ],
+                    spacing: { after: 120 }
+                }));
 
-    // Service
-    if (state.service.length) {
-        const serviceText = state.service.map(s => refineDetails[s] ? `${s} (${refineDetails[s]})` : s).join(', ');
-        children.push(new Paragraph({ text: `Service: ${serviceText}.`, spacing: { after: 120 } }));
-    }
+                if (finalAttire.length) {
+                    children.push(new Paragraph({ text: `I shall be prepared in ${finalAttire.join(', ')}.`, spacing: { after: 120 } }));
+                }
+                
+                if (state.impact.length) {
+                    const impactText = state.impact.map(i => `${i} (${impactDetails[i]})`).join(', ');
+                    children.push(new Paragraph({ text: `I welcome your hand using ${impactText}.`, spacing: { after: 120 } }));
+                }
 
-    // Deposit
-    if (state.deposit.length) {
-        children.push(new Paragraph({ text: `I await your release in my ${state.deposit.join('/')}.`, spacing: { after: 120 } }));
-    }
+                if (state.service.length) {
+                    const serviceText = state.service.map(s => refineDetails[s] ? `${s} (${refineDetails[s]})` : s).join(', ');
+                    children.push(new Paragraph({ text: `Service: ${serviceText}.`, spacing: { after: 120 } }));
+                }
 
-    // Scribbles (Notes)
-    if (scribble) {
-        children.push(new Paragraph({ 
-            children: [new TextRun({ text: `"${scribble}"`, italics: true })],
-            spacing: { before: 200, after: 200 } 
-        }));
-    }
-    
-    // Sign-off
-    children.push(new Paragraph({ text: "- Becca", alignment: "right" }));
+                if (state.deposit.length) {
+                    children.push(new Paragraph({ text: `I await your release in my ${state.deposit.join('/')}.`, spacing: { after: 120 } }));
+                }
 
-    // Generate and Save Document
-    const doc = new Document({
-        sections: [{ children: children }]
-    });
+                if (scribble) {
+                    children.push(new Paragraph({ 
+                        children: [new TextRun({ text: `"${scribble}"`, italics: true })],
+                        spacing: { before: 200, after: 200 } 
+                    }));
+                }
+                
+                children.push(new Paragraph({ text: "- Becca", alignment: "right" }));
+            }
 
-    const now = new Date();
-    const timestamp = now.getFullYear() + '-' + 
-                      String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                      String(now.getDate()).padStart(2, '0') + '_' + 
-                      String(now.getHours()).padStart(2, '0') + '-' + 
-                      String(now.getMinutes()).padStart(2, '0');
-                      
-    const fileName = `Scene Menu ${timestamp}.docx`;
+            // Generate the Document
+            const doc = new Document({ sections: [{ children: children }] });
 
-    Packer.toBlob(doc).then(blob => saveAs(blob, fileName));
+            // Generate a clean date and time string for the filename
+            const now = new Date();
+            const timestamp = now.getFullYear() + '-' + 
+                              String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(now.getDate()).padStart(2, '0') + '_' + 
+                              String(now.getHours()).padStart(2, '0') + '-' + 
+                              String(now.getMinutes()).padStart(2, '0');
+                              
+            const prefix = isListTabActive ? "Scene List" : "Scene Letter";
+            const fileName = `${prefix} ${timestamp}.docx`;
+
+            Packer.toBlob(doc).then(blob => saveAs(blob, fileName));
+        }
 }
     </script>
 </body>
