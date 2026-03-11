@@ -439,7 +439,82 @@
             if(tab === 'letter') { document.querySelectorAll('.final-tab')[0].classList.add('active'); document.getElementById('view-letter').classList.add('active'); }
             else { document.querySelectorAll('.final-tab')[1].classList.add('active'); document.getElementById('view-list').classList.add('active'); }
         }
-        async function exportDoc() { const { Document, Packer, Paragraph } = docx; const doc = new Document({ sections: [{ children: [new Paragraph({ text: "Sirender Protocol", bold: true })] }] }); Packer.toBlob(doc).then(blob => saveAs(blob, "Sirender_Protocol.docx")); }
+       async function exportDoc() {
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+    
+    const scribble = document.getElementById('scenario-text').value;
+    let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
+    
+    const children = [];
+    
+    // Header
+    children.push(new Paragraph({ 
+        text: "To My Sir,", 
+        heading: HeadingLevel.HEADING_2, 
+        spacing: { after: 200 } 
+    }));
+    
+    // Opening statement with bolded selections
+    children.push(new Paragraph({
+        children: [
+            new TextRun("I stand before you as your "),
+            new TextRun({ text: state.role.join('/') || 'Submissive', bold: true }),
+            new TextRun(", craving a session with a "),
+            new TextRun({ text: state.vibe[0] || 'classic', bold: true }),
+            new TextRun(" vibe.")
+        ],
+        spacing: { after: 120 }
+    }));
+
+    // Attire
+    if (finalAttire.length) {
+        children.push(new Paragraph({ text: `I shall be prepared in ${finalAttire.join(', ')}.`, spacing: { after: 120 } }));
+    }
+    
+    // Impact
+    if (state.impact.length) {
+        const impactText = state.impact.map(i => `${i} (${impactDetails[i]})`).join(', ');
+        children.push(new Paragraph({ text: `I welcome your hand using ${impactText}.`, spacing: { after: 120 } }));
+    }
+
+    // Service
+    if (state.service.length) {
+        const serviceText = state.service.map(s => refineDetails[s] ? `${s} (${refineDetails[s]})` : s).join(', ');
+        children.push(new Paragraph({ text: `Service: ${serviceText}.`, spacing: { after: 120 } }));
+    }
+
+    // Deposit
+    if (state.deposit.length) {
+        children.push(new Paragraph({ text: `I await your release in my ${state.deposit.join('/')}.`, spacing: { after: 120 } }));
+    }
+
+    // Scribbles (Notes)
+    if (scribble) {
+        children.push(new Paragraph({ 
+            children: [new TextRun({ text: `"${scribble}"`, italics: true })],
+            spacing: { before: 200, after: 200 } 
+        }));
+    }
+    
+    // Sign-off
+    children.push(new Paragraph({ text: "- Becca", alignment: "right" }));
+
+    // Generate and Save Document
+    const doc = new Document({
+        sections: [{ children: children }]
+    });
+
+    const now = new Date();
+    const timestamp = now.getFullYear() + '-' + 
+                      String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                      String(now.getDate()).padStart(2, '0') + '_' + 
+                      String(now.getHours()).padStart(2, '0') + '-' + 
+                      String(now.getMinutes()).padStart(2, '0');
+                      
+    const fileName = `Scene Menu ${timestamp}.docx`;
+
+    Packer.toBlob(doc).then(blob => saveAs(blob, fileName));
+}
     </script>
 </body>
 </html>
