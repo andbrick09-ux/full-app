@@ -36,12 +36,15 @@
         .app-title { font-family: 'Great Vibes', cursive; font-size: 34px; text-align: center; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding-bottom: 5px; letter-spacing: 1px; }
 
         /* --- SPLASH SCREEN --- */
-        #splash-screen { 
+       #splash-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020814; z-index: 10000; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            display: flex; flex-direction: column; align-items: center; /* Removed justify-content: center */
             padding: 40px 25px; overflow-y: auto; transition: opacity 0.8s ease;
         }
-        .splash-content { max-width: 500px; text-align: left; padding-bottom: 40px; }
+        .splash-content { 
+            max-width: 500px; text-align: left; padding-bottom: 40px; 
+            margin: auto; /* This handles the vertical centering safely */
+        }
         .splash-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
         .splash-text { font-size: 14px; line-height: 1.8; color: #d0d0d0; margin-bottom: 25px; }
         .splash-highlight { color: var(--gold); font-weight: bold; }
