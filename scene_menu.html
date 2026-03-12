@@ -41,6 +41,13 @@
             display: flex; flex-direction: column; align-items: center; /* Removed justify-content: center */
             padding: 40px 25px; overflow-y: auto; transition: opacity 0.8s ease;
         }
+                /* --- REFLECTIONS SCREEN --- */
+        #reflections-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020814; z-index: 9500; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 40px 25px; overflow-y: auto; transition: opacity 0.8s ease;
+        }
+
         .splash-content { 
             max-width: 500px; text-align: left; padding-bottom: 40px; 
             margin: auto; /* This handles the vertical centering safely */
@@ -189,6 +196,27 @@
             <button class="enter-btn" onclick="enterApp()">Build Sir a Map</button>
         </div>
     </div>
+       <div id="reflections-screen">
+        <div class="splash-content">
+            <div class="splash-title">Pre-Scene Reflections</div>
+            <p class="splash-text">Before you build the physical map, tell me where your head is at.</p>
+            
+            <label class="sub-group-label" style="margin-top:0;">What are you craving?</label>
+            <textarea id="q-craving" rows="3" placeholder="Tell Sir what you need..."></textarea>
+            
+            <label class="sub-group-label">What are you nervous about?</label>
+            <textarea id="q-nervous" rows="3" placeholder="Confess your fears..."></textarea>
+            
+            <label class="sub-group-label">What makes this scene a 10 out of 10?</label>
+            <textarea id="q-perfect" rows="3" placeholder="Define perfection..."></textarea>
+            
+            <label class="sub-group-label">Where do you want to stretch (push yourself)?</label>
+            <textarea id="q-stretch" rows="3" placeholder="Where can Sir take you?"></textarea>
+            
+            <button class="enter-btn" style="margin-top: 30px;" onclick="startMap()">Proceed to Map</button>
+        </div>
+    </div>
+
 
     <header class="app-header">
         <h1 class="app-title">Becca's Sirender</h1>
@@ -336,6 +364,9 @@
         Object.keys(sections).forEach(k => { const grid = document.getElementById(`${k}-grid`); if (grid) sections[k].forEach(val => grid.appendChild(createPill(k, val))); });
         
         function enterApp() { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; }, 800); }
+
+function startMap() { document.getElementById('reflections-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('reflections-screen').style.display = 'none'; }, 800); }
+
         function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); if(n.dataset.tab === id) n.classList.add('active'); }); const idx = ['intent', 'canvas', 'ritual', 'seal'].indexOf(id); document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%'; window.scrollTo(0,0); }
         function openSensoryLegend() { document.getElementById('sensory-modal').style.display = 'flex'; }
         function closeSensoryLegend() { document.getElementById('sensory-modal').style.display = 'none'; }
