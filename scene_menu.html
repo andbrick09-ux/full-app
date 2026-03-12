@@ -420,17 +420,33 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
         function findPill(txt) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(txt)); }
         function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; window.scrollTo(0,0); }
 
-       function generateFinal() {
-            const letter = document.getElementById('view-letter'); const list = document.getElementById('view-list');
+               function generateFinal() {
+            const letter = document.getElementById('view-letter'); 
+            const list = document.getElementById('view-list');
             const scribble = document.getElementById('scenario-text').value;
             let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
             
-            // Helper to format items that have custom intensity or refinement choices attached
+            // 1. Grab the answers from the Reflections Screen
+            const qCraving = document.getElementById('q-craving').value.trim();
+            const qNervous = document.getElementById('q-nervous').value.trim();
+            const qPerfect = document.getElementById('q-perfect').value.trim();
+            const qStretch = document.getElementById('q-stretch').value.trim();
+
             const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
 
+            // --- BUILD LETTER HTML ---
             let h = `<div class="letter-container"><div class="letter-header">To My Sir,</div>`;
             
-            // I. The Intent
+            // Inject Reflections into Letter
+            if (qCraving || qNervous || qPerfect || qStretch) {
+                h += `<div class="letter-body" style="background: rgba(212,175,55,0.05); padding: 15px; border-left: 2px solid var(--gold); border-radius: 4px; margin-bottom: 20px;">`;
+                if (qCraving) h += `<strong style="color:var(--gold);">I am craving:</strong> ${qCraving}<br><br>`;
+                if (qNervous) h += `<strong style="color:var(--gold);">I am nervous about:</strong> ${qNervous}<br><br>`;
+                if (qPerfect) h += `<strong style="color:var(--gold);">A 10/10 scene looks like:</strong> ${qPerfect}<br><br>`;
+                if (qStretch) h += `<strong style="color:var(--gold);">I want to stretch myself by:</strong> ${qStretch}`;
+                h += `</div>`;
+            }
+
             h += `<div class="letter-body">I stand before you as your <strong>${state.role.join('/') || 'Submissive'}</strong>, craving a session with a <strong>${state.vibe.join(', ') || 'classic'}</strong> vibe. `;
             let intentArr = [];
             if(state.handling.length) intentArr.push(`handle me <strong>${state.handling.join(', ')}</strong>`);
@@ -439,7 +455,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             if(intentArr.length) h += `I need you to ${intentArr.join(', and ')}.`;
             h += `</div>`;
 
-            // II. The Canvas
             if(finalAttire.length || state.zones.length || state.sensory.length) {
                 h += `<div class="letter-body">`;
                 if(finalAttire.length) h += `I shall be prepared in <strong>${finalAttire.join(', ')}</strong>. `;
@@ -449,7 +464,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 h += `</div>`;
             }
 
-            // III. The Scene
             if(state.bondage.length || state.toys.length || state.impact.length || state.edge.length) {
                 h += `<div class="letter-body">`;
                 let sceneArr = [];
@@ -461,7 +475,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 h += `</div>`;
             }
 
-            // IV. The Seal
             if(state.service.length || state.deposit.length || state.cleanup.length) {
                 h += `<div class="letter-body">`;
                 if(state.service.length) h += `For your pleasure, I will provide <strong>${formatItems(state.service, refineDetails)}</strong>. `;
@@ -475,14 +488,27 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             h += `<div class="signature" style="text-align:right; margin-top:20px;">- Becca</div></div>`;
             letter.innerHTML = h;
 
-            // List building logic remains the same below
+            // --- BUILD LIST HTML ---
             let lHTML = '';
+            
+            // Inject Reflections into List
+            if (qCraving || qNervous || qPerfect || qStretch) {
+                lHTML += `<div class="list-group"><div class="list-tab-header">PRE-SCENE REFLECTIONS</div>`;
+                const textStyle = "color:#ddd; font-size:12px; margin-bottom:15px; line-height:1.5; font-family:'Montserrat', sans-serif;";
+                if (qCraving) lHTML += `<div class="list-card-header">What are you craving?</div><div style="${textStyle}">${qCraving}</div>`;
+                if (qNervous) lHTML += `<div class="list-card-header">What are you nervous about?</div><div style="${textStyle}">${qNervous}</div>`;
+                if (qPerfect) lHTML += `<div class="list-card-header">What makes this a 10/10?</div><div style="${textStyle}">${qPerfect}</div>`;
+                if (qStretch) lHTML += `<div class="list-card-header">Where do you want to stretch?</div><div style="${textStyle}">${qStretch}</div>`;
+                lHTML += `</div>`;
+            }
+
             const masterMap = { 
                 "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
                 "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
                 "III. THE SCENE": { "Bondage": "bondage", "The Toy Box": "toys", "The Heavy Hand": "impact", "Edge & Climax": "edge" },
                 "IV. THE SEAL": { "Service to Sir": "service", "Sir's Release": "deposit", "Final Service": "cleanup" }
             };
+            
             for(const [tab, cards] of Object.entries(masterMap)) {
                 let tabHasData = false; let tabHTML = `<div class="list-tab-header">${tab}</div>`;
                 for(const [card, key] of Object.entries(cards)) {
@@ -509,22 +535,51 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             if(tab === 'letter') { 
                 document.querySelectorAll('.final-tab')[0].classList.add('active'); 
                 document.getElementById('view-letter').classList.add('active'); 
-                downloadBtn.innerText = "Download Letter (.docx)";
+                if (downloadBtn) downloadBtn.innerText = "Download Letter (.docx)";
             } else { 
                 document.querySelectorAll('.final-tab')[1].classList.add('active'); 
                 document.getElementById('view-list').classList.add('active'); 
-                downloadBtn.innerText = "Download List (.docx)";
+                if (downloadBtn) downloadBtn.innerText = "Download List (.docx)";
             }
         }
-      async function exportDoc() {
+
+        async function exportDoc() {
             const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
             const children = [];
             const isListTabActive = document.getElementById('view-list').classList.contains('active');
             const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
             
+            // 2. Grab the answers for the DOCX Export
+            const qCraving = document.getElementById('q-craving').value.trim();
+            const qNervous = document.getElementById('q-nervous').value.trim();
+            const qPerfect = document.getElementById('q-perfect').value.trim();
+            const qStretch = document.getElementById('q-stretch').value.trim();
+            
             if (isListTabActive) {
                 // --- BUILD THE LIST EXPORT ---
                 children.push(new Paragraph({ text: "Sirender Protocol - The List", heading: HeadingLevel.HEADING_1, spacing: { after: 200 } }));
+                
+                // Inject Reflections into DOCX List
+                if (qCraving || qNervous || qPerfect || qStretch) {
+                    children.push(new Paragraph({ text: "PRE-SCENE REFLECTIONS", heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
+                    if (qCraving) {
+                        children.push(new Paragraph({ text: "What are you craving?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                        children.push(new Paragraph({ text: qCraving, spacing: { after: 120 } }));
+                    }
+                    if (qNervous) {
+                        children.push(new Paragraph({ text: "What are you nervous about?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                        children.push(new Paragraph({ text: qNervous, spacing: { after: 120 } }));
+                    }
+                    if (qPerfect) {
+                        children.push(new Paragraph({ text: "What makes this a 10/10?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                        children.push(new Paragraph({ text: qPerfect, spacing: { after: 120 } }));
+                    }
+                    if (qStretch) {
+                        children.push(new Paragraph({ text: "Where do you want to stretch?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                        children.push(new Paragraph({ text: qStretch, spacing: { after: 120 } }));
+                    }
+                }
+
                 const masterMap = { 
                     "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
                     "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
@@ -556,7 +611,16 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
                 children.push(new Paragraph({ text: "To My Sir,", heading: HeadingLevel.HEADING_2, spacing: { after: 200 } }));
                 
-                // Helper to parse bold HTML tags into DOCX TextRuns automatically
+                // Inject Reflections into DOCX Letter
+                if (qCraving || qNervous || qPerfect || qStretch) {
+                    if (qCraving) children.push(new Paragraph({ children: [new TextRun({ text: "I am craving: ", bold: true }), new TextRun(qCraving)] }));
+                    if (qNervous) children.push(new Paragraph({ children: [new TextRun({ text: "I am nervous about: ", bold: true }), new TextRun(qNervous)] }));
+                    if (qPerfect) children.push(new Paragraph({ children: [new TextRun({ text: "A 10/10 scene looks like: ", bold: true }), new TextRun(qPerfect)] }));
+                    if (qStretch) children.push(new Paragraph({ children: [new TextRun({ text: "I want to stretch myself by: ", bold: true }), new TextRun(qStretch)] }));
+                    // Add a blank spacer paragraph after reflections
+                    children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
+                }
+
                 const parseRuns = (htmlString) => {
                     return htmlString.split(/(<strong>.*?<\/strong>)/g).map(part => {
                         if (part.startsWith('<strong>') && part.endsWith('</strong>')) {
@@ -566,7 +630,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                     }).filter(run => run.text !== "");
                 };
 
-                // I. Intent
                 let intentStr = `I stand before you as your <strong>${state.role.join('/') || 'Submissive'}</strong>, craving a session with a <strong>${state.vibe.join(', ') || 'classic'}</strong> vibe. `;
                 let intentArr = [];
                 if(state.handling.length) intentArr.push(`handle me <strong>${state.handling.join(', ')}</strong>`);
@@ -575,7 +638,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 if(intentArr.length) intentStr += `I need you to ${intentArr.join(', and ')}.`;
                 children.push(new Paragraph({ children: parseRuns(intentStr), spacing: { after: 120 } }));
 
-                // II. Canvas
                 if(finalAttire.length || state.zones.length || state.sensory.length) {
                     let canvasStr = "";
                     if(finalAttire.length) canvasStr += `I shall be prepared in <strong>${finalAttire.join(', ')}</strong>. `;
@@ -585,7 +647,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                     children.push(new Paragraph({ children: parseRuns(canvasStr), spacing: { after: 120 } }));
                 }
 
-                // III. Scene
                 if(state.bondage.length || state.toys.length || state.impact.length || state.edge.length) {
                     let sceneStr = "";
                     let sceneArr = [];
@@ -597,7 +658,6 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                     children.push(new Paragraph({ children: parseRuns(sceneStr), spacing: { after: 120 } }));
                 }
 
-                // IV. Seal
                 if(state.service.length || state.deposit.length || state.cleanup.length) {
                     let sealStr = "";
                     if(state.service.length) sealStr += `For your pleasure, I will provide <strong>${formatItems(state.service, refineDetails)}</strong>. `;
@@ -620,6 +680,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             const prefix = isListTabActive ? "Scene List" : "Scene Letter";
             Packer.toBlob(doc).then(blob => saveAs(blob, `${prefix} ${timestamp}.docx`));
         }
+
     </script>
 </body>
 </html>
