@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sir's Public Tasks | v56.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #01040a;
+            --surface: rgba(15, 23, 42, 0.97);
+            --champagne: #D4AF37;
+            --punish-red: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--midnight);
+            background-image: radial-gradient(circle at 50% 0%, #0f172a 0%, #01040a 100%);
+            color: #f1f5f9;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .serif { font-family: 'Cinzel', serif; }
+
+        @keyframes shuffle-blur {
+            0% { transform: translateY(0); filter: blur(2px); opacity: 0.6; }
+            50% { transform: translateY(-3px); filter: blur(4px); opacity: 1; }
+            100% { transform: translateY(0); filter: blur(2px); opacity: 0.6; }
+        }
+
+        .shuffling { animation: shuffle-blur 0.1s infinite; color: var(--champagne); }
+
+        .glass-card {
+            background: var(--surface);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 40px;
+            box-shadow: 0 35px 90px rgba(0,0,0,1);
+        }
+
+        .directive-display {
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .btn-corner {
+            position: absolute;
+            top: 1.5rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 14px;
+            background: rgba(212, 175, 55, 0.08);
+            z-index: 50;
+            transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-corner:active { transform: scale(0.85); background: var(--champagne); }
+        .btn-left { left: 1.25rem; }
+        .btn-right { right: 1.25rem; }
+
+        .btn-action {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        .btn-directive {
+            background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 100%);
+            color: #01040a;
+        }
+
+        .btn-discipline {
+            background: #0f172a;
+            color: var(--punish-red);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: #01040a;
+            z-index: 200;
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow-y: auto;
+            padding: 2.5rem 2rem;
+        }
+
+        .modal-overlay.open { transform: translateY(0); }
+
+        .protocol-item {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.75rem 0;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <button onclick="toggleDatabase(true)" class="btn-corner btn-left shadow-2xl">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+    </button>
+
+    <button onclick="toggleRules(true)" class="btn-corner btn-right shadow-2xl">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+    </button>
+
+    <header class="text-center pt-20 pb-6">
+        <h1 class="serif text-2xl font-bold tracking-[0.2em] text-white italic uppercase">Sir's Public Tasks</h1>
+    </header>
+
+    <main class="flex-grow flex flex-col justify-center items-center">
+        <div id="result-card" class="glass-card w-full max-w-md directive-display">
+            <div id="result-label" class="text-[11px] uppercase tracking-[0.5em] text-slate-600 mb-8 font-black">Current State: Compliance</div>
+            <h2 id="result-title" class="serif text-2xl text-white mb-6 px-4 italic font-bold">Ready for Sir?</h2>
+            <p id="result-desc" class="text-[18px] text-slate-400 italic px-8 leading-relaxed">The world sees a lady; Sir sees a girl on the edge. Stay composed and await your fate.</p>
+        </div>
+    </main>
+
+    <footer class="pb-12 space-y-6">
+        <button onclick="rollDirective('play')" class="btn-action btn-directive w-full py-8 rounded-3xl shadow-2xl">
+            Find Your Task
+        </button>
+
+        <button onclick="rollDirective('discipline')" class="btn-action btn-discipline w-full py-8 rounded-3xl">
+            Find Your Punishment
+        </button>
+    </footer>
+
+    <div id="database-overlay" class="modal-overlay">
+        <div class="flex justify-between items-center mb-6 sticky top-0 bg-[#01040a] py-4 z-10 border-b border-white/10">
+            <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Vault of Tasks</h2>
+            <button onclick="toggleDatabase(false)" class="text-slate-500 uppercase text-[10px] font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Close</button>
+        </div>
+        <div id="db-content" class="space-y-4 pb-20"></div>
+    </div>
+
+    <div id="rules-overlay" class="modal-overlay">
+        <div class="flex justify-between items-center mb-6 sticky top-0 bg-[#01040a] py-4 z-10 border-b border-white/10">
+            <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Sir's Public Rules</h2>
+            <button onclick="toggleRules(false)" class="text-slate-500 uppercase text-[10px] font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Return</button>
+        </div>
+        <div id="rules-content" class="space-y-1 pb-20"></div>
+    </div>
+
+    <script>
+        const rulesOfEngagement = [
+            { name: "No-panties Rule", desc: "Wear a skirt or dress with nothing underneath. Sir may verify discreetly whenever he wants." },
+            { name: "Chosen Undergarments", desc: "Wear the exact bra, panties (or none), or accessories Sir chooses before leaving." },
+            { name: "Positioning Rule", desc: "Walk slightly behind Sir or on his right side; never open doors; legs slightly apart." },
+            { name: "Permission Protocol", desc: "Ask Sir before restroom, eating/drinking, or crossing legs." },
+            { name: "Address Rule", desc: "Call him 'Sir' (quietly when appropriate)." },
+            { name: "Possessive Touch", desc: "When Sir touches your lower back, thigh, or neck, stay still and accept it." },
+            { name: "Posture & Presentation", desc: "Shoulders back, chin up, hands clasped when standing still." },
+            { name: "Gratitude Rule", desc: "Thank Sir for every decision, drink, or command he gives you." },
+            { name: "No Self-touch Rule", desc: "Do not adjust clothing, hair, or body without permission." },
+            { name: "Eye-contact Rule", desc: "Hold Sir’s gaze when he speaks; look down briefly when waiting for orders." }
+        ];
+
+        const fullDatabase = {
+            "Teasing & Composure": [
+                { name: "Arousal Report", desc: "Quietly report arousal level (0–5) and describe how wet and turned on you feel." },
+                { name: "Whisper Confession", desc: "Whisper to Sir one detailed, filthy thing you are fantasizing about him doing to you." },
+                { name: "Hold-the-pose", desc: "Maintain submissive posture with hands back and eyes down until Sir releases you." },
+                { name: "Now Command", desc: "Bite your lip in the way he likes or press your breasts together under your top for Sir." },
+                { name: "Breath-hold Tease", desc: "Hold breath for 15 counts while maintaining eye contact, then exhale and thank Sir." }
+            ],
+            "Intense Protocols": [
+                { name: "Thigh Press Edge", desc: "Edge via subtle rocking in 10-minute bursts; remain composed until Sir says stop." },
+                { name: "Server Squeeze", desc: "Every time a server approaches, press thighs together hard for 5 seconds." },
+                { name: "Subtle Grinding", desc: "Grind against the chair/hand for 45 seconds; keep every movement invisible." },
+                { name: "Pelvic Clenches", desc: "Perform 10 hard, silent internal clenches while staying perfectly still." },
+                { name: "Table Edge", desc: "Discreetly edge under the table for 3 minutes; report 'on edge, Sir' at the brink." },
+                { name: "Ice-melt Challenge", desc: "Hold an ice cube against your nipple or thigh until it fully melts unnoticed." }
+            ],
+            "Missions & Control": [
+                { name: "90% Threshold", desc: "Vibe locked at 90% power; remain totally still with zero reaction until released." },
+                { name: "Bathroom Video", desc: "Go to the stall, record yourself cumming, then send the video to Sir." },
+                { name: "Panty Removal", desc: "Remove underwear in restroom and hand them to Sir under the table." },
+                { name: "Stall Edge", desc: "Go to the restroom stall and edge yourself for 4 full minutes; return to the table denied." },
+                { name: "Public '5'", desc: "Orgasm as Sir ramps the vibe at the table; hands must stay visible on top. No sound." },
+                { name: "Full Release", desc: "Sir grants total release in the setting of his choosing once he is satisfied." }
+            ]
+        };
+
+        const directives = [...fullDatabase["Teasing & Composure"], ...fullDatabase["Intense Protocols"], ...fullDatabase["Missions & Control"]];
+        const discipline = [
+            { name: "Self-Pinch Nipples", desc: "Discreetly pinch or twist your own nipples under your clothing for the duration Sir sets." },
+            { name: "Self-Pinch Clit", desc: "Discreetly reach under skirt or use pressure to rub your clit for Sir's exact count." },
+            { name: "Low-Vibe Lock", desc: "Vibe locked on a low, frustrating 'tease' with zero relief until Sir decides." },
+            { name: "The Apology", desc: "Whisper a submissive, detailed apology to Sir under the table for your slip." }
+        ];
+
+        let taskHistory = [], punishHistory = [], isRolling = false;
+
+        function toggleRules(open) {
+            const overlay = document.getElementById('rules-overlay');
+            if (open) {
+                document.getElementById('rules-content').innerHTML = rulesOfEngagement.map(r => `
+                    <div class="protocol-item"><h4 class="serif text-lg text-white font-bold">${r.name}</h4><p class="text-xs text-slate-400 italic mt-0.5">${r.desc}</p></div>
+                `).join('');
+                overlay.classList.add('open');
+            } else overlay.classList.remove('open');
+        }
+
+        function toggleDatabase(open) {
+            const overlay = document.getElementById('database-overlay');
+            if (open) {
+                document.getElementById('db-content').innerHTML = Object.entries(fullDatabase).map(([cat, items]) => `
+                    <div><h3 class="serif text-[10px] tracking-[0.4em] text-slate-500 uppercase mb-2 border-b border-white/5 pb-1">${cat}</h3>
+                    ${items.map(i => `<div class="protocol-item"><h4 class="serif text-lg text-white font-bold">${i.name}</h4><p class="text-xs text-slate-400 italic mt-0.5">${i.desc}</p></div>`).join('')}</div>
+                `).join('');
+                overlay.classList.add('open');
+            } else overlay.classList.remove('open');
+        }
+
+        function rollDirective(type) {
+            if (isRolling) return; isRolling = true;
+            const pool = type === 'play' ? directives : discipline;
+            const history = type === 'play' ? taskHistory : punishHistory;
+            const label = document.getElementById('result-label'), title = document.getElementById('result-title'), desc = document.getElementById('result-desc');
+            label.innerText = type === 'play' ? "FINDING TASK..." : "FINDING PUNISHMENT...";
+            label.style.color = type === 'play' ? "#D4AF37" : "#ef4444";
+            
+            let count = 0;
+            const shuffle = setInterval(() => {
+                const temp = pool[Math.floor(Math.random() * pool.length)];
+                title.innerText = temp.name; title.className = "serif text-2xl shuffling"; desc.innerText = "...";
+                if (++count > 25) {
+                    clearInterval(shuffle);
+                    let final; do { final = pool[Math.floor(Math.random() * pool.length)]; } while (history.includes(final.name));
+                    history.push(final.name); if (history.length > 8) history.shift();
+                    title.innerText = final.name; title.className = "serif text-3xl text-white font-bold py-2 tracking-tight"; desc.innerText = final.desc;
+                    label.innerText = type === 'play' ? "Your task is:" : "Your punishment is:"; isRolling = false;
+                }
+            }, 75);
+        }
+    </script>
+</body>
+</html>
