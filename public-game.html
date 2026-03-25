@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sir's Public Tasks | v56.0</title>
+    <title>Sir's Public Tasks | v58.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -128,7 +128,7 @@
         </svg>
     </button>
 
-    <header class="text-center pt-20 pb-6">
+    <header class="text-center pt-24 pb-6">
         <h1 class="serif text-2xl font-bold tracking-[0.2em] text-white italic uppercase">Sir's Public Tasks</h1>
     </header>
 
@@ -168,7 +168,7 @@
 
     <script>
         const rulesOfEngagement = [
-            { name: "Sir’s Foundation Mandate", desc: "Wear only the specific bra, panties, lingerie, stockings, pantyhose, accessories, or lack thereof assigned by Sir before departure. You must remain prepared for his discreet verification of your compliance at any time." },
+            { name: "The Foundation Mandate", desc: "Wear only the specific bra, panties, lingerie, accessories, or lack thereof assigned by Sir before departure. Remain prepared for his discreet verification at any time." },
             { name: "Positioning Rule", desc: "Walk slightly behind Sir or on his right side; never open doors; legs slightly apart." },
             { name: "Permission Protocol", desc: "Ask Sir before restroom, eating/drinking, or crossing legs." },
             { name: "Address Rule", desc: "Call him 'Sir' (quietly when appropriate)." },
@@ -241,6 +241,7 @@
             const pool = type === 'play' ? directives : discipline;
             const history = type === 'play' ? taskHistory : punishHistory;
             const label = document.getElementById('result-label'), title = document.getElementById('result-title'), desc = document.getElementById('result-desc');
+            
             label.innerText = type === 'play' ? "FINDING TASK..." : "FINDING PUNISHMENT...";
             label.style.color = type === 'play' ? "#D4AF37" : "#ef4444";
             
@@ -248,12 +249,28 @@
             const shuffle = setInterval(() => {
                 const temp = pool[Math.floor(Math.random() * pool.length)];
                 title.innerText = temp.name; title.className = "serif text-2xl shuffling"; desc.innerText = "...";
+                
                 if (++count > 25) {
                     clearInterval(shuffle);
-                    let final; do { final = pool[Math.floor(Math.random() * pool.length)]; } while (history.includes(final.name));
-                    history.push(final.name); if (history.length > 8) history.shift();
-                    title.innerText = final.name; title.className = "serif text-3xl text-white font-bold py-2 tracking-tight"; desc.innerText = final.desc;
-                    label.innerText = type === 'play' ? "Your task is:" : "Your punishment is:"; isRolling = false;
+                    let final;
+                    
+                    // FIXED LOGIC: Ensure history doesn't lock the loop
+                    // If pool is small (like discipline), we only remember enough to allow one new option
+                    const maxHistory = Math.min(history.length, pool.length - 1);
+                    
+                    do { 
+                        final = pool[Math.floor(Math.random() * pool.length)]; 
+                    } while (history.includes(final.name) && pool.length > 1);
+
+                    history.push(final.name);
+                    // Dynamically shift history based on pool size
+                    if (history.length > 8 || history.length >= pool.length) history.shift();
+
+                    title.innerText = final.name; 
+                    title.className = "serif text-3xl text-white font-bold py-2 tracking-tight"; 
+                    desc.innerText = final.desc;
+                    label.innerText = type === 'play' ? "Your task is:" : "Your punishment is:"; 
+                    isRolling = false;
                 }
             }, 75);
         }
