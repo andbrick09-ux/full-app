@@ -5,29 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predicament Bondage Menu • Vault of Predicaments</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --midnight: #051024;
-            --paper-dark: #081226;
-            --deep-blue: #020814;
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.4);
-            --glass: rgba(5, 16, 36, 0.85);
-            --border: rgba(212, 175, 55, 0.35);
-            --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
-        }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body {
-            background-color: var(--midnight);
-            background-image: 
-                linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            color: #f0f0f0; 
-            font-family: 'Montserrat', sans-serif;
-            margin: 0; padding: 0; overflow-x: hidden;
+            overflow-x: hidden;
         }
 
         .dashboard { 
@@ -125,6 +110,9 @@
 
 <section class="dashboard">
     <h1 class="app-title">Becca's Sirrender</h1>
+    <div style="text-align: center; margin-bottom: 15px;">
+        <a href="index.html" style="color: var(--gold); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
+    </div>
     <div class="stats">
         <div class="stat-item"><span class="stat-val" id="stat-ok">0</span><span class="stat-lbl">OK</span></div>
         <div class="stat-item"><span class="stat-val" id="stat-maybe">0</span><span class="stat-lbl">MAYBE</span></div>
@@ -703,6 +691,14 @@
             });
         });
     };
+</script>
+</script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js');
+        });
+    }
 </script>
 </body>
 </html>

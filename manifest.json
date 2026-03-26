@@ -1,0 +1,16 @@
+{
+  "name": "Becca's Sirender",
+  "short_name": "Sirender",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#051024",
+  "theme_color": "#051024",
+  "description": "Progressive Web App for Becca's Sirender",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/action/favorite/materialicons/48dp/2x/baseline_favorite_black_48dp.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }
+  ]
+}

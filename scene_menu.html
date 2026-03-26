@@ -7,33 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --midnight: #051024;
-            --paper-dark: #081226;
-            --deep-blue: #020814;
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.4);
-            --glass: rgba(5, 16, 36, 0.85);
-            --border: rgba(212, 175, 55, 0.35);
-            --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
-        }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body {
-            background-color: var(--midnight);
-            background-image: 
-                linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            color: #f0f0f0; font-family: 'Montserrat', sans-serif;
-            margin: 0; padding: 0; overflow-x: hidden;
+            overflow-x: hidden;
         }
 
-        h1, h2, .final-tab { font-family: 'Playfair Display', serif; }
-        .signature { font-family: 'Great Vibes', cursive; font-size: 32px; color: var(--gold); }
-        .app-title { font-family: 'Great Vibes', cursive; font-size: 34px; text-align: center; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding-bottom: 5px; letter-spacing: 1px; }
+        .signature { font-size: 32px; color: var(--gold); }
+        .app-title { font-size: 34px; text-align: center; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding-bottom: 5px; letter-spacing: 1px; }
 
         /* --- SPLASH SCREEN --- */
        #splash-screen { 
@@ -60,11 +45,8 @@
         .guide-label { color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 4px; font-size: 11px; }
         .splash-sig { margin-top: 30px; margin-bottom: 30px; text-align: right; }
         .enter-btn { 
-            width: 100%; background: var(--luxury-gradient); border: none; padding: 22px; border-radius: 50px; 
-            font-weight: 700; color: #051024; text-transform: uppercase; letter-spacing: 3px; font-size: 14px; 
-            cursor: pointer; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3); transition: 0.2s ease;
+            padding: 22px; font-size: 14px; 
         }
-        .enter-btn:active { transform: scale(0.97) translateY(2px); }
 
         /* --- HEADER & NAVIGATION --- */
         .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(2, 8, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); padding: 15px 0 5px; }
@@ -76,7 +58,7 @@
         .tab-intro { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 14px; text-align: center; margin-bottom: 30px; font-style: italic; opacity: 0.95; letter-spacing: 1px; text-transform: uppercase; line-height: 1.6; }
 
         /* --- PILL GRID (3-COLUMN) --- */
-        .category-section { background: var(--glass); border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 30px; padding: 25px 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .category-section { margin-bottom: 30px; padding: 25px 15px; }
         h2 { font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 22px 0; display: flex; align-items: center; }
         h2::before { content: ""; width: 20px; height: 1px; background: var(--gold); margin-right: 15px; opacity: 0.5; }
         .sub-group-label { font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; margin-top: 25px; opacity: 0.8; font-weight: 600; display: block; }
@@ -88,10 +70,7 @@
         .pill-inline-input { background: transparent; border: none; color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 9px; text-align: center; width: 100%; height: 100%; outline: none; }
         .pill.editing { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
 
-        /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 16, 36, 0.95); backdrop-filter: blur(12px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #081226; border: 1px solid var(--gold); border-radius: 30px; padding: 40px 25px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.9); max-height: 85vh; overflow-y: auto; }
-        .modal-header { font-family: 'Playfair Display'; color: var(--gold); text-align: center; font-size: 22px; margin-bottom: 25px; line-height: 1.3; }
+        .modal-header { text-align: center; font-size: 22px; margin-bottom: 25px; line-height: 1.3; }
         
         .sensory-title { font-family: 'Playfair Display'; color: var(--gold); font-size: 16px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 25px; margin-bottom: 10px; }
         .sensory-item { font-size: 11px; margin-bottom: 12px; line-height: 1.5; color: #ddd; }
@@ -127,7 +106,7 @@
         .list-card-header { color: rgba(212, 175, 55, 0.7); font-family: 'Montserrat'; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; margin-bottom: 10px; margin-top: 15px; font-weight: 600; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 4px; display: inline-block; }
         .list-pill { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; padding: 6px 14px; margin: 4px; border-radius: 50px; font-size: 10px; }
 
-        .primary-btn { width: 100%; background: var(--luxury-gradient); border: none; padding: 20px; border-radius: 50px; font-weight: 700; color: var(--deep-blue); text-transform: uppercase; letter-spacing: 3px; font-size: 11px; margin-top: 20px; cursor: pointer; }
+        .primary-btn { padding: 20px; font-size: 11px; margin-top: 20px; }
         .secondary-btn { width: 100%; background: transparent; border: 1px solid var(--border); padding: 15px; border-radius: 50px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-size: 10px; margin-top: 10px; cursor: pointer; }
         textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: #ddd; padding: 15px; resize: none; margin-bottom: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px; line-height: 1.5; }
         .legend-trigger { width: 100%; background: transparent; border: 1px solid var(--gold-dim); padding: 10px; border-radius: 50px; color: var(--gold); text-transform: uppercase; font-size: 9px; letter-spacing: 2px; margin-bottom: 15px; cursor: pointer; }
@@ -220,6 +199,11 @@
 
     <header class="app-header">
         <h1 class="app-title">Becca's Sirender</h1>
+        <div style="text-align: center; margin-top: 8px;">
+            <a href="index.html" style="color: var(--gold); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
+            <span style="color:rgba(212, 175, 55, 0.3); margin: 0 10px;">|</span>
+            <a href="#" onclick="resetSession(); return false;" style="color: #F44336; font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">Reset Session</a>
+        </div>
         <div class="progress-bar-container"><div id="progress-fill"></div></div>
     </header>
 
@@ -285,6 +269,74 @@
         let state = { vibe:[], role:[], handling:[], verbal:[], subspace:[], attire:[], zones:[], sensory:[], bondage:[], toys:[], impact:[], edge:[], service:[], deposit:[], cleanup:[] };
         let impactDetails = {}; let refineDetails = {}; let pendingPill = null; let pendingCat = null;
         let customAttireValue = "";
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+
+        // Local Storage Methods
+        function saveState() {
+            localStorage.setItem('sirender_state', JSON.stringify(state));
+            localStorage.setItem('sirender_impactDetails', JSON.stringify(impactDetails));
+            localStorage.setItem('sirender_refineDetails', JSON.stringify(refineDetails));
+            localStorage.setItem('sirender_customAttireValue', customAttireValue);
+            
+            // Save answers
+            localStorage.setItem('sirender_qCraving', document.getElementById('q-craving').value);
+            localStorage.setItem('sirender_qNervous', document.getElementById('q-nervous').value);
+            localStorage.setItem('sirender_qPerfect', document.getElementById('q-perfect').value);
+            localStorage.setItem('sirender_qStretch', document.getElementById('q-stretch').value);
+            localStorage.setItem('sirender_scribble', document.getElementById('scenario-text').value);
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('sirender_state');
+            if (savedState) {
+                state = JSON.parse(savedState);
+                impactDetails = JSON.parse(localStorage.getItem('sirender_impactDetails') || '{}');
+                refineDetails = JSON.parse(localStorage.getItem('sirender_refineDetails') || '{}');
+                customAttireValue = localStorage.getItem('sirender_customAttireValue') || '';
+                
+                document.getElementById('q-craving').value = localStorage.getItem('sirender_qCraving') || '';
+                document.getElementById('q-nervous').value = localStorage.getItem('sirender_qNervous') || '';
+                document.getElementById('q-perfect').value = localStorage.getItem('sirender_qPerfect') || '';
+                document.getElementById('q-stretch').value = localStorage.getItem('sirender_qStretch') || '';
+                document.getElementById('scenario-text').value = localStorage.getItem('sirender_scribble') || '';
+            }
+        }
+
+        function resetSession() {
+            if(confirm('Are you sure you want to clear your current map and start over?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function renderStoredPills() {
+            Object.keys(state).forEach(cat => {
+                state[cat].forEach(val => {
+                    const pill = Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(val) || (val === "Other-" && p.innerText.includes(customAttireValue)));
+                    if (pill) {
+                        pill.classList.add('active');
+                        if (val === "Other-") {
+                            pill.innerHTML = customAttireValue;
+                        } else if (refineDetails[val]) {
+                            pill.innerHTML = `${val}<br><span style="font-size:7px; color:var(--midnight); font-weight:800;">(${refineDetails[val]})</span>`;
+                        }
+                    }
+                });
+            });
+            // Hide splash if there's significant progress
+            if (Object.values(state).some(arr => arr.length > 0)) {
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('reflections-screen').style.display = 'none';
+            }
+        }
+
+        loadState();
 
         const technicalMenu = {
             "Suck Sir": [
@@ -363,6 +415,14 @@
         function createPill(cat, val) { const div = document.createElement('div'); div.className = 'pill'; div.innerHTML = val; div.onclick = (e) => togglePill(div, cat, val); return div; }
         Object.keys(sections).forEach(k => { const grid = document.getElementById(`${k}-grid`); if (grid) sections[k].forEach(val => grid.appendChild(createPill(k, val))); });
         
+        renderStoredPills();
+
+        // Also add event listeners to text areas to trigger saveState
+        ['q-craving', 'q-nervous', 'q-perfect', 'q-stretch', 'scenario-text'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', saveState);
+        });
+
         function enterApp() { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; }, 800); }
 
 function startMap() { document.getElementById('reflections-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('reflections-screen').style.display = 'none'; }, 800); }
@@ -397,6 +457,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                         el.innerHTML = "Other-";
                         el.classList.remove('active');
                     }
+                    saveState();
                 };
 
                 input.onblur = finalizeOther;
@@ -408,15 +469,16 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             if (technicalMenu[val] && !el.classList.contains('active')) { pendingPill = val; pendingCat = cat; if(technicalMenu[val].isNested) openNestedModal(val); else openRefineModal(val); return; }
             if (el.classList.contains('active')) { el.classList.remove('active'); el.innerHTML = val; state[cat] = state[cat].filter(i => i !== val); delete refineDetails[val]; }
             else { el.classList.add('active'); state[cat].push(val); }
+            saveState();
         }
 
         function openImpactModal(name) { document.getElementById('impact-target-name').innerText = name; document.getElementById('impact-modal').style.display = 'flex'; }
         function closeImpactModal() { document.getElementById('impact-modal').style.display = 'none'; }
-        function confirmImpact(lvl) { const p = findPill(pendingPill); p.classList.add('active'); state.impact.push(pendingPill); impactDetails[pendingPill] = lvl; closeImpactModal(); }
+        function confirmImpact(lvl) { const p = findPill(pendingPill); p.classList.add('active'); state.impact.push(pendingPill); impactDetails[pendingPill] = lvl; saveState(); closeImpactModal(); }
         function openNestedModal(name) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; document.getElementById('refine-target-name').innerText = name; technicalMenu[name].categories.forEach(sub => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerText = sub; b.onclick = () => openRefineModal(name, sub); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
         function openRefineModal(name, sub = null) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; if(sub) { const back = document.createElement('button'); back.className = 'refinement-btn'; back.innerHTML = '← Back'; back.onclick = () => openNestedModal(name); list.appendChild(back); } const opts = sub ? technicalMenu[name][sub] : technicalMenu[name]; document.getElementById('refine-target-name').innerText = sub || name; opts.forEach(o => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerHTML = `${o.name}<span>${o.desc}</span>`; b.onclick = () => confirmRefine(sub ? `${sub}: ${o.name}` : o.name); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
-        function confirmRefine(s) { const p = findPill(pendingPill); p.classList.add('active'); p.innerHTML = `${pendingPill}<br><span style="font-size:7px; color:var(--midnight); font-weight:800;">(${s})</span>`; state[pendingCat].push(pendingPill); refineDetails[pendingPill] = s; document.getElementById('refinement-modal').style.display = 'none'; }
-        function closeRefineModal() { const p = findPill(pendingPill); if(p) { p.classList.add('active'); state[pendingCat].push(pendingPill); } document.getElementById('refinement-modal').style.display = 'none'; }
+        function confirmRefine(s) { const p = findPill(pendingPill); p.classList.add('active'); p.innerHTML = `${pendingPill}<br><span style="font-size:7px; color:var(--midnight); font-weight:800;">(${s})</span>`; state[pendingCat].push(pendingPill); refineDetails[pendingPill] = s; saveState(); document.getElementById('refinement-modal').style.display = 'none'; }
+        function closeRefineModal() { const p = findPill(pendingPill); if(p) { p.classList.add('active'); state[pendingCat].push(pendingPill); saveState(); } document.getElementById('refinement-modal').style.display = 'none'; }
         function findPill(txt) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(txt)); }
         function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; window.scrollTo(0,0); }
 

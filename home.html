@@ -5,18 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Becca's Sirrender | The Map</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --midnight: #051024;
-            --paper-dark: #081226;
-            --deep-blue: #020814;
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.4);
-            --glass: rgba(5, 16, 36, 0.85);
-            --border: rgba(212, 175, 55, 0.35);
-            --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
-        }
-
         body {
             margin: 0;
             padding: 0;
@@ -41,31 +33,6 @@
             max-width: 450px;
             padding: 40px;
             z-index: 1;
-        }
-
-        .branding {
-            font-family: 'Great Vibes', cursive;
-            font-size: 3.5rem;
-            text-align: center;
-            background: var(--luxury-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-            padding-bottom: 5px;
-            letter-spacing: 1px;
-        }
-
-        h1 {
-            font-family: 'Playfair Display', serif;
-            color: var(--gold);
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 30px;
-            font-style: italic;
-            opacity: 0.95;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            line-height: 1.6;
         }
 
         .pill-wrapper {
@@ -126,24 +93,40 @@
         <h1>Clarity in Submission</h1>
 
         <div class="pill-wrapper">
-            <a href="https://andbrick09-ux.github.io/full-app/scene_menu.html" class="pill">
+            <a href="scene_menu.html" class="pill">
                 Scene Menu
                 <span>Set the gaurd rails for Sir so make the perfect scene</span>
             </a>
 
-            <a href="https://andbrick09-ux.github.io/full-app/Predicament%20Bondage%20Menu.html" class="pill">
+            <a href="Predicament%20Bondage%20Menu.html" class="pill">
                 Predicament Bondage Menu
                 <span>Rating Menu for Predicament Bondage Ideas</span>
             </a>
 
-            <a href="https://andbrick09-ux.github.io/full-app/public%20play%20menu.html" class="pill">
+            <a href="public%20play%20menu.html" class="pill">
                 Public Play Menu
                 <span>Rating Menu for Public Play Ideas</span>
+            </a>
+
+            <a href="public-game.html" class="pill">
+                Sir's Public Tasks
+                <span>Interactive environment directives for public play</span>
             </a>
         </div>
 
         <div class="seal-decoration">❦</div>
     </div>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

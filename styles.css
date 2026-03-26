@@ -1,0 +1,84 @@
+/* Common Variables */
+:root {
+    --midnight: #051024;
+    --paper-dark: #081226;
+    --deep-blue: #020814;
+    --gold: #d4af37;
+    --gold-dim: rgba(212, 175, 55, 0.4);
+    --glass: rgba(5, 16, 36, 0.85);
+    --border: rgba(212, 175, 55, 0.35);
+    --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
+    --water-ripple: rgba(255, 255, 255, 0.4);
+}
+
+/* Base Body Styles */
+body.sirender-theme {
+    background-color: var(--midnight) !important;
+    background-image: 
+        linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px) !important;
+    background-size: 30px 30px !important;
+    color: #f0f0f0 !important;
+    font-family: 'Montserrat', sans-serif !important;
+    margin: 0; 
+    padding: 0;
+}
+
+/* Typography elements */
+.serif, h1, h2, .final-tab, .splash-title, .modal-header { 
+    font-family: 'Playfair Display', serif !important; 
+}
+.signature, .branding, .app-title { 
+    font-family: 'Great Vibes', cursive !important; 
+}
+
+/* Glass Card / Category Section */
+.glass-card, .category-section {
+    background: var(--glass) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5) !important;
+    transition: 0.5s all ease;
+}
+
+/* Primary / Gold Button */
+.gold-btn, .primary-btn, .enter-btn {
+    background: var(--luxury-gradient) !important;
+    color: var(--midnight) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3) !important;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+.gold-btn:active, .primary-btn:active, .enter-btn:active {
+    transform: scale(0.97) translateY(2px) !important;
+}
+
+/* Modal Shared Styles */
+.modal-overlay {
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(5, 16, 36, 0.95); 
+    backdrop-filter: blur(12px); 
+    z-index: 10000; 
+    display: none; 
+    align-items: center; justify-content: center; 
+    padding: 20px;
+}
+.modal-content {
+    background: #081226; 
+    border: 1px solid var(--gold); 
+    border-radius: 30px; 
+    padding: 40px 25px; 
+    width: 100%; 
+    max-width: 440px; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9); 
+    max-height: 85vh; 
+    overflow-y: auto;
+}

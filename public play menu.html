@@ -6,19 +6,10 @@
     <title>Public Play Menu | v37.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --midnight: #051024;
-            --paper-dark: #081226;
-            --deep-blue: #020814;
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.4);
-            --glass: rgba(5, 16, 36, 0.85);
-            --border: rgba(212, 175, 55, 0.35);
-            --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
-            --water-ripple: rgba(255, 255, 255, 0.4);
-        }
-
         body {
             font-family: 'Montserrat', sans-serif !important;
             background-color: var(--midnight) !important;
@@ -170,6 +161,9 @@
 
     <div class="sticky-header py-8 px-6 text-center">
         <h1 class="serif text-3xl font-bold tracking-[0.2em] text-[#D4AF37] uppercase italic">Public Play Menu</h1>
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="index.html" style="color: var(--gold); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
+        </div>
         <p class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mt-2 font-black">Ideas to be Sir's Good Girl in Public</p>
     </div>
 
@@ -408,6 +402,12 @@
             alert("Briefing Copied for Sir.");
         }
         renderTab();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
     </script>
 </body>
 </html>

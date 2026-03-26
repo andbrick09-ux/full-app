@@ -6,6 +6,9 @@
     <title>Sir's Public Tasks | v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
     <style>
         :root {
             --midnight: #01040a;
@@ -228,6 +231,9 @@
 
     <header class="text-center pt-16 pb-4">
         <h1 class="serif text-xl tracking-[0.2em] text-white italic uppercase">Sir's Public Tasks</h1>
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="index.html" style="color: var(--champagne); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
+        </div>
     </header>
 
     <section class="mb-4 space-y-4">
@@ -557,6 +563,39 @@
             } else {
                 document.getElementById('rules-overlay').classList.remove('open');
             }
+        }
+
+        // ── Connection Status ──
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                statusElement.classList.remove('bg-red-500', 'shadow-[0_0_10px_#ef4444]');
+                statusElement.classList.add('bg-green-500', 'shadow-[0_0_10px_#22c55e]');
+            } else {
+                statusElement.classList.remove('bg-green-500', 'shadow-[0_0_10px_#22c55e]');
+                statusElement.classList.add('bg-red-500', 'shadow-[0_0_10px_#ef4444]');
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        updateConnectionStatus(); // Initial check
+
+        // ── Time Display ──
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
         }
     </script>
 </body>
