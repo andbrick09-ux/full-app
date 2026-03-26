@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sir's Public Tasks | v58.0</title>
+    <title>Sir's Public Tasks | v59.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -19,7 +19,7 @@
             background-color: var(--midnight);
             background-image: radial-gradient(circle at 50% 0%, #0f172a 0%, #01040a 100%);
             color: #f1f5f9;
-            height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -27,13 +27,38 @@
 
         .serif { font-family: 'Cinzel', serif; }
 
+        /* ── FIX 2: Richer shuffle animation ── */
         @keyframes shuffle-blur {
-            0% { transform: translateY(0); filter: blur(2px); opacity: 0.6; }
-            50% { transform: translateY(-3px); filter: blur(4px); opacity: 1; }
-            100% { transform: translateY(0); filter: blur(2px); opacity: 0.6; }
+            0%   { transform: translateY(0) scaleX(1);    filter: blur(0px);  opacity: 1; }
+            20%  { transform: translateY(-6px) scaleX(0.97); filter: blur(3px);  opacity: 0.5; }
+            40%  { transform: translateY(4px) scaleX(1.02); filter: blur(5px);  opacity: 0.7; }
+            60%  { transform: translateY(-3px) scaleX(0.98); filter: blur(3px);  opacity: 0.55; }
+            80%  { transform: translateY(2px) scaleX(1.01); filter: blur(2px);  opacity: 0.8; }
+            100% { transform: translateY(0) scaleX(1);    filter: blur(0px);  opacity: 1; }
         }
 
-        .shuffling { animation: shuffle-blur 0.1s infinite; color: var(--champagne); }
+        /* ── FIX 3: Card content transition ── */
+        @keyframes revealResult {
+            0%   { opacity: 0; transform: translateY(10px) scale(0.97); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0px); }
+        }
+
+        .shuffling {
+            animation: shuffle-blur 0.12s infinite;
+            color: var(--champagne);
+        }
+
+        .result-reveal {
+            animation: revealResult 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* card glow pulse on reveal */
+        @keyframes cardGlow {
+            0%   { box-shadow: 0 35px 90px rgba(0,0,0,1); }
+            50%  { box-shadow: 0 35px 90px rgba(0,0,0,1), 0 0 40px rgba(212,175,55,0.15); }
+            100% { box-shadow: 0 35px 90px rgba(0,0,0,1); }
+        }
+        .card-glow { animation: cardGlow 1s ease both; }
 
         .glass-card {
             background: var(--surface);
@@ -41,33 +66,49 @@
             border: 1px solid rgba(212, 175, 55, 0.25);
             border-radius: 40px;
             box-shadow: 0 35px 90px rgba(0,0,0,1);
+            transition: border-color 0.4s ease;
+        }
+        .glass-card.punishment-mode {
+            border-color: rgba(239, 68, 68, 0.3);
         }
 
         .directive-display {
-            min-height: 420px;
+            /* FIX 4: fluid height instead of fixed 420px */
+            min-height: clamp(260px, 48vh, 420px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 3rem;
+            padding: clamp(1.5rem, 5vw, 3rem);
         }
 
+        /* ── FIX 5: Labelled corner buttons ── */
         .btn-corner {
             position: absolute;
-            top: 1.5rem;
-            width: 50px;
-            height: 50px;
+            top: 1.25rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 4px;
+            width: 54px;
+            height: 54px;
             border: 1px solid rgba(212, 175, 55, 0.4);
             border-radius: 14px;
             background: rgba(212, 175, 55, 0.08);
             z-index: 50;
             transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .btn-corner:active { transform: scale(0.85); background: var(--champagne); }
+        .btn-corner:active { transform: scale(0.85); background: rgba(212,175,55,0.2); }
+        .btn-corner-label {
+            font-size: 7px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(212,175,55,0.6);
+            font-weight: 700;
+            line-height: 1;
+        }
         .btn-left { left: 1.25rem; }
         .btn-right { right: 1.25rem; }
 
@@ -76,18 +117,37 @@
             text-transform: uppercase;
             letter-spacing: 4px;
             font-weight: 900;
-            font-size: 14px;
+            font-size: 13px;
         }
+        .btn-action:active { transform: scale(0.97); }
 
         .btn-directive {
             background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 100%);
             color: #01040a;
         }
 
+        /* FIX 4: punishment button more visually distinct */
         .btn-discipline {
             background: #0f172a;
             color: var(--punish-red);
-            border: 1px solid rgba(239, 68, 68, 0.4);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 16px !important;
+            box-shadow: inset 0 0 20px rgba(239,68,68,0.04), 0 0 0 0 rgba(239,68,68,0);
+            transition: all 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-discipline:active {
+            box-shadow: 0 0 20px rgba(239,68,68,0.2);
+        }
+
+        /* ── Result label — FIX: more visible ── */
+        #result-label {
+            font-size: 10px;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 1.75rem;
+            color: rgba(212,175,55,0.5);
+            transition: color 0.3s ease;
         }
 
         .modal-overlay {
@@ -96,60 +156,66 @@
             background: #01040a;
             z-index: 200;
             transform: translateY(100%);
-            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1);
             overflow-y: auto;
             padding: 2.5rem 2rem;
         }
-
         .modal-overlay.open { transform: translateY(0); }
 
         .protocol-item {
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 0.75rem 0;
+            padding: 0.85rem 0;
+        }
+
+        /* FIX 4: tighter body padding on mobile */
+        @media (max-height: 700px) {
+            body { padding: 0.5rem 1rem 1rem; }
+            header { padding-top: 4rem !important; padding-bottom: 0.5rem !important; }
+            .btn-corner { top: 0.75rem; }
         }
     </style>
 </head>
-<body class="p-8">
+<body class="px-5 pt-2 pb-6">
 
+    <!-- FIX 5: corner buttons now have labels -->
     <button onclick="toggleDatabase(true)" class="btn-corner btn-left shadow-2xl">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
         </svg>
+        <span class="btn-corner-label">Vault</span>
     </button>
 
     <button onclick="toggleRules(true)" class="btn-corner btn-right shadow-2xl">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>
+        <span class="btn-corner-label">Rules</span>
     </button>
 
-    <header class="text-center pt-24 pb-6">
+    <header class="text-center pt-20 pb-4">
         <h1 class="serif text-2xl font-bold tracking-[0.2em] text-white italic uppercase">Sir's Public Tasks</h1>
     </header>
 
     <main class="flex-grow flex flex-col justify-center items-center">
         <div id="result-card" class="glass-card w-full max-w-md directive-display">
-            <div id="result-label" class="text-[11px] uppercase tracking-[0.5em] text-slate-600 mb-8 font-black">Current State: Compliance</div>
-            <h2 id="result-title" class="serif text-2xl text-white mb-6 px-4 italic font-bold">Ready for Sir?</h2>
-            <p id="result-desc" class="text-[18px] text-slate-400 italic px-8 leading-relaxed">The world sees a lady; Sir sees a girl on the edge. Stay composed and await your fate.</p>
+            <div id="result-label">Current State: Compliance</div>
+            <h2 id="result-title" class="serif text-2xl text-white mb-5 px-4 italic font-bold">Ready for Sir?</h2>
+            <p id="result-desc" class="text-[17px] text-slate-400 italic px-6 leading-relaxed">The world sees a lady; Sir sees a girl on the edge. Stay composed and await your fate.</p>
         </div>
     </main>
 
-    <footer class="pb-12 space-y-6">
-        <button onclick="rollDirective('play')" class="btn-action btn-directive w-full py-8 rounded-3xl shadow-2xl">
+    <!-- FIX 4: tighter footer padding -->
+    <footer class="pt-4 pb-4 space-y-3">
+        <button onclick="rollDirective('play')" class="btn-action btn-directive w-full py-6 rounded-3xl shadow-2xl">
             Find Your Task
         </button>
-
-        <button onclick="rollDirective('discipline')" class="btn-action btn-discipline w-full py-8 rounded-3xl">
+        <button onclick="rollDirective('discipline')" class="btn-action btn-discipline w-full py-5 rounded-3xl">
             Find Your Punishment
         </button>
     </footer>
 
+    <!-- Vault Modal -->
     <div id="database-overlay" class="modal-overlay">
         <div class="flex justify-between items-center mb-6 sticky top-0 bg-[#01040a] py-4 z-10 border-b border-white/10">
             <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Vault of Tasks</h2>
@@ -158,10 +224,11 @@
         <div id="db-content" class="space-y-4 pb-20"></div>
     </div>
 
+    <!-- Rules Modal -->
     <div id="rules-overlay" class="modal-overlay">
         <div class="flex justify-between items-center mb-6 sticky top-0 bg-[#01040a] py-4 z-10 border-b border-white/10">
             <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Sir's Public Rules</h2>
-            <button onclick="toggleRules(false)" class="text-slate-500 uppercase text-[10px] font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Return</button>
+            <button onclick="toggleRules(false)" class="text-slate-500 uppercase text-[10px] font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Close</button>
         </div>
         <div id="rules-content" class="space-y-1 pb-20"></div>
     </div>
@@ -176,7 +243,7 @@
             { name: "Posture & Presentation", desc: "Shoulders back, chin up, hands clasped when standing still." },
             { name: "Gratitude Rule", desc: "Thank Sir for every decision, drink, or command he gives you." },
             { name: "No Self-touch Rule", desc: "Do not adjust clothing, hair, or body without permission." },
-            { name: "Eye-contact Rule", desc: "Hold Sir’s gaze when he speaks; look down briefly when waiting for orders." }
+            { name: "Eye-contact Rule", desc: "Hold Sir's gaze when he speaks; look down briefly when waiting for orders." }
         ];
 
         const fullDatabase = {
@@ -205,7 +272,11 @@
             ]
         };
 
-        const directives = [...fullDatabase["Teasing & Composure"], ...fullDatabase["Intense Protocols"], ...fullDatabase["Missions & Control"]];
+        const directives = [
+            ...fullDatabase["Teasing & Composure"],
+            ...fullDatabase["Intense Protocols"],
+            ...fullDatabase["Missions & Control"]
+        ];
         const discipline = [
             { name: "Self-Pinch Nipples", desc: "Discreetly pinch or twist your own nipples under your clothing for the duration Sir sets." },
             { name: "Self-Pinch Clit", desc: "Discreetly reach under skirt or use pressure to rub your clit for Sir's exact count." },
@@ -213,66 +284,124 @@
             { name: "The Apology", desc: "Whisper a submissive, detailed apology to Sir under the table for your slip." }
         ];
 
-        let taskHistory = [], punishHistory = [], isRolling = false;
+        // ── FIX 1: Correct history deduplication ──
+        // Separate circular buffers sized per pool so we never deadlock
+        const taskHistory    = new Set();
+        const punishHistory  = new Set();
+        const TASK_HISTORY_MAX   = Math.floor(directives.length  * 0.5); // remember last ~50%
+        const PUNISH_HISTORY_MAX = Math.max(1, discipline.length - 1);   // always leave 1 fresh option
+
+        function pickFresh(pool, history, maxHistory) {
+            // Filter out recently seen items
+            let available = pool.filter(item => !history.has(item.name));
+            // Safety: if all items are in history, clear oldest half and retry
+            if (available.length === 0) {
+                const entries = [...history];
+                entries.slice(0, Math.ceil(entries.length / 2)).forEach(k => history.delete(k));
+                available = pool.filter(item => !history.has(item.name));
+            }
+            const chosen = available[Math.floor(Math.random() * available.length)];
+            history.add(chosen.name);
+            // Trim history if over limit
+            if (history.size > maxHistory) {
+                history.delete(history.values().next().value);
+            }
+            return chosen;
+        }
+
+        let isRolling = false;
 
         function toggleRules(open) {
             const overlay = document.getElementById('rules-overlay');
             if (open) {
                 document.getElementById('rules-content').innerHTML = rulesOfEngagement.map(r => `
-                    <div class="protocol-item"><h4 class="serif text-lg text-white font-bold">${r.name}</h4><p class="text-xs text-slate-400 italic mt-0.5">${r.desc}</p></div>
+                    <div class="protocol-item">
+                        <h4 class="serif text-base text-white font-bold">${r.name}</h4>
+                        <p class="text-xs text-slate-400 italic mt-1">${r.desc}</p>
+                    </div>
                 `).join('');
                 overlay.classList.add('open');
-            } else overlay.classList.remove('open');
+            } else {
+                overlay.classList.remove('open');
+            }
         }
 
         function toggleDatabase(open) {
             const overlay = document.getElementById('database-overlay');
             if (open) {
                 document.getElementById('db-content').innerHTML = Object.entries(fullDatabase).map(([cat, items]) => `
-                    <div><h3 class="serif text-[10px] tracking-[0.4em] text-slate-500 uppercase mb-2 border-b border-white/5 pb-1">${cat}</h3>
-                    ${items.map(i => `<div class="protocol-item"><h4 class="serif text-lg text-white font-bold">${i.name}</h4><p class="text-xs text-slate-400 italic mt-0.5">${i.desc}</p></div>`).join('')}</div>
+                    <div>
+                        <h3 class="serif text-[10px] tracking-[0.4em] text-slate-500 uppercase mb-2 border-b border-white/5 pb-1">${cat}</h3>
+                        ${items.map(i => `
+                            <div class="protocol-item">
+                                <h4 class="serif text-base text-white font-bold">${i.name}</h4>
+                                <p class="text-xs text-slate-400 italic mt-1">${i.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
                 `).join('');
                 overlay.classList.add('open');
-            } else overlay.classList.remove('open');
+            } else {
+                overlay.classList.remove('open');
+            }
         }
 
         function rollDirective(type) {
-            if (isRolling) return; isRolling = true;
-            const pool = type === 'play' ? directives : discipline;
-            const history = type === 'play' ? taskHistory : punishHistory;
-            const label = document.getElementById('result-label'), title = document.getElementById('result-title'), desc = document.getElementById('result-desc');
-            
-            label.innerText = type === 'play' ? "FINDING TASK..." : "FINDING PUNISHMENT...";
-            label.style.color = type === 'play' ? "#D4AF37" : "#ef4444";
-            
+            if (isRolling) return;
+            isRolling = true;
+
+            const isPlay = type === 'play';
+            const pool     = isPlay ? directives : discipline;
+            const history  = isPlay ? taskHistory : punishHistory;
+            const maxHist  = isPlay ? TASK_HISTORY_MAX : PUNISH_HISTORY_MAX;
+
+            const card  = document.getElementById('result-card');
+            const label = document.getElementById('result-label');
+            const title = document.getElementById('result-title');
+            const desc  = document.getElementById('result-desc');
+
+            // Mode styling on card
+            card.classList.toggle('punishment-mode', !isPlay);
+
+            label.textContent = isPlay ? 'Finding task…' : 'Finding punishment…';
+            label.style.color = isPlay ? 'rgba(212,175,55,0.9)' : 'rgba(239,68,68,0.9)';
+
+            // ── FIX 2: Richer shuffle phase ──
             let count = 0;
+            const totalFrames = 30;
+
             const shuffle = setInterval(() => {
                 const temp = pool[Math.floor(Math.random() * pool.length)];
-                title.innerText = temp.name; title.className = "serif text-2xl shuffling"; desc.innerText = "...";
-                
-                if (++count > 25) {
+                title.textContent = temp.name;
+                title.className   = 'serif text-2xl shuffling px-4 font-bold';
+                desc.textContent  = '· · ·';
+                desc.style.opacity = '0.3';
+
+                if (++count >= totalFrames) {
                     clearInterval(shuffle);
-                    let final;
-                    
-                    // FIXED LOGIC: Ensure history doesn't lock the loop
-                    // If pool is small (like discipline), we only remember enough to allow one new option
-                    const maxHistory = Math.min(history.length, pool.length - 1);
-                    
-                    do { 
-                        final = pool[Math.floor(Math.random() * pool.length)]; 
-                    } while (history.includes(final.name) && pool.length > 1);
 
-                    history.push(final.name);
-                    // Dynamically shift history based on pool size
-                    if (history.length > 8 || history.length >= pool.length) history.shift();
+                    // ── FIX 1: Use corrected pickFresh ──
+                    const final = pickFresh(pool, history, maxHist);
 
-                    title.innerText = final.name; 
-                    title.className = "serif text-3xl text-white font-bold py-2 tracking-tight"; 
-                    desc.innerText = final.desc;
-                    label.innerText = type === 'play' ? "Your task is:" : "Your punishment is:"; 
+                    // ── FIX 3: Animated reveal ──
+                    title.className   = 'serif text-3xl text-white font-bold py-2 tracking-tight result-reveal';
+                    title.textContent = final.name;
+
+                    desc.className    = 'text-[17px] text-slate-400 italic px-6 leading-relaxed result-reveal';
+                    desc.style.opacity = '1';
+                    desc.textContent  = final.desc;
+
+                    label.textContent = isPlay ? 'Your task is:' : 'Your punishment is:';
+                    label.style.color = isPlay ? 'rgba(212,175,55,0.6)' : 'rgba(239,68,68,0.6)';
+
+                    // card glow on reveal
+                    card.classList.remove('card-glow');
+                    void card.offsetWidth; // reflow to re-trigger
+                    card.classList.add('card-glow');
+
                     isRolling = false;
                 }
-            }, 75);
+            }, 70);
         }
     </script>
 </body>
