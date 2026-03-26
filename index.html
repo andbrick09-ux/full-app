@@ -9,21 +9,14 @@
     <meta name="theme-color" content="#051024">
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* Page-specific layout applied over the global sirender-theme */
         body {
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: var(--midnight);
-            background-image: 
-                linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            font-family: 'Montserrat', sans-serif;
-            color: #f0f0f0;
             overflow: hidden;
+            /* The rest is inherited from styles.css .sirender-theme */
         }
 
         .container {
@@ -86,11 +79,11 @@
         }
     </style>
 </head>
-<body>
+<body class="sirender-theme">
 
     <div class="container">
-        <div class="branding">Becca's Surrender</div>
-        <h1>Clarity in Submission</h1>
+        <h1 class="app-title" style="font-size: 46px; margin-bottom: 5px;">Becca's Sirender</h1>
+        <div class="splash-title" style="border-bottom: none; font-size: 18px; font-weight: 400; opacity: 0.9; margin-bottom: 35px;">Clarity in Submission</div>
 
         <div class="pill-wrapper">
             <a href="scene_menu.html" class="pill">
