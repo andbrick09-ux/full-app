@@ -264,3 +264,9 @@ body.sirender-theme {
 /* Scale */
 .active\:scale-95:active { transform: scale(0.95); }
 
+/* Additional utilities */
+.rounded-lg { border-radius: 0.5rem; }
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.border-slate-800 { border-color: #1e293b; }
+
+
