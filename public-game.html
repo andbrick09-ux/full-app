@@ -209,15 +209,15 @@
         .btn-directive { background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 100%); color: #01040a; }
         .btn-directive:disabled { opacity: 0.35; pointer-events: none; }
 
-        .modal-overlay {
+        .slide-modal-overlay {
             position: fixed; inset: 0; background: #01040a; z-index: 200;
             transform: translateY(100%); transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
             overflow-y: auto; padding: 2rem;
         }
-        .modal-overlay.open { transform: translateY(0); }
+        .slide-modal-overlay.open { transform: translateY(0); }
     </style>
 </head>
-<body class="px-5 pt-2 pb-6">
+<body class="px-5 pt-2 pb-6 sirender-theme">
 
     <button onclick="toggleDatabase(true)" class="btn-corner left-5">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -280,7 +280,8 @@
         </button>
     </footer>
 
-    <div id="database-overlay" class="modal-overlay">
+    <!-- Modals -->
+    <div id="database-overlay" class="slide-modal-overlay">
         <div class="flex justify-between items-center mb-8">
             <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Master Vault</h2>
             <button onclick="toggleDatabase(false)" class="text-xs uppercase font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Close</button>
@@ -288,7 +289,7 @@
         <div id="db-content" class="space-y-6 pb-20"></div>
     </div>
 
-    <div id="rules-overlay" class="modal-overlay">
+    <div id="rules-overlay" class="slide-modal-overlay">
         <div class="flex justify-between items-center mb-8">
             <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Public Mandates</h2>
             <button onclick="toggleRules(false)" class="text-xs uppercase font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Close</button>
@@ -568,6 +569,7 @@
         // ── Connection Status ──
         function updateConnectionStatus() {
             const statusElement = document.getElementById('connection-status');
+            if (!statusElement) return;
             if (navigator.onLine) {
                 statusElement.classList.remove('bg-red-500', 'shadow-[0_0_10px_#ef4444]');
                 statusElement.classList.add('bg-green-500', 'shadow-[0_0_10px_#22c55e]');
@@ -583,6 +585,8 @@
 
         // ── Time Display ──
         function updateTime() {
+            const timeElement = document.getElementById('current-time');
+            if (!timeElement) return;
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
