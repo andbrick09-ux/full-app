@@ -16,8 +16,9 @@ body.sirender-theme {
     background-color: var(--midnight) !important;
     background-image: 
         linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px) !important;
-    background-size: 30px 30px !important;
+        linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+        radial-gradient(ellipse at top, #0f172a 0%, transparent 80%) !important;
+    background-size: 30px 30px, 30px 30px, 100% 100% !important;
     color: #f0f0f0 !important;
     font-family: 'Montserrat', sans-serif !important;
     margin: 0; 
