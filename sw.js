@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sirender-cache-v2';
+const CACHE_NAME = 'sirender-cache-v3';
 const urlsToCache = [
   './',
   './index.html',

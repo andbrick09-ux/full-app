@@ -8,9 +8,16 @@
   "description": "Progressive Web App for Becca's Sirender",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/action/favorite/materialicons/48dp/2x/baseline_favorite_black_48dp.png",
-      "sizes": "96x96",
-      "type": "image/png"
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
