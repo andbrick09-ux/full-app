@@ -33,6 +33,27 @@ body.sirender-theme {
     font-family: 'Great Vibes', cursive !important; 
 }
 
+/* Global Typography Styles */
+.signature { 
+    font-size: 32px; 
+    color: var(--gold); 
+}
+.app-title { 
+    text-align: center; 
+    background: var(--luxury-gradient); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    margin: 0; 
+    padding-bottom: 5px; 
+    letter-spacing: 1px; 
+}
+.splash-title { 
+    color: var(--gold); 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    text-align: center; 
+}
+
 /* Glass Card / Category Section */
 .glass-card, .category-section {
     background: var(--glass) !important;
