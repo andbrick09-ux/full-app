@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sirender-cache-v1';
+const CACHE_NAME = 'sirender-cache-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Instantly activate the new service worker
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -21,15 +22,27 @@ self.addEventListener('install', event => {
   );
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          // Delete old caches (like v1)
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => self.clients.claim()) // Take control of all pages immediately 
+  );
+});
+
 self.addEventListener('fetch', event => {
+  // Network-first strategy: Always try to get the newest file from the server
+  // If the network is unavailable (offline), fallback to the cache.
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
   );
 });
