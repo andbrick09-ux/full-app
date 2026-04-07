@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BDSM Checklist v1.0</title>
+<title>BDSM Checklist</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -27,12 +27,12 @@ body {
 .slider-bg { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:var(--luxury-gradient); border-radius:25px; transition:0.4s cubic-bezier(0.4,0,0.2,1); z-index:1; }
 .p2-active .slider-bg { transform:translateX(100%); }
 
-/* PERSISTENCE BAR */
+/* TOOLS & NAVIGATION */
 .persistence-bar { display:flex; justify-content:center; align-items:center; gap:10px; padding:10px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:10px; color:var(--gold-dim); flex-wrap:wrap; }
 .btn-mini { background:transparent; border: 1px solid var(--border); color: var(--gold); padding: 5px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 9px; }
 
-/* TABS & SUMMARY */
 .tabs-nav { display:flex; overflow-x:auto; gap:8px; padding:15px 20px; border-bottom:1px solid var(--border); scrollbar-width:none; }
+.tabs-nav::-webkit-scrollbar { display: none; }
 .tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:20px; color:var(--gold-dim); font-size:11px; padding:7px 16px; cursor:pointer; white-space:nowrap; }
 .tab-btn.active { background:var(--luxury-gradient); color:var(--midnight); border-color:transparent; }
 
@@ -62,10 +62,11 @@ body {
 .profile-cell { flex:1; display:flex; flex-direction:column; gap:6px; min-width: 0; }
 
 .label-sub { font-size:9px; text-transform:uppercase; color:var(--gold-dim); letter-spacing:1px; }
-.kink-row { display:flex; gap:5px; flex-wrap:nowrap; overflow-x: visible; }
+.kink-row { display:flex; gap:5px; flex-wrap:nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.kink-row::-webkit-scrollbar { display: none; }
 .kink-pill { 
   font-size:9px; font-weight:700; padding:6px 10px; border-radius:6px; background:rgba(255,255,255,0.03); 
-  border:1px solid rgba(212,175,55,0.15); cursor:pointer; color:#aaa; text-align:center; flex: 1; min-width: 65px;
+  border:1px solid rgba(212,175,55,0.15); cursor:pointer; color:#aaa; text-align:center; flex: 0 0 auto; min-width: 65px;
 }
 .kink-pill.status-yes { color:var(--green); border-color:var(--green); }
 .kink-pill.status-want { color:var(--gold); border-color:var(--gold); }
@@ -83,7 +84,7 @@ body {
 .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; backdrop-filter:blur(10px); }
 .modal-content { background:var(--paper-dark); margin: 15% auto; padding:30px; border:1px solid var(--gold); border-radius:12px; max-width:400px; width:90%; text-align:center; }
 
-@media(max-width: 1000px) { .item-grid { flex-direction:column; align-items:flex-start; } .profile-cols { width: 100%; } .kink-row { flex-wrap: wrap; } }
+@media(max-width: 1000px) { .item-grid { flex-direction:column; align-items:flex-start; } .profile-cols { width: 100%; } }
 </style>
 </head>
 <body onload="init()">
@@ -143,7 +144,7 @@ body {
 <div id="snapModal" class="modal">
   <div class="modal-content">
     <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;">Save Progress Snapshot</h3>
-    <input type="text" id="snapName" style="width:100%; padding:12px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:6px;" placeholder="Entry Name">
+    <input type="text" id="snapName" style="width:100%; padding:12px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:6px;" placeholder="Snapshot Name">
     <div style="display:flex; gap:10px;">
       <button class="btn-mini" style="flex:1" onclick="saveSnapshot()">Save</button>
       <button class="btn-mini" style="flex:1; border-color:#555; color:#888;" onclick="closeSnapshotModal()">Cancel</button>
@@ -152,7 +153,7 @@ body {
 </div>
 
 <script>
-// ── EXHAUSTIVE UNIFIED DATA ──────────────────────────────────────────
+// ── EXHAUSTIVE UNIFIED DATABASE ─────────────────────────────────
 const DATABASE_TEMPLATE = [
   { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed Bondage','Breast Bondage','Cage','Chains','Chair Bondage','Chastity','Croch Rope','Collars (Private)','Collars (Public)','Corset','Crotch Rope','Cuffs Leather','Cuffs Metal','Gags Ball','Gags Bit','Gags Phallic','Gags Ring','Gags Tape','Heavy Bondage','Leash','Light Bondage','Long-term','Manacles & Irons','Mummification','Predicament Bondage','Restraints','One Bar Prison','Rope Shibari','Rope Simple','Sleep Sacks','Spreader Bar','Stocks','Straight Jacket','Suspension'] },
   { id:'bodily', label:'Bodily Fluid', items:['Blood play','Breast milk - Milking','Chamber pot use','Cum in Panties','Cum In Ass','Cum In Mouth','Cum In - Vagina','Cum On - Body','Cum On Face','Cum On Food/Drink','Drooling','Fake Cum','Grool','Rimming','Scat','Spit for lube','Spit In','Spit On','Swallow Semen','Running Makeup','Throat Pie','Urinate in body','Urinate on body'] },
@@ -169,7 +170,7 @@ const DATABASE_TEMPLATE = [
   { id:'kinks', label:'Kinks', items:['Skin on Skin','Stockings/Pantyhose','Lingerie','Foot Job','Forced Orgasms','High Heels','Waking Up to Sex','Waking Up to Oral Sex','Induced Lactation','Milk Blowjob','Design & Build BDSM Stuff','Device Bondage','Messy Face (BJ)','Rubbing drool over face','Impact Play','Teasing','Eye Contact'] }
 ];
 
-// ── FULL FILE EXTRACTION MAPPING ──────────────────────────────
+// ── FULL FILE MAPPING ──────────────────────────────────────────
 const MAP_ANDY = {
   'Anal Hook':{t:'yes',r:'liked',ro:'Giving'},'Arm Binding':{t:'yes',r:'loved',ro:'Giving'},'Bed Bondage':{t:'yes',r:'loved',ro:'Both'},
   'Breast Bondage':{t:'yes',r:'loved',ro:'Giving'},'Chair Bondage':{t:'yes',r:'loved',ro:'Giving'},'Croch Rope':{t:'yes',r:'liked',ro:'Giving'},
@@ -190,8 +191,10 @@ const MAP_ANDY = {
   'Fellatio':{t:'yes',r:'loved',ro:'Receiving'},'Mutual Masturbation':{t:'yes',r:'loved',ro:'Both'},'Prostate Massage':{t:'yes',r:'liked',ro:'Receiving',n:'Maybe'},
   'Foot Job':{t:'yes',r:'loved',ro:'Receiving'},'Forced Orgasms':{t:'yes',r:'loved',ro:'Giving'},'Waking Up to Sex':{t:'yes',r:'loved',ro:'Both'},
   'Design & Build BDSM Stuff':{t:'yes',r:'loved'},'Device Bondage':{t:'yes',r:'loved',ro:'Giving'},'Messy Face (BJ)':{t:'yes',r:'loved',ro:'Giving'},
+  'Following Orders':{t:'yes',r:'loved',ro:'Giving'},'Massage':{t:'yes',r:'loved',ro:'Giving'},'Begging':{t:'yes',r:'loved',ro:'Giving'},
   'Cage':{t:'no-want',r:'meh',ro:'Giving'},'Chains':{t:'no-want',ro:'Giving'},'Chastity':{t:'no-want',r:'liked',ro:'Giving'},
   'Cuffs Metal':{t:'no-want',r:'loved',ro:'Giving'},'Mummification':{t:'no-want',r:'liked',ro:'Giving'},'Suspension':{t:'no-want',ro:'Giving',m:'Arousal'},
+  'One Bar Prison':{t:'no-want',ro:'Giving'},'Manacles & Irons':{t:'no-want',ro:'Giving'},'Straight Jacket':{t:'no-want',ro:'Giving'},
   'Blood play':{t:'no-dont',l:'hard'},'Scat':{t:'no-dont',l:'hard'},'Sleep Sacks':{t:'no-dont',ro:'Giving'}
 };
 
@@ -209,7 +212,10 @@ const MAP_BECCA = {
   'Clamps-Nipple':{t:'yes',r:'loved',ro:'Wearing'},'Nuru':{t:'yes',r:'loved',ro:'Both'},'Skin Sensation':{t:'yes',r:'loved',ro:'Both'},
   'Anal sex':{t:'yes',r:'meh',ro:'Receiving'},'Breast fucking':{t:'yes',r:'loved'},'Fellatio':{t:'yes',r:'loved',ro:'Giving'},
   'Mutual Masturbation':{t:'yes',r:'loved',ro:'Both'},'Forced Orgasms':{t:'yes',r:'loved',ro:'Receiving'},'Waking Up to Sex':{t:'yes',r:'loved',ro:'Both'},
+  'Remote Toys':{t:'yes',r:'loved',ro:'Wearing'},'Internal Vibrator':{t:'yes',r:'loved',ro:'Wearing'},'Kneeling':{t:'yes',r:'liked'},'Massage':{t:'yes',r:'loved'},
   'Subspace':{t:'no-want',ro:'Receiving'},'Consensual non-consent':{t:'no-want'},'Face Fucking':{t:'no-want',ro:'Receiving'},
+  'Collars (Public)':{t:'no-want',ro:'Wearing',n:'Prefer necklace from Dom'},'Gags Phallic':{t:'no-want',n:'Work up to this'},
+  'Heavy Bondage':{t:'no-want',n:'Work up to this level'},'Grool':{t:'no-want',n:'Not sure what this is fully'},
   'Blood play':{t:'no-dont',l:'hard'},'Scat':{t:'no-dont',l:'hard'},'Sleep Sacks':{t:'no-dont',l:'soft'},'Mummification':{t:'no-dont',l:'soft'}
 };
 
@@ -218,7 +224,7 @@ let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } }
 let activeP = 'p1', activeTab = 'all', isCompare = false, activeFilters = new Set(), searchQ = '', sheetCtx = null, comparisonData = null;
 
 function init() {
-  const saved = localStorage.getItem('bdsm_checklist_vFINAL_SYNC_26');
+  const saved = localStorage.getItem('bdsm_checklist_vFINAL_2026');
   if (saved) {
     APP_STATE = JSON.parse(saved);
   } else {
@@ -226,12 +232,11 @@ function init() {
       APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => buildItem(n, MAP_ANDY[n])) });
       APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => buildItem(n, MAP_BECCA[n])) });
     });
-    // Create pre-loaded Baseline snapshots
-    createSnapshotEntry('p1', 'March 2026 Baseline');
-    createSnapshotEntry('p2', 'March 2026 Baseline');
+    // Create pre-loaded March Baseline snapshot
+    createBaselineSnapshot('p1'); createBaselineSnapshot('p2');
   }
 
-  // FORCE AUTO-LOAD LATEST SNAPSHOT ON EVERY PAGE LOAD
+  // AUTO-LOAD LATEST SNAPSHOT ON EVERY LOAD
   if(APP_STATE.p1.history.length > 0) APP_STATE.p1.data = JSON.parse(JSON.stringify(APP_STATE.p1.history[0].data));
   if(APP_STATE.p2.history.length > 0) APP_STATE.p2.data = JSON.parse(JSON.stringify(APP_STATE.p2.history[0].data));
 
@@ -248,8 +253,8 @@ function buildItem(name, audit) {
   return { n: name, tried: audit?.t||'', rating: audit?.r||'', role: audit?.ro||'', limit: audit?.l||'', motive: audit?.m||'', note: audit?.n||'' };
 }
 
-function createSnapshotEntry(p, name) {
-  APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name, date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) });
+function createBaselineSnapshot(p) {
+  APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) });
 }
 
 function setProfile(p) {
@@ -264,8 +269,11 @@ function setTab(id, btn) { activeTab = id; document.querySelectorAll('.tab-btn')
 function toggleCompare() { isCompare = !isCompare; comparisonData = null; render(); }
 function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
 function toggleFilter(f, btn) { if(activeFilters.has(f)) activeFilters.delete(f); else activeFilters.add(f); btn.classList.toggle('active'); render(); }
-function clearFilters() { activeFilters.clear(); searchQ = ''; document.getElementById('searchInput').value = ''; document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); render(); }
-function save() { localStorage.setItem('bdsm_checklist_vFINAL_SYNC_26', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Progress Saved'; }
+function clearFilters() { 
+  activeFilters.clear(); searchQ = ''; document.getElementById('searchInput').value = ''; 
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); render(); 
+}
+function save() { localStorage.setItem('bdsm_checklist_vFINAL_2026', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Progress Saved'; }
 
 // ── HISTORY ──────────────────────────────────────────────────
 function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
@@ -305,10 +313,10 @@ function render() {
       let isMatch = false, hasLimit = false, isChanged = false;
 
       if(isCompare) {
-        const p1 = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
-        const p2 = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
-        isMatch = (p1.tried==='yes' || p1.tried==='no-want') && (p2.tried==='yes' || p2.tried==='no-want');
-        hasLimit = p1.limit==='hard' || p2.limit==='hard';
+        const p1Item = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
+        const p2Item = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
+        isMatch = (p1Item.tried==='yes' || p1Item.tried==='no-want') && (p2Item.tried==='yes' || p2Item.tried==='no-want');
+        hasLimit = p1Item.limit==='hard' || p2Item.limit==='hard';
       }
       if(comparisonData) {
         const oldCat = comparisonData.find(c=>c.id===cat.id);
@@ -320,14 +328,14 @@ function render() {
 
       html += `<div class="activity-item ${isCompare && isMatch ? 'match' : ''} ${isCompare && hasLimit ? 'limit-active' : ''} ${isChanged ? 'changed' : ''}">
         <div class="item-grid">
-          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL INTEREST</span>' : ''}</div>
+          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL INTEREST</span>' : ''} ${isChanged ? '<br><span style="color:var(--gold); font-size:8px;">✦ UPDATED</span>' : ''}</div>
           <div class="profile-cols">
             ${isCompare ? renderCell(APP_STATE.p1.data.find(c=>c.id==cat.id).items[idx], 'Andy', 'p1', cat.id, idx) : ''}
             ${isCompare ? renderCell(APP_STATE.p2.data.find(c=>c.id==cat.id).items[idx], 'Becca', 'p2', cat.id, idx) : ''}
             ${!isCompare ? renderCell(item, activeP==='p1'?'Andy':'Becca', activeP, cat.id, idx) : ''}
           </div>
         </div>
-        ${!isCompare ? `<input type="text" class="note-input" placeholder="Notes..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}
+        ${!isCompare ? `<input type="text" class="note-input" placeholder="Reflections..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}
       </div>`;
     });
     html += `</div></div>`;
@@ -376,7 +384,7 @@ function triggerSheet(cid, i, f) {
 
 function closeSheet() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); }
 function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
-function resetApp() { if(confirm("Clear progress? Baseline entry will be recreated.")) { localStorage.removeItem('bdsm_checklist_vFINAL_SYNC_26'); location.reload(); } }
+function resetApp() { if(confirm("Clear progress? Baseline entry will be recreated.")) { localStorage.removeItem('bdsm_checklist_vFINAL_2026'); location.reload(); } }
 
 function updateStats() {
   let t=0, l=0, w=0, lim=0, f=0;
