@@ -8,7 +8,7 @@
 <style>
 :root {
   --midnight: #051024; --paper-dark: #081226; --gold: #d4af37; --gold-dim: rgba(212,175,55,0.4);
-  --glass: rgba(5,16,36,0.85); --border: rgba(212,175,55,0.15); --green: #4CAF50; --red: #F44336;
+  --glass: rgba(5,16,36,0.85); --border: rgba(212,175,55,0.2); --green: #4CAF50; --red: #F44336;
   --luxury-gradient: linear-gradient(135deg,#bf953f 0%,#fcf6ba 50%,#b38728 100%);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -18,7 +18,7 @@ body {
   min-height:100vh; overflow-x: hidden;
 }
 
-/* HEADER & PROFILE SWITCHER */
+/* HEADER & SWITCHER */
 .header { text-align:center; padding:20px 15px; border-bottom:1px solid var(--border); background:rgba(5,16,36,0.7); backdrop-filter:blur(15px); position:sticky; top:0; z-index:100; }
 .brand { font-family:'Great Vibes',cursive; font-size:32px; background:var(--luxury-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px; }
 .profile-switcher { display:inline-flex; background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:30px; padding:3px; position:relative; width: 220px; }
@@ -30,52 +30,64 @@ body {
 .persistence-bar { display:flex; justify-content:center; align-items:center; gap:12px; padding:10px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:9px; color:var(--gold-dim); }
 .btn-mini { background:transparent; border: 1px solid var(--border); color: var(--gold); padding: 4px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
 
+/* TABS */
 .tabs-nav { display:flex; overflow-x:auto; gap:8px; padding:12px 15px; border-bottom:1px solid var(--border); scrollbar-width:none; }
-.tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:20px; color:var(--gold-dim); font-size:10px; padding:7px 16px; cursor:pointer; white-space:nowrap; }
-.tab-btn.active { background:var(--luxury-gradient); color:var(--midnight); border-color:transparent; }
+.tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:20px; color:var(--gold-dim); font-size:10px; padding:7px 16px; cursor:pointer; white-space:nowrap; text-transform: uppercase; letter-spacing: 1px; }
+.tab-btn.active { background:var(--luxury-gradient); color:var(--midnight); border-color:transparent; font-weight: 700; }
 
-/* CONTENT CARD SYSTEM */
+/* SEARCH & FILTERS */
+.filter-bar { padding:20px 15px; border-bottom:1px solid rgba(212,175,55,0.1); }
+.search-container { display: flex; gap: 10px; margin-bottom: 15px; }
+.search-input { 
+  background:rgba(8,18,38,0.8); border:1.5px solid var(--border); border-radius:30px; color:white; 
+  padding:12px 20px; font-size:14px; flex:1; outline:none; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+.filter-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.filter-chip { 
+  font-size:9px; font-weight:700; padding:8px 16px; border-radius:20px; border:1.5px solid rgba(212,175,55,0.15); 
+  background:transparent; color:#777; cursor:pointer; text-transform:uppercase; white-space: nowrap; transition: 0.3s;
+}
+.filter-chip.active { border-color:var(--gold); color:var(--gold); background:rgba(212,175,55,0.05); }
+
+/* CONTENT */
 .main { padding:15px; max-width:1200px; margin:0 auto; }
 .category-section { background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:30px; overflow:hidden; }
-.category-header { padding:15px 20px; background:rgba(212,175,55,0.03); }
+.category-header { padding:15px 20px; background:rgba(212,175,55,0.03); border-bottom: 1px solid rgba(212,175,55,0.05); }
 .category-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--gold); text-transform: uppercase; letter-spacing: 2px; }
 
 .activity-item { padding:20px; border-bottom:1px solid rgba(212,175,55,0.08); transition:0.3s; }
-.activity-item.match { border-left:5px solid var(--green); background:rgba(76,175,80,0.05); }
-.activity-item.limit-active { border-left:5px solid var(--red); background:rgba(244,67,54,0.05); }
+.activity-item.match { border-left:5px solid var(--green); background:rgba(76,175,80,0.03); }
 
 .item-grid { display:flex; gap:25px; align-items:flex-start; width: 100%; flex-direction: column; }
 .name-area { width: 100%; }
 .name-col { font-weight:700; font-size:18px; color: #fff; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
-.desc-text { font-size: 11px; color: #777; font-style: italic; line-height: 1.4; display: block; max-width: 800px; }
+.desc-text { font-size: 11px; color: #888; font-style: italic; line-height: 1.4; display: block; max-width: 800px; }
 
 .profile-cols { display:flex; gap:25px; width: 100%; }
 .profile-cell { flex:1; display:flex; flex-direction:column; gap:10px; min-width: 0; }
 
-/* 2-ROW INTERACTION GRID */
+/* 2-ROW GRID SYSTEM */
 .kink-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .kink-grid-row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
 
 .kink-pill { 
   padding:12px 8px; border-radius:8px; background:rgba(255,255,255,0.02); 
-  border:1.5px solid rgba(212,175,55,0.1); cursor:pointer; text-align:center;
+  border:1px solid var(--border); cursor:pointer; text-align:center;
   display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 55px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
 }
 .pill-title { font-size: 9px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1.2px; transition: 0.3s; }
 .pill-value { font-size: 9px; font-weight: 600; color: transparent; text-transform: uppercase; line-height: 1.2; margin-top: 4px; }
 
-/* FILLED STATE STYLING */
+/* FILLED STATE */
 .kink-pill.filled { border-color: rgba(212,175,55,0.4); background: rgba(255,255,255,0.04); border-width: 1.5px; }
 .kink-pill.filled .pill-title { color: var(--gold); }
 .kink-pill.filled .pill-value { color: #eee; }
 
 .kink-pill.status-yes { border-color: var(--green); background: rgba(76,175,80,0.05); }
 .kink-pill.status-yes .pill-title, .kink-pill.status-yes .pill-value { color: var(--green); }
-
-.kink-pill.status-want { border-color: var(--gold); background: rgba(212,175,55,0.05); }
+.kink-pill.status-want { border-color: var(--gold); }
 .kink-pill.status-want .pill-title, .kink-pill.status-want .pill-value { color: var(--gold); }
-
 .kink-pill.status-limit { border-color: var(--red); background: rgba(244,67,54,0.05); }
 .kink-pill.status-limit .pill-title, .kink-pill.status-limit .pill-value { color: var(--red); }
 
@@ -109,9 +121,8 @@ body {
   <span id="saveLabel">Ready</span>
   <button class="btn-mini" onclick="openSnapshotModal()">Snapshot</button>
   <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226; max-width: 130px;">
-    <option value="">History Vault</option>
+    <option value="">Vault</option>
   </select>
-  <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison</button>
   <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset Portal</button>
 </div>
 
@@ -119,23 +130,32 @@ body {
   <button class="tab-btn active" id="tab-all" onclick="setTab('all', this)">All Categories</button>
 </div>
 
+<div class="filter-bar">
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="🔍 Search activities or descriptions..." oninput="handleSearch(this.value)" class="search-input">
+    <button class="btn-mini" onclick="clearFilters()" style="height: 44px; border-radius: 22px;">Clear</button>
+  </div>
+  <div class="filter-chips">
+    <button class="filter-chip" id="f-tried" onclick="toggleFilter('tried', this)">✓ Tried</button>
+    <button class="filter-chip" id="f-loved" onclick="toggleFilter('loved', this)">★ Loved</button>
+    <button class="filter-chip" id="f-limit" onclick="toggleFilter('limit', this)">✕ Limit</button>
+  </div>
+</div>
+
 <div class="main" id="mainContent"></div>
 
 <div id="sheetOverlay" onclick="closeSheet()"></div>
 <div id="bottomSheet">
-  <div style="text-align:center; margin-bottom:20px;">
-    <div style="width: 45px; height: 4px; background: rgba(212,175,55,0.3); border-radius: 2px; margin: 0 auto 15px;"></div>
-    <div id="sheetTitle" style="color:var(--gold); font-family:'Playfair Display'; font-size:20px; text-transform: uppercase; letter-spacing: 1px;">Selection</div>
-    <div id="sheetSubtitle" style="font-size:11px; color:#888; text-transform:uppercase; margin-top: 5px;">Item</div>
-  </div>
+  <div id="sheetTitle" style="color:var(--gold); font-family:'Playfair Display'; font-size:20px; text-transform: uppercase; text-align:center;">Selection</div>
+  <div id="sheetSubtitle" style="font-size:11px; color:#888; text-align:center; margin: 10px 0 20px;">Item</div>
   <div id="sheetOptions"></div>
-  <button onclick="closeSheet()" style="width:100%; padding:18px; margin-top:10px; background:transparent; border:none; color:#888; text-transform:uppercase; font-size:11px; font-weight: 700;">Cancel</button>
+  <button onclick="closeSheet()" style="width:100%; padding:15px; margin-top:10px; background:transparent; border:none; color:#888; text-transform:uppercase;">Cancel</button>
 </div>
 
 <div id="snapModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; backdrop-filter:blur(10px);">
   <div style="background:var(--paper-dark); margin: 20% auto; padding:35px; border:1px solid var(--gold); border-radius:15px; max-width:400px; width:90%; text-align:center;">
-    <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:15px; font-size:22px;">Create Snapshot</h3>
-    <input type="text" id="snapName" style="width:100%; padding:15px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:8px; font-size:14px;" placeholder="Snapshot Name (e.g. March Baseline)">
+    <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:15px; font-size:22px;">Save Snapshot</h3>
+    <input type="text" id="snapName" style="width:100%; padding:15px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:8px;" placeholder="Snapshot Name">
     <div style="display:flex; gap:15px;">
       <button class="btn-mini" style="flex:1; height: 45px;" onclick="saveSnapshot()">Save</button>
       <button class="btn-mini" style="flex:1; border-color:#555; color:#888;" onclick="closeSnapshotModal()">Cancel</button>
@@ -144,96 +164,78 @@ body {
 </div>
 
 <script>
-// ── MASTER DATABASE WITH DESCRIPTIONS ───────────────────────────
+// ── SYNCED DATABASE ─────────────────────────────────────────────
 const DATABASE_TEMPLATE = [
   { id:'bondage', label:'Bondage', items:[
     {n:'Anal Hook', d:'A curved blunt device for internal weighted play and restraint.'},
     {n:'Arm Binding', d:'Tying arms together behind the back or to the body to restrict movement.'},
     {n:'Bed bondage', d:'Fixing a partner to a bed using straps, ropes, or hardware.'},
-    {n:'Breast Bondage', d:'Rope or leather techniques used to bind or compress the breasts.'},
     {n:'Cage', d:'Full physical containment in a small, secure enclosure.'},
-    {n:'Chains', d:'Heavy metal restraint providing weight, cold sensation, and specific sounds.'},
-    {n:'Chair bondage', d:'Securing a partner to a chair to limit movement while seated.'},
     {n:'Chastity', d:'Mechanical prevention of sexual access using specialized cages or belts.'},
-    {n:'Collars (Private)', d:'Neckwear signaling submission or belonging in a private setting.'},
-    {n:'Collars (Public)', d:'Wearing a visible symbol of ownership in public view.'},
-    {n:'Corset', d:'Tight-laced garments used for posture control and body shaping.'},
     {n:'Gags', d:'Devices that limit or prevent speech and vocalization.'},
-    {n:'Mummification', d:'Wrapping the body in layers to restrict all movement.'},
     {n:'Restraints', d:'Handcuffs, leg irons, or leather cuffs to limit mobility.'},
-    {n:'Rope - Shibari', d:'Japanese-style artistic rope bondage focused on pressure and aesthetics.'},
-    {n:'Suspension', d:'Lifting a partner off the ground using ropes or specialized hardware.'}
+    {n:'Suspension', d:'Lifting a partner partially or fully off the ground using ropes.'}
   ]},
   { id:'bodily', label:'Bodily Fluid', items:[
     {n:'Cum in Panties', d:'Directly ejaculating into a partner\'s undergarments.'},
     {n:'Cum In Mouth', d:'Ejaculating directly into a partner\'s mouth.'},
-    {n:'Cum On Body', d:'Ejaculating on the skin of a partner.'},
-    {n:'Cum On Face', d:'Ejaculating on a partner\'s face.'},
     {n:'Fake Cum', d:'Using synthetic fluids for visual or sensory play.'},
     {n:'Spit for lube', d:'Using saliva as a natural lubricant during play.'},
-    {n:'Swallow Semen', d:'Ingesting semen after ejaculation.'},
-    {n:'Urinate on body', d:'Watersports involving direct urination on a partner.'}
+    {n:'Urinate on body', d:'Watersports involving urination on a partner.'}
   ]},
   { id:'ds', label:'Dominance/Submission', items:[
     {n:'Behavior correction', d:'Punishment or discipline for breaking rules or protocols.'},
-    {n:'Decision control', d:'Giving one partner authority over daily life choices.'},
-    {n:'Journaling', d:'A tool for communication or tracking thoughts within a dynamic.'},
+    {n:'Decision control', d:'Giving one partner authority over life choices.'},
     {n:'Mind Fucking', d:'Psychological play focused on challenging or confusing a partner.'},
-    {n:'Subspace', d:'A mental state of deep relaxation or euphoria during submission.'},
-    {n:'Task setting', d:'Assigning specific duties or chores to a submissive partner.'}
+    {n:'Subspace', d:'A mental state of euphoria or deep relaxation during submission.'}
   ]},
   { id:'impact', label:'Impact Play', items:[
     {n:'Breast whipping', d:'Light impact to the breasts using soft tools.'},
-    {n:'Caning', d:'Intense localized impact using flexible or rigid sticks.'},
-    {n:'Face slapping', d:'Striking the face for psychological or physical thrill.'},
-    {n:'Riding crops', d:'Stiff tools delivering a sharp, stinging sensation.'},
+    {n:'Riding crops', d:'Stiff-shafted tools delivering a stinging sensation.'},
     {n:'Spanking (OTK)', d:'Over-the-knee strikes with the hand or paddle.'},
     {n:'Whipping - Flogger', d:'Multi-tailed tools delivering thuddy or stinging sensations.'}
   ]},
   { id:'sensation', label:'Sensation Play', items:[
     {n:'Blindfold', d:'Sensory deprivation by blocking sight to heighten other senses.'},
-    {n:'Breath control', d:'Negotiated restriction of airflow for arousal.'},
     {n:'Hot wax', d:'Dripping low-temperature candles for a heat-based thrill.'},
     {n:'Ice', d:'Using extreme cold for sensory contrast.'},
     {n:'Nuru', d:'Body-to-body massage with highly slippery gel.'},
-    {n:'Skin Sensation', d:'Using textures like feathers or claws to explore nerve sensitivity.'}
+    {n:'Skin Sensation', d:'Using textures to explore nerve sensitivity.'}
   ]},
   { id:'sexual', label:'Sexual Play', items:[
     {n:'Anal sex', d:'Penetrative intercourse via the anus.'},
-    {n:'Body Paint', d:'Using skin-safe paint for artistic or sensory exploration.'},
     {n:'Face Fucking', d:'Dominant thrusting while a partner performs oral sex.'},
-    {n:'Mutual Masterbation', d:'Partners pleasuring themselves or each other simultaneously.'},
+    {n:'Mutual Masterbation', d:'Partners pleasuring each other simultaneously.'},
     {n:'Forced Orgasms', d:'Using restraint or toys to compel a partner to climax.'}
   ]}
 ];
 
-// ── FULL DATA MAPPING (Andy & Becca March '26 Baseline) ────────
+// ── AUDITED HARD-CODED DATA (Andy & Becca March '26) ─────────────
 const AUDIT_ANDY = {
-  'Anal Hook':{t:'yes',r:'Liked it',ro:'Giving'},'Arm Binding':{t:'yes',r:'Loved it',ro:'Giving'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Both'},
-  'Breast Bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Chair bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Chastity':{t:'no-want',r:'Liked it',ro:'Giving'},
-  'Cage':{t:'no-want',r:'Take it or leave it',ro:'Giving'},'Gags':{t:'yes',r:'Loved it',ro:'Giving'},'Restraints':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Cum in Panties':{t:'yes',r:'Loved it',ro:'Giving',n:'Private or public'},'Breast whipping':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Riding crops':{t:'yes',r:'Loved it',ro:'Giving'},'Spanking (OTK)':{t:'yes',r:'Loved it',ro:'Giving'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Giving'},
+  'Arm Binding':{t:'yes',r:'Loved it',ro:'Giving'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Both'},
+  'Cage':{t:'no-want',r:'Take it or leave it',ro:'Giving'},'Chastity':{t:'no-want',r:'Liked it',ro:'Giving'},
+  'Gags':{t:'yes',r:'Loved it',ro:'Giving'},'Restraints':{t:'yes',r:'Loved it',ro:'Giving'},
+  'Cum in Panties':{t:'yes',r:'Loved it',ro:'Giving',n:'Private or public'},
+  'Breast whipping':{t:'yes',r:'Loved it',ro:'Giving'},'Riding crops':{t:'yes',r:'Loved it',ro:'Giving'},
+  'Spanking (OTK)':{t:'yes',r:'Loved it',ro:'Giving'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Giving'},
   'Blindfold':{t:'yes',r:'Loved it',ro:'Both'},'Nuru':{t:'yes',r:'Loved it',ro:'Both'},'Skin Sensation':{t:'yes',r:'Loved it',ro:'Both'}
 };
 
 const AUDIT_BECCA = {
   'Arm Binding':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Receiving',m:'Arousal'},
-  'Breast Bondage':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Chair bondage':{t:'yes',ro:'Receiving'},'Chastity':{t:'yes',ro:'Receiving'},
-  'Collars (Public)':{t:'no-want',ro:'Wearing',n:'prefer normal necklace'},'Corset':{t:'yes',r:'Loved it',ro:'Wearing',n:'Public and private'},
-  'Gags':{t:'yes',r:'Liked it',ro:'Wearing',n:'work up to level'},'Restraints':{t:'yes',ro:'Receiving'},
+  'Chastity':{t:'yes',ro:'Receiving'},'Gags':{t:'yes',r:'Liked it',ro:'Wearing',n:'work up to level'},'Restraints':{t:'yes',ro:'Receiving'},
   'Cum in Panties':{t:'yes',ro:'Wearing',m:'Arousal'},'Behavior correction':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},
-  'Breast whipping':{t:'yes',r:'Loved it',ro:'Receiving',n:'With flogger'},'Spanking (OTK)':{t:'yes',ro:'Receiving'},
-  'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Receiving'},'Blindfold':{t:'yes',r:'Loved it',ro:'Wearing',m:'Arousal'},
-  'Hot wax':{t:'yes',ro:'Both'},'Ice':{t:'yes',ro:'Both'},'Nuru':{t:'yes',ro:'Both'},'Skin Sensation':{t:'yes',ro:'Both'},
-  'Face Fucking':{t:'no-want',ro:'Receiving',n:'dark fantasy maybe one day'},'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'},'Forced Orgasms':{t:'yes',r:'Loved it',ro:'Receiving'}
+  'Breast whipping':{t:'yes',r:'Loved it',ro:'Receiving',n:'With flogger'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Receiving'},
+  'Blindfold':{t:'yes',r:'Loved it',ro:'Wearing',m:'Arousal'},'Hot wax':{t:'yes',ro:'Both'},'Ice':{t:'yes',ro:'Both'},
+  'Nuru':{t:'yes',ro:'Both'},'Skin Sensation':{t:'yes',ro:'Both'},'Face Fucking':{t:'no-want',ro:'Receiving',n:'dark fantasy'},
+  'Following orders':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'}
 };
 
 let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
-let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '';
+let activeP = 'p1', activeTab = 'all', activeFilters = new Set(), searchQ = '';
 
 function init() {
-  const saved = localStorage.getItem('bdsm_portal_vSYNC_FULL_COMPLETE');
+  const saved = localStorage.getItem('bdsm_portal_vFINAL_SYNC');
   if (saved) { APP_STATE = JSON.parse(saved); } else {
     DATABASE_TEMPLATE.forEach(cat => {
       APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_ANDY[i.n])) });
@@ -255,77 +257,57 @@ function buildItem(name, desc, audit) { return { n: name, d: desc, tried: audit?
 function createBaselineSnapshot(p) { APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) }); }
 
 function setProfile(p) {
-  activeP = p; isCompare = false;
-  document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
+  activeP = p; document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
   document.getElementById('p1-btn').classList.toggle('active', p === 'p1');
   document.getElementById('p2-btn').classList.toggle('active', p === 'p2');
   render(); updateHistDropdown();
 }
 
 function setTab(id, btn) { activeTab = id; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
-function toggleCompare() { isCompare = !isCompare; render(); }
 function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
-function clearFilters() { searchQ = ''; document.getElementById('searchInput').value = ''; render(); }
-function save() { localStorage.setItem('bdsm_portal_vSYNC_FULL_COMPLETE', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved'; }
-
-function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
-function closeSnapshotModal() { document.getElementById('snapModal').style.display='none'; }
-function saveSnapshot() {
-  const name = document.getElementById('snapName').value || 'Snapshot';
-  APP_STATE[activeP].history.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE[activeP].data)) });
-  save(); updateHistDropdown(); closeSnapshotModal(); render();
-}
-function updateHistDropdown() {
-  const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">History Vault</option>';
-  APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
-}
-function compareHistory(id) { 
-    const snap = APP_STATE[activeP].history.find(h => h.id == id);
-    if(snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
-}
+function toggleFilter(f, btn) { if(activeFilters.has(f)) activeFilters.delete(f); else activeFilters.add(f); btn.classList.toggle('active'); render(); }
+function clearFilters() { activeFilters.clear(); searchQ = ''; document.getElementById('searchInput').value = ''; document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); render(); }
+function save() { localStorage.setItem('bdsm_portal_vFINAL_SYNC', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved'; }
 
 function render() {
   const main = document.getElementById('mainContent');
   const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
   let html = '';
   cats.forEach(cat => {
-    const visItems = cat.items.filter(item => (item.n.toLowerCase().includes(searchQ) || item.d.toLowerCase().includes(searchQ)));
+    const visItems = cat.items.filter(item => {
+      const matchText = item.n.toLowerCase().includes(searchQ) || item.d.toLowerCase().includes(searchQ);
+      if (activeFilters.size === 0) return matchText;
+      let mF = false;
+      if (activeFilters.has('tried') && item.tried === 'yes') mF = true;
+      if (activeFilters.has('loved') && item.rating === 'Loved it') mF = true;
+      if (activeFilters.has('limit') && item.limit !== '') mF = true;
+      return matchText && mF;
+    });
     if (visItems.length === 0) return;
     html += `<div class="category-section"><div class="category-header"><span class="category-title">${cat.label}</span></div><div class="category-body">`;
     visItems.forEach((item) => {
       const idx = cat.items.indexOf(item);
-      let isMatch = false, hasLimit = false;
-      if(isCompare) {
-        const p1 = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
-        const p2 = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
-        isMatch = (p1.tried==='yes' || p1.tried==='no-want') && (p2.tried==='yes' || p2.tried==='no-want');
-        hasLimit = p1.limit==='Hard Limit' || p2.limit==='Hard Limit';
-      }
-      html += `<div class="activity-item ${isCompare && isMatch ? 'match' : ''} ${isCompare && hasLimit ? 'limit-active' : ''}">
-        <div class="item-grid"><div class="name-area"><span class="name-col">${item.n} ${isCompare && isMatch ? '✦ MUTUAL' : ''}</span><span class="desc-text">${item.d}</span></div><div class="profile-cols">
-            ${isCompare ? renderCell(APP_STATE.p1.data.find(c=>c.id==cat.id).items[idx], 'Andy', 'p1', cat.id, idx) : ''}
-            ${isCompare ? renderCell(APP_STATE.p2.data.find(c=>c.id==cat.id).items[idx], 'Becca', 'p2', cat.id, idx) : ''}
-            ${!isCompare ? renderCell(item, activeP==='p1'?'Andy':'Becca', activeP, cat.id, idx) : ''}
-        </div></div>${!isCompare ? `<input type="text" class="note-input" placeholder="Notes & Conditions..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}</div>`;
+      html += `<div class="activity-item">
+        <div class="item-grid"><div class="name-area"><span class="name-col">${item.n}</span><span class="desc-text">${item.d}</span></div><div class="profile-cols">${renderCell(item, cat.id, idx)}</div></div>
+        <input type="text" class="note-input" placeholder="Notes..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">
+      </div>`;
     });
     html += `</div></div>`;
   });
-  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No activities match search.</div>';
+  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No results.</div>';
 }
 
-function renderCell(res, name, pKey, cid, idx) {
-  const isEdit = activeP === pKey && !isCompare;
-  const isSSet = res.tried !== ''; const isESet = res.rating !== ''; const isBSet = res.limit !== '';
-  const isRSet = res.role !== ''; const isMSet = res.motive !== '';
-  return `<div class="profile-cell" style="opacity:${isCompare || activeP===pKey ? '1' : '0.2'}">
-        ${isCompare ? `<div style="font-size:9px; color:var(--gold); font-weight:700; margin-bottom:5px; text-transform:uppercase;">${name}</div>` : ''}
+function renderCell(res, cid, idx) {
+  const isS = res.tried !== ''; const isE = res.rating !== ''; const isB = res.limit !== '';
+  const isR = res.role !== ''; const isM = res.motive !== '';
+  return `<div class="profile-cell">
         <div class="kink-grid">
-            <div class="kink-pill ${isSSet ? 'filled' : ''} ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${res.tried==='yes'?'YES':(res.tried==='no-want'?'WANT TO TRY':'')}</span></div>
-            <div class="kink-pill ${isESet ? 'filled' : ''} ${res.rating==='Loved it'?'status-yes':''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}"><span class="pill-title">Enthusiasm</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : ''}</span></div>
-            <div class="kink-pill ${isBSet ? 'filled' : ''} ${res.limit ? 'status-limit' : ''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}"><span class="pill-title">Boundary</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : ''}</span></div>
+            <div class="kink-pill ${isS ? 'filled' : ''} ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="triggerSheet('${cid}', ${idx}, 'tried')"><span class="pill-title">Status</span><span class="pill-value">${res.tried==='yes'?'YES':(res.tried==='no-want'?'WANT':'')}</span></div>
+            <div class="kink-pill ${isE ? 'filled' : ''} ${res.rating==='Loved it'?'status-yes':''}" onclick="triggerSheet('${cid}', ${idx}, 'rating')"><span class="pill-title">Enthusiasm</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : ''}</span></div>
+            <div class="kink-pill ${isB ? 'filled' : ''} ${res.limit ? 'status-limit' : ''}" onclick="triggerSheet('${cid}', ${idx}, 'limit')"><span class="pill-title">Boundary</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : ''}</span></div>
         </div><div class="kink-grid-row2">
-            <div class="kink-pill ${isRSet ? 'filled' : ''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'role')` : ''}"><span class="pill-title">Dynamic</span><span class="pill-value">${res.role ? res.role.toUpperCase() : ''}</span></div>
-            <div class="kink-pill ${isMSet ? 'filled' : ''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'motive')` : ''}"><span class="pill-title">Motivation</span><span class="pill-value">${res.motive ? res.motive.toUpperCase() : ''}</span></div>
+            <div class="kink-pill ${isR ? 'filled' : ''}" onclick="triggerSheet('${cid}', ${idx}, 'role')"><span class="pill-title">Dynamic</span><span class="pill-value">${res.role ? res.role.toUpperCase() : ''}</span></div>
+            <div class="kink-pill ${isM ? 'filled' : ''}" onclick="triggerSheet('${cid}', ${idx}, 'motive')"><span class="pill-title">Motivation</span><span class="pill-value">${res.motive ? res.motive.toUpperCase() : ''}</span></div>
         </div></div>`;
 }
 
@@ -337,7 +319,7 @@ function openSheet(cid, idx, field, title, opts) {
   opts.forEach(o => {
     const d = document.createElement('div'); d.className = 'sheet-option';
     d.onclick = () => { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx][field] = o.val; save(); render(); closeSheet(); };
-    d.innerHTML = `<span style="font-size:16px; color:${o.col || 'var(--gold)'}">${o.icon}</span><span>${o.lab}</span>`;
+    d.innerHTML = `<span style="font-size:18px; color:${o.col || 'var(--gold)'}">${o.icon}</span><span>${o.lab}</span>`;
     cont.appendChild(d);
   });
   document.getElementById('sheetOverlay').style.display='block'; document.getElementById('bottomSheet').classList.add('open');
@@ -353,14 +335,22 @@ function triggerSheet(cid, i, f) {
 
 function closeSheet() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); }
 function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
-function resetApp() { if(confirm("Wipe portal data? Snapshot stays.")) { localStorage.removeItem('bdsm_portal_vSYNC_FULL_COMPLETE'); location.reload(); } }
-
-function updateStats() {
-  let t=0, l=0, w=0, lim=0;
-  APP_STATE[activeP].data.forEach(c => c.items.forEach(i => { if(i.tried==='yes') t++; if(i.rating==='Loved it') l++; if(i.tried==='no-want') w++; if(i.limit) lim++; }));
-  document.getElementById('statTried').textContent = t+' Tried'; document.getElementById('statLoved').textContent = l+' Loved';
-  document.getElementById('statWant').textContent = w+' Want'; document.getElementById('statLimit').textContent = lim+' Limits';
+function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
+function closeSnapshotModal() { document.getElementById('snapModal').style.display='none'; }
+function saveSnapshot() {
+  const name = document.getElementById('snapName').value || 'Snapshot';
+  APP_STATE[activeP].history.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE[activeP].data)) });
+  save(); updateHistDropdown(); closeSnapshotModal();
 }
+function updateHistDropdown() {
+  const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">Vault</option>';
+  APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
+}
+function compareHistory(id) { 
+  const snap = APP_STATE[activeP].history.find(h => h.id == id);
+  if(snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
+}
+function resetApp() { if(confirm("Clear all data?")) { localStorage.removeItem('bdsm_portal_vFINAL_SYNC'); location.reload(); } }
 </script>
 </body>
 </html>
