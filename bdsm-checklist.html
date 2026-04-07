@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Kink Consultant — Ultimate Partner Portal</title>
+<title>The Kink Consultant — Final Partner Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -18,7 +18,7 @@ body {
   min-height:100vh; overflow-x: hidden;
 }
 
-/* HEADER & SWITCHER */
+/* HEADER & PROFILE SWITCHER */
 .header { text-align:center; padding:30px 20px; border-bottom:1px solid var(--border); background:rgba(5,16,36,0.7); backdrop-filter:blur(15px); position:sticky; top:0; z-index:100; }
 .brand { font-family:'Great Vibes',cursive; font-size:38px; background:var(--luxury-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; }
 .profile-switcher { display:inline-flex; background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:30px; padding:4px; position:relative; }
@@ -27,10 +27,11 @@ body {
 .slider-bg { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:var(--luxury-gradient); border-radius:25px; transition:0.4s cubic-bezier(0.4,0,0.2,1); z-index:1; }
 .p2-active .slider-bg { transform:translateX(100%); }
 
-/* TOOLS & NAVIGATION */
+/* PERSISTENCE BAR */
 .persistence-bar { display:flex; justify-content:center; align-items:center; gap:10px; padding:10px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:10px; color:var(--gold-dim); flex-wrap:wrap; }
 .btn-mini { background:transparent; border: 1px solid var(--border); color: var(--gold); padding: 5px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 9px; }
 
+/* TABS & SUMMARY */
 .tabs-nav { display:flex; overflow-x:auto; gap:8px; padding:15px 20px; border-bottom:1px solid var(--border); scrollbar-width:none; }
 .tabs-nav::-webkit-scrollbar { display: none; }
 .tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:20px; color:var(--gold-dim); font-size:11px; padding:7px 16px; cursor:pointer; white-space:nowrap; }
@@ -39,7 +40,7 @@ body {
 .summary-bar { display:flex; gap:10px; padding:15px 20px; background:rgba(8,18,38,0.8); border-bottom:1px solid rgba(212,175,55,0.15); overflow-x:auto; }
 .stat-pill { flex-shrink:0; display:flex; align-items:center; gap:6px; background:var(--glass); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:10px; }
 
-/* SEARCH & FILTERS */
+/* FILTERS */
 .filter-bar { display:flex; gap:10px; padding:15px 20px; border-bottom:1px solid rgba(212,175,55,0.1); flex-wrap:wrap; align-items:center; }
 .search-input { background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:20px; color:white; padding:8px 15px; font-size:11px; flex:1; outline:none; }
 .filter-chip { font-size:9px; font-weight:700; padding:6px 12px; border-radius:20px; border:1px solid rgba(212,175,55,0.25); background:transparent; color:#888; cursor:pointer; text-transform:uppercase; }
@@ -117,7 +118,7 @@ body {
 </div>
 
 <div class="filter-bar">
-  <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="handleSearch(this.value)" class="search-input">
+  <input type="text" id="searchInput" placeholder="🔍 Search activities..." oninput="handleSearch(this.value)" class="search-input">
   <button class="filter-chip" id="f-tried" onclick="toggleFilter('tried', this)">✓ Tried</button>
   <button class="filter-chip" id="f-loved" onclick="toggleFilter('loved', this)">★ Loved</button>
   <button class="filter-chip" id="f-limit" onclick="toggleFilter('limit', this)">✕ Limit</button>
@@ -139,7 +140,7 @@ body {
 <div id="snapModal" class="modal">
   <div class="modal-content">
     <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;">Save Progress Snapshot</h3>
-    <input type="text" id="snapName" style="width:100%; padding:12px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:6px;" placeholder="Entry Name">
+    <input type="text" id="snapName" style="width:100%; padding:12px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:6px;" placeholder="Snapshot Name">
     <div style="display:flex; gap:10px;">
       <button class="btn-mini" style="flex:1" onclick="saveSnapshot()">Save</button>
       <button class="btn-mini" style="flex:1; border-color:#555; color:#888;" onclick="closeSnapshotModal()">Cancel</button>
@@ -148,9 +149,9 @@ body {
 </div>
 
 <script>
-// ── EXHAUSTIVE MERGED DATABASE ─────────────────────────────────
+// ── EXHAUSTIVE UNIFIED DATABASE ─────────────────────────────────
 const DATABASE_TEMPLATE = [
-  { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed Bondage','Breast Bondage','Cage','Chains','Chair Bondage','Chastity','Croch Rope','Collars (Private)','Collars (Public)','Corset','Crotch Rope','Cuffs Leather','Cuffs Metal','Gags Ball','Gags Bit','Gags Phallic','Gags Ring','Gags Tape','Heavy Bondage','Leash','Light Bondage','Long-term','Manacles & Irons','Mummification','Predicament Bondage','Restraints','One Bar Prison','Rope Shibari','Rope Simple','Sleep Sacks','Spreader Bar','Stocks','Straight Jacket','Suspension'] },
+  { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed Bondage','Breast Bondage','Cage','Chains','Chair Bondage','Chastity','Croch Rope','Collars (Private)','Collars (Public)','Corset','Cuffs Leather','Cuffs Metal','Gags Ball','Gags Bit','Gags Phallic','Gags Ring','Gags Tape','Heavy Bondage','Leash','Light Bondage','Long-term','Manacles & Irons','Mummification','Predicament Bondage','Restraints','One Bar Prison','Rope Shibari','Rope Simple','Sleep Sacks','Spreader Bar','Stocks','Straight Jacket','Suspension'] },
   { id:'bodily', label:'Bodily Fluid', items:['Blood play','Breast milk - Milking','Chamber pot use','Cum in Panties','Cum In Ass','Cum In Mouth','Cum In - Vagina','Cum On - Body','Cum On Face','Cum On Food/Drink','Drooling','Fake Cum','Grool','Rimming','Scat','Spit for lube','Spit In','Spit On','Swallow Semen','Running Makeup','Throat Pie','Urinate in body','Urinate on body'] },
   { id:'ds', label:'Dominance/Submission', items:['24/7 power exchange','Behavior correction','Chastity (behavioral)','Chastity (physical)','Collaring (ceremonial)','Collaring (daily)','Deepthroat training','Journaling','Mind Fucking','Obedience training','Rituals (bedtime)','Rituals (collaring)','Rituals (greetings)','Submissive postures','Subspace','Task setting','Title Honorifics','TPE'] },
   { id:'edge', label:'Edge Play', items:['Branding','Breath Play','Catheterization','Clit Pumping','CNC','Emotional Edge','Erotic asphyxiation','Fear Play','Fire Play','Gun Play','Hypnosis','Saline Injection','Interrogation','Knife play','Medical Play','Penis Pumping','Pickup Play','Pissing (Private)','Pussy Pumping','Psychological Torment','Public Play','Ripping of clothing','Raceplay','Sounding','Taser play','Temperature extremes','Trampling','Waterboarding','Watersports','Wrestling'] },
@@ -165,29 +166,41 @@ const DATABASE_TEMPLATE = [
   { id:'kinks', label:'Kinks', items:['Skin on Skin','Stockings/Pantyhose','Lingerie','Foot Job','Forced Orgasms','High Heels','Waking Up to Sex','Waking Up to Oral Sex','Induced Lactation','Milk Blowjob','Design & Build BDSM Stuff','Device Bondage','Messy Face (BJ)','Rubbing drool over face','Impact Play','Teasing','Eye Contact'] }
 ];
 
-// ── DATA MAPPING LOGIC ──────────────────────────────────────────
+// ── DATA MAPPING LOGIC (Audited from original files) ───────────
 function mapAndy(n) {
   let i = { n, tried:'', rating:'', role:'', limit:'', motive:'', note:'' };
-  // Exhaustive mapping based on Andy's PDF
-  if(['Anal Hook','Croch Rope','Cuffs Metal','Rope Simple','Gags Ring','Gags Tape','Riding crops'].includes(n)) { i.tried='yes'; i.rating='liked'; i.role='Giving'; }
-  if(['Arm Binding','Bed Bondage','Breast Bondage','Chair Bondage','Corset','Cuffs Leather','Restraints','Spreader Bar','Nuru','Skin Sensation','Fellatio','Hand Job'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Giving'; }
-  if(['Drooling','Grool','Breast milk - Milking'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Receiving'; }
-  if(n==='Cum in Panties') { i.tried='yes'; i.rating='loved'; i.role='Giving'; i.note='Public/Private'; }
-  if(['Blood play','Scat','Chamber pot use'].includes(n)) { i.tried='no-dont'; i.limit='hard'; }
-  if(['Cage','Chains','Stocks'].includes(n)) { i.tried='no-want'; i.role='Giving'; }
+  // Andy's exact mapping
+  if(['Anal Hook','Croch Rope','Cuffs Metal','Rope Simple','Gags Ring','Gags Tape','Riding crops','Spit for lube','Spit In','Spit On','Swallow Semen','Running Makeup','Urinate in body','Urinate on body'].includes(n)) { i.tried='yes'; i.rating='liked'; i.role='Giving'; }
+  if(['Arm Binding','Bed Bondage','Breast Bondage','Chair Bondage','Corset','Cuffs Leather','Restraints','Spreader Bar','Nuru','Skin Sensation','Fellatio','Hand Job','Mutual Masturbation','Orgasm control','Throat Fucking','Squirting','Messy Face (BJ)','Device Bondage','Design & Build BDSM Stuff'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Giving'; }
+  if(['Bed Bondage','Nuru','Skin Sensation','Rimming','Spit for lube','Spit In','Urinate on body'].includes(n)) { i.role='Both'; }
+  if(['Drooling','Grool','Breast milk - Milking','Prostate Massage','Foot Job','Milk Blowjob'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Receiving'; }
+  if(n==='Cum in Panties') { i.tried='yes'; i.rating='loved'; i.role='Giving'; i.note='Worn in private or public'; }
+  if(['Stockings/Pantyhose','Lingerie','High Heels','Legs'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Others Wearing'; }
+  if(n==='Public Play') { i.tried='yes'; i.rating='liked'; i.role='Giving'; i.note='Teasing, toys, remote vib, etc'; }
+  if(['Blood play','Scat','Chamber pot use','Fisting Anal','Fisting Vaginal','Forced homosexuality'].includes(n)) { i.tried='no-dont'; i.limit='hard'; }
+  if(['Cage','Chains','Stocks','One Bar Prison','Manacles & Irons','Straight jacket'].includes(n)) { i.tried='no-want'; i.role='Giving'; i.rating='meh'; }
+  if(n==='Suspension') { i.tried='no-want'; i.role='Giving'; i.motive='Arousal'; }
+  if(n==='Prostate Massage') { i.note='Maybe'; }
   return i;
 }
 
 function mapBecca(n) {
   let i = { n, tried:'', rating:'', role:'', limit:'', motive:'', note:'' };
-  // Exhaustive mapping based on Becca's HTML
+  // Becca's exact mapping
   if(n==='Anal Hook') { i.tried='no-want'; }
   if(n==='Arm Binding') { i.tried='yes'; i.rating='liked'; i.role='Receiving'; }
-  if(n==='Bed Bondage') { i.tried='yes'; i.rating='loved'; i.role='Receiving'; i.motive='Arousal'; }
-  if(n==='Breast Bondage') { i.tried='yes'; i.rating='liked'; i.role='Receiving'; i.motive='Arousal'; }
+  if(['Bed Bondage','Breast Bondage','Light Bondage'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Receiving'; i.motive='Arousal'; }
   if(n==='Corset') { i.tried='yes'; i.rating='loved'; i.role='Wearing'; i.note='Public and private'; }
   if(n==='Blood play') { i.tried='no-dont'; i.limit='hard'; }
-  if(n==='Sleep Sacks' || n==='Mummification') { i.tried='no-dont'; i.limit='soft'; i.role='Receiving'; }
+  if(['Sleep Sacks','Mummification'].includes(n)) { i.tried='no-dont'; i.limit='soft'; i.role='Receiving'; }
+  if(n==='Collars (Public)') { i.tried='no-want'; i.role='Wearing'; i.note='Prefer normal necklace given to me by Dom for public instead of actual collar.'; }
+  if(n==='Gags Ball') { i.tried='yes'; i.rating='liked'; i.role='Wearing'; }
+  if(n==='Gags Phallic') { i.tried='no-want'; i.note='Will need to work up to this one'; }
+  if(n==='Heavy Bondage') { i.tried='no-want'; i.note='Will need to work up to this level'; }
+  if(n==='Grool') { i.tried='no-want'; i.note='Not sure what this is fully'; }
+  if(n==='Breast Whipping') { i.tried='yes'; i.rating='loved'; i.role='Receiving'; i.note='With flogger'; }
+  if(n==='Temperature extremes') { i.tried='yes'; i.rating='liked'; i.note='A little experience with cold'; }
+  if(n==='Light Bondage') { i.role='Both'; i.motive='Arousal'; }
   return i;
 }
 
@@ -196,7 +209,7 @@ let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } }
 let activeP = 'p1', activeTab = 'all', isCompare = false, activeFilters = new Set(), searchQ = '', sheetCtx = null, comparisonData = null;
 
 function init() {
-  const saved = localStorage.getItem('partner_portal_v16_exhaustive');
+  const saved = localStorage.getItem('partner_portal_v19_final');
   if (saved) {
     APP_STATE = JSON.parse(saved);
   } else {
@@ -204,12 +217,12 @@ function init() {
       APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => mapAndy(n)) });
       APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => mapBecca(n)) });
     });
-    // Create the required March Snapshot for both
-    APP_STATE.p1.history.unshift({ id: 1711929600000, name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE.p1.data)) });
-    APP_STATE.p2.history.unshift({ id: 1711929600001, name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE.p2.data)) });
+    // Create pre-loaded March Snapshots
+    saveSnapshotBaseline('p1');
+    saveSnapshotBaseline('p2');
   }
 
-  // AUTO-LOAD LATEST SNAPSHOT ON EVERY LOAD
+  // AUTO-LOAD LATEST SNAPSHOT ON LOAD
   if(APP_STATE.p1.history.length > 0) APP_STATE.p1.data = JSON.parse(JSON.stringify(APP_STATE.p1.history[0].data));
   if(APP_STATE.p2.history.length > 0) APP_STATE.p2.data = JSON.parse(JSON.stringify(APP_STATE.p2.history[0].data));
 
@@ -220,6 +233,10 @@ function init() {
   });
   
   render(); updateHistDropdown();
+}
+
+function saveSnapshotBaseline(p) {
+  APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) });
 }
 
 function setProfile(p) {
@@ -235,7 +252,7 @@ function toggleCompare() { isCompare = !isCompare; comparisonData = null; render
 function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
 function toggleFilter(f, btn) { if(activeFilters.has(f)) activeFilters.delete(f); else activeFilters.add(f); btn.classList.toggle('active'); render(); }
 function clearFilters() { activeFilters.clear(); searchQ = ''; document.getElementById('searchInput').value = ''; document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); render(); }
-function save() { localStorage.setItem('partner_portal_v16_exhaustive', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved Locally'; }
+function save() { localStorage.setItem('partner_portal_v19_final', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Live Saved'; }
 
 // ── HISTORY ──────────────────────────────────────────────────
 function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
@@ -290,7 +307,7 @@ function render() {
 
       html += `<div class="activity-item ${isCompare && isMatch ? 'match' : ''} ${isCompare && hasLimit ? 'limit-active' : ''} ${isChanged ? 'changed' : ''}">
         <div class="item-grid">
-          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL</span>' : ''}</div>
+          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL</span>' : ''} ${isChanged ? '<br><span style="color:var(--gold); font-size:8px;">✦ UPDATED</span>' : ''}</div>
           <div class="profile-cols">
             ${isCompare ? renderCell(APP_STATE.p1.data.find(c=>c.id==cat.id).items[idx], 'Andy', 'p1', cat.id, idx) : ''}
             ${isCompare ? renderCell(APP_STATE.p2.data.find(c=>c.id==cat.id).items[idx], 'Becca', 'p2', cat.id, idx) : ''}
@@ -302,7 +319,8 @@ function render() {
     });
     html += `</div></div>`;
   });
-  main.innerHTML = html; updateStats();
+  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No activities match filters.</div>';
+  updateStats();
 }
 
 function renderCell(res, name, pKey, cid, idx) {
@@ -345,7 +363,7 @@ function triggerSheet(cid, i, f) {
 
 function closeSheet() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); }
 function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
-function resetApp() { if(confirm("Clear progress?")) { localStorage.removeItem('partner_portal_v16_exhaustive'); location.reload(); } }
+function resetApp() { if(confirm("Clear progress?")) { localStorage.removeItem('partner_portal_v19_final'); location.reload(); } }
 
 function updateStats() {
   let t=0, l=0, w=0, lim=0, f=0;
