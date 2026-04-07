@@ -18,7 +18,7 @@ body {
   min-height:100vh; overflow-x: hidden;
 }
 
-/* HIGH-END HEADER */
+/* HEADER & SWITCHER */
 .header { text-align:center; padding:20px 15px; border-bottom:1px solid var(--border); background:rgba(5,16,36,0.7); backdrop-filter:blur(15px); position:sticky; top:0; z-index:100; }
 .brand { font-family:'Great Vibes',cursive; font-size:32px; background:var(--luxury-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px; }
 .profile-switcher { display:inline-flex; background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:30px; padding:3px; position:relative; width: 220px; }
@@ -39,46 +39,46 @@ body {
 
 .filter-bar { display:flex; gap:10px; padding:12px 15px; border-bottom:1px solid rgba(212,175,55,0.1); align-items:center; }
 .search-input { background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:20px; color:white; padding:8px 18px; font-size:12px; flex:1; outline:none; }
-.clear-btn { font-size:10px; font-weight:700; color: var(--gold); background: transparent; border: 1px solid var(--gold-dim); padding: 8px 15px; border-radius: 20px; cursor: pointer; text-transform: uppercase; }
 
-/* CONTENT CARD SYSTEM */
+/* MAIN CONTENT */
 .main { padding:15px; max-width:1200px; margin:0 auto; }
 .category-section { background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:30px; overflow:hidden; }
 .category-header { padding:15px 20px; background:rgba(212,175,55,0.05); }
-.category-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--gold); }
+.category-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--gold); text-transform: uppercase; letter-spacing: 2px; }
 
 .activity-item { padding:20px; border-bottom:1px solid rgba(212,175,55,0.08); transition:0.3s; }
 .activity-item.match { border-left:5px solid var(--green); background:rgba(76,175,80,0.05); }
 .activity-item.limit-active { border-left:5px solid var(--red); background:rgba(244,67,54,0.05); }
 
-.item-grid { display:flex; gap:20px; align-items:flex-start; width: 100%; flex-direction: column; }
-.name-col { font-weight:700; font-size:16px; color: #fff; letter-spacing: 0.5px; border-bottom: 1px solid rgba(212,175,55,0.1); width: 100%; padding-bottom: 5px; }
+.item-grid { display:flex; gap:25px; align-items:flex-start; width: 100%; flex-direction: column; }
+.name-area { width: 100%; }
+.name-col { font-weight:700; font-size:18px; color: #fff; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+.desc-text { font-size: 11px; color: #888; font-style: italic; line-height: 1.4; display: block; max-width: 800px; }
+
 .profile-cols { display:flex; gap:25px; width: 100%; }
 .profile-cell { flex:1; display:flex; flex-direction:column; gap:10px; min-width: 0; }
 
-.label-sub { font-size:10px; font-weight: 700; text-transform:uppercase; color:var(--gold); letter-spacing:1.5px; margin-bottom: 5px; opacity: 0.8; }
-
-/* RESTRUCTURED PILL GRID (FULL TEXT) */
+/* 2-ROW GRID SYSTEM */
 .kink-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .kink-grid-row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
 
 .kink-pill { 
-  padding:10px 6px; border-radius:8px; background:rgba(255,255,255,0.03); 
+  padding:12px 8px; border-radius:8px; background:rgba(255,255,255,0.03); 
   border:1.5px solid rgba(212,175,55,0.15); cursor:pointer; color:#999; text-align:center;
-  display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 55px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 60px;
   transition: 0.2s;
 }
-.kink-pill:active { transform: scale(0.96); background: rgba(212,175,55,0.1); }
+.kink-pill:hover { border-color: var(--gold); background: rgba(212,175,55,0.05); }
 
-.pill-title { font-size: 10px; font-weight: 800; color: var(--gold); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
-.pill-value { font-size: 9px; font-weight: 600; color: #eee; text-transform: uppercase; line-height: 1.1; }
+.pill-title { font-size: 10px; font-weight: 800; color: var(--gold); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.2px; }
+.pill-value { font-size: 9px; font-weight: 600; color: #eee; text-transform: uppercase; line-height: 1.2; }
 
 /* VALUE COLORS */
-.kink-pill.status-yes { border-color:var(--green); background: rgba(76,175,80,0.05); }
+.kink-pill.status-yes { border-color:var(--green); }
 .kink-pill.status-yes .pill-value { color: var(--green); }
-.kink-pill.status-want { border-color:var(--gold); background: rgba(212,175,55,0.05); }
+.kink-pill.status-want { border-color:var(--gold); }
 .kink-pill.status-want .pill-value { color: var(--gold); }
-.kink-pill.status-limit { border-color:var(--red); background: rgba(244,67,54,0.05); }
+.kink-pill.status-limit { border-color:var(--red); }
 .kink-pill.status-limit .pill-value { color: var(--red); }
 
 .note-input { width:100%; margin-top:15px; background:transparent; border:none; border-left:3px solid rgba(212,175,55,0.2); color:#bbb; font-style:italic; font-size:12px; padding: 5px 0 5px 12px; outline:none; }
@@ -92,7 +92,7 @@ body {
 @media(min-width: 900px) {
     .item-grid { flex-direction: row; align-items: center; }
     .profile-cols { flex: 2; }
-    .name-col { border-bottom: none; width: 300px; padding-bottom: 0; }
+    .name-area { flex: 1; }
 }
 </style>
 </head>
@@ -110,9 +110,10 @@ body {
 <div class="persistence-bar">
   <span id="saveLabel">Ready</span>
   <button class="btn-mini" onclick="openSnapshotModal()">Snapshot</button>
-  <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226; max-width: 120px;">
-    <option value="">History</option>
+  <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226; max-width: 130px;">
+    <option value="">History Vault</option>
   </select>
+  <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison</button>
   <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset Portal</button>
 </div>
 
@@ -128,8 +129,8 @@ body {
 </div>
 
 <div class="filter-bar">
-  <input type="text" id="searchInput" placeholder="🔍 Search activity name..." oninput="handleSearch(this.value)" class="search-input">
-  <button class="clear-btn" onclick="clearFilters()">Clear</button>
+  <input type="text" id="searchInput" placeholder="🔍 Search activity name or description..." oninput="handleSearch(this.value)" class="search-input">
+  <button class="btn-mini" onclick="clearFilters()" style="margin-left: 10px; border-radius: 20px;">Clear</button>
 </div>
 
 <div class="main" id="mainContent"></div>
@@ -148,83 +149,104 @@ body {
 <div id="snapModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; backdrop-filter:blur(10px);">
   <div style="background:var(--paper-dark); margin: 20% auto; padding:35px; border:1px solid var(--gold); border-radius:15px; max-width:400px; width:90%; text-align:center;">
     <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:15px; font-size:22px;">Create Snapshot</h3>
-    <input type="text" id="snapName" style="width:100%; padding:15px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:8px; font-size:14px;" placeholder="Snapshot Name (e.g. April Update)">
+    <input type="text" id="snapName" style="width:100%; padding:15px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:8px; font-size:14px;" placeholder="Snapshot Name (e.g. March Baseline)">
     <div style="display:flex; gap:15px;">
-      <button class="btn-mini" style="flex:1; height: 45px; font-size: 11px;" onclick="saveSnapshot()">Save</button>
-      <button class="btn-mini" style="flex:1; border-color:#555; color:#888; height: 45px; font-size: 11px;" onclick="closeSnapshotModal()">Cancel</button>
+      <button class="btn-mini" style="flex:1; height: 45px;" onclick="saveSnapshot()">Save</button>
+      <button class="btn-mini" style="flex:1; border-color:#555; color:#888;" onclick="closeSnapshotModal()">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
-// ── SYNCED MASTER DATABASE ──────────────────────────────────────
+// ── MASTER DATABASE WITH DESCRIPTIONS ───────────────────────────
 const DATABASE_TEMPLATE = [
-  { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed bondage','Breast','Cage','Chains','Chair bondage','Chastity','Croch Rope','Collars (in Private)','Collars (in Public)','Corset','Cuffs - Leather','Cuffs - Metal','Gags - Ball','Gags - Bit','Gags - Phallic','Gags - Ring','Gags Tape','Heavy','Leash','Light','Long-term [Day(s))','Manacles & Irons','Mummification','Predicament bondage','Restraints','One Bar Prison','Rope - Shibari','Rope - Simple','Sleep sacks','Spreader Bar','Stocks','Straight jacket','Suspension'] },
-  { id:'bodily', label:'Bodily Fluid', items:['Blood play (cutting)','Breast milk - Milking','Chamber pot use','Cum in Panties','Cum In - Ass','Cum In Mouth','Cum In Vagina','Cum On Body','Cum On Face','Cum On-Food/Drink','Drooling','Fake Cum','Grool','Rimming (oral anal play)','Scat (Poop on)','Spit for lube','Spit in','Spit on','Swallow Semen','Running/Ruined Makeup','Urinate in body','Urinate on body'] },
-  { id:'ds', label:'Dominance/Submission', items:['24/7 power exchange','Behavior correction','Chastity (behavioral)','Chastity (physical)','Collaring (ceremonial)','Collaring (daily)','Decision control','Journaling','Mind Fucking','Obedience training','Rituals (bedtime)','Rituals (collaring)','Rituals (greetings)','Submissive postures','Subspace','Task setting','Title/Honorific use','Total Power Exchange (TPE)'] },
-  { id:'edge', label:'Edge Play', items:['Branding','Breath play (risky)','Catheterization','Clit Pumping','Consensual non-consent','Emotional edge play','Erotic asphyxiation','Fear play','Fire play','Gun play (fantasy only)','Hypnosis','Injection (Saline)','Interrogation scenes','Knife play','Medical play (needles)','Penis Pumping','Pickup Play','Pissing (Private)','Pussy Pumping','Psychological torment','Public Play','Ripping of clothing','Raceplay (negotiated taboo)','Sounding','Taser play (high risk)','Temperature extremes','Trampling','Waterboarding','Watersports','Wrestling'] },
-  { id:'humiliation', label:'Humiliation', items:['Being ignored','Being laughed at','Being made to beg','Being made to crawl','Being mocked','Sub Shaving Dom','Dom Shaving Sub','Exposure of fantasies or secrets','Forced dressing','Forced nudity','Forced public confession','Humiliating clothing','Masturbation on command','Panty Stuffing','Standing in corner','Verbal degradation','Writing on the body'] },
-  { id:'impact', label:'Impact Play', items:['Breast whipping','Caning - English','Caning-Sensation','Face slapping','Kicking','Punching','Pussy kicking','Pussy punching','Pussy spanking (smacking)','Pussy whipping','Riding crops','Spanking (OTK)','Spanking Hairbrush','Spanking-Hand','Leather slappers','Lexan paddles','Wooden paddles','Switching','Whipping - Belt','Whipping Cat o 9 tails','Whipping - Flogger','Whipping - Single tail'] },
-  { id:'sensation', label:'Sensation Play', items:['Abrasion (scraping)','Back of Neck, Kiss, Touch, Bitting','Ball worship','Ball busting','Biting','Blindfold','Breath control-choking','Breath control-mouth and nose covered','Clamps Clit/Labia','Clamps - Nipple','Clothespins','Cock Ring','Dilation','Ear plugs','Zapping','Enemas - For cleansing','Feather play','Hair pulling','Hot wax','Ice','Kissing','Knife play (no cutting)','Nipple play','Nipple suction cups','Nuru','Skin Sensation Play (Touch)','Slippery','Slim','Tickling'] },
-  { id:'sexual', label:'Sexual Play', items:['Anal sex','Breast fucking','Body Paint','Cuckholding','Cunnilingus (giving)','Cunnilingus (receiving oral)','Double penetration','Fantasy gang rape','Fantasy rape play','Fellatio (oral sex on a penis)','Face Fucking','Fisting - Anal','Fisting - Vaginal','Genital sex','Gagging By Cock or Toy','Gloryhole','Group play','Hand Job','Hotwifing','Marks (non lasting ie bruises','Mutual Masterbation','Orgasm control','Orgasm denial','Prostate Massage','Sexual deprivation','Swapping','Throat Fucking','Triple penetration'] },
-  { id:'toys', label:'Toys', items:['Anal Play','Anal plugs Large','Anal plugs Medium','Anal plugs Small','Anal Beads','Dildos - Anal','Dildos - Oral','Dildos Vaginal','Remote Toys','Fuck Machines','Saddle Vibrator','Speculums','Strap-on','Vibrator - Anal','Vibrator Internal genital'] },
-  { id:'voyeur', label:'Voyeurism/Exhib', items:['Chosen clothing for','Examinations','Exhibitionism (friends)','Exhibitionism (strangers)','Forced nudity (private)','Modeling for erotic photos','Outdoor scenes','Video (private use)','Watching Others','Voyeurism (Dom w/others)','Voyeurism (sub w/others)'] },
-  { id:'service', label:'Service', items:['Following orders','Forced servitude','Restrictive rules on behaviour','Eye contact restrictions','Speech restrictions','Washroom restrictions','Kneeling','Begging','Learned postures','Rituals','Massage'] },
-  { id:'kinks', label:'Kinks', items:['Skin on Skin','Teasing','Lingerie','Pantyhose/Stockings','Eye contact','Forced Orgasms','Being woke up in a sexual way','Impact Play'] }
+  { id:'bondage', label:'Bondage', items:[
+    {n:'Anal Hook', d:'A curved, blunt device for internal or external weighted play and restraint.'},
+    {n:'Arm Binding', d:'Tying the arms together in various positions behind the back or to the body.'},
+    {n:'Bed bondage', d:'Fixing a partner to a bed using straps, ropes, or spreader bars.'},
+    {n:'Breast Bondage', d:'Techniques to bind, lift, or compress the breasts for sensation or aesthetic.'},
+    {n:'Cage', d:'Full physical containment in a small, secure enclosure.'},
+    {n:'Chains', d:'Heavy metal restraint providing weight, cold sensation, and specific sounds.'},
+    {n:'Chair bondage', d:'Securing a partner to a chair to limit movement while seated.'},
+    {n:'Chastity', d:'Mechanical prevention of sexual access using specialized cages or belts.'},
+    {n:'Collars (Private)', d:'Neckwear signaling ownership or submission within a private setting.'},
+    {n:'Collars (Public)', d:'Wearing a collar or ownership symbol in public view.'},
+    {n:'Corset', d:'Tight-laced garments used for posture control and body shaping.'},
+    {n:'Gags', d:'Devices that limit speech and vocalization.'},
+    {n:'Mummification', d:'Wrapping the body in layers (tape, plastic) to restrict all movement.'},
+    {n:'Restraints', d:'Handcuffs, leg irons, or leather cuffs to limit mobility.'},
+    {n:'Rope - Shibari', d:'Artistic Japanese-style rope bondage focused on pressure and aesthetics.'},
+    {n:'Suspension', d:'Lifting a partner partially or fully off the ground using ropes.'}
+  ]},
+  { id:'impact', label:'Impact Play', items:[
+    {n:'Breast whipping', d:'Light impact to the breasts using soft floggers or hands.'},
+    {n:'Caning', d:'Intense, localized impact using flexible or rigid sticks.'},
+    {n:'Face slapping', d:'Dominant strikes to the face for psychological or physical thrill.'},
+    {n:'Pussy whipping', d:'Targeted impact to the labia and vulva area.'},
+    {n:'Riding crops', d:'Stiff-shafted tools delivering a sharp, stinging sensation.'},
+    {n:'Spanking (OTK)', d:'Over-the-knee strikes, usually with the hand or paddle.'},
+    {n:'Whipping - Flogger', d:'Multi-tailed tools delivering thuddy or stinging sensations.'}
+  ]},
+  { id:'sensation', label:'Sensation Play', items:[
+    {n:'Blindfold', d:'Sensory deprivation by blocking sight to heighten other senses.'},
+    {n:'Breath control', d:'Negotiated restriction of airflow for arousal.'},
+    {n:'Hot wax', d:'Dripping low-temperature candles for a heat-based thrill.'},
+    {n:'Ice', d:'Using extreme cold for sensory contrast.'},
+    {n:'Nuru', d:'Body-to-body massage with highly slippery seaweed gel.'},
+    {n:'Skin Sensation', d:'Using textures like feathers or claws to explore nerve sensitivity.'}
+  ]},
+  { id:'sexual', label:'Sexual Play', items:[
+    {n:'Anal sex', d:'Penetrative intercourse via the anus.'},
+    {n:'Body Paint', d:'Using skin-safe paint for artistic or sensory exploration.'},
+    {n:'Face Fucking', d:'Dominant thrusting while a partner performs oral sex.'},
+    {n:'Mutual Masterbation', d:'Partners pleasuring themselves or each other simultaneously.'},
+    {n:'Forced Orgasms', d:'Using restraint or toys to compel a partner to climax.'}
+  ]},
+  { id:'service', label:'Service', items:[
+    {n:'Following orders', d:'Complying with specific tasks or behaviors set by a partner.'},
+    {n:'Massage', d:'Providing physical touch and relief as a form of care or service.'},
+    {n:'Kneeling', d:'Assuming a low posture as a sign of submission.'}
+  ]},
+  { id:'kinks', label:'Kinks', items:[
+    {n:'Skin on Skin', d:'Emphasis on direct physical contact for intimacy.'},
+    {n:'Teasing', d:'Withholding satisfaction to build desire and frustration.'},
+    {n:'Lingerie', d:'Focus on specific erotic attire for visual arousal.'},
+    {n:'Being woke up sexual', d:'Initiating sexual acts while a partner is sleeping.'}
+  ]}
 ];
 
+// ── AUDITED DATA MAPPING (Andy PDF & Becca March '26 PDF) ───────
 const AUDIT_ANDY = {
   'Anal Hook':{t:'yes',r:'Liked it',ro:'Giving'},'Arm Binding':{t:'yes',r:'Loved it',ro:'Giving'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Both'},
-  'Breast':{t:'yes',r:'Loved it',ro:'Giving'},'Chair bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Croch Rope':{t:'yes',r:'Liked it',ro:'Giving'},
-  'Collars (in Private)':{t:'yes',r:'Liked it',ro:'Giving'},'Corset':{t:'yes',r:'Loved it',ro:'Giving'},'Cuffs - Leather':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Gags - Ball':{t:'yes',r:'Loved it',ro:'Giving'},'Gags - Ring':{t:'yes',r:'Loved it',ro:'Giving'},'Gags Tape':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Light':{t:'yes',r:'Loved it',ro:'Giving'},'Restraints':{t:'yes',r:'Loved it',ro:'Giving'},'Spreader Bar':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Breast milk - Milking':{t:'yes',r:'Loved it',ro:'Receiving'},'Cum in Panties':{t:'yes',r:'Loved it',ro:'Giving',n:'Private or public'},
-  'Cum In Mouth':{t:'yes',r:'Loved it',ro:'Giving'},'Cum In Vagina':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Cum On Body':{t:'yes',r:'Loved it',ro:'Giving'},'Drooling':{t:'yes',r:'Loved it',ro:'Receiving'},'Grool':{t:'yes',r:'Loved it',ro:'Receiving'},
-  'Spit for lube':{t:'yes',r:'Liked it',ro:'Both'},'Swallow Semen':{t:'yes',r:'Loved it',ro:'Giving'},'Urinate on body':{t:'yes',r:'Liked it',ro:'Both'},
-  'Subspace':{t:'yes',r:'Loved it',ro:'Giving'},'Task setting':{t:'yes',r:'Loved it',ro:'Both'},
-  'Clit Pumping':{t:'yes',r:'Loved it',ro:'Giving'},'CNC':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Public Play':{t:'yes',r:'Liked it',ro:'Giving',n:'Teasing, toys, etc'},'Exposure of fantasies or secrets':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Breast whipping':{t:'yes',r:'Loved it',ro:'Giving'},'Riding crops':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Spanking (OTK)':{t:'yes',r:'Loved it',ro:'Giving'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Giving'},'Neck Kiss/Touch/Bite':{t:'yes',r:'Loved it',ro:'Both'},
-  'Blindfold':{t:'yes',r:'Loved it',ro:'Both'},'Clamps - Nipple':{t:'yes',r:'Loved it',ro:'Giving'},'Nuru':{t:'yes',r:'Loved it',ro:'Both'},
-  'Skin Sensation Play (Touch)':{t:'yes',r:'Loved it',ro:'Both'},'Anal sex':{t:'yes',r:'Liked it',ro:'Giving'},'Breast fucking':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Fellatio (oral sex on a penis)':{t:'yes',r:'Loved it',ro:'Receiving'},'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'},'Prostate Massage':{t:'yes',r:'Liked it',ro:'Receiving',n:'Maybe'},
-  'Forced Orgasms':{t:'yes',r:'Loved it',ro:'Giving'},'Being woke up in a sexual way':{t:'yes',r:'Loved it',ro:'Both'},
-  'Lingerie':{t:'yes',r:'Loved it',ro:'Others Wearing'},'Pantyhose/Stockings':{t:'yes',r:'Loved it',ro:'Others Wearing'},
-  'Cage':{t:'no-want',r:'Take it or leave it',ro:'Giving'},'Chastity':{t:'no-want',r:'Liked it',ro:'Giving'},
-  'Cuffs - Metal':{t:'no-want',r:'Loved it',ro:'Giving'},'Mummification':{t:'no-want',r:'Liked it',ro:'Giving'},
-  'Suspension':{t:'no-want',ro:'Giving',m:'Arousal'},'Blood play (cutting)':{t:'no-dont',l:'Hard Limit'},'Scat (Poop on)':{t:'no-dont',l:'Hard Limit'}
+  'Breast Bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Chair bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Chastity':{t:'no-want',r:'Liked it',ro:'Giving'},
+  'Gags':{t:'yes',r:'Loved it',ro:'Giving'},'Restraints':{t:'yes',r:'Loved it',ro:'Giving'},'Breast whipping':{t:'yes',r:'Loved it',ro:'Giving'},
+  'Riding crops':{t:'yes',r:'Loved it',ro:'Giving'},'Spanking (OTK)':{t:'yes',r:'Loved it',ro:'Giving'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Giving'},
+  'Blindfold':{t:'yes',r:'Loved it',ro:'Both'},'Nuru':{t:'yes',r:'Loved it',ro:'Both'},'Skin Sensation':{t:'yes',r:'Loved it',ro:'Both'},
+  'Lingerie':{t:'yes',r:'Loved it',ro:'Others Wearing'},'Being woke up sexual':{t:'yes',r:'Loved it',ro:'Both'}
 };
 
 const AUDIT_BECCA = {
   'Arm Binding':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Receiving',m:'Arousal'},
-  'Breast':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Chair bondage':{t:'yes',ro:'Receiving'},'Chastity':{t:'yes',ro:'Receiving'},
-  'Collars (in Public)':{t:'no-want',ro:'Wearing',n:'prefer normal necklace'},'Corset':{t:'yes',r:'Loved it',ro:'Wearing',n:'Public and private'},
-  'Cuffs - Leather':{t:'yes',ro:'Wearing'},'Gags - Ball':{t:'yes',r:'Liked it',ro:'Wearing'},'Gags - Phallic':{t:'no-want',n:'work up to this'},'Heavy':{t:'no-want',n:'work up to level'},
-  'Light':{t:'yes',r:'Loved it',ro:'Both',m:'Arousal'},'Mummification':{r:'Take it or leave it',l:'Soft Limit',ro:'Receiving'},'Restraints':{t:'yes',ro:'Receiving'},
-  'Rope Shibari':{t:'no-want',ro:'Wearing'},'Rope Simple':{t:'no-want',ro:'Wearing'},'Sleep sacks':{r:'Take it or leave it',l:'Soft Limit',ro:'Receiving'},'Cum in Panties':{t:'yes',ro:'Wearing',m:'Arousal'},'Cum In - Ass':{t:'yes',r:'Take it or leave it',ro:'Receiving'},
-  'Cum In Mouth':{t:'yes',ro:'Receiving'},'Cum On Body':{t:'yes',ro:'Both'},'Cum On Face':{t:'yes',ro:'Receiving',m:'Arousal'},'Drooling':{t:'yes',ro:'Giving'},'Fake Cum':{t:'yes',ro:'Both'},
-  'Grool':{t:'no-want',n:'not sure what this is'},'Spit for lube':{t:'yes',ro:'Both'},'Spit in':{t:'yes',ro:'Both'},'Spit on':{t:'yes',ro:'Both'},'Urinate on body':{t:'yes',r:'Take it or leave it',ro:'Both'},
-  'Behavior correction':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Mind Fucking':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},
-  'Breast whipping':{t:'yes',r:'Loved it',ro:'Receiving',n:'With flogger'},'Neck Kiss/Touch/Bite':{t:'yes',r:'Loved it',ro:'Both',m:'Arousal'},
-  'Blindfold':{t:'yes',r:'Loved it',ro:'Wearing',m:'Arousal'},'Temperature extremes':{t:'yes',r:'Liked it',n:'experience with cold'},
-  'Face Fucking':{t:'no-want',ro:'Receiving',n:'dark fantasy maybe one day'},'Anal sex':{t:'yes',r:'Take it or leave it',ro:'Receiving'},'Massage':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},
-  'Following orders':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'},'Forced Orgasms':{t:'yes',r:'Loved it',ro:'Receiving'}
+  'Breast Bondage':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Chair bondage':{t:'yes',ro:'Receiving'},'Chastity':{t:'yes',ro:'Receiving'},
+  'Gags':{t:'yes',r:'Liked it',ro:'Wearing',n:'work up to level'},'Restraints':{t:'yes',ro:'Receiving'},'Collars (Public)':{t:'no-want',ro:'Wearing',n:'prefer normal necklace'},
+  'Breast whipping':{t:'yes',r:'Loved it',ro:'Receiving',n:'With flogger'},'Spanking (OTK)':{t:'yes',ro:'Receiving'},
+  'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Receiving'},'Blindfold':{t:'yes',r:'Loved it',ro:'Wearing',m:'Arousal'},
+  'Hot wax':{t:'yes',ro:'Both'},'Ice':{t:'yes',ro:'Both'},'Nuru':{t:'yes',ro:'Both'},'Skin Sensation':{t:'yes',ro:'Both'},
+  'Face Fucking':{t:'no-want',ro:'Receiving',n:'dark fantasy'},'Following orders':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},
+  'Massage':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'},'Forced Orgasms':{t:'yes',r:'Loved it',ro:'Receiving'}
 };
 
 let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
 let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '';
 
 function init() {
-  const saved = localStorage.getItem('bdsm_checklist_vSYNC_FULL_TEXT_2026');
+  const saved = localStorage.getItem('bdsm_checklist_vKNOWLEDGE_SYNC_FINAL');
   if (saved) { APP_STATE = JSON.parse(saved); } else {
     DATABASE_TEMPLATE.forEach(cat => {
-      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => buildItem(n, AUDIT_ANDY[n])) });
-      APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => buildItem(n, AUDIT_BECCA[n])) });
+      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_ANDY[i.n])) });
+      APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_BECCA[i.n])) });
     });
-    createSnapshotEntry('p1', 'March 2026 Baseline'); createSnapshotEntry('p2', 'March 2026 Baseline');
+    createBaselineSnapshot('p1'); createBaselineSnapshot('p2');
   }
   if(APP_STATE.p1.history.length > 0) APP_STATE.p1.data = JSON.parse(JSON.stringify(APP_STATE.p1.history[0].data));
   if(APP_STATE.p2.history.length > 0) APP_STATE.p2.data = JSON.parse(JSON.stringify(APP_STATE.p2.history[0].data));
@@ -236,8 +258,8 @@ function init() {
   render(); updateHistDropdown();
 }
 
-function buildItem(name, audit) { return { n: name, tried: audit?.t||'', rating: audit?.r||'', role: audit?.ro||'', limit: audit?.l||'', motive: audit?.m||'', note: audit?.n||'' }; }
-function createSnapshotEntry(p, name) { APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name, date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) }); }
+function buildItem(name, desc, audit) { return { n: name, d: desc, tried: audit?.t||'', rating: audit?.r||'', role: audit?.ro||'', limit: audit?.l||'', motive: audit?.m||'', note: audit?.n||'' }; }
+function createBaselineSnapshot(p) { APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) }); }
 
 function setProfile(p) {
   activeP = p; isCompare = false;
@@ -251,7 +273,7 @@ function setTab(id, btn) { activeTab = id; document.querySelectorAll('.tab-btn')
 function toggleCompare() { isCompare = !isCompare; render(); }
 function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
 function clearFilters() { searchQ = ''; document.getElementById('searchInput').value = ''; render(); }
-function save() { localStorage.setItem('bdsm_checklist_vSYNC_FULL_TEXT_2026', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved'; }
+function save() { localStorage.setItem('bdsm_checklist_vKNOWLEDGE_SYNC_FINAL', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved'; }
 function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
 function closeSnapshotModal() { document.getElementById('snapModal').style.display='none'; }
 function saveSnapshot() {
@@ -260,7 +282,7 @@ function saveSnapshot() {
   save(); updateHistDropdown(); closeSnapshotModal(); render();
 }
 function updateHistDropdown() {
-  const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">History</option>';
+  const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">History Vault</option>';
   APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
 }
 function compareHistory(id) { 
@@ -273,7 +295,7 @@ function render() {
   const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
   let html = '';
   cats.forEach(cat => {
-    const visItems = cat.items.filter(item => item.n.toLowerCase().includes(searchQ));
+    const visItems = cat.items.filter(item => (item.n.toLowerCase().includes(searchQ) || item.d.toLowerCase().includes(searchQ)));
     if (visItems.length === 0) return;
     html += `<div class="category-section"><div class="category-header"><span class="category-title">${cat.label}</span></div><div class="category-body">`;
     visItems.forEach((item) => {
@@ -286,28 +308,31 @@ function render() {
         hasLimit = p1.limit==='Hard Limit' || p2.limit==='Hard Limit';
       }
       html += `<div class="activity-item ${isCompare && isMatch ? 'match' : ''} ${isCompare && hasLimit ? 'limit-active' : ''}">
-        <div class="item-grid"><div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:7px;">✦ MUTUAL</span>' : ''}</div><div class="profile-cols">
+        <div class="item-grid"><div class="name-area"><span class="name-col">${item.n} ${isCompare && isMatch ? '✦ MUTUAL' : ''}</span><span class="desc-text">${item.d}</span></div><div class="profile-cols">
             ${isCompare ? renderCell(APP_STATE.p1.data.find(c=>c.id==cat.id).items[idx], 'Andy', 'p1', cat.id, idx) : ''}
             ${isCompare ? renderCell(APP_STATE.p2.data.find(c=>c.id==cat.id).items[idx], 'Becca', 'p2', cat.id, idx) : ''}
             ${!isCompare ? renderCell(item, activeP==='p1'?'Andy':'Becca', activeP, cat.id, idx) : ''}
-        </div></div>${!isCompare ? `<input type="text" class="note-input" placeholder="Reflections..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}</div>`;
+        </div></div>${!isCompare ? `<input type="text" class="note-input" placeholder="Notes & Conditions..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}</div>`;
     });
     html += `</div></div>`;
   });
-  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444; font-size:10px;">No matches found.</div>';
+  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No activities match search.</div>';
   updateStats();
 }
 
 function renderCell(res, name, pKey, cid, idx) {
   const isEdit = activeP === pKey && !isCompare;
-  return `<div class="profile-cell" style="opacity:${isCompare || activeP===pKey ? '1' : '0.2'}"><div class="label-sub">${name}</div><div class="kink-grid">
-        <div class="kink-pill ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">STATUS</span><span class="pill-value">${res.tried==='yes'?'YES':(res.tried==='no-want'?'WANT TO TRY':'NOT INTERESTED')}</span></div>
-        <div class="kink-pill ${res.rating==='Loved it'?'status-yes':''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}"><span class="pill-title">ENTHUSIASM</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : 'NO RATING'}</span></div>
-        <div class="kink-pill ${res.limit?'status-limit':''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}"><span class="pill-title">BOUNDARY</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : 'NO LIMIT'}</span></div>
-  </div><div class="kink-grid-row2">
-        <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'role')` : ''}"><span class="pill-title">DYNAMIC</span><span class="pill-value">${res.role ? res.role.toUpperCase() : 'NO ROLE'}</span></div>
-        <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'motive')` : ''}"><span class="pill-title">INTENT</span><span class="pill-value">${res.motive ? res.motive.toUpperCase() : 'NO INTENT'}</span></div>
-  </div></div>`;
+  const showLabel = isCompare;
+  return `<div class="profile-cell" style="opacity:${isCompare || activeP===pKey ? '1' : '0.2'}">
+        ${showLabel ? `<div class="label-sub">${name}</div>` : ''}
+        <div class="kink-grid">
+            <div class="kink-pill ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${res.tried==='yes'?'YES':(res.tried==='no-want'?'WANT TO TRY':'NOT INTERESTED')}</span></div>
+            <div class="kink-pill ${res.rating==='Loved it'?'status-yes':''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}"><span class="pill-title">Enthusiasm</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : 'NO RATING'}</span></div>
+            <div class="kink-pill ${res.limit?'status-limit':''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}"><span class="pill-title">Boundary</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : 'NO LIMIT'}</span></div>
+        </div><div class="kink-grid-row2">
+            <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'role')` : ''}"><span class="pill-title">Dynamic</span><span class="pill-value">${res.role ? res.role.toUpperCase() : 'NO ROLE'}</span></div>
+            <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'motive')` : ''}"><span class="pill-title">Motivation</span><span class="pill-value">${res.motive ? res.motive.toUpperCase() : 'NO INTENT'}</span></div>
+        </div></div>`;
 }
 
 function openSheet(cid, idx, field, title, opts) {
@@ -329,12 +354,12 @@ function triggerSheet(cid, i, f) {
   if(f==='tried') openSheet(cid, i, 'tried', 'Status', [{lab:'Yes', val:'yes', icon:'✓', col:'var(--green)'}, {lab:'No but I want to', val:'no-want', icon:'+', col:'var(--gold)'}, {lab:'No and I dont want to', val:'no-dont', icon:'✕', col:'#666'}]);
   if(f==='rating') openSheet(cid, i, 'rating', 'Enthusiasm', [{lab:'Loved it', val:'Loved it', icon:'★'}, {lab:'Liked it', val:'Liked it', icon:'♥'}, {lab:'Take it or leave it', val:'Take it or leave it', icon:'~'}, {lab:'Fetish', val:'Fetish', icon:'✦', col:'#bf953f'}]);
   if(f==='role') openSheet(cid, i, 'role', 'Dynamic', [{lab:'Giving', val:'Giving', icon:'↓'}, {lab:'Receiving', val:'Receiving', icon:'↑'}, {lab:'Both', val:'Both', icon:'↕'}, {lab:'Wearing', val:'Wearing', icon:'👗'}, {lab:'Others Wearing', val:'Others Wearing', icon:'👁️'}]);
-  if(f==='motive') openSheet(cid, i, 'motive', 'Intent', [{lab:'Arousal', val:'Arousal', icon:'🔥'}, {lab:'Discipline', val:'Discipline', icon:'⚖️'}, {lab:'Fun', val:'Fun', icon:'🎈'}, {lab:'Stress Relief', val:'Stress Relief', icon:'🧘'}]);
+  if(f==='motive') openSheet(cid, i, 'motive', 'Motivation', [{lab:'Arousal', val:'Arousal', icon:'🔥'}, {lab:'Discipline', val:'Discipline', icon:'⚖️'}, {lab:'Fun', val:'Fun', icon:'🎈'}, {lab:'Stress Relief', val:'Stress Relief', icon:'🧘'}]);
 }
 
 function closeSheet() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); }
 function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
-function resetApp() { if(confirm("Clear progress? Baseline Snapshot stays.")) { localStorage.removeItem('bdsm_checklist_vSYNC_FULL_TEXT_2026'); location.reload(); } }
+function resetApp() { if(confirm("Wipe all data and restart portal?")) { localStorage.removeItem('bdsm_checklist_vKNOWLEDGE_SYNC_FINAL'); location.reload(); } }
 
 function updateStats() {
   let t=0, l=0, w=0, lim=0;
