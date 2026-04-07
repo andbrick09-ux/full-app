@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Kink Consultant — Final Partner Portal</title>
+<title>BDSM Checklist v1.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -18,7 +18,7 @@ body {
   min-height:100vh; overflow-x: hidden;
 }
 
-/* HEADER & PROFILE SWITCHER */
+/* HEADER & SWITCHER */
 .header { text-align:center; padding:30px 20px; border-bottom:1px solid var(--border); background:rgba(5,16,36,0.7); backdrop-filter:blur(15px); position:sticky; top:0; z-index:100; }
 .brand { font-family:'Great Vibes',cursive; font-size:38px; background:var(--luxury-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; }
 .profile-switcher { display:inline-flex; background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:30px; padding:4px; position:relative; }
@@ -33,7 +33,6 @@ body {
 
 /* TABS & SUMMARY */
 .tabs-nav { display:flex; overflow-x:auto; gap:8px; padding:15px 20px; border-bottom:1px solid var(--border); scrollbar-width:none; }
-.tabs-nav::-webkit-scrollbar { display: none; }
 .tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:20px; color:var(--gold-dim); font-size:11px; padding:7px 16px; cursor:pointer; white-space:nowrap; }
 .tab-btn.active { background:var(--luxury-gradient); color:var(--midnight); border-color:transparent; }
 
@@ -64,15 +63,14 @@ body {
 
 .label-sub { font-size:9px; text-transform:uppercase; color:var(--gold-dim); letter-spacing:1px; }
 .kink-row { display:flex; gap:5px; flex-wrap:wrap; }
-.kink-pill { font-size:9px; font-weight:700; padding:5px 8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.15); cursor:pointer; color:#aaa; text-align:center; min-width:65px; }
+.kink-pill { font-size:9px; font-weight:700; padding:5px 8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.15); cursor:pointer; color:#aaa; text-align:center; min-width:70px; }
 .kink-pill.status-yes { color:var(--green); border-color:var(--green); }
 .kink-pill.status-want { color:var(--gold); border-color:var(--gold); }
 .kink-pill.status-limit { color:var(--red); border-color:var(--red); }
-.kink-pill.status-fetish { color:#bf953f; border-color:#bf953f; }
 
 .note-input { width:100%; margin-top:10px; background:transparent; border:none; border-left:2px solid rgba(212,175,55,0.2); color:#888; font-style:italic; font-size:11px; padding-left:8px; outline:none; }
 
-/* MODALS */
+/* OVERLAYS */
 #sheetOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:2000; }
 #bottomSheet { position:fixed; bottom:-100%; left:0; width:100%; background:rgba(8,18,38,0.98); border-top:2px solid var(--gold); border-radius:24px 24px 0 0; padding: 20px; z-index:2001; transition:0.4s; max-height: 85vh; overflow-y:auto; }
 #bottomSheet.open { bottom:0; }
@@ -87,7 +85,7 @@ body {
 <body onload="init()">
 
 <div class="header">
-  <div class="brand">The Kink Consultant</div>
+  <div class="brand">BDSM Checklist</div>
   <div class="profile-switcher" id="profileSwitcher">
     <div class="slider-bg"></div>
     <button class="profile-btn active" id="p1-btn" onclick="setProfile('p1')">Andy</button>
@@ -99,7 +97,7 @@ body {
   <span id="saveLabel">Ready</span>
   <button class="btn-mini" onclick="openSnapshotModal()">Create Snapshot</button>
   <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226;">
-    <option value="">History Vault</option>
+    <option value="">History</option>
   </select>
   <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison</button>
   <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset</button>
@@ -149,9 +147,9 @@ body {
 </div>
 
 <script>
-// ── EXHAUSTIVE UNIFIED DATABASE ─────────────────────────────────
+// ── EXHAUSTIVE UNIFIED DATA STRUCTURE ──────────────────────────
 const DATABASE_TEMPLATE = [
-  { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed Bondage','Breast Bondage','Cage','Chains','Chair Bondage','Chastity','Croch Rope','Collars (Private)','Collars (Public)','Corset','Cuffs Leather','Cuffs Metal','Gags Ball','Gags Bit','Gags Phallic','Gags Ring','Gags Tape','Heavy Bondage','Leash','Light Bondage','Long-term','Manacles & Irons','Mummification','Predicament Bondage','Restraints','One Bar Prison','Rope Shibari','Rope Simple','Sleep Sacks','Spreader Bar','Stocks','Straight Jacket','Suspension'] },
+  { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed Bondage','Breast Bondage','Cage','Chains','Chair Bondage','Chastity','Croch Rope','Collars (Private)','Collars (Public)','Corset','Crotch Rope','Cuffs Leather','Cuffs Metal','Gags Ball','Gags Bit','Gags Phallic','Gags Ring','Gags Tape','Heavy Bondage','Leash','Light Bondage','Long-term','Manacles & Irons','Mummification','Predicament Bondage','Restraints','One Bar Prison','Rope Shibari','Rope Simple','Sleep Sacks','Spreader Bar','Stocks','Straight Jacket','Suspension'] },
   { id:'bodily', label:'Bodily Fluid', items:['Blood play','Breast milk - Milking','Chamber pot use','Cum in Panties','Cum In Ass','Cum In Mouth','Cum In - Vagina','Cum On - Body','Cum On Face','Cum On Food/Drink','Drooling','Fake Cum','Grool','Rimming','Scat','Spit for lube','Spit In','Spit On','Swallow Semen','Running Makeup','Throat Pie','Urinate in body','Urinate on body'] },
   { id:'ds', label:'Dominance/Submission', items:['24/7 power exchange','Behavior correction','Chastity (behavioral)','Chastity (physical)','Collaring (ceremonial)','Collaring (daily)','Deepthroat training','Journaling','Mind Fucking','Obedience training','Rituals (bedtime)','Rituals (collaring)','Rituals (greetings)','Submissive postures','Subspace','Task setting','Title Honorifics','TPE'] },
   { id:'edge', label:'Edge Play', items:['Branding','Breath Play','Catheterization','Clit Pumping','CNC','Emotional Edge','Erotic asphyxiation','Fear Play','Fire Play','Gun Play','Hypnosis','Saline Injection','Interrogation','Knife play','Medical Play','Penis Pumping','Pickup Play','Pissing (Private)','Pussy Pumping','Psychological Torment','Public Play','Ripping of clothing','Raceplay','Sounding','Taser play','Temperature extremes','Trampling','Waterboarding','Watersports','Wrestling'] },
@@ -166,63 +164,45 @@ const DATABASE_TEMPLATE = [
   { id:'kinks', label:'Kinks', items:['Skin on Skin','Stockings/Pantyhose','Lingerie','Foot Job','Forced Orgasms','High Heels','Waking Up to Sex','Waking Up to Oral Sex','Induced Lactation','Milk Blowjob','Design & Build BDSM Stuff','Device Bondage','Messy Face (BJ)','Rubbing drool over face','Impact Play','Teasing','Eye Contact'] }
 ];
 
-// ── DATA MAPPING LOGIC (Audited from original files) ───────────
-function mapAndy(n) {
-  let i = { n, tried:'', rating:'', role:'', limit:'', motive:'', note:'' };
-  // Andy's exact mapping
-  if(['Anal Hook','Croch Rope','Cuffs Metal','Rope Simple','Gags Ring','Gags Tape','Riding crops','Spit for lube','Spit In','Spit On','Swallow Semen','Running Makeup','Urinate in body','Urinate on body'].includes(n)) { i.tried='yes'; i.rating='liked'; i.role='Giving'; }
-  if(['Arm Binding','Bed Bondage','Breast Bondage','Chair Bondage','Corset','Cuffs Leather','Restraints','Spreader Bar','Nuru','Skin Sensation','Fellatio','Hand Job','Mutual Masturbation','Orgasm control','Throat Fucking','Squirting','Messy Face (BJ)','Device Bondage','Design & Build BDSM Stuff'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Giving'; }
-  if(['Bed Bondage','Nuru','Skin Sensation','Rimming','Spit for lube','Spit In','Urinate on body'].includes(n)) { i.role='Both'; }
-  if(['Drooling','Grool','Breast milk - Milking','Prostate Massage','Foot Job','Milk Blowjob'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Receiving'; }
-  if(n==='Cum in Panties') { i.tried='yes'; i.rating='loved'; i.role='Giving'; i.note='Worn in private or public'; }
-  if(['Stockings/Pantyhose','Lingerie','High Heels','Legs'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Others Wearing'; }
-  if(n==='Public Play') { i.tried='yes'; i.rating='liked'; i.role='Giving'; i.note='Teasing, toys, remote vib, etc'; }
-  if(['Blood play','Scat','Chamber pot use','Fisting Anal','Fisting Vaginal','Forced homosexuality'].includes(n)) { i.tried='no-dont'; i.limit='hard'; }
-  if(['Cage','Chains','Stocks','One Bar Prison','Manacles & Irons','Straight jacket'].includes(n)) { i.tried='no-want'; i.role='Giving'; i.rating='meh'; }
-  if(n==='Suspension') { i.tried='no-want'; i.role='Giving'; i.motive='Arousal'; }
-  if(n==='Prostate Massage') { i.note='Maybe'; }
-  return i;
-}
+// ── AUDITED MAPPING DATA ───────────────────────────────────────
+const AUDIT_ANDY = {
+  'Anal Hook':{t:'yes',r:'liked',ro:'Giving'},'Croch Rope':{t:'yes',r:'liked',ro:'Giving'},'Cuffs Metal':{t:'yes',r:'liked',ro:'Giving'},'Rope Simple':{t:'yes',r:'liked',ro:'Giving'},
+  'Arm Binding':{t:'yes',r:'loved',ro:'Giving'},'Bed Bondage':{t:'yes',r:'loved',ro:'Both'},'Breast Bondage':{t:'yes',r:'loved',ro:'Giving'},'Chair Bondage':{t:'yes',r:'loved',ro:'Giving'},
+  'Corset':{t:'yes',r:'loved',ro:'Giving'},'Cuffs Leather':{t:'yes',r:'loved',ro:'Giving'},'Restraints':{t:'yes',r:'loved',ro:'Giving'},'Spreader Bar':{t:'yes',r:'loved',ro:'Giving'},
+  'Nuru':{t:'yes',r:'loved',ro:'Both'},'Skin Sensation':{t:'yes',r:'loved',ro:'Both'},'Fellatio':{t:'yes',r:'loved',ro:'Giving'},'Hand Job':{t:'yes',r:'loved',ro:'Giving'},
+  'Drooling':{t:'yes',r:'loved',ro:'Receiving'},'Grool':{t:'yes',r:'loved',ro:'Receiving'},'Breast milk - Milking':{t:'yes',r:'loved',ro:'Receiving'},
+  'Cum in Panties':{t:'yes',r:'loved',ro:'Giving',n:'Worn in private or public'},'Public Play':{t:'yes',r:'liked',ro:'Giving',n:'Teasing, toys, etc'},
+  'Blood play':{t:'no-dont',l:'hard'},'Scat':{t:'no-dont',l:'hard'},'Chamber pot use':{t:'no-dont',l:'hard'},
+  'Cage':{t:'no-want',ro:'Giving',r:'meh'},'Chains':{t:'no-want',ro:'Giving',r:'meh'},'Stocks':{t:'no-want',ro:'Giving',r:'meh'}
+};
 
-function mapBecca(n) {
-  let i = { n, tried:'', rating:'', role:'', limit:'', motive:'', note:'' };
-  // Becca's exact mapping
-  if(n==='Anal Hook') { i.tried='no-want'; }
-  if(n==='Arm Binding') { i.tried='yes'; i.rating='liked'; i.role='Receiving'; }
-  if(['Bed Bondage','Breast Bondage','Light Bondage'].includes(n)) { i.tried='yes'; i.rating='loved'; i.role='Receiving'; i.motive='Arousal'; }
-  if(n==='Corset') { i.tried='yes'; i.rating='loved'; i.role='Wearing'; i.note='Public and private'; }
-  if(n==='Blood play') { i.tried='no-dont'; i.limit='hard'; }
-  if(['Sleep Sacks','Mummification'].includes(n)) { i.tried='no-dont'; i.limit='soft'; i.role='Receiving'; }
-  if(n==='Collars (Public)') { i.tried='no-want'; i.role='Wearing'; i.note='Prefer normal necklace given to me by Dom for public instead of actual collar.'; }
-  if(n==='Gags Ball') { i.tried='yes'; i.rating='liked'; i.role='Wearing'; }
-  if(n==='Gags Phallic') { i.tried='no-want'; i.note='Will need to work up to this one'; }
-  if(n==='Heavy Bondage') { i.tried='no-want'; i.note='Will need to work up to this level'; }
-  if(n==='Grool') { i.tried='no-want'; i.note='Not sure what this is fully'; }
-  if(n==='Breast Whipping') { i.tried='yes'; i.rating='loved'; i.role='Receiving'; i.note='With flogger'; }
-  if(n==='Temperature extremes') { i.tried='yes'; i.rating='liked'; i.note='A little experience with cold'; }
-  if(n==='Light Bondage') { i.role='Both'; i.motive='Arousal'; }
-  return i;
-}
+const AUDIT_BECCA = {
+  'Anal Hook':{t:'no-want'},'Arm Binding':{t:'yes',r:'liked',ro:'Receiving'},
+  'Bed Bondage':{t:'yes',r:'loved',ro:'Receiving',m:'Arousal'},'Breast Bondage':{t:'yes',r:'liked',ro:'Receiving',m:'Arousal'},
+  'Corset':{t:'yes',r:'loved',ro:'Wearing',n:'Public and private'},'Blood play':{t:'no-dont',l:'hard'},
+  'Sleep Sacks':{t:'no-dont',l:'soft',ro:'Receiving'},'Mummification':{t:'no-dont',l:'soft',ro:'Receiving'},
+  'Collars (Public)':{t:'no-want',ro:'Wearing',n:'Prefer normal necklace'},'Breast Whipping':{t:'yes',r:'loved',ro:'Receiving',n:'With flogger'},
+  'Light Bondage':{t:'yes',r:'loved',ro:'Both',m:'Arousal'},'Temperature extremes':{t:'yes',r:'liked',n:'A little experience with cold'}
+};
 
 // ── ENGINE ─────────────────────────────────────────────────────
 let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
 let activeP = 'p1', activeTab = 'all', isCompare = false, activeFilters = new Set(), searchQ = '', sheetCtx = null, comparisonData = null;
 
 function init() {
-  const saved = localStorage.getItem('partner_portal_v19_final');
+  const saved = localStorage.getItem('bdsm_checklist_vFINAL_PROD');
   if (saved) {
     APP_STATE = JSON.parse(saved);
   } else {
     DATABASE_TEMPLATE.forEach(cat => {
-      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => mapAndy(n)) });
-      APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => mapBecca(n)) });
+      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => buildItem(n, AUDIT_ANDY[n])) });
+      APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => buildItem(n, AUDIT_BECCA[n])) });
     });
-    // Create pre-loaded March Snapshots
-    saveSnapshotBaseline('p1');
-    saveSnapshotBaseline('p2');
+    // Create pre-loaded March Baseline snapshots for first load
+    createBaseline('p1'); createBaseline('p2');
   }
 
-  // AUTO-LOAD LATEST SNAPSHOT ON LOAD
+  // Load latest history entry into the live UI immediately
   if(APP_STATE.p1.history.length > 0) APP_STATE.p1.data = JSON.parse(JSON.stringify(APP_STATE.p1.history[0].data));
   if(APP_STATE.p2.history.length > 0) APP_STATE.p2.data = JSON.parse(JSON.stringify(APP_STATE.p2.history[0].data));
 
@@ -235,7 +215,11 @@ function init() {
   render(); updateHistDropdown();
 }
 
-function saveSnapshotBaseline(p) {
+function buildItem(name, audit) {
+  return { n: name, tried: audit?.t||'', rating: audit?.r||'', role: audit?.ro||'', limit: audit?.l||'', motive: audit?.m||'', note: audit?.n||'' };
+}
+
+function createBaseline(p) {
   APP_STATE[p].history.unshift({ id: Date.now() + (p==='p2'?1:0), name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) });
 }
 
@@ -252,7 +236,7 @@ function toggleCompare() { isCompare = !isCompare; comparisonData = null; render
 function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
 function toggleFilter(f, btn) { if(activeFilters.has(f)) activeFilters.delete(f); else activeFilters.add(f); btn.classList.toggle('active'); render(); }
 function clearFilters() { activeFilters.clear(); searchQ = ''; document.getElementById('searchInput').value = ''; document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); render(); }
-function save() { localStorage.setItem('partner_portal_v19_final', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Live Saved'; }
+function save() { localStorage.setItem('bdsm_checklist_vFINAL_PROD', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Progress Saved'; }
 
 // ── HISTORY ──────────────────────────────────────────────────
 function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
@@ -292,22 +276,19 @@ function render() {
       let isMatch = false, hasLimit = false, isChanged = false;
 
       if(isCompare) {
-        const p1Item = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
-        const p2Item = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
-        isMatch = (p1Item.tried==='yes' || p1Item.tried==='no-want') && (p2Item.tried==='yes' || p2Item.tried==='no-want');
-        hasLimit = p1Item.limit==='hard' || p2Item.limit==='hard';
+        const p1 = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
+        const p2 = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
+        isMatch = (p1.tried==='yes' || p1.tried==='no-want') && (p2.tried==='yes' || p2.tried==='no-want');
+        hasLimit = p1.limit==='hard' || p2.limit==='hard';
       }
       if(comparisonData) {
-        const oldCat = comparisonData.find(c=>c.id===cat.id);
-        if(oldCat) {
-            const oldItem = oldCat.items[idx];
-            if(JSON.stringify(oldItem) !== JSON.stringify(item)) isChanged = true;
-        }
+        const oldItem = comparisonData.find(c=>c.id===cat.id).items[idx];
+        if(JSON.stringify(oldItem) !== JSON.stringify(item)) isChanged = true;
       }
 
       html += `<div class="activity-item ${isCompare && isMatch ? 'match' : ''} ${isCompare && hasLimit ? 'limit-active' : ''} ${isChanged ? 'changed' : ''}">
         <div class="item-grid">
-          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL</span>' : ''} ${isChanged ? '<br><span style="color:var(--gold); font-size:8px;">✦ UPDATED</span>' : ''}</div>
+          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL INTEREST</span>' : ''} ${isChanged ? '<br><span style="color:var(--gold); font-size:8px;">✦ UPDATED</span>' : ''}</div>
           <div class="profile-cols">
             ${isCompare ? renderCell(APP_STATE.p1.data.find(c=>c.id==cat.id).items[idx], 'Andy', 'p1', cat.id, idx) : ''}
             ${isCompare ? renderCell(APP_STATE.p2.data.find(c=>c.id==cat.id).items[idx], 'Becca', 'p2', cat.id, idx) : ''}
@@ -338,7 +319,7 @@ function renderCell(res, name, pKey, cid, idx) {
     </div>`;
 }
 
-// ── SELECTION SHEET ────────────────────────────────────────────
+// ── SHEET ENGINE ────────────────────────────────────────────
 function openSheet(cid, idx, field, title, opts) {
   sheetCtx = { cid, idx, field };
   document.getElementById('sheetTitle').textContent = title;
@@ -363,7 +344,7 @@ function triggerSheet(cid, i, f) {
 
 function closeSheet() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); }
 function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
-function resetApp() { if(confirm("Clear progress?")) { localStorage.removeItem('partner_portal_v19_final'); location.reload(); } }
+function resetApp() { if(confirm("Clear progress? Baseline entry will be recreated.")) { localStorage.removeItem('bdsm_checklist_vFINAL_PROD'); location.reload(); } }
 
 function updateStats() {
   let t=0, l=0, w=0, lim=0, f=0;
