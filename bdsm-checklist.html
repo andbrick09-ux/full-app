@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BDSM Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+:root {
+  --midnight: #051024; --paper-dark: #081226; --gold: #d4af37; --gold-dim: rgba(212,175,55,0.4);
+  --glass: rgba(5,16,36,0.85); --border: rgba(212,175,55,0.35); --green: #4CAF50; --red: #F44336;
+  --luxury-gradient: linear-gradient(135deg,#bf953f 0%,#fcf6ba 50%,#b38728 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body {
+  background-color: var(--midnight); color:#f0f0f0; font-family:'Montserrat',sans-serif;
+  background-image: radial-gradient(ellipse at top,#0f172a 0%,transparent 80%);
+  min-height:100vh; overflow-x: hidden;
+}
+
+/* HEADER & SWITCHER */
+.header { text-align:center; padding:30px 20px; border-bottom:1px solid var(--border); background:rgba(5,16,36,0.7); backdrop-filter:blur(15px); position:sticky; top:0; z-index:100; }
+.brand { font-family:'Great Vibes',cursive; font-size:38px; background:var(--luxury-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; }
+.profile-switcher { display:inline-flex; background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:30px; padding:4px; position:relative; }
+.profile-btn { padding:8px 24px; border-radius:25px; border:none; background:transparent; color:var(--gold-dim); font-size:10px; font-weight:700; text-transform:uppercase; cursor:pointer; position:relative; z-index:2; transition: 0.3s; }
+.profile-btn.active { color:var(--midnight); }
+.slider-bg { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:var(--luxury-gradient); border-radius:25px; transition:0.4s cubic-bezier(0.4,0,0.2,1); z-index:1; }
+.p2-active .slider-bg { transform:translateX(100%); }
+
+/* PERSISTENCE BAR */
+.persistence-bar { display:flex; justify-content:center; align-items:center; gap:10px; padding:10px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:10px; color:var(--gold-dim); flex-wrap:wrap; }
+.btn-mini { background:transparent; border: 1px solid var(--border); color: var(--gold); padding: 5px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 9px; }
+
+/* TABS & SUMMARY */
+.tabs-nav { display:flex; overflow-x:auto; gap:8px; padding:15px 20px; border-bottom:1px solid var(--border); scrollbar-width:none; }
+.tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:20px; color:var(--gold-dim); font-size:11px; padding:7px 16px; cursor:pointer; white-space:nowrap; }
+.tab-btn.active { background:var(--luxury-gradient); color:var(--midnight); border-color:transparent; }
+
+.summary-bar { display:flex; gap:10px; padding:15px 20px; background:rgba(8,18,38,0.8); border-bottom:1px solid rgba(212,175,55,0.15); overflow-x:auto; }
+.stat-pill { flex-shrink:0; display:flex; align-items:center; gap:6px; background:var(--glass); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:10px; }
+
+/* FILTERS */
+.filter-bar { display:flex; gap:10px; padding:15px 20px; border-bottom:1px solid rgba(212,175,55,0.1); flex-wrap:wrap; align-items:center; }
+.search-input { background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:20px; color:white; padding:8px 15px; font-size:11px; flex:1; outline:none; }
+.filter-chip { font-size:9px; font-weight:700; padding:6px 12px; border-radius:20px; border:1px solid rgba(212,175,55,0.25); background:transparent; color:#888; cursor:pointer; text-transform:uppercase; }
+.filter-chip.active { border-color:var(--gold); color:var(--gold); background:rgba(212,175,55,0.1); }
+
+/* MAIN CONTENT */
+.main { padding:20px; max-width:1200px; margin:0 auto; }
+.category-section { background:var(--glass); border:1.5px solid var(--border); border-radius:12px; margin-bottom:25px; overflow:hidden; }
+.category-header { padding:15px 20px; background:rgba(212,175,55,0.05); }
+.category-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--gold); }
+
+.activity-item { padding:15px 20px; border-bottom:1px solid rgba(212,175,55,0.08); transition:0.3s; }
+.activity-item.match { border-left:4px solid var(--green); background:rgba(76,175,80,0.05); }
+.activity-item.limit-active { border-left:4px solid var(--red); background:rgba(244,67,54,0.05); }
+.activity-item.changed { border-left: 4px solid var(--gold); background: rgba(212,175,55,0.05); }
+
+.item-grid { display:flex; gap:20px; align-items:center; }
+.name-col { flex:1; font-weight:600; font-size:14px; }
+.profile-cols { display:flex; gap:15px; flex:2.5; }
+.profile-cell { flex:1; display:flex; flex-direction:column; gap:6px; }
+
+.label-sub { font-size:9px; text-transform:uppercase; color:var(--gold-dim); letter-spacing:1px; }
+.kink-row { display:flex; gap:5px; flex-wrap:wrap; }
+.kink-pill { font-size:9px; font-weight:700; padding:5px 8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.15); cursor:pointer; color:#aaa; text-align:center; min-width:60px; }
+.kink-pill.status-yes { color:var(--green); border-color:var(--green); }
+.kink-pill.status-want { color:var(--gold); border-color:var(--gold); }
+.kink-pill.status-limit { color:var(--red); border-color:var(--red); }
+.kink-pill.status-fetish { color:#bf953f; border-color:#bf953f; }
+
+.note-input { width:100%; margin-top:10px; background:transparent; border:none; border-left:2px solid rgba(212,175,55,0.2); color:#888; font-style:italic; font-size:11px; padding-left:8px; outline:none; }
+
+/* MODALS */
+#sheetOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:2000; }
+#bottomSheet { position:fixed; bottom:-100%; left:0; width:100%; background:rgba(8,18,38,0.98); border-top:2px solid var(--gold); border-radius:24px 24px 0 0; padding:20px; z-index:2001; transition:0.4s; max-height: 85vh; overflow-y:auto; }
+#bottomSheet.open { bottom:0; }
+.sheet-option { background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.1); padding:16px; border-radius:12px; margin-bottom:10px; display:flex; align-items:center; gap:15px; cursor:pointer; }
+
+.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; backdrop-filter:blur(10px); }
+.modal-content { background:var(--paper-dark); margin: 15% auto; padding:30px; border:1px solid var(--gold); border-radius:12px; max-width:400px; width:90%; text-align:center; }
+
+@media(max-width: 1000px) { .item-grid { flex-direction:column; align-items:flex-start; } .profile-cols { width: 100%; } }
+</style>
+</head>
+<body onload="init()">
+
+<div class="header">
+  <div class="brand">BDSM Checklist</div>
+  <div class="profile-switcher" id="profileSwitcher">
+    <div class="slider-bg"></div>
+    <button class="profile-btn" id="p2-btn" onclick="setProfile('p2')">Becca</button>
+    <button class="profile-btn active" id="p1-btn" onclick="setProfile('p1')">Andy</button>
+  </div>
+</div>
+
+<div class="persistence-bar">
+  <span id="saveLabel">Ready</span>
+  <button class="btn-mini" onclick="openSnapshotModal()">Create Snapshot</button>
+  <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226;">
+    <option value="">History</option>
+  </select>
+  <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison</button>
+  <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset Current</button>
+</div>
+
+<div class="tabs-nav" id="tabsNav">
+  <button class="tab-btn active" id="tab-all" onclick="setTab('all', this)">All Categories</button>
+</div>
+
+<div class="summary-bar">
+  <div class="stat-pill"><span style="color:#4CAF50">✓</span> <span id="statTried">0 Tried</span></div>
+  <div class="stat-pill"><span style="color:var(--gold)">★</span> <span id="statLoved">0 Loved</span></div>
+  <div class="stat-pill"><span style="color:#bf953f">♥</span> <span id="statFetish">0 Fetish</span></div>
+  <div class="stat-pill"><span style="color:#FFC107">+</span> <span id="statWant">0 Want</span></div>
+  <div class="stat-pill"><span style="color:#F44336">✕</span> <span id="statLimit">0 Limits</span></div>
+</div>
+
+<div class="filter-bar">
+  <input type="text" id="searchInput" placeholder="🔍 Search activities..." oninput="handleSearch(this.value)" class="search-input">
+  <button class="filter-chip" id="f-tried" onclick="toggleFilter('tried', this)">✓ Tried</button>
+  <button class="filter-chip" id="f-loved" onclick="toggleFilter('loved', this)">★ Loved</button>
+  <button class="filter-chip" id="f-limit" onclick="toggleFilter('limit', this)">✕ Limit</button>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+<div id="sheetOverlay" onclick="closeSheet()"></div>
+<div id="bottomSheet">
+  <div style="text-align:center; margin-bottom:20px;">
+    <div style="width: 40px; height: 4px; background: rgba(212,175,55,0.3); border-radius: 2px; margin: 0 auto 15px;"></div>
+    <div id="sheetTitle" style="color:var(--gold); font-family:'Playfair Display'; font-size:18px;">Selection</div>
+    <div id="sheetSubtitle" style="font-size:10px; color:#888; text-transform:uppercase;">Item</div>
+  </div>
+  <div id="sheetOptions"></div>
+  <button onclick="closeSheet()" style="width:100%; padding:15px; margin-top:10px; background:transparent; border:none; color:#888; text-transform:uppercase; font-size:11px;">Cancel</button>
+</div>
+
+<div id="snapModal" class="modal">
+  <div class="modal-content">
+    <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;">Save Progress Snapshot</h3>
+    <input type="text" id="snapName" style="width:100%; padding:12px; margin:20px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:6px;" placeholder="Entry Name">
+    <div style="display:flex; gap:10px;">
+      <button class="btn-mini" style="flex:1" onclick="saveSnapshot()">Save</button>
+      <button class="btn-mini" style="flex:1; border-color:#555; color:#888;" onclick="closeSnapshotModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── EXHAUSTIVE UNIFIED DATABASE ─────────────────────────────────
+const DATABASE_TEMPLATE = [
+  { id:'bondage', label:'Bondage', items:['Anal Hook','Arm Binding','Bed Bondage','Breast Bondage','Cage','Chains','Chair Bondage','Chastity','Croch Rope','Collars (Private)','Collars (Public)','Corset','Crotch Rope','Cuffs Leather','Cuffs Metal','Gags Ball','Gags Bit','Gags Phallic','Gags Ring','Gags Tape','Heavy Bondage','Leash','Light Bondage','Long-term','Manacles & Irons','Mummification','Predicament Bondage','Restraints','One Bar Prison','Rope Shibari','Rope Simple','Sleep Sacks','Spreader Bar','Stocks','Straight Jacket','Suspension'] },
+  { id:'bodily', label:'Bodily Fluid', items:['Blood play','Breast milk - Milking','Chamber pot use','Cum in Panties','Cum In Ass','Cum In Mouth','Cum In - Vagina','Cum On - Body','Cum On Face','Cum On Food/Drink','Drooling','Fake Cum','Grool','Rimming','Scat','Spit for lube','Spit In','Spit On','Swallow Semen','Running Makeup','Throat Pie','Urinate in body','Urinate on body'] },
+  { id:'ds', label:'Dominance/Submission', items:['24/7 power exchange','Behavior correction','Chastity (behavioral)','Chastity (physical)','Collaring (ceremonial)','Collaring (daily)','Deepthroat training','Journaling','Mind Fucking','Obedience training','Rituals (bedtime)','Rituals (collaring)','Rituals (greetings)','Submissive postures','Subspace','Task setting','Title Honorifics','TPE'] },
+  { id:'edge', label:'Edge Play', items:['Branding','Breath Play','Catheterization','Clit Pumping','CNC','Emotional Edge','Erotic asphyxiation','Fear Play','Fire Play','Gun Play','Hypnosis','Saline Injection','Interrogation','Knife play','Medical Play','Penis Pumping','Pickup Play','Pissing (Private)','Pussy Pumping','Psychological Torment','Public Play','Ripping of clothing','Raceplay','Sounding','Taser play','Temperature extremes','Trampling','Waterboarding','Watersports','Wrestling'] },
+  { id:'humiliation', label:'Humiliation', items:['Being ignored','Being laughed at','Being made to beg','Being made to crawl','Being mocked','Sub Shaving Dom','Dom Shaving Sub','Exposure of secrets','Forced dressing','Forced nudity','Forced Public Confession','Humiliating Clothing','Masturbation on command','Panty Stuffing','Standing in corner','Verbal Degradation','Writing on body'] },
+  { id:'impact', label:'Impact Play', items:['Breast whipping','Caning-English','Caning-Sensation','Face slapping','Kicking','Punching','Pussy Kicking','Pussy Punching','Pussy spanking','Pussy whipping','Riding crops','Spanking (OTK)','Spanking-Hairbrush','Spanking-Hand','Leather Slappers','Lexan Paddles','Wooden Paddles','Switching','Whipping Flogger','Whipping-Belt','Whipping Cat o 9','Whipping Single Tail'] },
+  { id:'roleplay', label:'Role Play', items:['Vampire/Prey','Teacher/Student','Switching Roles','Stranger/Acquaintance','Schoolroom','Royalty/Servant','Robot/Programmer','Religious','Public Disgrace','Psych Ward','Prostitution','Prison','Priest/Confessor','Pony Play','Master/Pet','Kidnapping','Initiation Rites','Baby Play','Puppy Play','Doctor/Patient','Cuckold Fantasy','Boss/Employee','Age Play','Abandonment'] },
+  { id:'sensation', label:'Sensation', items:['Abrasion','Neck Kiss/Touch/Bite','Ball worship','Ball Busting','Biting','Blindfold','Breath Control - Choking','Breath Control - Nose','Clamps-Clit/Labia','Clamps-Nipple','Clothespins','Cock Ring','Dilation','Ear Plugs','Zapping (Electric)','Feather Play','Finger Claws','Hair Pulling','Hot Wax','Ice','Kissing','Knife Play (No Cut)','Nipple Play','Nipple Weights','Nipple Suction','Nuru','Skin Sensation','Slime','Tickling'] },
+  { id:'sexual', label:'Sexual Play', items:['Anal sex','Breast fucking','Body Paint','Cuckolding','Cunnilingus (Giving)','Cunnilingus (Receiving)','Double penetration','Fantasy Gang Rape','Fantasy Rape Play','Fellatio','Face Fucking','Fisting Anal','Fisting Vaginal','Genital Sex','Gagging by Cock','Gloryhole','Group Play','Hand Job','Hotwifing','Marks (Bruises)','Mutual Masturbation','Orgasm control','Orgasm denial','Prostate Massage','Sexual deprivation','Throat Fucking','Triple penetration'] },
+  { id:'toys', label:'Toys', items:['Anal Play','Anal Plugs Large','Anal Plugs Medium','Anal Plugs Small','Anal Beads','Dildos - Anal','Dildos - Oral','Dildos - Vaginal','Remote Toys','Fuck Machines','Saddle Vibrator','Speculums','Strap-on','Vibrator - Anal','Vibrator - External','Vibrator - Internal'] },
+  { id:'voyeur', label:'Voyeurism/Exhib', items:['Chosen Clothing','Examinations','Exhibitionism (Friends)','Exhibitionism (Strangers)','Forced Nudity','Modeling','Outdoor Scenes','Video (Private)','Watching Others','Voyeurism (Dom w/Others)','Voyeurism (Sub w/Others)'] },
+  { id:'service', label:'Service', items:['Following Orders','Forced Servitude','Eye Contact Restrictions','Speech Restrictions','Washroom Restrictions','Kneeling','Begging','Standing in corner','Learned Postures','Rituals','Massage'] },
+  { id:'kinks', label:'Kinks', items:['Skin on Skin','Stockings/Pantyhose','Lingerie','Foot Job','Forced Orgasms','High Heels','Waking Up to Sex','Waking Up to Oral Sex','Induced Lactation','Milk Blowjob','Design & Build BDSM Stuff','Device Bondage','Messy Face (BJ)','Rubbing drool over face','Impact Play','Teasing','Eye Contact'] }
+];
+
+// ── APP ENGINE ───────────────────────────────────────────────
+let APP_STATE = {
+  p1: { data: [], history: [] },
+  p2: { data: [], history: [] }
+};
+
+let activeP = 'p1', activeTab = 'all', isCompare = false, activeFilters = new Set(), searchQ = '', sheetCtx = null, comparisonData = null;
+
+function init() {
+  const saved = localStorage.getItem('partner_portal_v12_ultimate');
+  if (saved) {
+    APP_STATE = JSON.parse(saved);
+  } else {
+    // Initial Load & Mapping of Original Choices
+    DATABASE_TEMPLATE.forEach(cat => {
+      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => mapOriginals(n, 'p1')) });
+      APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(n => mapOriginals(n, 'p2')) });
+    });
+    
+    // Create the March 2026 Baseline snapshots
+    saveBaseline('p1');
+    saveBaseline('p2');
+  }
+
+  const nav = document.getElementById('tabsNav');
+  DATABASE_TEMPLATE.forEach(c => {
+    const b = document.createElement('button'); b.className = 'tab-btn'; b.textContent = c.label;
+    b.onclick = () => setTab(c.id, b); nav.appendChild(b);
+  });
+  
+  render(); updateHistDropdown();
+}
+
+function mapOriginals(name, p) {
+  let item = { n: name, tried:'', rating:'', role:'', limit:'', motive:'', note:'' };
+  // Andy's Originals (p1)
+  if(p==='p1') {
+    if(['Anal Hook','Croch Rope','Cuffs - Metal','Rope - Simple'].includes(name)) { item.tried='yes'; item.rating='liked'; item.role='Giving'; }
+    if(['Arm Binding','Chair bondage','Cuffs Leather','Restraints','Spreader Bar'].includes(name)) { item.tried='yes'; item.rating='loved'; item.role='Giving'; }
+    if(name==='Bed bondage') { item.tried='yes'; item.rating='loved'; item.role='Both'; }
+    if(name==='Breast milk - Milking') { item.tried='yes'; item.rating='loved'; item.role='Receiving'; }
+    if(name==='Cum in Panties') { item.tried='yes'; item.rating='loved'; item.role='Giving'; item.note='Public/Private'; }
+    if(['Drooling','Grool'].includes(name)) { item.tried='yes'; item.rating='loved'; item.role='Receiving'; }
+    if(name==='Blood play') { item.tried='no-dont'; item.limit='hard'; }
+  } 
+  // Becca's Originals (p2)
+  else {
+    if(name==='Anal Hook') { item.tried='no-want'; }
+    if(name==='Arm Binding') { item.tried='yes'; item.rating='liked'; item.role='Receiving'; }
+    if(name==='Bed bondage') { item.tried='yes'; item.rating='loved'; item.role='Receiving'; item.motive='Arousal'; }
+    if(name==='Breast Bondage') { item.tried='yes'; item.rating='liked'; item.role='Receiving'; item.motive='Arousal'; }
+    if(name==='Corset') { item.tried='yes'; item.rating='loved'; item.role='Wearing'; }
+    if(name==='Blood play') { item.tried='no-dont'; item.limit='hard'; }
+  }
+  return item;
+}
+
+function saveBaseline(p) {
+  APP_STATE[p].history.push({ id: Date.now() + (p==='p2'?1:0), name: 'March 2026 Baseline', date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) });
+}
+
+function setProfile(p) {
+  activeP = p; isCompare = false; comparisonData = null;
+  document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
+  document.getElementById('p1-btn').classList.toggle('active', p === 'p1');
+  document.getElementById('p2-btn').classList.toggle('active', p === 'p2');
+  render(); updateHistDropdown();
+}
+
+function setTab(id, btn) { activeTab = id; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
+function toggleCompare() { isCompare = !isCompare; comparisonData = null; render(); }
+function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
+function toggleFilter(f, btn) { if(activeFilters.has(f)) activeFilters.delete(f); else activeFilters.add(f); btn.classList.toggle('active'); render(); }
+function clearFilters() { activeFilters.clear(); searchQ = ''; document.getElementById('searchInput').value = ''; document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); render(); }
+function save() { localStorage.setItem('partner_portal_v12_ultimate', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+// ── HISTORY LOGIC ────────────────────────────────────────────
+function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
+function closeSnapshotModal() { document.getElementById('snapModal').style.display='none'; }
+function saveSnapshot() {
+  const name = document.getElementById('snapName').value || 'Snapshot';
+  APP_STATE[activeP].history.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE[activeP].data)) });
+  save(); updateHistDropdown(); closeSnapshotModal();
+}
+function updateHistDropdown() {
+  const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">History</option>';
+  APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
+}
+function compareHistory(id) { const snap = APP_STATE[activeP].history.find(h => h.id == id); comparisonData = snap ? snap.data : null; isCompare = false; render(); }
+
+// ── RENDER ENGINE ────────────────────────────────────────────
+function render() {
+  const main = document.getElementById('mainContent');
+  const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
+  let html = '';
+
+  cats.forEach(cat => {
+    const visItems = cat.items.filter(item => {
+      const matchesSearch = item.n.toLowerCase().includes(searchQ);
+      if (activeFilters.size === 0) return matchesSearch;
+      let m = false;
+      if (activeFilters.has('tried') && item.tried === 'yes') m = true;
+      if (activeFilters.has('loved') && item.rating === 'loved') m = true;
+      if (activeFilters.has('limit') && item.limit) m = true;
+      return matchesSearch && m;
+    });
+
+    if (visItems.length === 0) return;
+    html += `<div class="category-section"><div class="category-header"><span class="category-title">${cat.label}</span></div><div class="category-body">`;
+    visItems.forEach((item) => {
+      const idx = cat.items.indexOf(item);
+      let isMatch = false, hasLimit = false, isChanged = false;
+
+      if(isCompare) {
+        const p1Item = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
+        const p2Item = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
+        isMatch = (p1Item.tried==='yes' || p1Item.tried==='no-want') && (p2Item.tried==='yes' || p2Item.tried==='no-want');
+        hasLimit = p1Item.limit==='hard' || p2Item.limit==='hard';
+      }
+      if(comparisonData) {
+        const oldItem = comparisonData.find(c=>c.id===cat.id).items[idx];
+        if(JSON.stringify(oldItem) !== JSON.stringify(item)) isChanged = true;
+      }
+
+      html += `<div class="activity-item ${isCompare && isMatch ? 'match' : ''} ${isCompare && hasLimit ? 'limit-active' : ''} ${isChanged ? 'changed' : ''}">
+        <div class="item-grid">
+          <div class="name-col">${item.n} ${isCompare && isMatch ? '<br><span style="color:var(--green); font-size:8px;">✦ MUTUAL INTEREST</span>' : ''} ${isChanged ? '<br><span style="color:var(--gold); font-size:8px;">✦ CHANGED</span>' : ''}</div>
+          <div class="profile-cols">
+            ${isCompare ? renderCell(APP_STATE.p1.data.find(c=>c.id==cat.id).items[idx], 'Andy', 'p1', cat.id, idx) : ''}
+            ${isCompare ? renderCell(APP_STATE.p2.data.find(c=>c.id==cat.id).items[idx], 'Becca', 'p2', cat.id, idx) : ''}
+            ${!isCompare ? renderCell(item, activeP==='p1'?'Andy':'Becca', activeP, cat.id, idx) : ''}
+          </div>
+        </div>
+        ${!isCompare ? `<input type="text" class="note-input" placeholder="Note..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No activities match filters.</div>';
+  updateStats();
+}
+
+function renderCell(res, name, pKey, cid, idx) {
+  const isEdit = activeP === pKey && !isCompare && !comparisonData;
+  return `
+    <div class="profile-cell" style="opacity:${isCompare || activeP===pKey ? '1' : '0.2'}">
+      <div class="label-sub">${name}</div>
+      <div class="kink-row">
+        <div class="kink-pill ${res.limit?'status-limit':''}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}">${res.limit?(res.limit==='hard'?'✕ Hard':'△ Soft'):'○ Limit'}</div>
+        <div class="kink-pill ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}">${res.tried==='yes'?'✓ Tried':(res.tried==='no-want'?'+ Want':'Status')}</div>
+        <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}">${res.rating.toUpperCase() || 'RATING'}</div>
+        <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'role')` : ''}">${res.role.toUpperCase() || 'ROLE'}</div>
+        <div class="kink-pill" onclick="${isEdit ? `triggerSheet('${cid}', ${idx}, 'motive')` : ''}">${res.motive.toUpperCase() || 'MOTIVE'}</div>
+      </div>
+    </div>`;
+}
+
+// ── SELECTION LOGIC ────────────────────────────────────────────
+function openSheet(cid, idx, field, title, opts) {
+  sheetCtx = { cid, idx, field };
+  document.getElementById('sheetTitle').textContent = title;
+  document.getElementById('sheetSubtitle').textContent = APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].n;
+  const cont = document.getElementById('sheetOptions'); cont.innerHTML = '';
+  opts.forEach(o => {
+    const d = document.createElement('div'); d.className = 'sheet-option';
+    d.onclick = () => { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx][field] = o.val; save(); render(); closeSheet(); };
+    d.innerHTML = `<span style="font-size:18px; color:${o.col || 'var(--gold)'}">${o.icon}</span><span style="font-weight:600; font-size:13px; color:white;">${o.lab}</span>`;
+    cont.appendChild(d);
+  });
+  document.getElementById('sheetOverlay').style.display='block'; document.getElementById('bottomSheet').classList.add('open');
+}
+
+function triggerSheet(cid, i, f) {
+  if(f==='limit') openSheet(cid, i, 'limit', 'Boundaries', [{lab:'No Limit', val:'', icon:'○'}, {lab:'Soft Limit', val:'soft', icon:'△', col:'var(--gold)'}, {lab:'Hard Limit', val:'hard', icon:'✕', col:'var(--red)'}]);
+  if(f==='tried') openSheet(cid, i, 'tried', 'Experience', [{lab:'Tried It', val:'yes', icon:'✓', col:'var(--green)'}, {lab:'Want to Try', val:'no-want', icon:'+', col:'var(--gold)'}, {lab:'Not Interested', val:'no-dont', icon:'✕', col:'#666'}]);
+  if(f==='rating') openSheet(cid, i, 'rating', 'Enthusiasm', [{lab:'Loved It', val:'loved', icon:'★'}, {lab:'Liked It', val:'liked', icon:'♥'}, {lab:'Meh', val:'meh', icon:'~'}, {lab:'Fetish', val:'fetish', icon:'✦', col:'#bf953f'}]);
+  if(f==='role') openSheet(cid, i, 'role', 'Role', [{lab:'Giving', val:'Giving', icon:'↓'}, {lab:'Receiving', val:'Receiving', icon:'↑'}, {lab:'Both', val:'Both', icon:'↕'}, {lab:'Wearing', val:'Wearing', icon:'👗'}]);
+  if(f==='motive') openSheet(cid, i, 'motive', 'Motivation', [{lab:'Arousal', val:'Arousal', icon:'🔥'}, {lab:'Discipline', val:'Discipline', icon:'⚖️'}, {lab:'Fun', val:'Fun', icon:'🎈'}, {lab:'Stress Relief', val:'Stress Relief', icon:'🧘'}]);
+}
+
+function closeSheet() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); }
+function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
+function resetApp() { if(confirm("Clear current progress? History will remain.")) { localStorage.removeItem('partner_portal_v12_ultimate'); location.reload(); } }
+
+function updateStats() {
+  let t=0, l=0, w=0, lim=0;
+  APP_STATE[activeP].data.forEach(c => c.items.forEach(i => { if(i.tried==='yes') t++; if(i.rating==='loved') l++; if(i.tried==='no-want') w++; if(i.limit) lim++; }));
+  document.getElementById('statTried').textContent = t+' Tried'; document.getElementById('statLoved').textContent = l+' Loved';
+  document.getElementById('statWant').textContent = w+' Want'; document.getElementById('statLimit').textContent = lim+' Limits';
+}
+</script>
+</body>
+</html>
