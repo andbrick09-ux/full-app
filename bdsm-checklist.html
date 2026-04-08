@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BDSM Portal - Comprehensive Synergy Edition</title>
+<title>BDSM Portal - Terminology Update 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -27,7 +27,7 @@ body {
 .slider-bg { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:var(--luxury-gradient); border-radius:25px; transition:0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index:1; }
 .p2-active .slider-bg { transform:translateX(100%); }
 
-.persistence-bar { display:flex; justify-content:center; align-items:center; gap:12px; padding:12px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:10px; color:var(--gold-dim); flex-wrap: wrap; }
+.persistence-bar { display:flex; justify-content:center; align-items:center; gap:12px; padding:10px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:10px; color:var(--gold-dim); flex-wrap: wrap; }
 .btn-mini { background:transparent; border: 1.5px solid var(--gold-dim); color: var(--gold); padding: 5px 15px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; transition: 0.3s; }
 
 /* COMPATIBILITY SCORE */
@@ -127,7 +127,7 @@ body {
   <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226; max-width: 150px;">
     <option value="">History Vault</option>
   </select>
-  <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Compare Mode</button>
+  <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison Mode</button>
   <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset Portal</button>
 </div>
 
@@ -230,12 +230,12 @@ const DATABASE_TEMPLATE = [
     {n:'Mind Fucking', d:'Psychological play focused on challenging a partner.'},
     {n:'Subspace', d:'A mental state of deep relaxation during submission.'},
     {n:'Task setting', d:'Assigning specific duties or chores.'},
-    {n:'24/7 power exchange', d:'A lifestyle dynamic where power is exchanged continuously.'}
+    {n:'24/7 power exchange', d:'A continuous lifestyle exchange of authority.'}
   ]},
   { id:'edge', label:'Edge Play', items:[
     {n:'Blood play (cutting)', d:'High-risk play involving the drawing of blood.'},
     {n:'Breath play', d:'Negotiated restriction of airflow for arousal.'},
-    {n:'Clit Pumping', d:'Using suction to increase blood flow.'},
+    {n:'Clit Pumping', d:'Using suction to increase blood flow to the clitoris.'},
     {n:'CNC', d:'Consensual non-consent scenarios.'},
     {n:'Public Play', d:'Sexual acts or teasing performed in public spaces.'},
     {n:'Exposure', d:'Revealing fantasies or the body to induce arousal.'},
@@ -365,14 +365,6 @@ const AUDIT_BECCA = {
   'Massage':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},'Teasing':{t:'yes',ro:'Both'},'Lingerie':{t:'yes',ro:'Wearing'}
 };
 
-const FILTER_CONFIG = {
-    tried: { title: 'Status', opts: ['yes','no-want','no-dont'] },
-    rating: { title: 'Enthusiasm', opts: ['Loved it','Liked it','Take it or leave it','Fetish'] },
-    limit: { title: 'Boundary', opts: ['Soft Limit','Hard Limit'] },
-    role: { title: 'Dynamic', opts: ['Giving','Receiving','Both','Wearing','Others Wearing'] },
-    motive: { title: 'Motivation', opts: ['Arousal','Discipline','Fun','Stress Relief'] }
-};
-
 let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
 let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '', filters = { tried: [], rating: [], limit: [], role: [], motive: [] };
 
@@ -380,7 +372,7 @@ function init() {
   const saved = localStorage.getItem('bdsm_portal_vTRAD_SYNC_2026');
   if (saved) { APP_STATE = JSON.parse(saved); } else {
     DATABASE_TEMPLATE.forEach(cat => {
-      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_ANDY[i.n])) });
+      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_AND_Y[i.n])) });
       APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_BECCA[i.n])) });
     });
     createSnapshot('p1', 'March 2026 Baseline'); createSnapshot('p2', 'March 2026 Baseline');
@@ -452,10 +444,12 @@ function render() {
 function renderCell(res, name, pKey, cid, idx) {
   const isE = activeP === pKey && !isCompare;
   const sS = res.tried !== ''; const eS = res.rating !== ''; const bS = res.limit !== '';
+  const statusLabel = res.tried === 'yes' ? 'TRIED IT' : (res.tried === 'no-want' ? 'WANT' : (res.tried === 'no-dont' ? 'NO' : ''));
+  
   return `<div class="profile-cell" style="opacity:${isCompare || activeP===pKey ? '1' : '0.2'}">
         ${isCompare ? `<div style="font-size:9px; color:var(--gold); font-weight:700; margin-bottom:5px; text-transform:uppercase;">${name}</div>` : ''}
         <div class="kink-grid">
-            <div class="kink-pill ${sS?'filled':''} ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${res.tried==='yes'?'YES':(res.tried==='no-want'?'WANT TO TRY':'')}</span></div>
+            <div class="kink-pill ${sS?'filled':''} ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${statusLabel}</span></div>
             <div class="kink-pill ${eS?'filled':''} ${res.rating==='Loved it'?'status-yes':''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}"><span class="pill-title">Enthusiasm</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : ''}</span></div>
             <div class="kink-pill ${bS?'filled':''} ${res.limit ? 'status-limit' : ''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}"><span class="pill-title">Boundary</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : ''}</span></div>
         </div><div class="kink-grid-row2">
@@ -485,12 +479,20 @@ function calculateSynergy() {
 
 function renderFilterDashboard() {
     const dash = document.getElementById('filterDashboard'); dash.innerHTML = '';
-    Object.keys(FILTER_CONFIG).forEach(key => {
-        const cat = FILTER_CONFIG[key];
-        let h = `<div class="filter-category"><div class="filter-cat-title">${cat.title}</div><div class="filter-options">`;
-        cat.opts.forEach(opt => {
+    const CONFIG = {
+        tried: { t: 'Status', o: ['yes','no-want','no-dont'] },
+        rating: { t: 'Enthusiasm', o: ['Loved it','Liked it','Take it or leave it','Fetish'] },
+        limit: { t: 'Boundary', o: ['Soft Limit','Hard Limit'] },
+        role: { t: 'Dynamic', o: ['Giving','Receiving','Both','Wearing','Others Wearing'] },
+        motive: { t: 'Motivation', o: ['Arousal','Discipline','Fun','Stress Relief'] }
+    };
+    Object.keys(CONFIG).forEach(key => {
+        const cat = CONFIG[key];
+        let h = `<div class="filter-category"><div class="filter-cat-title">${cat.t}</div><div class="filter-options">`;
+        cat.o.forEach(opt => {
             const isSel = filters[key].includes(opt);
-            h += `<div class="filter-opt ${isSel?'selected':''}" onclick="toggleFilterValue('${key}', '${opt}')">${opt}</div>`;
+            const label = opt === 'yes' ? 'Tried It' : (opt === 'no-want' ? 'Want to try' : (opt === 'no-dont' ? 'No interest' : opt));
+            h += `<div class="filter-opt ${isSel?'selected':''}" onclick="toggleFilterValue('${key}', '${opt}')">${label}</div>`;
         });
         h += `</div></div>`; dash.innerHTML += h;
     });
@@ -502,7 +504,7 @@ function triggerSheet(cid, i, f) {
   const item = APP_STATE[activeP].data.find(c=>c.id==cid).items[i];
   const CONFIGS = {
       limit: [{lab:'No Limit', val:''}, {lab:'Soft Limit', val:'Soft Limit'}, {lab:'Hard Limit', val:'Hard Limit'}],
-      tried: [{lab:'Yes', val:'yes'}, {lab:'Want to try', val:'no-want'}, {lab:'No Interest', val:'no-dont'}],
+      tried: [{lab:'Tried It', val:'yes'}, {lab:'Want to try', val:'no-want'}, {lab:'No Interest', val:'no-dont'}],
       rating: [{lab:'Loved it', val:'Loved it'}, {lab:'Liked it', val:'Liked it'}, {lab:'Take it or leave it', val:'Take it or leave it'}, {lab:'Fetish', val:'Fetish'}],
       role: [{lab:'Giving', val:'Giving'}, {lab:'Receiving', val:'Receiving'}, {lab:'Both', val:'Both'}, {lab:'Wearing', val:'Wearing'}, {lab:'Others Wearing', val:'Others Wearing'}],
       motive: [{lab:'Arousal', val:'Arousal'}, {lab:'Discipline', val:'Discipline'}, {lab:'Fun', val:'Fun'}, {lab:'Stress Relief', val:'Stress Relief'}]
