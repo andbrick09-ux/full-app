@@ -558,10 +558,10 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             if (qCraving || qNervous || qPerfect || qStretch) {
                 lHTML += `<div class="list-group"><div class="list-tab-header">PRE-SCENE REFLECTIONS</div>`;
                 const textStyle = "color:#ddd; font-size:12px; margin-bottom:15px; line-height:1.5; font-family:'Montserrat', sans-serif;";
-                if (qCraving) lHTML += `<div class="list-card-header">What are you craving?</div><div style="${textStyle}">${qCraving}</div>`;
-                if (qNervous) lHTML += `<div class="list-card-header">What are you nervous about?</div><div style="${textStyle}">${qNervous}</div>`;
-                if (qPerfect) lHTML += `<div class="list-card-header">What makes this a 10/10?</div><div style="${textStyle}">${qPerfect}</div>`;
-                if (qStretch) lHTML += `<div class="list-card-header">Where do you want to stretch?</div><div style="${textStyle}">${qStretch}</div>`;
+                if (qCraving) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">What are you craving?</div><div style="${textStyle}">${qCraving}</div>`;
+                if (qNervous) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">What are you nervous about?</div><div style="${textStyle}">${qNervous}</div>`;
+                if (qPerfect) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">What makes this a 10/10?</div><div style="${textStyle}">${qPerfect}</div>`;
+                if (qStretch) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">Where do you want to stretch?</div><div style="${textStyle}">${qStretch}</div>`;
                 lHTML += `</div>`;
             }
 
@@ -576,11 +576,21 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 let tabHasData = false; let tabHTML = `<div class="list-tab-header">${tab}</div>`;
                 for(const [card, key] of Object.entries(cards)) {
                     if(state[key] && state[key].length) {
-                        tabHasData = true; tabHTML += `<div class="list-card-header">${card}</div>`;
+                        tabHasData = true; 
+                        
+                        // 1. Wrap the entire card (header + pills) to give it vertical breathing room
+                        tabHTML += `<div style="margin-bottom: 20px;">`;
+                        
+                        // 2. Force the header to take up the full line block
+                        tabHTML += `<div class="list-card-header" style="display: block; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 4px; margin-bottom: 8px;">${card}</div>`;
+                        
+                        // 3. Wrap the pills in their own container so they drop safely below the header
+                        tabHTML += `<div>`;
                         tabHTML += state[key].map(i => {
                             let label = i === "Other-" ? customAttireValue : i;
                             return `<span class="list-pill">${impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label)}</span>`;
                         }).join('');
+                        tabHTML += `</div></div>`; // Close the pills container and the main card container
                     }
                 }
                 if(tabHasData) lHTML += `<div class="list-group">${tabHTML}</div>`;
