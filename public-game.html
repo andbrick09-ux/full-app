@@ -290,19 +290,28 @@
         </div>
     </header>
 
-    <section class="mb-4 space-y-4">
-        <div class="flex justify-center gap-3" id="location-filters">
-            <button onclick="toggleFilter('loc', 'Public')"   class="filter-chip active" data-val="Public">Public</button>
-            <button onclick="toggleFilter('loc', 'Vehicle')"  class="filter-chip"        data-val="Vehicle">Vehicle</button>
-            <button onclick="toggleFilter('loc', 'Bathroom')" class="filter-chip"        data-val="Bathroom">Bathroom</button>
-        </div>
-        <div class="flex justify-center gap-8" id="risk-filters">
-            <button onclick="toggleFilter('risk', '[Low Risk]')"    class="risk-tab active" data-val="[Low Risk]">Low</button>
-            <button onclick="toggleFilter('risk', '[Medium Risk]')" class="risk-tab"        data-val="[Medium Risk]">Med</button>
-            <button onclick="toggleFilter('risk', '[High Risk]')"   class="risk-tab"        data-val="[High Risk]">High</button>
-        </div>
-        <p class="filter-briefing">Define your current environment and allowed risk level.</p>
-    </section>
+    <section class="mb-4 space-y-4" style="margin-top: 20px;">
+    <div class="text-center" style="margin-bottom: -10px;">
+        <span style="font-size: 8px; text-transform: uppercase; letter-spacing: 3px; color: rgba(212,175,55,0.4); font-weight: 700;">Select Environment</span>
+    </div>
+    <div class="flex justify-center gap-3" id="location-filters">
+        <button onclick="toggleFilter('loc', 'Public')"   class="filter-chip active" data-val="Public">Public</button>
+        <button onclick="toggleFilter('loc', 'Vehicle')"  class="filter-chip"        data-val="Vehicle">Vehicle</button>
+        <button onclick="toggleFilter('loc', 'Bathroom')" class="filter-chip"        data-val="Bathroom">Bathroom</button>
+    </div>
+
+    <div class="text-center" style="margin-top: 25px; margin-bottom: -10px;">
+        <span style="font-size: 8px; text-transform: uppercase; letter-spacing: 3px; color: rgba(212,175,55,0.4); font-weight: 700;">Exposure Risk Level</span>
+    </div>
+    <div class="flex justify-center gap-8" id="risk-filters">
+        <button onclick="toggleFilter('risk', '[Low Risk]')"    class="risk-tab active" data-val="[Low Risk]">Low</button>
+        <button onclick="toggleFilter('risk', '[Medium Risk]')" class="risk-tab"        data-val="[Medium Risk]">Med</button>
+        <button onclick="toggleFilter('risk', '[High Risk]')"   class="risk-tab"        data-val="[High Risk]">High</button>
+    </div>
+    
+    <p class="filter-briefing" style="margin-top: 15px; opacity: 0.6;">Ensure your settings match your current surroundings.</p>
+</section>
+
 
     <main class="flex-grow flex flex-col justify-center items-center">
         <div id="result-card" class="glass-card w-full max-w-md directive-display">
