@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sir's Public Tasks | v2.0</title>
-    <!-- Tailwind CDN removed — utilities now in styles.css -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -19,6 +18,26 @@
             --punish-red: #dc2626;
         }
 
+        /* Essential Layout Utilities (Replacing Tailwind) */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-grow { flex-grow: 1; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-8 { gap: 2rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-6 > * + * { margin-top: 1.5rem; }
+        .w-full { width: 100%; }
+        .max-w-md { max-width: 448px; }
+        .text-center { text-align: center; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .pt-16 { padding-top: 4rem; }
+        .pb-4 { padding-bottom: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--midnight);
@@ -29,6 +48,31 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            margin: 0;
+        }
+
+        /* Status Bar Fix */
+        .status-bar {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+        #connection-status {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        #current-time {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(212, 175, 55, 0.6);
+            letter-spacing: 1px;
         }
 
         .serif { font-family: 'Cinzel', serif; }
@@ -97,6 +141,7 @@
             color: rgba(212, 175, 55, 0.5);
             background: rgba(15, 23, 42, 0.5);
             transition: 0.3s all ease;
+            cursor: pointer;
         }
         .filter-chip.active {
             background: rgba(212, 175, 55, 0.15);
@@ -111,9 +156,13 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             padding-bottom: 6px;
+            border: none;
+            background: none;
+            color: white;
             border-bottom: 2px solid transparent;
             opacity: 0.3;
             transition: 0.3s all ease;
+            cursor: pointer;
         }
         .risk-tab.active { opacity: 1; transform: translateY(-2px); }
         .risk-tab[data-val="[Low Risk]"].active    { border-color: #D4AF37; }
@@ -129,7 +178,6 @@
             letter-spacing: 0.05em;
         }
 
-        /* Timer wrapper — hidden by default */
         #timer-wrap {
             display: none;
             flex-direction: column;
@@ -138,7 +186,6 @@
             animation: timerReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
-        /* Begin Task button */
         #timer-start-btn {
             font-family: 'Cinzel', serif;
             font-size: 10px;
@@ -154,7 +201,6 @@
         }
         #timer-start-btn:active { transform: scale(0.93); opacity: 0.85; }
 
-        /* Ring container — hidden until Begin Task tapped */
         #timer-ring-wrap {
             display: none;
             flex-direction: column;
@@ -202,11 +248,12 @@
             justify-content: center; gap: 4px; width: 50px; height: 50px;
             border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 14px;
             background: rgba(212, 175, 55, 0.08); z-index: 50; transition: 0.2s all ease;
+            cursor: pointer;
         }
         .btn-corner:active { transform: scale(0.88); background: rgba(212,175,55,0.18); }
         .btn-corner-label  { font-size: 7px; text-transform: uppercase; color: rgba(212,175,55,0.6); font-weight: 700; }
 
-        .btn-action { transition: 0.3s all ease; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; font-size: 13px; }
+        .btn-action { transition: 0.3s all ease; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; font-size: 13px; cursor: pointer; border: none; }
         .btn-action:active { transform: scale(0.97); }
         .btn-directive { background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 100%); color: #01040a; }
         .btn-directive:disabled { opacity: 0.35; pointer-events: none; }
@@ -219,23 +266,27 @@
         .slide-modal-overlay.open { transform: translateY(0); }
     </style>
 </head>
-<body class="px-5 pt-2 pb-6 sirender-theme">
+<body class="px-5 pt-2 pb-6">
 
-    <button onclick="toggleDatabase(true)" class="btn-corner left-5">
+    <div class="status-bar">
+        <div id="connection-status"></div>
+        <div id="current-time">00:00</div>
+    </div>
+
+    <button onclick="toggleDatabase(true)" class="btn-corner" style="left: 1.25rem;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         <span class="btn-corner-label">Vault</span>
     </button>
 
-    <button onclick="toggleRules(true)" class="btn-corner right-5">
+    <button onclick="toggleRules(true)" class="btn-corner" style="right: 1.25rem;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="btn-corner-label">Rules</span>
     </button>
 
     <header class="text-center pt-16 pb-4">
-        <div class="signature" style="margin-bottom: 12px;">Becca's Sirender</div>
-        <h1 class="app-title" style="font-size: 38px; margin-bottom: 5px;">Sir's Public Tasks</h1>
-        <div style="text-align: center; margin-top: 15px;">
-            <a href="index.html" style="color: var(--champagne); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
+        <h1 class="serif" style="font-size: 32px; margin-bottom: 5px; color: var(--champagne);">Sir's Public Tasks</h1>
+        <div style="text-align: center;">
+            <a href="index.html" style="color: rgba(212,175,55,0.4); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
         </div>
     </header>
 
@@ -256,14 +307,12 @@
     <main class="flex-grow flex flex-col justify-center items-center">
         <div id="result-card" class="glass-card w-full max-w-md directive-display">
             <div id="result-label">Status: Compliance</div>
-            <h2 id="result-title" class="serif text-2xl text-white mb-4 px-4 italic font-bold">Ready for Sir?</h2>
-            <p id="result-desc" class="text-[16px] text-slate-400 italic px-6 leading-relaxed">Adjust your filters and await your directive.</p>
+            <h2 id="result-title" class="serif italic font-bold" style="font-size: 24px; color: white; margin-bottom: 1rem; padding: 0 1rem;">Ready for Sir?</h2>
+            <p id="result-desc" style="font-size: 16px; color: #94a3b8; font-style: italic; padding: 0 1.5rem; line-height: 1.6;">Adjust your filters and await your directive.</p>
             <p id="empty-msg">Boundaries too narrow — adjust filters.</p>
 
             <div id="timer-wrap">
-                <!-- Shown after roll — user reads task, then taps when ready -->
                 <button id="timer-start-btn" onclick="beginTimer()">Begin Task</button>
-                <!-- Shown after Begin Task is tapped -->
                 <div id="timer-ring-wrap">
                     <svg id="timer-ring-svg" width="100" height="100" viewBox="0 0 100 100">
                         <circle id="timer-ring-track" cx="50" cy="50" r="45"/>
@@ -277,27 +326,26 @@
         </div>
     </main>
 
-    <footer class="pt-4">
-        <button id="roll-btn" onclick="rollDirective()" class="btn-action btn-directive w-full py-7 rounded-3xl shadow-2xl">
+    <footer style="padding-top: 1rem;">
+        <button id="roll-btn" onclick="rollDirective()" class="btn-action btn-directive w-full" style="padding: 1.75rem 0; border-radius: 1.5rem;">
             Get Directive
         </button>
     </footer>
 
-    <!-- Modals -->
     <div id="database-overlay" class="slide-modal-overlay">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Master Vault</h2>
-            <button onclick="toggleDatabase(false)" class="text-xs uppercase font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Close</button>
+            <h2 class="serif italic" style="font-size: 20px; color: var(--champagne); text-transform: uppercase; letter-spacing: 2px;">Master Vault</h2>
+            <button onclick="toggleDatabase(false)" style="background: none; border: 1px solid #1e293b; color: #94a3b8; font-size: 10px; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">CLOSE</button>
         </div>
-        <div id="db-content" class="space-y-6 pb-20"></div>
+        <div id="db-content" class="space-y-6" style="padding-bottom: 5rem;"></div>
     </div>
 
     <div id="rules-overlay" class="slide-modal-overlay">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="serif text-xl text-[#D4AF37] uppercase italic tracking-widest">Public Mandates</h2>
-            <button onclick="toggleRules(false)" class="text-xs uppercase font-black tracking-widest border border-slate-800 px-4 py-2 rounded-lg">Close</button>
+            <h2 class="serif italic" style="font-size: 20px; color: var(--champagne); text-transform: uppercase; letter-spacing: 2px;">Public Mandates</h2>
+            <button onclick="toggleRules(false)" style="background: none; border: 1px solid #1e293b; color: #94a3b8; font-size: 10px; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">CLOSE</button>
         </div>
-        <div id="rules-content" class="space-y-6 pb-20"></div>
+        <div id="rules-content" class="space-y-6" style="padding-bottom: 5rem;"></div>
     </div>
 
     <script>
@@ -314,40 +362,35 @@
         ];
 
         const masterVault = [
-            { name: "Arousal Report",         desc: "Quietly report your arousal level (0–5) and describe how wet and turned on you feel.",                                        loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Whisper Confession",     desc: "Whisper one detailed, filthy thing you are fantasizing about Sir doing to you in his ear.",                                   loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Hold-the-pose",          desc: "Maintain a submissive posture with your hands back and eyes down until Sir releases you.",                                    loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Now Command",            desc: "Bite your lip in the way he likes or press your breasts together under your top for Sir.",                                    loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Breath-hold Tease",      desc: "Hold your breath for 15 counts while maintaining eye contact, then exhale and thank Sir.",                                   loc: ["Public", "Vehicle"],             risk: "[Medium Risk]" },
-            { name: "Permission Signal",      desc: "Subtly signal and wait for Sir's silent approval before you take any sip, bite, or shift.",                                  loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Thigh Press Edge",       desc: "Edge via subtle rocking in 10-minute bursts; remain composed until Sir says stop.",                                          loc: ["Public"],                        risk: "[Medium Risk]" },
-            { name: "Server Squeeze",         desc: "Every time a server or stranger approaches, press your thighs together hard for 5 seconds.",                                 loc: ["Public"],                        risk: "[Low Risk]" },
-            { name: "Subtle Grinding",        desc: "Grind against the chair or your hand for 45 seconds; keep every movement invisible.",                                        loc: ["Public", "Vehicle"],             risk: "[Medium Risk]" },
-            { name: "Pelvic Clenches",        desc: "Perform 10 hard, silent internal clenches while staying perfectly still.",                                                   loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Table Edge",             desc: "Discreetly edge for 3 minutes; report 'on edge, Sir' when at the brink.",                                                    loc: ["Public", "Vehicle"],             risk: "[Medium Risk]" },
-            { name: "Ice-melt Challenge",     desc: "Hold an ice cube against your nipple or thigh until it fully melts unnoticed by others.",                                    loc: ["Public"],                        risk: "[Medium Risk]" },
-            { name: "Whispered Edging Loop",  desc: "Maintain a neutral face while Sir leans in and whispers explicit commands to you.",                                          loc: ["Public", "Vehicle"],             risk: "[Low Risk]" },
-            { name: "Bathroom Video",         desc: "Go to the stall, record yourself cumming, and immediately send the video to Sir.",                                           loc: ["Bathroom"],                      risk: "[High Risk]" },
-            { name: "Panty Removal",          desc: "Remove your underwear in the restroom and hand them to Sir discreetly upon return.",                                         loc: ["Public", "Vehicle", "Bathroom"], risk: "[Medium Risk]" },
-            { name: "Stall Edge",             desc: "Go to the restroom stall and edge yourself for 4 full minutes; return to the table denied.",                                 loc: ["Bathroom"],                      risk: "[Medium Risk]" },
-            { name: "Nipple Clamp Mission",   desc: "Put on nipple clamps in the restroom, then return to the table wearing them discreetly.",                                    loc: ["Bathroom"],                      risk: "[Medium Risk]" },
-            { name: "90% Threshold",          desc: "Stay locked at 90% power; remain totally still with zero reaction until released.",                                          loc: ["Public"],                        risk: "[High Risk]" },
-            { name: "Public '5'",             desc: "Orgasm as Sir ramps the vibe; your hands must stay visible on the table/surface. No sound.",                                 loc: ["Public"],                        risk: "[High Risk]" },
-            { name: "Full Release",           desc: "Wait for Sir to grant your total release in the setting of his choosing once he is satisfied.",                              loc: ["Public"],                        risk: "[High Risk]" },
-            { name: "Stoplight Commands",     desc: "At every red light or stop, perform a small commanded act exactly as Sir orders.",                                           loc: ["Vehicle"],                       risk: "[Medium Risk]" },
-            { name: "AC Vent Temperature",    desc: "Endure sensory teasing as Sir directs the vents toward your sensitive areas.",                                               loc: ["Vehicle"],                       risk: "[Medium Risk]" },
-            { name: "Road Head",              desc: "Perform oral or manual service on Sir while moving or safely parked as commanded.",                                          loc: ["Vehicle"],                       risk: "[High Risk]" },
-            { name: "Chest Exposure",         desc: "Lift top to fully expose your breasts to Sir upon his command.",                                                             loc: ["Vehicle"],                       risk: "[High Risk]" },
-            { name: "Intimate Exposure",      desc: "Part your legs or shift clothing to show Sir your pussy as he instructs.",                                                   loc: ["Vehicle"],                       risk: "[High Risk]" },
-            { name: "Stroke Sir",             desc: "Stroke Sir while he is driving only when parked or in low-traffic areas.",                                                   loc: ["Vehicle"],                       risk: "[High Risk]" },
-            { name: "The Focused Gaze",       desc: "Choose one object in the room and do not take your eyes off it until Sir releases you.",                                     loc: ["Public"],                        risk: "[Low Risk]" },
-            { name: "The Invisible Anchor",   desc: "Maintain constant physical contact with Sir's hand or clothing while moving through public.",                                loc: ["Public"],                        risk: "[Low Risk]" },
-            { name: "Self-Pinch Nipples",     desc: "Discreetly pinch or twist your own nipples under your clothing for the exact duration Sir sets.",                            loc: ["Public", "Vehicle"],             risk: "[Medium Risk]" },
-            { name: "Self-Pinch Clit",        desc: "Discreetly apply pressure or rub your clit for Sir's exact count, maintaining a neutral expression.",                       loc: ["Public", "Vehicle"],             risk: "[Medium Risk]" },
-            { name: "Low-Vibe Lock",          desc: "Your vibrator is locked on a low, frustrating tease setting with zero relief until Sir decides.",                           loc: ["Public", "Vehicle"],             risk: "[Low Risk]" }
+            { name: "Arousal Report", desc: "Quietly report your arousal level (0–5) and describe how wet and turned on you feel.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" },
+            { name: "Whisper Confession", desc: "Whisper one detailed, filthy thing you are fantasizing about Sir doing to you in his ear.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" },
+            { name: "Hold-the-pose", desc: "Maintain a submissive posture with your hands back and eyes down until Sir releases you.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" },
+            { name: "Now Command", desc: "Bite your lip in the way he likes or press your breasts together under your top for Sir.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" },
+            { name: "Breath-hold Tease", desc: "Hold your breath for 15 counts while maintaining eye contact, then exhale and thank Sir.", loc: ["Public", "Vehicle"], risk: "[Medium Risk]" },
+            { name: "Permission Signal", desc: "Subtly signal and wait for Sir's silent approval before you take any sip, bite, or shift.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" },
+            { name: "Thigh Press Edge", desc: "Edge via subtle rocking in 10-minute bursts; remain composed until Sir says stop.", loc: ["Public"], risk: "[Medium Risk]" },
+            { name: "Server Squeeze", desc: "Every time a server or stranger approaches, press your thighs together hard for 5 seconds.", loc: ["Public"], risk: "[Low Risk]" },
+            { name: "Subtle Grinding", desc: "Grind against the chair or your hand for 45 seconds; keep every movement invisible.", loc: ["Public", "Vehicle"], risk: "[Medium Risk]" },
+            { name: "Pelvic Clenches", desc: "Perform 10 hard, silent internal clenches while staying perfectly still.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" },
+            { name: "Table Edge", desc: "Discreetly edge for 3 minutes; report 'on edge, Sir' when at the brink.", loc: ["Public", "Vehicle"], risk: "[Medium Risk]" },
+            { name: "Ice-melt Challenge", desc: "Hold an ice cube against your nipple or thigh until it fully melts unnoticed by others.", loc: ["Public"], risk: "[Medium Risk]" },
+            { name: "Bathroom Video", desc: "Go to the stall, record yourself cumming, and immediately send the video to Sir.", loc: ["Bathroom"], risk: "[High Risk]" },
+            { name: "Panty Removal", desc: "Remove your underwear in the restroom and hand them to Sir discreetly upon return.", loc: ["Public", "Vehicle", "Bathroom"], risk: "[Medium Risk]" },
+            { name: "Stall Edge", desc: "Go to the restroom stall and edge yourself for 4 full minutes; return to the table denied.", loc: ["Bathroom"], risk: "[Medium Risk]" },
+            { name: "90% Threshold", desc: "Stay locked at 90% power; remain totally still with zero reaction until released.", loc: ["Public"], risk: "[High Risk]" },
+            { name: "Public '5'", desc: "Orgasm as Sir ramps the vibe; your hands must stay visible on the table/surface. No sound.", loc: ["Public"], risk: "[High Risk]" },
+            { name: "Road Head", desc: "Perform oral or manual service on Sir while moving or safely parked as commanded.", loc: ["Vehicle"], risk: "[High Risk]" },
+            { name: "Chest Exposure", desc: "Lift top to fully expose your breasts to Sir upon his command.", loc: ["Vehicle"], risk: "[High Risk]" },
+            { name: "Intimate Exposure", desc: "Part your legs or shift clothing to show Sir your pussy as he instructs.", loc: ["Vehicle"], risk: "[High Risk]" },
+            { name: "Low-Vibe Lock", desc: "Your vibrator is locked on a low, frustrating tease setting with zero relief until Sir decides.", loc: ["Public", "Vehicle"], risk: "[Low Risk]" }
         ];
 
-        // ── Timer detection ──
+        // Timer Logic
+        let timerInterval = null;
+        let timerTotal = 0;
+        let timerRemaining = 0;
+        const RING_CIRC = 283;
+
         function extractSeconds(desc) {
             const t = desc.toLowerCase();
             const m = t.match(/(\d+)[\s-](?:full\s)?minutes?/);
@@ -359,249 +402,159 @@
             return null;
         }
 
-        // ── Timer state ──
-        let timerInterval  = null;
-        let timerTotal     = 0;
-        let timerRemaining = 0;
-        const RING_CIRC    = 283;
-
-        // Called after roll reveal — shows "Begin Task", hides ring
         function prepareTimer(seconds) {
             clearTimer();
-            timerTotal     = seconds;
+            timerTotal = seconds;
             timerRemaining = seconds;
-
             const fill = document.getElementById('timer-ring-fill');
             const text = document.getElementById('timer-text');
-            fill.style.stroke           = 'var(--champagne)';
-            text.style.fill             = 'var(--champagne)';
+            fill.style.stroke = 'var(--champagne)';
+            text.style.fill = 'var(--champagne)';
             fill.style.strokeDashoffset = '0';
-
-            document.getElementById('timer-expired').style.display   = 'none';
+            document.getElementById('timer-expired').style.display = 'none';
             document.getElementById('timer-start-btn').style.display = 'block';
             document.getElementById('timer-ring-wrap').style.display = 'none';
-            document.getElementById('timer-wrap').style.display      = 'flex';
+            document.getElementById('timer-wrap').style.display = 'flex';
         }
 
-        // Called when user taps "Begin Task"
         function beginTimer() {
             document.getElementById('timer-start-btn').style.display = 'none';
             document.getElementById('timer-ring-wrap').style.display = 'flex';
-            document.getElementById('roll-btn').disabled             = true;
-
+            document.getElementById('roll-btn').disabled = true;
             renderRing();
-
             timerInterval = setInterval(() => {
                 timerRemaining--;
                 renderRing();
-
                 if (timerRemaining <= 0) {
                     clearInterval(timerInterval);
-                    timerInterval = null;
-
                     const fill = document.getElementById('timer-ring-fill');
                     const text = document.getElementById('timer-text');
-                    fill.style.stroke     = 'var(--punish-red)';
-                    text.style.fill       = 'var(--punish-red)';
-                    text.textContent      = '00:00';
-
+                    fill.style.stroke = 'var(--punish-red)';
+                    text.style.fill = 'var(--punish-red)';
+                    text.textContent = '00:00';
                     document.getElementById('timer-expired').style.display = 'block';
                     document.getElementById('result-card').classList.add('urgency-pulse');
                     document.getElementById('roll-btn').disabled = false;
-
                     if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
                 }
             }, 1000);
         }
 
         function renderRing() {
-            const fill     = document.getElementById('timer-ring-fill');
-            const text     = document.getElementById('timer-text');
+            const fill = document.getElementById('timer-ring-fill');
+            const text = document.getElementById('timer-text');
             const progress = timerRemaining / timerTotal;
-
             fill.style.strokeDashoffset = RING_CIRC * (1 - progress);
-
             const m = Math.floor(timerRemaining / 60);
             const s = timerRemaining % 60;
             text.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-            if (progress < 0.2) {
-                fill.style.stroke = 'var(--punish-red)';
-                text.style.fill   = 'var(--punish-red)';
-            }
         }
 
         function clearTimer() {
-            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-            document.getElementById('timer-wrap').style.display  = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('timer-wrap').style.display = 'none';
             document.getElementById('result-card').classList.remove('urgency-pulse');
-            document.getElementById('roll-btn').disabled         = false;
+            document.getElementById('roll-btn').disabled = false;
         }
 
-        // ── Filter state ──
+        // Filter & Roll logic
         let historyBuffer = [];
-        const BUFFER_SIZE = 5;
-        let selectedLocs  = ["Public"];
+        let selectedLocs = ["Public"];
         let selectedRisks = ["[Low Risk]"];
-        let isRolling     = false;
-
-        function renderFilterUI() {
-            document.querySelectorAll('#location-filters .filter-chip').forEach(el =>
-                el.classList.toggle('active', selectedLocs.includes(el.dataset.val))
-            );
-            document.querySelectorAll('#risk-filters .risk-tab').forEach(el =>
-                el.classList.toggle('active', selectedRisks.includes(el.dataset.val))
-            );
-        }
+        let isRolling = false;
 
         function toggleFilter(type, val) {
             if (type === 'loc') {
                 if (selectedLocs.includes(val)) {
                     if (selectedLocs.length > 1) selectedLocs = selectedLocs.filter(l => l !== val);
-                } else { selectedLocs.push(val); }
+                } else selectedLocs.push(val);
             } else {
                 if (selectedRisks.includes(val)) {
                     if (selectedRisks.length > 1) selectedRisks = selectedRisks.filter(r => r !== val);
-                } else { selectedRisks.push(val); }
+                } else selectedRisks.push(val);
             }
-            renderFilterUI();
-            historyBuffer = [];
-            document.getElementById('empty-msg').style.display = 'none';
+            document.querySelectorAll(`#location-filters .filter-chip`).forEach(el => el.classList.toggle('active', selectedLocs.includes(el.dataset.val)));
+            document.querySelectorAll(`#risk-filters .risk-tab`).forEach(el => el.classList.toggle('active', selectedRisks.includes(el.dataset.val)));
             clearTimer();
         }
 
-        // ── Roll ──
         function rollDirective() {
             if (isRolling) return;
-
-            const pool = masterVault.filter(t =>
-                selectedRisks.includes(t.risk) && t.loc.some(l => selectedLocs.includes(l))
-            );
-
+            const pool = masterVault.filter(t => selectedRisks.includes(t.risk) && t.loc.some(l => selectedLocs.includes(l)));
             if (pool.length === 0) {
                 document.getElementById('empty-msg').style.display = 'block';
                 return;
             }
             document.getElementById('empty-msg').style.display = 'none';
-
-            let available = pool.filter(t => !historyBuffer.includes(t.name));
-            if (available.length === 0) {
-                historyBuffer.splice(0, Math.ceil(historyBuffer.length / 2));
-                available = pool.filter(t => !historyBuffer.includes(t.name));
-            }
-
             clearTimer();
             isRolling = true;
-
-            const label = document.getElementById('result-label');
             const title = document.getElementById('result-title');
-            const desc  = document.getElementById('result-desc');
-            const card  = document.getElementById('result-card');
-
-            label.textContent = 'Finding directive…';
-            label.style.color = 'rgba(212,175,55,0.9)';
+            const desc = document.getElementById('result-desc');
+            const label = document.getElementById('result-label');
+            label.textContent = "FINDING DIRECTIVE...";
 
             let count = 0;
             const shuffle = setInterval(() => {
-                title.textContent  = pool[Math.floor(Math.random() * pool.length)].name;
-                title.className    = 'serif text-2xl shuffling italic px-4';
-                desc.textContent   = '· · ·';
-                desc.style.opacity = '0.3';
-
-                if (++count > 25) {
+                title.textContent = pool[Math.floor(Math.random() * pool.length)].name;
+                title.className = 'serif shuffling';
+                if (++count > 20) {
                     clearInterval(shuffle);
-
-                    const final = available[Math.floor(Math.random() * available.length)];
-                    historyBuffer.push(final.name);
-                    if (historyBuffer.length > BUFFER_SIZE) historyBuffer.shift();
-
-                    title.textContent  = final.name;
-                    title.className    = 'serif text-3xl text-white font-bold result-reveal';
-                    desc.textContent   = final.desc;
-                    desc.className     = 'text-[16px] text-slate-400 italic px-6 leading-relaxed result-reveal';
-                    desc.style.opacity = '1';
-                    label.textContent  = 'Your directive:';
-                    label.style.color  = 'rgba(212,175,55,0.5)';
-
-                    card.classList.remove('card-glow');
-                    void card.offsetWidth;
-                    card.classList.add('card-glow');
-
-                    // Show Begin Task button after reveal settles — user taps when ready
-                    const seconds = extractSeconds(final.desc);
-                    if (seconds) setTimeout(() => prepareTimer(seconds), 600);
-
+                    const final = pool[Math.floor(Math.random() * pool.length)];
+                    title.textContent = final.name;
+                    title.className = 'serif result-reveal';
+                    desc.textContent = final.desc;
+                    desc.className = 'result-reveal';
+                    label.textContent = "YOUR DIRECTIVE:";
+                    const secs = extractSeconds(final.desc);
+                    if (secs) prepareTimer(secs);
                     isRolling = false;
                 }
             }, 60);
         }
 
-        // ── Modals ──
+        // Modal Helpers
         function toggleDatabase(open) {
             if (open) {
                 document.getElementById('db-content').innerHTML = masterVault.map(i => `
-                    <div class="border-b border-white/5 pb-3">
-                        <h4 class="serif text-white font-bold uppercase text-sm">
-                            ${i.name}
-                            <span class="text-[9px] text-slate-500 ml-2 tracking-widest">${i.risk}</span>
-                        </h4>
-                        <p class="text-xs text-slate-400 italic mt-1 leading-relaxed">${i.desc}</p>
-                        <p class="text-[9px] text-slate-600 mt-1 tracking-widest uppercase">${i.loc.join(' · ')}</p>
-                    </div>
-                `).join('');
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;">
+                        <h4 class="serif" style="font-size: 14px; margin: 0; color: white;">${i.name} <span style="font-size: 9px; color: #64748b; margin-left: 8px;">${i.risk}</span></h4>
+                        <p style="font-size: 12px; color: #94a3b8; font-style: italic; margin-top: 4px;">${i.desc}</p>
+                    </div>`).join('');
                 document.getElementById('database-overlay').classList.add('open');
-            } else {
-                document.getElementById('database-overlay').classList.remove('open');
-            }
+            } else document.getElementById('database-overlay').classList.remove('open');
         }
 
         function toggleRules(open) {
             if (open) {
                 document.getElementById('rules-content').innerHTML = rulesOfEngagement.map(r => `
-                    <div class="border-b border-white/5 pb-3">
-                        <h4 class="serif text-white font-bold uppercase tracking-wider text-sm">${r.name}</h4>
-                        <p class="text-xs text-slate-400 italic mt-1 leading-relaxed">${r.desc}</p>
-                    </div>
-                `).join('');
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;">
+                        <h4 class="serif" style="font-size: 14px; margin: 0; color: white;">${r.name}</h4>
+                        <p style="font-size: 12px; color: #94a3b8; font-style: italic; margin-top: 4px;">${r.desc}</p>
+                    </div>`).join('');
                 document.getElementById('rules-overlay').classList.add('open');
-            } else {
-                document.getElementById('rules-overlay').classList.remove('open');
-            }
+            } else document.getElementById('rules-overlay').classList.remove('open');
         }
 
-        // ── Connection Status ──
-        function updateConnectionStatus() {
-            const statusElement = document.getElementById('connection-status');
-            if (!statusElement) return;
-            if (navigator.onLine) {
-                statusElement.classList.remove('bg-red-500', 'shadow-[0_0_10px_#ef4444]');
-                statusElement.classList.add('bg-green-500', 'shadow-[0_0_10px_#22c55e]');
-            } else {
-                statusElement.classList.remove('bg-green-500', 'shadow-[0_0_10px_#22c55e]');
-                statusElement.classList.add('bg-red-500', 'shadow-[0_0_10px_#ef4444]');
-            }
-        }
-
-        window.addEventListener('online', updateConnectionStatus);
-        window.addEventListener('offline', updateConnectionStatus);
-        updateConnectionStatus(); // Initial check
-
-        // ── Time Display ──
-        function updateTime() {
-            const timeElement = document.getElementById('current-time');
-            if (!timeElement) return;
+        // System Checks
+        function updateStatus() {
+            const dot = document.getElementById('connection-status');
+            const timeEl = document.getElementById('current-time');
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+            timeEl.textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            if (navigator.onLine) {
+                dot.style.background = '#22c55e';
+                dot.style.boxShadow = '0 0 10px #22c55e';
+            } else {
+                dot.style.background = '#ef4444';
+                dot.style.boxShadow = '0 0 10px #ef4444';
+            }
         }
-
-        setInterval(updateTime, 1000);
-        updateTime();
+        setInterval(updateStatus, 1000);
+        updateStatus();
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.register('sw.js').catch(e => console.error(e));
             });
         }
     </script>
