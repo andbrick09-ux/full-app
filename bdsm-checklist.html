@@ -192,7 +192,9 @@ async function init() {
   document.getElementById('saveLabel').textContent = 'Connecting to Cloud...';
   
   try {
-    const response = await fetch(`${API_URL}?token=${APP_TOKEN}`);
+    // The &t=... adds a millisecond timestamp so the URL is uniquely fresh every time
+const response = await fetch(`${API_URL}?token=${APP_TOKEN}&t=${new Date().getTime()}`);
+
     const sheetData = await response.json();
 
     if (sheetData.error) throw new Error(sheetData.error);
