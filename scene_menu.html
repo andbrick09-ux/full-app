@@ -329,11 +329,14 @@
                     }
                 });
             });
+            
+            /* --- COMMENTED OUT TO ALWAYS SHOW SPLASH SCREEN ---
             // Hide splash if there's significant progress
             if (Object.values(state).some(arr => arr.length > 0)) {
                 document.getElementById('splash-screen').style.display = 'none';
                 document.getElementById('reflections-screen').style.display = 'none';
             }
+            --------------------------------------------------- */
         }
 
         loadState();
