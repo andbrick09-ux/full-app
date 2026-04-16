@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BDSM Portal - Terminology Update 2026</title>
+<title>BDSM Portal - Cloud Sync 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -122,13 +122,13 @@ body {
 </div>
 
 <div class="persistence-bar">
-  <span id="saveLabel">Ready</span>
+  <span id="saveLabel">Connecting...</span>
   <button class="btn-mini" onclick="openSnapshotModal()">Snapshot</button>
   <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226; max-width: 150px;">
     <option value="">History Vault</option>
   </select>
   <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison Mode</button>
-  <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset Portal</button>
+  <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset UI Cache</button>
 </div>
 
 <div id="scoreCard" class="score-card">
@@ -137,8 +137,7 @@ body {
 </div>
 
 <div class="tabs-nav" id="tabsNav">
-  <button class="tab-btn active" id="tab-all" onclick="setTab('all', this)">All Categories</button>
-</div>
+  </div>
 
 <div class="filter-bar">
   <div class="search-container">
@@ -179,217 +178,107 @@ body {
 </div>
 
 <script>
-// ── DATA MAPPING ───────────────────────────────────────────────
-const DATABASE_TEMPLATE = [
-  { id:'bondage', label:'Bondage', items:[
-    {n:'Anal Hook', d:'A curved blunt device for internal weighted play and restraint.'},
-    {n:'Arm Binding', d:'Tying arms together behind the back or to the body to restrict movement.'},
-    {n:'Bed bondage', d:'Fixing a partner to a bed using straps, ropes, or hardware.'},
-    {n:'Breast Bondage', d:'Rope or leather techniques used to bind or compress the breasts.'},
-    {n:'Cage', d:'Full physical containment in a small, secure enclosure.'},
-    {n:'Chains', d:'Heavy metal restraint providing weight, cold sensation, and specific sounds.'},
-    {n:'Chair bondage', d:'Securing a partner to a chair to limit movement while seated.'},
-    {n:'Chastity', d:'Mechanical prevention of sexual access using specialized cages or belts.'},
-    {n:'Collars (Private)', d:'Neckwear signaling belonging in a private setting.'},
-    {n:'Collars (Public)', d:'Wearing a visible symbol of ownership in public view.'},
-    {n:'Corset', d:'Tight-laced garments used for posture control and body shaping.'},
-    {n:'Crotch Rope', d:'Bondage that applies pressure or sensation to the crotch area.'},
-    {n:'Cuffs - Leather', d:'Wrist or ankle restraints made of leather for security.'},
-    {n:'Cuffs - Metal', d:'Traditional rigid restraints for high-security or clinical play.'},
-    {n:'Gags', d:'Devices that limit or prevent speech and vocalization.'},
-    {n:'Heavy Bondage', d:'Intensive restrictive restraint requiring expertise.'},
-    {n:'Light Bondage', d:'Gentle restraint or symbolic tying.'},
-    {n:'Mummification', d:'Wrapping the body in layers to restrict all movement.'},
-    {n:'Restraints', d:'General term for handcuffs, leg irons, or leather cuffs.'},
-    {n:'Rope - Shibari', d:'Artistic Japanese-style rope bondage focused on pressure.'},
-    {n:'Sleep sacks', d:'Restraint within a bag or sack to limit limb movement.'},
-    {n:'Spreader Bar', d:'A rigid bar used to keep limbs separated.'},
-    {n:'Suspension', d:'Lifting a partner partially or fully off the ground using ropes.'}
-  ]},
-  { id:'bodily', label:'Bodily Fluid', items:[
-    {n:'Breast milk - Milking', d:'Stimulation to express breast milk for consumption or play.'},
-    {n:'Cum in Panties', d:'Directly ejaculating into undergarments.'},
-    {n:'Cum In Ass', d:'Anal ejaculation for physical or visual sensation.'},
-    {n:'Cum In Mouth', d:'Ejaculating directly into a partner\'s mouth.'},
-    {n:'Cum In Vagina', d:'Unprotected internal ejaculation.'},
-    {n:'Cum On Body', d:'Ejaculating on the skin of a partner.'},
-    {n:'Cum On Face', d:'Ejaculating on a partner\'s face.'},
-    {n:'Fake Cum', d:'Using synthetic fluids for visual or sensory play.'},
-    {n:'Grool', d:'Natural arousal fluids used for sensation or lubrication.'},
-    {n:'Spit for lube', d:'Using saliva as a natural lubricant during play.'},
-    {n:'Spit in', d:'Ejaculating or spitting directly into a partner\'s mouth.'},
-    {n:'Spit on', d:'Applying saliva to the skin for sensation.'},
-    {n:'Urinate on body', d:'Watersports involving urination on a partner.'},
-    {n:'Drooling', d:'Deriving pleasure from excessive saliva flow.'},
-    {n:'Chamber pot use', d:'Scene-based use of a collection vessel.'}
-  ]},
-  { id:'ds', label:'Dominance/Submission', items:[
-    {n:'Behavior correction', d:'Punishment or discipline for breaking protocols.'},
-    {n:'Decision control', d:'Giving one partner authority over life choices.'},
-    {n:'Journaling', d:'A tool for tracking thoughts within a dynamic.'},
-    {n:'Mind Fucking', d:'Psychological play focused on challenging a partner.'},
-    {n:'Subspace', d:'A mental state of deep relaxation during submission.'},
-    {n:'Task setting', d:'Assigning specific duties or chores.'},
-    {n:'24/7 power exchange', d:'A continuous lifestyle exchange of authority.'}
-  ]},
-  { id:'edge', label:'Edge Play', items:[
-    {n:'Blood play (cutting)', d:'High-risk play involving the drawing of blood.'},
-    {n:'Breath play', d:'Negotiated restriction of airflow for arousal.'},
-    {n:'Clit Pumping', d:'Using suction to increase blood flow to the clitoris.'},
-    {n:'CNC', d:'Consensual non-consent scenarios.'},
-    {n:'Public Play', d:'Sexual acts or teasing performed in public spaces.'},
-    {n:'Exposure', d:'Revealing fantasies or the body to induce arousal.'},
-    {n:'Temperature extremes', d:'Using extreme heat or cold for sensory contrast.'},
-    {n:'Trampling', d:'Walking or standing on a partner\'s body.'},
-    {n:'Waterboarding', d:'A high-risk scenario involving simulated drowning.'}
-  ]},
-  { id:'humiliation', label:'Humiliation', items:[
-    {n:'Being ignored', d:'Withholding attention to induce a feeling of submission.'},
-    {n:'Being mocked', d:'Verbal teasing intended to challenge a partner\'s ego.'},
-    {n:'Forced dressing', d:'Compelling a partner to wear specific attire.'},
-    {n:'Verbal degradation', d:'The use of specific words to demean or dominate.'},
-    {n:'Writing on the body', d:'Marking a partner\'s skin with words or symbols.'}
-  ]},
-  { id:'impact', label:'Impact Play', items:[
-    {n:'Breast whipping', d:'Light impact to the breasts using soft tools.'},
-    {n:'Caning', d:'Intense localized impact using rigid sticks.'},
-    {n:'Face slapping', d:'Dominance strikes to the face for psychological thrill.'},
-    {n:'Pussy spanking', d:'Hand impact delivered to the vulva area.'},
-    {n:'Pussy whipping', d:'Targeted tool impact to the labia area.'},
-    {n:'Riding crops', d:'Stiff tools delivering a stinging sensation.'},
-    {n:'Spanking (OTK)', d:'Over-the-knee strikes with the hand or paddle.'},
-    {n:'Spanking-Hand', d:'Manual impact delivered to the buttocks.'},
-    {n:'Whipping - Flogger', d:'Multi-tailed tools delivering thuddy sensations.'}
-  ]},
-  { id:'sensation', label:'Sensation Play', items:[
-    {n:'Blindfold', d:'deprivation by blocking sight to heighten other senses.'},
-    {n:'Breath control-choking', d:'Negotiated neck pressure for arousal.'},
-    {n:'Cock Ring', d:'Wearing a device to prolong arousal.'},
-    {n:'Ear plugs', d:'Reducing auditory input to focus on touch.'},
-    {n:'Enemas', d:'Introduction of fluid for cleansing or sensation.'},
-    {n:'Finger Claws', d:'Metal or sharp extensions for scratching play.'},
-    {n:'Hair pulling', d:'Dominant sensory play involving the scalp.'},
-    {n:'Hot wax', d:'Dripping low-temperature candles for heat play.'},
-    {n:'Ice', d:'Using extreme cold for sensory contrast.'},
-    {n:'Kissing', d:'Intimate physical contact focusing on the mouth.'},
-    {n:'Nipple play', d:'Direct stimulation of the nipples for arousal.'},
-    {n:'Nipple suction', d:'The use of cups to provide vacuum sensation.'},
-    {n:'Nuru', d:'Body-to-body massage with highly slippery gel.'},
-    {n:'Piercing', d:'Temporary or permanent body modification play.'},
-    {n:'Skin Sensation', d:'Using feathers or claws to explore nerve sensitivity.'},
-    {n:'Neck Kiss/Touch/Bite', d:'Sensory play focused on the neck and shoulders.'},
-    {n:'Clamps - Nipple', d:'Applying weighted or spring-loaded pressure.'}
-  ]},
-  { id:'sexual', label:'Sexual Play', items:[
-    {n:'Anal sex', d:'Penetrative intercourse via the anus.'},
-    {n:'Body Paint', d:'Using skin-safe paint for sensory exploration.'},
-    {n:'Face Fucking', d:'Dominant thrusting while a partner performs oral sex.'},
-    {n:'Mutual Masterbation', d:'Partners pleasuring each other simultaneously.'},
-    {n:'Forced Orgasms', d:'Using restraint or toys to compel a partner to climax.'},
-    {n:'Prostate Massage', d:'Stimulation of the male prostate for intense pleasure.'},
-    {n:'Breast fucking', d:'Penetrative movement between the breasts.'},
-    {n:'Fellatio', d:'Oral stimulation of the penis.'},
-    {n:'Cunnilingus', d:'Oral stimulation of the vulva.'}
-  ]},
-  { id:'toys', label:'Toys', items:[
-    {n:'Remote Toys', d:'Toys controlled by a partner from a distance.'},
-    {n:'Internal Vibrator', d:'Vibrating toys used internally for sensation.'}
-  ]},
-  { id:'voyeur', label:'Voyeurism/Exhib', items:[
-    {n:'Exhibitionism', d:'Deriving pleasure from being seen by others.'},
-    {n:'Voyeurism', d:'Deriving pleasure from watching others.'}
-  ]},
-  { id:'service', label:'Service', items:[
-    {n:'Following orders', d:'Complying with specific tasks or behaviors.'},
-    {n:'Learned postures', d:'Adopting specific physical positions on command.'},
-    {n:'Massage', d:'Providing physical touch as a form of care.'},
-    {n:'Kneeling', d:'Assuming a low posture as a sign of submission.'},
-    {n:'Rituals', d:'Consistent routines or protocols within a dynamic.'}
-  ]},
-  { id:'kinks', label:'Kinks', items:[
-    {n:'Lingerie', d:'Focus on erotic attire for visual arousal.'},
-    {n:'Pantyhose/Stockings', d:'Specific focus on legwear for sensory arousal.'},
-    {n:'Being woke up sexual', d:'Initiating sexual acts while a partner sleeps.'},
-    {n:'Teasing', d:'Withholding satisfaction to build desire.'},
-    {n:'Skin on Skin', d:'Pure direct body contact without barriers.'}
-  ]}
-];
+// --- CLOUD API CONFIGURATION ---
+const API_URL =  "https://script.google.com/macros/s/AKfycbyTBm0qNlaCPg22tTBpsv1chX5zbaY7jvU1f_hDn1vwksyxLOlaz6dtT4lEsBwNHWWR/exec"; 
+const APP_TOKEN = "8zhd0ajdfa8";
 
-const AUDIT_ANDY = {
-  'Anal Hook':{t:'yes',r:'Liked it',ro:'Giving'},'Arm Binding':{t:'yes',r:'Loved it',ro:'Giving'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Both'},
-  'Breast Bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Chair bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Crotch Rope':{t:'yes',r:'Liked it',ro:'Giving'},
-  'Collars (Private)':{t:'yes',r:'Liked it',ro:'Giving'},'Corset':{t:'yes',r:'Loved it',ro:'Giving'},'Cuffs - Leather':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Light Bondage':{t:'yes',r:'Loved it',ro:'Giving'},'Restraints':{t:'yes',r:'Loved it',ro:'Giving'},'Spreader Bar':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Breast milk - Milking':{t:'yes',r:'Loved it',ro:'Receiving'},'Cum in Panties':{t:'yes',r:'Loved it',ro:'Giving',n:'Private or public'},
-  'Cum In Mouth':{t:'yes',r:'Loved it',ro:'Giving'},'Cum In Vagina':{t:'yes',r:'Loved it',ro:'Giving'},'Cum On Body':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Drooling':{t:'yes',r:'Loved it',ro:'Receiving'},'Grool':{t:'yes',r:'Loved it',ro:'Receiving'},'Spit for lube':{t:'yes',r:'Liked it',ro:'Both'},
-  'Swallow Semen':{t:'yes',r:'Loved it',ro:'Giving'},'Urinate on body':{t:'yes',r:'Liked it',ro:'Both'},'Subspace':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Task setting':{t:'yes',r:'Loved it',ro:'Both'},'Clit Pumping':{t:'yes',r:'Loved it',ro:'Giving'},'CNC':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Public Play':{t:'yes',r:'Liked it',ro:'Giving',n:'Teasing, toys, etc'},'Exposure':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Breast whipping':{t:'yes',r:'Loved it',ro:'Giving'},'Riding crops':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Spanking (OTK)':{t:'yes',r:'Loved it',ro:'Giving'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Giving'},
-  'Neck Kiss/Touch/Bite':{t:'yes',r:'Loved it',ro:'Both'},'Blindfold':{t:'yes',r:'Loved it',ro:'Both'},
-  'Clamps - Nipple':{t:'yes',r:'Loved it',ro:'Giving'},'Nuru':{t:'yes',r:'Loved it',ro:'Both'},
-  'Skin Sensation':{t:'yes',r:'Loved it',ro:'Both'},'Anal sex':{t:'yes',r:'Liked it',ro:'Giving'},
-  'Breast fucking':{t:'yes',r:'Loved it',ro:'Giving'},'Fellatio':{t:'yes',r:'Loved it',ro:'Receiving'},
-  'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'},'Prostate Massage':{t:'yes',r:'Liked it',ro:'Receiving',n:'Maybe'},
-  'Forced Orgasms':{t:'yes',r:'Loved it',ro:'Giving'},'Being woke up sexual':{t:'yes',r:'Loved it',ro:'Both'},
-  'Lingerie':{t:'yes',r:'Loved it',ro:'Others Wearing'},'Pantyhose/Stockings':{t:'yes',r:'Loved it',ro:'Others Wearing'},
-  'Cage':{t:'no-want',r:'Take it or leave it',ro:'Giving'},'Chastity':{t:'no-want',r:'Liked it',ro:'Giving'},
-  'Cuffs - Metal':{t:'no-want',r:'Loved it',ro:'Giving'},'Mummification':{t:'no-want',r:'Liked it',ro:'Giving'},
-  'Suspension':{t:'no-want',ro:'Giving',m:'Arousal'},'Blood play (cutting)':{t:'no-dont',l:'Hard Limit'},
-  'Scat':{t:'no-dont',l:'Hard Limit'},'Chamber pot use':{t:'no-dont',l:'Hard Limit'}
-};
-
-const AUDIT_BECCA = {
-  'Anal Hook':{t:'no-want'},'Arm Binding':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Bed bondage':{t:'yes',r:'Loved it',ro:'Receiving',m:'Arousal'},
-  'Breast Bondage':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Chair bondage':{t:'yes',ro:'Receiving'},'Chastity':{t:'yes',ro:'Receiving'},
-  'Chains':{t:'yes',ro:'Receiving'},'Restraints':{t:'yes',ro:'Receiving'},'Mummification':{r:'Take it or leave it',l:'Soft Limit',ro:'Receiving'},
-  'Sleep sacks':{r:'Take it or leave it',l:'Soft Limit',ro:'Receiving'},'Collars (Public)':{t:'no-want',ro:'Wearing',n:'prefer normal necklace given to me by Don'},
-  'Corset':{t:'yes',r:'Loved it',ro:'Wearing',n:'Public and private'},'Gags':{t:'yes',r:'Liked it',ro:'Wearing',n:'work up to level'},
-  'Heavy Bondage':{t:'no-want',n:'work up to level'},'Light Bondage':{t:'yes',r:'Loved it',ro:'Both',m:'Arousal'},
-  'Cum in Panties':{t:'yes',ro:'Wearing',m:'Arousal'},'Cum In Ass':{t:'yes',r:'Take it or leave it',ro:'Receiving'},'Cum In Mouth':{t:'yes',ro:'Receiving'},
-  'Cum On Body':{t:'yes',ro:'Both'},'Drooling':{t:'yes',ro:'Giving'},'Fake Cum':{t:'yes',ro:'Both'},
-  'Spit for lube':{t:'yes',ro:'Both'},'Spit in':{t:'yes',ro:'Both'},'Spit on':{t:'yes',ro:'Both'},
-  'Urinate on body':{t:'yes',r:'Take it or leave it',ro:'Both'},
-  'Behavior correction':{t:'yes',r:'Liked it',ro:'Receiving',m:'Arousal'},'Mind Fucking':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},
-  'Breast whipping':{t:'yes',r:'Loved it',ro:'Receiving',n:'With flogger'},'Pussy spanking':{t:'yes',r:'Liked it',ro:'Receiving'},
-  'Pussy whipping':{t:'yes',r:'Liked it',ro:'Receiving'},'Riding crops':{t:'yes',r:'Liked it',ro:'Receiving'},
-  'Spanking (OTK)':{t:'yes',ro:'Receiving'},'Spanking-Hand':{t:'yes',ro:'Receiving'},'Whipping - Flogger':{t:'yes',r:'Loved it',ro:'Receiving'},
-  'Blindfold':{t:'yes',r:'Loved it',ro:'Wearing',m:'Arousal'},'Ear plugs':{t:'yes',r:'Liked it',ro:'Wearing'},
-  'Enemas':{t:'yes',r:'Liked it',ro:'Receiving'},'Finger Claws':{t:'yes',ro:'Both'},'Hair pulling':{t:'yes',ro:'Both'},
-  'Hot wax':{t:'yes',ro:'Both'},'Ice':{t:'yes',ro:'Both'},'Kissing':{t:'yes',ro:'Both'},'Nuru':{t:'yes',ro:'Both'},
-  'Skin Sensation':{t:'yes',ro:'Both'},'Neck Kiss/Touch/Bite':{t:'yes',r:'Loved it',ro:'Both',m:'Arousal'},
-  'Face Fucking':{t:'no-want',ro:'Receiving',n:'dark fantasy maybe one day'},'Mutual Masterbation':{t:'yes',r:'Loved it',ro:'Both'},
-  'Forced Orgasms':{t:'yes',r:'Loved it',ro:'Receiving'},'Following orders':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},
-  'Massage':{t:'yes',r:'Liked it',ro:'Both',m:'Arousal'},'Teasing':{t:'yes',ro:'Both'},'Lingerie':{t:'yes',ro:'Wearing'}
-};
-
+// App State
 let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
-let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '', filters = { tried: [], rating: [], limit: [], role: [], motive: [] };
+let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '';
+let filters = { tried: [], rating: [], limit: [], role: [], motive: [] };
 
-function init() {
-  const saved = localStorage.getItem('bdsm_portal_vTRAD_SYNC_2026');
-  if (saved) { APP_STATE = JSON.parse(saved); } else {
-    DATABASE_TEMPLATE.forEach(cat => {
-      APP_STATE.p1.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_AND_Y[i.n])) });
-      APP_STATE.p2.data.push({ id: cat.id, label: cat.label, items: cat.items.map(i => buildItem(i.n, i.d, AUDIT_BECCA[i.n])) });
+// API Fetch and Initialize
+async function init() {
+  document.getElementById('saveLabel').textContent = 'Connecting to Cloud...';
+  
+  try {
+    const response = await fetch(`${API_URL}?token=${APP_TOKEN}`);
+    const sheetData = await response.json();
+
+    if (sheetData.error) throw new Error(sheetData.error);
+
+    // Group the flat spreadsheet rows into categories
+    const categories = [...new Set(sheetData.map(row => row.Category))];
+    
+    categories.forEach(cat => {
+      const itemsInCat = sheetData.filter(row => row.Category === cat);
+      const catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+      
+      let p1Items = itemsInCat.map(row => ({
+        n: row.Activity, d: row.Description || '',
+        tried: row.Andy_Tried || '', rating: row.Andy_Rating || '', role: row.Andy_Role || '', limit: row.Andy_Limit || '', motive: row.Andy_Motive || '', note: row.Andy_Note || ''
+      }));
+      
+      let p2Items = itemsInCat.map(row => ({
+        n: row.Activity, d: row.Description || '',
+        tried: row.Becca_Tried || '', rating: row.Becca_Rating || '', role: row.Becca_Role || '', limit: row.Becca_Limit || '', motive: row.Becca_Motive || '', note: row.Becca_Note || ''
+      }));
+
+      APP_STATE.p1.data.push({ id: catId, label: cat, items: p1Items });
+      APP_STATE.p2.data.push({ id: catId, label: cat, items: p2Items });
     });
-    createSnapshot('p1', 'March 2026 Baseline'); createSnapshot('p2', 'March 2026 Baseline');
+
+    document.getElementById('saveLabel').textContent = 'Synced with Cloud';
+    document.getElementById('saveLabel').style.color = 'var(--green)';
+    save(); // Cache to local storage as fallback
+
+  } catch (error) {
+    console.error("Failed to load cloud data:", error);
+    document.getElementById('saveLabel').textContent = 'Offline (Using Cache)';
+    document.getElementById('saveLabel').style.color = 'var(--red)';
+    const saved = localStorage.getItem('bdsm_portal_vTRAD_SYNC_2026');
+    if (saved) APP_STATE = JSON.parse(saved);
   }
-  if(APP_STATE.p1.history.length > 0) APP_STATE.p1.data = JSON.parse(JSON.stringify(APP_STATE.p1.history[0].data));
-  if(APP_STATE.p2.history.length > 0) APP_STATE.p2.data = JSON.parse(JSON.stringify(APP_STATE.p2.history[0].data));
+
+  // Inject category tabs dynamically
   const nav = document.getElementById('tabsNav');
-  DATABASE_TEMPLATE.forEach(c => {
-    const b = document.createElement('button'); b.className = 'tab-btn'; b.textContent = c.label;
-    b.onclick = () => setTab(c.id, b); nav.appendChild(b);
+  nav.innerHTML = '<button class="tab-btn active" id="tab-all" onclick="setTab(\'all\', this)">All Categories</button>';
+  APP_STATE.p1.data.forEach(c => {
+    const b = document.createElement('button'); 
+    b.className = 'tab-btn'; 
+    b.textContent = c.label;
+    b.onclick = () => setTab(c.id, b); 
+    nav.appendChild(b);
   });
-  render(); updateHistDropdown(); renderFilterDashboard();
+
+  render(); 
+  updateHistDropdown(); 
+  renderFilterDashboard();
 }
 
-function buildItem(n, d, a) { return { n, d, tried: a?.t||'', rating: a?.r||'', role: a?.ro||'', limit: a?.l||'', motive: a?.m||'', note: a?.n||'' }; }
-function createSnapshot(p, name) { APP_STATE[p].history.unshift({ id: Date.now()+(p==='p2'?1:0), name, date: '3/31/2026', data: JSON.parse(JSON.stringify(APP_STATE[p].data)) }); }
+// API Post (Live Sync)
+async function syncToCloud(itemName, profile, field, value) {
+  const payload = { token: APP_TOKEN, profile: profile, itemName: itemName, field: field, value: value };
 
+  try {
+    document.getElementById('saveLabel').textContent = 'Syncing...';
+    document.getElementById('saveLabel').style.color = 'var(--gold)';
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      document.getElementById('saveLabel').textContent = 'Live Synced';
+      document.getElementById('saveLabel').style.color = 'var(--green)';
+    } else {
+      console.error("Cloud Error:", result.error);
+      document.getElementById('saveLabel').textContent = 'Sync Error';
+      document.getElementById('saveLabel').style.color = 'var(--red)';
+    }
+  } catch (err) {
+    console.error("Network Error:", err);
+    document.getElementById('saveLabel').textContent = 'Offline (Saved Locally)';
+    document.getElementById('saveLabel').style.color = 'var(--red)';
+  }
+}
+
+function save() { localStorage.setItem('bdsm_portal_vTRAD_SYNC_2026', JSON.stringify(APP_STATE)); }
+
+// --- UI LOGIC ---
 function setProfile(p) {
   activeP = p; isCompare = false; document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
   document.getElementById('p1-btn').classList.toggle('active', p === 'p1');
@@ -401,10 +290,11 @@ function setTab(id, b) { activeTab = id; document.querySelectorAll('.tab-btn').f
 function toggleCompare() { isCompare = !isCompare; render(); }
 function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
 function clearFilters() { searchQ = ''; document.getElementById('searchInput').value = ''; Object.keys(filters).forEach(k => filters[k] = []); renderFilterDashboard(); render(); }
-function save() { localStorage.setItem('bdsm_portal_vTRAD_SYNC_2026', JSON.stringify(APP_STATE)); document.getElementById('saveLabel').textContent = 'Saved'; }
 
 function render() {
   const main = document.getElementById('mainContent');
+  if(!APP_STATE[activeP] || !APP_STATE[activeP].data.length) { main.innerHTML = '<div style="text-align:center; padding:40px; color:#444;">No data loaded.</div>'; return; }
+  
   const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
   let html = '';
   
@@ -460,11 +350,10 @@ function renderCell(res, name, pKey, cid, idx) {
 
 function calculateSynergy() {
     let total = 0, mutual = 0;
-    DATABASE_TEMPLATE.forEach(cat => {
-        const p1Cat = APP_STATE.p1.data.find(c => c.id === cat.id);
-        const p2Cat = APP_STATE.p2.data.find(c => c.id === cat.id);
-        cat.items.forEach((item, idx) => {
-            const i1 = p1Cat.items[idx], i2 = p2Cat.items[idx];
+    APP_STATE.p1.data.forEach((cat, cIdx) => {
+        const p2Cat = APP_STATE.p2.data[cIdx];
+        cat.items.forEach((i1, idx) => {
+            const i2 = p2Cat.items[idx];
             const hasP1 = i1.tried === 'yes' || i1.tried === 'no-want';
             const hasP2 = i2.tried === 'yes' || i2.tried === 'no-want';
             if (hasP1 || hasP2) total++;
@@ -500,27 +389,40 @@ function renderFilterDashboard() {
 
 function toggleFilterValue(key, val) { if(filters[key].includes(val)) filters[key] = filters[key].filter(v => v !== val); else filters[key].push(val); renderFilterDashboard(); render(); }
 function openFilterSheet() { document.getElementById('sheetOverlay').style.display='block'; document.getElementById('filterSheet').classList.add('open'); }
+
 function triggerSheet(cid, i, f) {
   const item = APP_STATE[activeP].data.find(c=>c.id==cid).items[i];
   const CONFIGS = {
       limit: [{lab:'No Limit', val:''}, {lab:'Soft Limit', val:'Soft Limit'}, {lab:'Hard Limit', val:'Hard Limit'}],
-      tried: [{lab:'Tried It', val:'yes'}, {lab:'Want to try', val:'no-want'}, {lab:'No Interest', val:'no-dont'}],
-      rating: [{lab:'Loved it', val:'Loved it'}, {lab:'Liked it', val:'Liked it'}, {lab:'Take it or leave it', val:'Take it or leave it'}, {lab:'Fetish', val:'Fetish'}],
-      role: [{lab:'Giving', val:'Giving'}, {lab:'Receiving', val:'Receiving'}, {lab:'Both', val:'Both'}, {lab:'Wearing', val:'Wearing'}, {lab:'Others Wearing', val:'Others Wearing'}],
-      motive: [{lab:'Arousal', val:'Arousal'}, {lab:'Discipline', val:'Discipline'}, {lab:'Fun', val:'Fun'}, {lab:'Stress Relief', val:'Stress Relief'}]
+      tried: [{lab:'Tried It', val:'yes'}, {lab:'Want to try', val:'no-want'}, {lab:'No Interest', val:'no-dont'}, {lab:'Clear Selection', val:''}],
+      rating: [{lab:'Loved it', val:'Loved it'}, {lab:'Liked it', val:'Liked it'}, {lab:'Take it or leave it', val:'Take it or leave it'}, {lab:'Clear Selection', val:''}],
+      role: [{lab:'Giving', val:'Giving'}, {lab:'Receiving', val:'Receiving'}, {lab:'Both', val:'Both'}, {lab:'Wearing', val:'Wearing'}, {lab:'Others Wearing', val:'Others Wearing'}, {lab:'Clear Selection', val:''}],
+      motive: [{lab:'Arousal', val:'Arousal'}, {lab:'Discipline', val:'Discipline'}, {lab:'Fun', val:'Fun'}, {lab:'Stress Relief', val:'Stress Relief'}, {lab:'Clear Selection', val:''}]
   };
   document.getElementById('sheetSubtitle').textContent = item.n;
   const cont = document.getElementById('sheetOptions'); cont.innerHTML = '';
   CONFIGS[f].forEach(o => {
     const d = document.createElement('div'); d.className = 'sheet-option';
-    d.onclick = () => { item[f] = o.val; save(); render(); closeSheets(); };
+    d.onclick = () => { 
+        item[f] = o.val; 
+        save(); 
+        syncToCloud(item.n, activeP, f, o.val); 
+        render(); 
+        closeSheets(); 
+    };
     d.textContent = o.lab; cont.appendChild(d);
   });
   document.getElementById('sheetOverlay').style.display='block'; document.getElementById('bottomSheet').classList.add('open');
 }
 
 function closeSheets() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); document.getElementById('filterSheet').classList.remove('open'); }
-function updateNote(cid, idx, val) { APP_STATE[activeP].data.find(c=>c.id==cid).items[idx].note = val; save(); }
+function updateNote(cid, idx, val) { 
+    const item = APP_STATE[activeP].data.find(c=>c.id==cid).items[idx];
+    item.note = val; 
+    save(); 
+    syncToCloud(item.n, activeP, 'note', val); 
+}
+
 function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
 function closeSnapshotModal() { document.getElementById('snapModal').style.display='none'; }
 function saveSnapshot() {
@@ -530,13 +432,14 @@ function saveSnapshot() {
 }
 function updateHistDropdown() {
   const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">Vault</option>';
+  if(!APP_STATE[activeP] || !APP_STATE[activeP].history) return;
   APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
 }
 function compareHistory(id) { 
     const snap = APP_STATE[activeP].history.find(h => h.id == id);
     if(snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
 }
-function resetApp() { if(confirm("Wipe portal? Baseline remains.")) { localStorage.removeItem('bdsm_portal_vTRAD_SYNC_2026'); location.reload(); } }
+function resetApp() { if(confirm("Wipe local cache? App will reload from cloud.")) { localStorage.removeItem('bdsm_portal_vTRAD_SYNC_2026'); location.reload(); } }
 </script>
 </body>
 </html>
