@@ -17,18 +17,18 @@
         
         body {
             overflow-x: hidden;
-            background: #020814;
         }
 
         .signature { font-size: 32px; color: var(--gold); }
         .app-title { font-size: 34px; text-align: center; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding-bottom: 5px; letter-spacing: 1px; }
 
-        /* --- SCREENS --- */
+        /* --- SPLASH SCREEN --- */
        #splash-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020814; z-index: 10000; 
             display: flex; flex-direction: column; align-items: center; 
             padding: 40px 25px; overflow-y: auto; transition: opacity 0.8s ease;
         }
+        /* --- REFLECTIONS SCREEN --- */
         #reflections-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020814; z-index: 9500; 
             display: flex; flex-direction: column; align-items: center; 
@@ -47,41 +47,78 @@
         .guide-label { color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 4px; font-size: 11px; }
         .splash-sig { margin-top: 30px; margin-bottom: 30px; text-align: right; }
 
-        /* --- UPDATED BUTTON STYLING --- */
+        /* --- BUTTON STYLING (THE PREDICAMENT MENU LOOK) --- */
         .enter-btn, .primary-btn, .reset-confirm-btn { 
-            display: block; width: 100%; max-width: 400px; margin: 20px auto; padding: 18px 25px;
-            background-color: #1a1a1a; color: #d4af37; text-align: center; text-decoration: none;
-            font-size: 12px; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 2px; border: 1px solid #333; border-radius: 12px; transition: all 0.3s ease;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 18px 25px;
+            background-color: #1a1a1a; 
+            color: #d4af37; 
+            text-align: center;
+            text-decoration: none;
+            font-size: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid #333;
+            border-radius: 12px; 
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         .secondary-btn, .legend-trigger, .reset-cancel-btn { 
-            display: block; width: 100%; max-width: 400px; margin: 10px auto; padding: 14px 20px;
-            background-color: transparent; color: #888; text-align: center; font-size: 10px;
-            font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px auto;
+            padding: 14px 20px;
+            background-color: transparent;
+            color: #888; 
+            text-align: center;
+            font-size: 10px;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .refinement-btn { 
-            width: 100%; padding: 20px; margin-bottom: 12px; border-radius: 12px; background: #161616;
-            border: 1px solid #2a2a2a; color: #eee; text-align: left; transition: all 0.2s ease;
-            display: flex; flex-direction: column; cursor: pointer;
+            width: 100%; padding: 20px; margin-bottom: 12px; border-radius: 12px; 
+            background: #161616; border: 1px solid #2a2a2a; color: #eee; 
+            text-align: left; transition: all 0.2s ease; display: flex; flex-direction: column;
+            cursor: pointer;
         }
         .refinement-btn span { font-size: 9px; opacity: 0.6; text-transform: none; margin-top: 6px; font-weight: 400; color: #aaa; }
 
         .impact-btn { 
-            width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; color: white;
-            text-transform: uppercase; font-size: 11px; font-weight: 600; border: 1px solid #333;
-            cursor: pointer; background: #1a1a1a; transition: 0.3s; 
+            width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; 
+            color: white; text-transform: uppercase; font-size: 11px; font-weight: 600; 
+            border: 1px solid #333; cursor: pointer; background: #1a1a1a; transition: 0.3s; 
         }
 
+        /* Hover States for all updated buttons */
         .enter-btn:hover, .primary-btn:hover, .reset-confirm-btn:hover, .refinement-btn:hover {
-            background-color: #222; border-color: #d4af37; color: #fff; transform: translateY(-2px);
+            background-color: #222;
+            border-color: #d4af37;
+            color: #fff;
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         }
 
-        /* --- APP HEADER & NAV --- */
+        .secondary-btn:hover, .legend-trigger:hover, .reset-cancel-btn:hover {
+            border-color: #555;
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* --- HEADER & NAVIGATION --- */
         .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(2, 8, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); padding: 15px 0 5px; }
         .progress-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.08); margin-top: 10px; }
         #progress-fill { width: 25%; height: 100%; background: var(--luxury-gradient); transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 12px var(--gold); }
@@ -90,7 +127,7 @@
         .tab-content.active { display: block; }
         .tab-intro { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 14px; text-align: center; margin-bottom: 30px; font-style: italic; opacity: 0.95; letter-spacing: 1px; text-transform: uppercase; line-height: 1.6; }
 
-        /* --- PILL GRID --- */
+        /* --- PILL GRID (3-COLUMN) --- */
         .category-section { margin-bottom: 30px; padding: 25px 15px; }
         h2 { font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 22px 0; display: flex; align-items: center; }
         h2::before { content: ""; width: 20px; height: 1px; background: var(--gold); margin-right: 15px; opacity: 0.5; }
@@ -99,55 +136,100 @@
         .pill { position: relative; padding: 8px 4px; border-radius: 50px; border: 1px solid rgba(212, 175, 55, 0.15); font-size: 9px; font-weight: 500; cursor: pointer; background: rgba(2, 8, 20, 0.5); color: #888; transition: 0.3s; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 48px; line-height: 1.2; overflow: hidden; }
         .pill.active { background: var(--luxury-gradient); color: var(--midnight); border-color: transparent; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); font-weight: 700; }
 
+        /* --- MORPHING PILL INPUT --- */
         .pill-inline-input { background: transparent; border: none; color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 9px; text-align: center; width: 100%; height: 100%; outline: none; }
         .pill.editing { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
 
         .modal-header { text-align: center; font-size: 22px; margin-bottom: 25px; line-height: 1.3; font-family: 'Playfair Display', serif; color: var(--gold); }
+        
+        .sensory-title { font-family: 'Playfair Display'; color: var(--gold); font-size: 16px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 25px; margin-bottom: 10px; }
+        .sensory-item { font-size: 11px; margin-bottom: 12px; line-height: 1.5; color: #ddd; }
+        .sensory-label { color: var(--gold); font-weight: 700; margin-right: 5px; }
+
         .impact-btn.level-light { border-color: #4CAF50; }
         .impact-btn.level-medium { border-color: #FFC107; }
         .impact-btn.level-heavy { border-color: #FF9800; }
         .impact-btn.level-mark { border-color: #F44336; }
 
+        /* --- FOOTER NAV --- */
         .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(2, 8, 20, 0.88); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(212, 175, 55, 0.3); transition: 0.3s; flex: 1; cursor: pointer; position: relative; }
         .nav-item.active { color: var(--gold); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
+        .nav-icon-wrapper { font-size: 22px; margin-bottom: 3px; position: relative; display: inline-block; }
+        .nav-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
         .nav-badge { position: absolute; top: -4px; right: -10px; background: var(--gold); color: #020814; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; font-weight: 800; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0); transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
         .nav-badge.visible { opacity: 1; transform: scale(1); }
 
+        /* --- FINAL PROTOCOL --- */
+        .final-tabs { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .final-tab { color: rgba(255,255,255,0.4); text-transform: uppercase; font-size: 11px; letter-spacing: 2px; cursor: pointer; padding: 8px 16px; transition: 0.3s; border-radius: 20px; }
+        .final-tab.active { color: var(--midnight); background: var(--gold); font-weight: 700; }
+        .view-content { display: none; }
+        .view-content.active { display: block; }
         .list-group { margin-bottom: 30px; border-left: 3px solid var(--gold); padding-left: 20px; background: rgba(255,255,255,0.01); padding: 15px; border-radius: 0 12px 12px 0; }
         .list-tab-header { color: var(--gold); font-family: 'Playfair Display'; text-transform: uppercase; font-size: 16px; letter-spacing: 3px; margin-bottom: 15px; font-weight: bold; }
+        .list-card-header { color: rgba(212, 175, 55, 0.7); font-family: 'Montserrat'; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; margin-bottom: 10px; margin-top: 15px; font-weight: 600; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 4px; display: inline-block; }
         .list-pill { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; padding: 6px 14px; margin: 4px; border-radius: 50px; font-size: 10px; }
 
+        textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: #ddd; padding: 15px; resize: none; margin-bottom: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px; line-height: 1.5; }
+
         @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- RESET CONFIRM MODAL --- */
+        #reset-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,8,20,0.92); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 25px; }
+        #reset-modal.open { display: flex; }
+        .reset-modal-box { background: #070f1e; border: 1px solid rgba(244,67,54,0.4); border-radius: 16px; padding: 35px 25px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 0 40px rgba(244,67,54,0.15); }
+        .reset-modal-title { font-family: 'Playfair Display', serif; color: #F44336; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .reset-modal-body { color: #aaa; font-size: 13px; line-height: 1.7; margin-bottom: 30px; }
+        .reset-modal-btns { display: flex; gap: 12px; }
+
+        /* --- OTHER PILL HINT --- */
+        .pill-other-hint { font-size: 8px; color: rgba(212,175,55,0.4); display: block; margin-top: 3px; font-style: italic; letter-spacing: 0; text-transform: none; }
     </style>
 </head>
 <body class="sirender-theme">
 
     <div id="sensory-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">The Sensory Map</div>
-            <div class="sensory-title">I. Upper Body</div>
-            <div class="sensory-item">Scalp, Ears, Mouth, Neck.</div>
-            <button class="primary-btn" onclick="closeSensoryLegend()">Return</button>
+            <div class="modal-header">The Sensory Map: <br>Topographical Legend</div>
+            <div class="sensory-title">I. Upper Body & Face</div>
+            <div class="sensory-item"><span class="sensory-label">Scalp:</span> Massaging or hair-pulling activates nerve endings.</div>
+            <div class="sensory-item"><span class="sensory-label">Ears:</span> lobes to tips; light whispers, nibbles, or kisses.</div>
+            <div class="sensory-item"><span class="sensory-label">Mouth:</span> soft kisses, varied pressure, building tension.</div>
+            <div class="sensory-item"><span class="sensory-label">Neck:</span> Nape and sides; erogenous hotspots.</div>
+            <div class="sensory-title">II. Torso & Midsection</div>
+            <div class="sensory-item"><span class="sensory-label">Nipples:</span> Biological pleasure centers. Calibrate from grazing to firm.</div>
+            <div class="sensory-item"><span class="sensory-label">Inner Arms:</span> Strong nervous system response.</div>
+            <div class="sensory-item"><span class="sensory-label">Belly Button:</span> Preview to the genital region.</div>
+            <div class="sensory-item"><span class="sensory-label">Lower Back:</span> Sacrum touch evokes vulnerability.</div>
+            <div class="sensory-title">III. The Genital Region</div>
+            <div class="sensory-item"><span class="sensory-label">Concentrated Arousal:</span> Clitoris, Pubic Mound, and internal points.</div>
+            <div class="sensory-title">IV. Extremities</div>
+            <div class="sensory-item"><span class="sensory-label">Inner Thighs:</span> Move from knees toward genitals for anticipation.</div>
+            <div class="sensory-item"><span class="sensory-label">Back of the Knees:</span> Nerve-rich area.</div>
+            <div class="sensory-item"><span class="sensory-label">Hands & Wrists:</span> Highly sensitive to stroking.</div>
+            <div class="sensory-item"><span class="sensory-label">Feet:</span> Relaxation through pressure points.</div>
+            <button class="primary-btn" onclick="closeSensoryLegend()">Return to Blueprint</button>
         </div>
     </div>
 
     <div id="refinement-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">Technical Choice: <br><span id="refine-target-name" style="color:var(--gold);"></span></div>
+            <div class="modal-header">Technical Choice: <br><span id="refine-target-name" style="font-size:18px; color:var(--gold);"></span></div>
             <div id="refinement-options-list"></div>
-            <button class="secondary-btn" id="modal-cancel-btn" onclick="closeRefineModal()">Use Standard</button>
+            <button class="secondary-btn" id="modal-cancel-btn" onclick="closeRefineModal()">Use Standard Style</button>
         </div>
     </div>
 
     <div id="impact-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">Intensity Check: <br><span id="impact-target-name"></span></div>
+            <div class="modal-header">Intensity Check: <br><span id="impact-target-name" style="font-size:24px; font-weight:bold;"></span></div>
             <div id="impact-options-list">
-                <button class="impact-btn level-light" onclick="confirmImpact('Light')">🟢 Light</button>
+                <button class="impact-btn level-light" onclick="confirmImpact('Light')">🟢 Light / Warm Up</button>
                 <button class="impact-btn level-medium" onclick="confirmImpact('Medium')">🟡 Medium</button>
                 <button class="impact-btn level-heavy" onclick="confirmImpact('Heavy')">🟠 Heavy</button>
-                <button class="impact-btn level-mark" onclick="confirmImpact('Mark Me')">🔴 Mark Me</button>
+                <button class="impact-btn level-mark" onclick="confirmImpact('Mark Me')">🔴 Mark Me / Bruise</button>
             </div>
             <button class="secondary-btn" onclick="closeImpactModal()">Cancel</button>
         </div>
@@ -155,48 +237,61 @@
 
     <div id="reset-modal">
         <div class="reset-modal-box">
-            <div class="reset-modal-title" style="color:#F44336; margin-bottom:10px;">Clear Map?</div>
-            <div class="reset-modal-btns" style="display:flex; gap:10px;">
-                <button class="reset-cancel-btn" onclick="closeResetModal()">Keep</button>
-                <button class="reset-confirm-btn" onclick="confirmReset()">Reset</button>
+            <div class="reset-modal-title">Clear This Map?</div>
+            <div class="reset-modal-body">This will erase all your selections and reflections. This cannot be undone.</div>
+            <div class="reset-modal-btns">
+                <button class="reset-cancel-btn" onclick="closeResetModal()">Keep It</button>
+                <button class="reset-confirm-btn" onclick="confirmReset()">Yes, Reset</button>
             </div>
         </div>
     </div>
 
     <div id="splash-screen">
         <div class="splash-content">
-            <div class="splash-title">Clarity in Submission</div>
-            <p class="splash-text">Your submission is a gift. This app ensures focus is on you, not guesswork.</p>
+            <div class="splash-title">The Purpose: Clarity in Submission</div>
+            <p class="splash-text">Your submission is a gift to me from you. <span class="splash-highlight">This app exists to strip away the hesitation and the "maybe."</span> It forces you to look inward and articulate exactly what you crave and what you are prepared to give. By picking each selection, you are creating a map for me to follow as I see fit. You are ensuring that when we enter that space, my focus is entirely on your subjection, not on guesswork.</p>
+            <div class="splash-guide">
+                <div class="guide-item"><span class="guide-label">I. The Intent</span>Define the structural foundation—the roles and dynamics required for this architecture of surrender.</div>
+                <div class="guide-item"><span class="guide-label">II. The Canvas</span>Catalog the material manifest—the attire and sensory triggers that dress your body for My inspection.</div>
+                <div class="guide-item"><span class="guide-label">III. The Scene</span>List the physical specifications—the restraints and tools necessary to enforce My will.</div>
+                <div class="guide-item"><span class="guide-label">IV. The Seal</span>Finalize the completion covenant—the service and release that close our time together.</div>
+            </div>
             <div class="splash-sig signature">- Your Sir</div>
             <button class="enter-btn" onclick="enterApp()">Build Sir a Map</button>
         </div>
     </div>
-
-    <div id="reflections-screen">
+       <div id="reflections-screen">
         <div class="splash-content">
             <div class="splash-title">Pre-Scene Reflections</div>
-            <label class="sub-group-label">What are you craving?</label>
-            <textarea id="q-craving" rows="3" placeholder="Tell Sir..."></textarea>
+            <p class="splash-text">Before you build the physical map, tell me where your head is at.</p>
+            
+            <label class="sub-group-label" style="margin-top:0;">What are you craving?</label>
+            <textarea id="q-craving" rows="3" placeholder="Tell Sir what you need..."></textarea>
+            
             <label class="sub-group-label">What are you nervous about?</label>
-            <textarea id="q-nervous" rows="3" placeholder="Confess..."></textarea>
-            <label class="sub-group-label">Perfect Scene?</label>
-            <textarea id="q-perfect" rows="3" placeholder="Define..."></textarea>
-            <label class="sub-group-label">Where to stretch?</label>
+            <textarea id="q-nervous" rows="3" placeholder="Confess your fears..."></textarea>
+            
+            <label class="sub-group-label">What makes this scene a 10 out of 10?</label>
+            <textarea id="q-perfect" rows="3" placeholder="Define perfection..."></textarea>
+            
+            <label class="sub-group-label">Where do you want to stretch (push yourself)?</label>
             <textarea id="q-stretch" rows="3" placeholder="Where can Sir take you?"></textarea>
+            
             <button class="enter-btn" style="margin-top: 30px;" onclick="startMap()">Proceed to Map</button>
         </div>
     </div>
 
+
     <header class="app-header">
         <h1 class="app-title">Scene Planner</h1>
         <div style="text-align: center; margin-top: 8px;">
-            <a href="#" onclick="openResetModal(); return false;" style="color: #F44336; font-size: 10px; text-decoration: none; text-transform: uppercase;">Reset Session</a>
+            <a href="#" onclick="openResetModal(); return false;" style="color: #F44336; font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">Reset Session</a>
         </div>
         <div class="progress-bar-container"><div id="progress-fill"></div></div>
     </header>
 
     <div id="intent" class="tab-content active">
-        <div class="tab-intro">The Headspace.</div>
+        <div class="tab-intro">The Headspace. Lay out exactly who You will be for Me and how You need to be handled.</div>
         <div class="category-section"><h2>Identity & Role</h2><div class="pill-grid" id="role-grid"></div></div>
         <div class="category-section"><h2>The Vibe</h2><div id="vibe-grid" class="pill-grid"></div></div>
         <div class="category-section"><h2>Handling Style</h2><div class="pill-grid" id="handling-grid"></div></div>
@@ -206,11 +301,11 @@
     </div>
 
     <div id="canvas" class="tab-content">
-        <div class="tab-intro">Body Preparation.</div>
+        <div class="tab-intro">Body Preparation. Choose how You will be dressed and which parts of You are to be targeted for My pleasure.</div>
         <div class="category-section"><h2>Dress Code</h2><div class="pill-grid" id="attire-grid"></div></div>
         <div class="category-section">
-            <h2>Erogenous Zones</h2>
-            <button class="legend-trigger" onclick="openSensoryLegend()">View Legend</button>
+            <h2>Focus Erogenous Zones</h2>
+            <button class="legend-trigger" onclick="openSensoryLegend()">View Sensory Legend</button>
             <div class="pill-grid" id="zones-grid"></div>
         </div>
         <div class="category-section"><h2>Sensory Exploration</h2><div class="pill-grid" id="sensory-grid"></div></div>
@@ -218,7 +313,7 @@
     </div>
 
     <div id="ritual" class="tab-content">
-        <div class="tab-intro">The Physicality.</div>
+        <div class="tab-intro">The Physicality. Secure the tools I will use to command Your body and the limits I will push You to.</div>
         <div class="category-section"><h2>Bondage & Gags</h2><div class="pill-grid" id="bondage-grid"></div></div>
         <div class="category-section"><h2>The Toy Box</h2><div class="pill-grid" id="toys-grid"></div></div>
         <div class="category-section"><h2>The Heavy Hand</h2><div class="pill-grid" id="impact-grid"></div></div>
@@ -231,12 +326,15 @@
             <div class="category-section"><h2>Service to Sir</h2><div class="pill-grid" id="service-grid"></div></div>
             <div class="category-section"><h2>Sir's Release</h2><div class="pill-grid" id="deposit-grid"></div></div>
             <div class="category-section"><h2>Final Service</h2><div class="pill-grid" id="cleanup-grid"></div></div>
-            <div class="category-section"><h2>The Scribbles</h2><textarea id="scenario-text" rows="4" placeholder="Your fantasies..."></textarea></div>
+            <div class="category-section"><h2>The Scribbles</h2><textarea id="scenario-text" rows="4" placeholder="Your unspoken fantasies..."></textarea></div>
         </div>
         <div id="submit-stage-2" style="display:none;">
+            <div class="final-tabs">
+                <div class="final-tab active" onclick="switchFinalTab('list')">The List</div>
+            </div>
             <div id="view-list" class="view-content active"></div>
-            <button class="secondary-btn" onclick="returnToMap()">Edit Selections</button>
-            <button onclick="exportDoc()" class="primary-btn">Download .docx</button>
+            <button class="secondary-btn" onclick="returnToMap()">Return to Selections</button>
+            <button id="download-btn" onclick="exportDoc()" class="primary-btn">Download List (.docx)</button>
         </div>
     </div>
 
@@ -253,47 +351,21 @@
         let impactDetails = {}; let refineDetails = {}; let pendingPill = null; let pendingCat = null;
         let customAttireValue = "";
 
-        const technicalMenu = {
-            "Suck Sir": [
-                { name: "The Hummingbird", desc: "Rapid vibration against the frenulum." },
-                { name: "Deepthroat", desc: "Relaxing the back of the tongue." },
-                { name: "Sloppy Oral", desc: "Let saliva pool for sensory effect." },
-                { name: "Pure Tongue-Tracing", desc: "Mapping from base to head." },
-                { name: "On-demand BJ", desc: "Immediate drop to knees." }
-            ],
-            "Worship Sir": {
-                isNested: true, categories: ["Cock", "Balls"],
-                "Cock": [{ name: "Ceremonial", desc: "State admiration." }, { name: "360 Mapping", desc: "Spiral patterns." }],
-                "Balls": [{ name: "Swirl Specialist", desc: "Manual/oral coordination." }, { name: "Nesting", desc: "Tucking into cheek." }]
-            },
-            "Massage Sir": [{ name: "Clock", desc: "Mapping as a clock face." }, { name: "Grounding", desc: "Heavy trap pressure." }],
-            "Ass/Prostate Work": [{ name: "Rimming", desc: "Flat tongue strokes." }, { name: "Prostate Milking", desc: "Internal stroking." }],
-            "Hand Job": [{ name: "Ruined", desc: "Timing ruin to contraction." }, { name: "Pearl Wrap", desc: "Webbing on frenulum." }]
-        };
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
 
-        const sections = {
-            role: ["Brat", "Good Girl", "Slave", "Sex Toy", "Submissive", "Switch", "Claimed"],
-            vibe: ["Classic Build-Up", "Primal", "Service", "Sensory", "Training", "Control"],
-            handling: ["Sir's Way", "Dominate Me", "Force Submit", "Gentle", "Manhandled", "Inspected"],
-            verbal: ["Name Calling", "Praise Me", "Degrade Me"],
-            subspace: ["Light", "Deep"],
-            attire: ["Naked", "Lingerie", "Panties", "Hoodie", "Skirt", "Heels", "Stockings", "Pantyhose", "Corset", "Other-"],
-            zones: ["Scalp", "Ears", "Neck", "Mouth", "Wrists", "Hands", "Breasts", "Thighs", "Knees", "Feet", "Genitals", "Ass"],
-            sensory: ["Blindfold", "Scent Play", "Wheel", "Feathers", "Claws", "Ice", "Hot Wax", "Breath", "Nuru", "Oil", "Lube", "Bite"],
-            bondage: ["Bed", "Door", "Spreader Bars", "Armbinder", "Rope", "Ball Gag", "Ring Gag", "Predicament"],
-            toys: ["Wand", "Ferri", "Lush 4", "Bullet", "Dildo", "Inflatable", "Clamps", "Hook"],
-            impact: ["Hand", "Crop", "Flogger", "Cane", "Paddle", "Belt"],
-            edge: ["Choking", "Hand Over Mouth", "Make Me Beg", "Forced Orgasms", "Sex"],
-            service: ["Suck Sir", "Worship Sir", "Face Fucking", "Hand Job", "Massage Sir", "Ass/Prostate"],
-            deposit: ["Mouth", "Face", "Pussy", "Panties", "Ass", "Throat", "Breasts", "Sir's Choice"],
-            cleanup: ["Lick Sir Clean", "Wipe Sir Clean", "Shower Together"]
-        };
-
+        // Local Storage Methods
         function saveState() {
             localStorage.setItem('sirender_state', JSON.stringify(state));
             localStorage.setItem('sirender_impactDetails', JSON.stringify(impactDetails));
             localStorage.setItem('sirender_refineDetails', JSON.stringify(refineDetails));
             localStorage.setItem('sirender_customAttireValue', customAttireValue);
+            
+            // Save answers
             localStorage.setItem('sirender_qCraving', document.getElementById('q-craving').value);
             localStorage.setItem('sirender_qNervous', document.getElementById('q-nervous').value);
             localStorage.setItem('sirender_qPerfect', document.getElementById('q-perfect').value);
@@ -303,12 +375,13 @@
         }
 
         function loadState() {
-            const saved = localStorage.getItem('sirender_state');
-            if (saved) {
-                state = JSON.parse(saved);
+            const savedState = localStorage.getItem('sirender_state');
+            if (savedState) {
+                state = JSON.parse(savedState);
                 impactDetails = JSON.parse(localStorage.getItem('sirender_impactDetails') || '{}');
                 refineDetails = JSON.parse(localStorage.getItem('sirender_refineDetails') || '{}');
                 customAttireValue = localStorage.getItem('sirender_customAttireValue') || '';
+                
                 document.getElementById('q-craving').value = localStorage.getItem('sirender_qCraving') || '';
                 document.getElementById('q-nervous').value = localStorage.getItem('sirender_qNervous') || '';
                 document.getElementById('q-perfect').value = localStorage.getItem('sirender_qPerfect') || '';
@@ -317,30 +390,156 @@
             }
         }
 
-        // NAVIGATION BUG FIX
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function openResetModal() { document.getElementById('reset-modal').classList.add('open'); }
+        function closeResetModal() { document.getElementById('reset-modal').classList.remove('open'); }
+        function confirmReset() { localStorage.clear(); location.reload(); }
 
-            if (id === 'seal') {
-                document.getElementById('submit-stage-1').style.display = 'block';
-                document.getElementById('submit-stage-2').style.display = 'none';
+        // Badge counts per tab
+        const tabBadgeMap = {
+            intent: ['role','vibe','handling','verbal','subspace'],
+            canvas: ['attire','zones','sensory'],
+            ritual: ['bondage','toys','impact','edge'],
+            seal:   ['service','deposit','cleanup']
+        };
+
+        function updateBadges() {
+            for (const [tab, cats] of Object.entries(tabBadgeMap)) {
+                const count = cats.reduce((sum, cat) => sum + (state[cat] ? state[cat].length : 0), 0);
+                const badge = document.getElementById(`badge-${tab}`);
+                if (badge) {
+                    if (count > 0) { badge.textContent = count > 9 ? '9+' : count; badge.classList.add('visible'); }
+                    else { badge.classList.remove('visible'); }
+                }
             }
-
-            document.querySelectorAll('.nav-item[data-tab]').forEach(n => {
-                n.classList.remove('active');
-                if(n.dataset.tab === id) n.classList.add('active');
-            });
-            const idx = ['intent', 'canvas', 'ritual', 'seal'].indexOf(id);
-            document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%';
-            updateBadges();
-            window.scrollTo(0,0);
         }
 
+        function renderStoredPills() {
+            Object.keys(state).forEach(cat => {
+                state[cat].forEach(val => {
+                    const pill = Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(val) || (val === "Other-" && p.innerText.includes('Other-')));
+                    if (pill) {
+                        pill.classList.add('active');
+                        if (val === "Other-") {
+                            pill.innerHTML = customAttireValue;
+                        } else if (refineDetails[val]) {
+                            pill.innerHTML = `${val}<br><span style="font-size:7px; color:var(--midnight); font-weight:800;">(${refineDetails[val]})</span>`;
+                        }
+                    }
+                });
+            });
+            updateBadges();
+        }
+
+        loadState();
+
+        const technicalMenu = {
+            "Suck Sir": [
+                { name: "The Hummingbird", desc: "Fluttering your tongue rapidly against the frenulum while maintaining steady suction." },
+                { name: "Deepthroat Training", desc: "Focus on 'The Open Throat'—relaxing the muscles at the back of the tongue. Breathe through nose." },
+                { name: "Sloppy Oral", desc: "Let the saliva pool; the sound (the 'squish') is a powerful psychological trigger for him." },
+                { name: "Pure Tongue-Tracing", desc: "Focused mapping of the raphe (seam) from base up to the head." },
+                { name: "On-demand BJ", desc: "Immediate audible drop to knees. The sound of knees hitting floor is part of service." }
+            ],
+            "Worship Sir": {
+                isNested: true, categories: ["Worship Sir's Cock", "Worship Sir's Balls"],
+                "Worship Sir's Cock": [
+                    { name: "Ceremonial Ritual", desc: "In the 'admiring' phase, look up and state clearly what you find most beautiful about him." },
+                    { name: "360 Mapping", desc: "Move in a 'spiral' pattern, starting from outer edges closing in on center." },
+                    { name: "Pure Tongue-Tracing", desc: "Focus on the raphe (seam) from base up to the head." }
+                ],
+                "Worship Sir's Balls": [
+                    { name: "Ball Swirl Specialist", desc: "Cup weight of balls in one hand while using mouth to 'swirl' each individually." },
+                    { name: "The Nesting", desc: "Tuck balls into cheek while hand-stroking the shaft." },
+                    { name: "Scrotum Massage", desc: "Roll each testicle between thumb and fingers like a silk pearl." },
+                    { name: "Ball Vacuum", desc: "Pull cheeks in tight to maximize suction force on the scrotum." },
+                ]
+            },
+            "Massage Sir": [
+                { name: "Clock Technique", desc: "Mapping head as a clock face (12,3,6,9) for equal nerve attention." },
+                { name: "Grounding Palms", desc: "Heavy pressure on traps to ground him, followed by fingertip 'spider-walks' down the spine." },
+                { name: "Nuru Slide", desc: "Using core muscles to create vacuum-like pressure between skins during full-body contact slides." },
+                { name: "Chest Squeeze", desc: "Pressing breasts together to create a tight channel for him to slide through." },
+                { name: "V-line Adoration", desc: "Trace V-line with tongue, slowing toward the root." },
+                { name: "Scalp Raking", desc: "Nails rake scalp while breathing hot air into Sir's ear." },
+                { name: "Tantric Slow", desc: "Move at one stroke per 5 seconds, focusing entirely on skin texture." },
+                { name: "Lingam Ritual", desc: "Focus on the 'energy pull'—visualize pulling pleasure from spine into chest." },
+                { name: "Temperature Play", desc: "Alternate mouth temperature using ice water and warm oil."},
+            ],
+            "Ass/Prostate Work": [
+                { name: "Rimming", desc: "Flat tongue for broad strokes; tip for precise exploration of the rim." },
+                { name: "Prostate Milking", desc: "Slow downward internal stroking to move fluid and build deep tension." },
+                { name: "Oral w/ Prostate", desc: "Coordinate 'come hither' finger motion with oral suction." },
+                
+            ],
+            "Play After Cum": [
+                { name: "Post-Orgasm Torture (POT)", desc: "Continue a fast, light head-flutter while he pulls away." },
+                { name: "Final Milking", desc: "Base-to-head stripping motion with firm, intentional pressure." },
+                { name: "Refractory Adoration", desc: "Use softest part of lips—no teeth, no friction." },
+                { name: "Gratitude", desc: "Each kiss accompanied by a whispered 'Thank you.'" },
+                { name: "Ball Recovery", desc: "Warm hands to coax retracted balls back down into scrotum." }
+            ],
+            "Hand Job": [
+                { name: "Ruined Orgasm", desc: "Timing ruin to first contraction for release without mental peak." },
+                { name: "Triple Control", desc: "Using cooling phases of 5 minutes between each orgasm type to reset." },
+                { name: "Pearl Wrap", desc: "Webbing between thumb and index in constant contact with the frenulum." },
+                { name: "Frenulum Focus", desc: "Single drop of warm lube and pinky finger for lightest possible touch." },
+                { name: "Handjob Marathon", desc: "Using 'The Cooling Breath' during pauses to reset arousal." },
+                { name: "Perineum Massage", desc: "Knuckle circular pressure on bridge between balls and anus." }
+            ]
+        };
+
+        const sections = {
+            role: ["Brat", "Good Girl", "Slave", "Sir's Sex Toy", "Submissive", "Switch", "Claimed"],
+            vibe: ["Classic Build-Up", "Primal / Intense", "Service Oriented", "Exploratory / Sensory", "Discipline / Training", "Sir's Full Control"],
+            handling: ["My Way", "Sir's Way", "Dominate Me", "Force Submit", "Strict", "Gentle", "Manhandled", "Held Down", "Inspected"],
+            verbal: ["Name Calling", "Praise Me", "Degrade Me"],
+            subspace: ["Light", "Deep"],
+            attire: ["Naked", "Lingerie", "Just Panties", "Just Hoodie", "Skirt/Dress", "Heels", "Stockings", "Pantyhose", "Corset", "Other-"],
+            zones: ["Scalp", "Ears", "Neck", "Mouth", "Armpits", "Wrists", "Hands", "Breasts", "Inner Thighs", "Behind Knees", "Feet", "Genitals", "Ass"],
+            sensory: ["Blindfold", "Earplugs", "Mirrors", "Scent Play", "Wartenberg Wheel", "Feathers", "Finger Claws", "Makeup Brush", "Ice/Cold", "Hot Wax", "Sir's Breath", "Nuru", "Oil", "Lube", "Messy", "Food", "Body Paint", "Sir's Bite", "Tazapper"],
+            bondage: ["Bound to Bed", "Bound to Door", "Spreader Bars", "Armbinder", "Rope Ties", "Ball Gag", "Ring Gag", "Fully Restrainted", "Predicament Bondage"],
+            toys: ["Wand", "Ferri", "Lush 4", "Bullet Vib", "Flexer", "Pinpoint Vib", "Dildo", "Glass Dildo", "Double End", "Njoy Wand", "Hollow Plug", "Inflatable", "Pussy Pump", "Penis Pump", "Clit Pump", "Ben Wa Balls", "Nipple Clamps", "Liba Spreader", "Pussy Clamp", "Anal Hook", "Ping Pong Balls", "Fuck Saw"],
+            impact: ["Sir's Hand", "Crop", "Flogger", "Cane", "Paddle", "Slapper", "Cat O 9", "Whip", "Dragons Tongue", "Belt"],
+            edge: ["Light Choking", "Hand Over Mouth", "Make Me Beg", "Forced Orgasms", "Sir Eats Me Out", "Ride Sir's Face", "Squirting", "Have Sex"],
+            service: ["Suck Sir", "Worship Sir", "Face Fucking", "Hand Job", "Play Sir After He Cums", "Massage Sir", "Ass/Prostate", "Shave Sir"],
+            deposit: ["Mouth", "Face", "On Pussy", "In My Panties", "Ass", "Down my Throat", "On Breasts", "Sir's Choice"],
+            cleanup: ["Lick Sir Clean", "Wipe Sir Clean", "Shower Together"]
+        };
+
+        function createPill(cat, val) { 
+            const div = document.createElement('div'); 
+            div.className = 'pill'; 
+            if (val === "Other-" && cat === "attire") {
+                div.innerHTML = `Other-<span class="pill-other-hint">tap to type</span>`;
+            } else {
+                div.innerHTML = val; 
+            }
+            div.onclick = (e) => togglePill(div, cat, val); 
+            return div; 
+        }
+        Object.keys(sections).forEach(k => { const grid = document.getElementById(`${k}-grid`); if (grid) sections[k].forEach(val => grid.appendChild(createPill(k, val))); });
+        
+        renderStoredPills();
+
+        // Also add event listeners to text areas to trigger saveState
+        ['q-craving', 'q-nervous', 'q-perfect', 'q-stretch', 'scenario-text'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', saveState);
+        });
+
+        function enterApp() { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; }, 800); }
+
+function startMap() { document.getElementById('reflections-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('reflections-screen').style.display = 'none'; }, 800); }
+
+        function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item[data-tab]').forEach(n => { n.classList.remove('active'); if(n.dataset.tab === id) n.classList.add('active'); }); const idx = ['intent', 'canvas', 'ritual', 'seal'].indexOf(id); document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%'; updateBadges(); window.scrollTo(0,0); }
+        function openSensoryLegend() { document.getElementById('sensory-modal').style.display = 'flex'; }
+        function closeSensoryLegend() { document.getElementById('sensory-modal').style.display = 'none'; }
+
         function togglePill(el, cat, val) {
+            // Option 1: Morphing Pill Logic for "Other-"
             if (val === "Other-" && cat === "attire") {
                 if (el.classList.contains('active')) {
-                   el.classList.remove('active'); el.innerHTML = `Other-`;
+                   el.classList.remove('active'); el.innerHTML = `Other-<span class="pill-other-hint">tap to type</span>`;
                    state[cat] = state[cat].filter(i => i !== "Other-");
                    return;
                 }
@@ -348,15 +547,28 @@
                 el.innerHTML = `<input type="text" class="pill-inline-input" placeholder="..." maxlength="25">`;
                 const input = el.querySelector('input');
                 input.focus();
-                input.onblur = () => {
+
+                const finalizeOther = () => {
                     const txt = input.value.trim();
                     el.classList.remove('editing');
-                    if (txt) { customAttireValue = txt; el.innerHTML = txt; el.classList.add('active'); if (!state[cat].includes("Other-")) state[cat].push("Other-"); }
-                    else { el.innerHTML = `Other-`; el.classList.remove('active'); }
+                    if (txt) {
+                        customAttireValue = txt;
+                        el.innerHTML = txt;
+                        el.classList.add('active');
+                        if (!state[cat].includes("Other-")) state[cat].push("Other-");
+                    } else {
+                        // Empty State Handling: Revert
+                        el.innerHTML = `Other-<span class="pill-other-hint">tap to type</span>`;
+                        el.classList.remove('active');
+                    }
                     saveState();
                 };
+
+                input.onblur = finalizeOther;
+                input.onkeydown = (e) => { if (e.key === "Enter") finalizeOther(); };
                 return;
             }
+
             if (cat === 'impact' && !el.classList.contains('active')) { pendingPill = val; openImpactModal(val); return; }
             if (technicalMenu[val] && !el.classList.contains('active')) { pendingPill = val; pendingCat = cat; if(technicalMenu[val].isNested) openNestedModal(val); else openRefineModal(val); return; }
             if (el.classList.contains('active')) { el.classList.remove('active'); el.innerHTML = val; state[cat] = state[cat].filter(i => i !== val); delete refineDetails[val]; }
@@ -364,54 +576,107 @@
             saveState();
         }
 
+        function openImpactModal(name) { document.getElementById('impact-target-name').innerText = name; document.getElementById('impact-modal').style.display = 'flex'; }
+        function closeImpactModal() { document.getElementById('impact-modal').style.display = 'none'; }
+        function confirmImpact(lvl) { const p = findPill(pendingPill); p.classList.add('active'); state.impact.push(pendingPill); impactDetails[pendingPill] = lvl; saveState(); closeImpactModal(); }
+        function openNestedModal(name) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; document.getElementById('refine-target-name').innerText = name; technicalMenu[name].categories.forEach(sub => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerText = sub; b.onclick = () => openRefineModal(name, sub); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
+        function openRefineModal(name, sub = null) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; if(sub) { const back = document.createElement('button'); back.className = 'refinement-btn'; back.innerHTML = '← Back'; back.onclick = () => openNestedModal(name); list.appendChild(back); } const opts = sub ? technicalMenu[name][sub] : technicalMenu[name]; document.getElementById('refine-target-name').innerText = sub || name; opts.forEach(o => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerHTML = `${o.name}<span>${o.desc}</span>`; b.onclick = () => confirmRefine(sub ? `${sub}: ${o.name}` : o.name); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
+        function confirmRefine(s) { const p = findPill(pendingPill); p.classList.add('active'); p.innerHTML = `${pendingPill}<br><span style="font-size:7px; color:var(--midnight); font-weight:800;">(${s})</span>`; state[pendingCat].push(pendingPill); refineDetails[pendingPill] = s; saveState(); document.getElementById('refinement-modal').style.display = 'none'; }
+        function closeRefineModal() { const p = findPill(pendingPill); if(p) { p.classList.add('active'); state[pendingCat].push(pendingPill); saveState(); } document.getElementById('refinement-modal').style.display = 'none'; }
+        function findPill(txt) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(txt)); }
+        function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; window.scrollTo(0,0); }
+
         function generateFinal() {
             showTab('seal');
             const list = document.getElementById('view-list');
+            const scribble = document.getElementById('scenario-text').value;
+            let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
+            
+            // 1. Grab the answers from the Reflections Screen
             const qCraving = document.getElementById('q-craving').value.trim();
             const qNervous = document.getElementById('q-nervous').value.trim();
             const qPerfect = document.getElementById('q-perfect').value.trim();
             const qStretch = document.getElementById('q-stretch').value.trim();
+
+            const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
+
+            // --- BUILD LIST HTML ---
             let lHTML = '';
+            
+            // Inject Reflections into List
             if (qCraving || qNervous || qPerfect || qStretch) {
-                lHTML += `<div class="list-group"><div class="list-tab-header">REFLECTIONS</div>`;
-                if (qCraving) lHTML += `<div class="list-card-header">Craving</div><div>${qCraving}</div>`;
-                if (qNervous) lHTML += `<div class="list-card-header">Nervous</div><div>${qNervous}</div>`;
+                lHTML += `<div class="list-group"><div class="list-tab-header">PRE-SCENE REFLECTIONS</div>`;
+                const textStyle = "color:#ddd; font-size:12px; margin-bottom:15px; line-height:1.5; font-family:'Montserrat', sans-serif;";
+                if (qCraving) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">What are you craving?</div><div style="${textStyle}">${qCraving}</div>`;
+                if (qNervous) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">What are you nervous about?</div><div style="${textStyle}">${qNervous}</div>`;
+                if (qPerfect) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">What makes this a 10/10?</div><div style="${textStyle}">${qPerfect}</div>`;
+                if (qStretch) lHTML += `<div class="list-card-header" style="display:block; margin-bottom:8px;">Where do you want to stretch?</div><div style="${textStyle}">${qStretch}</div>`;
                 lHTML += `</div>`;
             }
-            Object.keys(state).forEach(key => {
-                if(state[key].length) {
-                    lHTML += `<div class="list-group"><div class="list-card-header">${key.toUpperCase()}</div><div>`;
-                    lHTML += state[key].map(i => `<span class="list-pill">${i}</span>`).join('');
-                    lHTML += `</div></div>`;
+
+            const masterMap = { 
+                "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
+                "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
+                "III. THE SCENE": { "Bondage": "bondage", "The Toy Box": "toys", "The Heavy Hand": "impact", "Edge & Climax": "edge" },
+                "IV. THE SEAL": { "Service to Sir": "service", "Sir's Release": "deposit", "Final Service": "cleanup" }
+            };
+            
+            for(const [tab, cards] of Object.entries(masterMap)) {
+                let tabHasData = false; let tabHTML = `<div class="list-tab-header">${tab}</div>`;
+                for(const [card, key] of Object.entries(cards)) {
+                    if(state[key] && state[key].length) {
+                        tabHasData = true; 
+                        tabHTML += `<div style="margin-bottom: 20px;">`;
+                        tabHTML += `<div class="list-card-header" style="display: block; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 4px; margin-bottom: 8px;">${card}</div>`;
+                        tabHTML += `<div>`;
+                        tabHTML += state[key].map(i => {
+                            let label = i === "Other-" ? customAttireValue : i;
+                            return `<span class="list-pill">${impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label)}</span>`;
+                        }).join('');
+                        tabHTML += `</div></div>`; 
+                    }
                 }
-            });
+                if(tabHasData) lHTML += `<div class="list-group">${tabHTML}</div>`;
+            }
             list.innerHTML = lHTML;
             document.getElementById('submit-stage-1').style.display = 'none'; document.getElementById('submit-stage-2').style.display = 'block'; window.scrollTo(0,0);
         }
 
-        // UI Helpers
-        function enterApp() { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; }, 800); }
-        function startMap() { document.getElementById('reflections-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('reflections-screen').style.display = 'none'; }, 800); }
-        function openSensoryLegend() { document.getElementById('sensory-modal').style.display = 'flex'; }
-        function closeSensoryLegend() { document.getElementById('sensory-modal').style.display = 'none'; }
-        function openImpactModal(n) { document.getElementById('impact-target-name').innerText = n; document.getElementById('impact-modal').style.display = 'flex'; }
-        function closeImpactModal() { document.getElementById('impact-modal').style.display = 'none'; }
-        function confirmImpact(l) { const p = findPill(pendingPill); p.classList.add('active'); state.impact.push(pendingPill); impactDetails[pendingPill] = l; saveState(); closeImpactModal(); }
-        function openNestedModal(n) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; technicalMenu[n].categories.forEach(s => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerText = s; b.onclick = () => openRefineModal(n, s); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
-        function openRefineModal(n, s=null) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; const opts = s ? technicalMenu[n][s] : technicalMenu[n]; opts.forEach(o => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerHTML = `${o.name}<span>${o.desc}</span>`; b.onclick = () => confirmRefine(o.name); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
-        function confirmRefine(s) { const p = findPill(pendingPill); p.classList.add('active'); state[pendingCat].push(pendingPill); refineDetails[pendingPill] = s; saveState(); document.getElementById('refinement-modal').style.display = 'none'; }
-        function closeRefineModal() { document.getElementById('refinement-modal').style.display = 'none'; }
-        function findPill(t) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(t)); }
-        function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; }
-        function updateBadges() {}
-        function confirmReset() { localStorage.clear(); location.reload(); }
-        function openResetModal() { document.getElementById('reset-modal').style.display = 'flex'; }
-        function closeResetModal() { document.getElementById('reset-modal').style.display = 'none'; }
-        async function exportDoc() { /* docx export logic */ }
+        function switchFinalTab(tab) {
+            // Function deactivated, list is the only view.
+        }
 
-        loadState();
-        Object.keys(sections).forEach(k => { const grid = document.getElementById(`${k}-grid`); if(grid) sections[k].forEach(v => grid.appendChild(createPill(k, v))); });
-        renderStoredPills();
+        async function exportDoc() {
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+            const children = [];
+            const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
+            const qCraving = document.getElementById('q-craving').value.trim();
+            const qNervous = document.getElementById('q-nervous').value.trim();
+            const qPerfect = document.getElementById('q-perfect').value.trim();
+            const qStretch = document.getElementById('q-stretch').value.trim();
+            children.push(new Paragraph({ text: "Sirender Protocol - The List", heading: HeadingLevel.HEADING_1, spacing: { after: 200 } }));
+            if (qCraving || qNervous || qPerfect || qStretch) {
+                children.push(new Paragraph({ text: "PRE-SCENE REFLECTIONS", heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
+                if (qCraving) { children.push(new Paragraph({ text: "What are you craving?", heading: HeadingLevel.HEADING_3 })); children.push(new Paragraph({ text: qCraving })); }
+                if (qNervous) { children.push(new Paragraph({ text: "What are you nervous about?", heading: HeadingLevel.HEADING_3 })); children.push(new Paragraph({ text: qNervous })); }
+                if (qPerfect) { children.push(new Paragraph({ text: "What makes this a 10/10?", heading: HeadingLevel.HEADING_3 })); children.push(new Paragraph({ text: qPerfect })); }
+                if (qStretch) { children.push(new Paragraph({ text: "Where do you want to stretch?", heading: HeadingLevel.HEADING_3 })); children.push(new Paragraph({ text: qStretch })); }
+            }
+            const masterMap = { "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" }, "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" }, "III. THE SCENE": { "Bondage": "bondage", "The Toy Box": "toys", "The Heavy Hand": "impact", "Edge & Climax": "edge" }, "IV. THE SEAL": { "Service to Sir": "service", "Sir's Release": "deposit", "Final Service": "cleanup" } };
+            for(const [tab, cards] of Object.entries(masterMap)) {
+                let tabHasData = false; const sectionChildren = []; sectionChildren.push(new Paragraph({ text: tab, heading: HeadingLevel.HEADING_2 }));
+                for(const [card, key] of Object.entries(cards)) {
+                    if(state[key] && state[key].length) {
+                        tabHasData = true; sectionChildren.push(new Paragraph({ text: card, heading: HeadingLevel.HEADING_3 }));
+                        const items = state[key].map(i => { let label = i === "Other-" ? customAttireValue : i; return impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label); });
+                        sectionChildren.push(new Paragraph({ text: items.join(' • ') }));
+                    }
+                }
+                if(tabHasData) children.push(...sectionChildren);
+            }
+            const doc = new Document({ sections: [{ children: children }] });
+            Packer.toBlob(doc).then(blob => saveAs(blob, `Scene List.docx`));
+        }
     </script>
 </body>
 </html>
