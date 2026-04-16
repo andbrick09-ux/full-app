@@ -18,22 +18,27 @@
         body {
             overflow-x: hidden;
             background: #020814;
-            color: #ddd;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .signature { font-size: 32px; color: var(--gold); }
         .app-title { font-size: 34px; text-align: center; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding-bottom: 5px; letter-spacing: 1px; }
 
         /* --- SCREENS --- */
-        #splash-screen, #reflections-screen { 
+       #splash-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020814; z-index: 10000; 
             display: flex; flex-direction: column; align-items: center; 
             padding: 40px 25px; overflow-y: auto; transition: opacity 0.8s ease;
         }
-        #reflections-screen { z-index: 9500; }
+        #reflections-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020814; z-index: 9500; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 40px 25px; overflow-y: auto; transition: opacity 0.8s ease;
+        }
 
-        .splash-content { max-width: 500px; text-align: left; padding-bottom: 40px; margin: auto; }
+        .splash-content { 
+            max-width: 500px; text-align: left; padding-bottom: 40px; 
+            margin: auto; 
+        }
         .splash-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
         .splash-text { font-size: 14px; line-height: 1.8; color: #d0d0d0; margin-bottom: 25px; }
         .splash-highlight { color: var(--gold); font-weight: bold; }
@@ -42,7 +47,7 @@
         .guide-label { color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 4px; font-size: 11px; }
         .splash-sig { margin-top: 30px; margin-bottom: 30px; text-align: right; }
 
-        /* --- UPDATED BUTTON STYLING (PREDICAMENT MENU STYLE) --- */
+        /* --- UPDATED BUTTON STYLING --- */
         .enter-btn, .primary-btn, .reset-confirm-btn { 
             display: block; width: 100%; max-width: 400px; margin: 20px auto; padding: 18px 25px;
             background-color: #1a1a1a; color: #d4af37; text-align: center; text-decoration: none;
@@ -76,7 +81,7 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         }
 
-        /* --- APP STRUCTURE --- */
+        /* --- APP HEADER & NAV --- */
         .app-header { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(2, 8, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); padding: 15px 0 5px; }
         .progress-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.08); margin-top: 10px; }
         #progress-fill { width: 25%; height: 100%; background: var(--luxury-gradient); transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 12px var(--gold); }
@@ -85,14 +90,23 @@
         .tab-content.active { display: block; }
         .tab-intro { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 14px; text-align: center; margin-bottom: 30px; font-style: italic; opacity: 0.95; letter-spacing: 1px; text-transform: uppercase; line-height: 1.6; }
 
+        /* --- PILL GRID --- */
         .category-section { margin-bottom: 30px; padding: 25px 15px; }
         h2 { font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 22px 0; display: flex; align-items: center; }
         h2::before { content: ""; width: 20px; height: 1px; background: var(--gold); margin-right: 15px; opacity: 0.5; }
         .sub-group-label { font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; margin-top: 25px; opacity: 0.8; font-weight: 600; display: block; }
-        
         .pill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .pill { position: relative; padding: 8px 4px; border-radius: 50px; border: 1px solid rgba(212, 175, 55, 0.15); font-size: 9px; font-weight: 500; cursor: pointer; background: rgba(2, 8, 20, 0.5); color: #888; transition: 0.3s; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 48px; line-height: 1.2; overflow: hidden; }
         .pill.active { background: var(--luxury-gradient); color: var(--midnight); border-color: transparent; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); font-weight: 700; }
+
+        .pill-inline-input { background: transparent; border: none; color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 9px; text-align: center; width: 100%; height: 100%; outline: none; }
+        .pill.editing { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
+
+        .modal-header { text-align: center; font-size: 22px; margin-bottom: 25px; line-height: 1.3; font-family: 'Playfair Display', serif; color: var(--gold); }
+        .impact-btn.level-light { border-color: #4CAF50; }
+        .impact-btn.level-medium { border-color: #FFC107; }
+        .impact-btn.level-heavy { border-color: #FF9800; }
+        .impact-btn.level-mark { border-color: #F44336; }
 
         .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(2, 8, 20, 0.88); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(212, 175, 55, 0.3); transition: 0.3s; flex: 1; cursor: pointer; position: relative; }
@@ -100,13 +114,11 @@
         .nav-badge { position: absolute; top: -4px; right: -10px; background: var(--gold); color: #020814; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; font-weight: 800; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0); transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
         .nav-badge.visible { opacity: 1; transform: scale(1); }
 
-        textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: #ddd; padding: 15px; resize: none; margin-bottom: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px; line-height: 1.5; }
+        .list-group { margin-bottom: 30px; border-left: 3px solid var(--gold); padding-left: 20px; background: rgba(255,255,255,0.01); padding: 15px; border-radius: 0 12px 12px 0; }
+        .list-tab-header { color: var(--gold); font-family: 'Playfair Display'; text-transform: uppercase; font-size: 16px; letter-spacing: 3px; margin-bottom: 15px; font-weight: bold; }
+        .list-pill { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; padding: 6px 14px; margin: 4px; border-radius: 50px; font-size: 10px; }
 
         @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        #reset-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,8,20,0.92); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        #reset-modal.open { display: flex; }
-        .reset-modal-box { background: #070f1e; border: 1px solid rgba(244,67,54,0.4); border-radius: 16px; padding: 35px 25px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 0 40px rgba(244,67,54,0.15); }
     </style>
 </head>
 <body class="sirender-theme">
@@ -115,9 +127,7 @@
         <div class="modal-content">
             <div class="modal-header">The Sensory Map</div>
             <div class="sensory-title">I. Upper Body</div>
-            <div class="sensory-item">Scalp, Ears, Neck, Mouth.</div>
-            <div class="sensory-title">II. Torso</div>
-            <div class="sensory-item">Nipples, Inner Arms, Belly, Lower Back.</div>
+            <div class="sensory-item">Scalp, Ears, Mouth, Neck.</div>
             <button class="primary-btn" onclick="closeSensoryLegend()">Return</button>
         </div>
     </div>
@@ -126,7 +136,7 @@
         <div class="modal-content">
             <div class="modal-header">Technical Choice: <br><span id="refine-target-name" style="color:var(--gold);"></span></div>
             <div id="refinement-options-list"></div>
-            <button class="secondary-btn" onclick="closeRefineModal()">Use Standard</button>
+            <button class="secondary-btn" id="modal-cancel-btn" onclick="closeRefineModal()">Use Standard</button>
         </div>
     </div>
 
@@ -145,11 +155,10 @@
 
     <div id="reset-modal">
         <div class="reset-modal-box">
-            <div class="reset-modal-title" style="color:#F44336; font-size:18px; margin-bottom:10px;">Clear This Map?</div>
-            <div class="reset-modal-body" style="color:#aaa; font-size:13px; margin-bottom:20px;">This erases everything. This cannot be undone.</div>
+            <div class="reset-modal-title" style="color:#F44336; margin-bottom:10px;">Clear Map?</div>
             <div class="reset-modal-btns" style="display:flex; gap:10px;">
-                <button class="reset-cancel-btn" onclick="closeResetModal()">Keep It</button>
-                <button class="reset-confirm-btn" onclick="confirmReset()">Yes, Reset</button>
+                <button class="reset-cancel-btn" onclick="closeResetModal()">Keep</button>
+                <button class="reset-confirm-btn" onclick="confirmReset()">Reset</button>
             </div>
         </div>
     </div>
@@ -157,7 +166,7 @@
     <div id="splash-screen">
         <div class="splash-content">
             <div class="splash-title">Clarity in Submission</div>
-            <p class="splash-text">Define exactly what you crave. No guesswork.</p>
+            <p class="splash-text">Your submission is a gift. This app ensures focus is on you, not guesswork.</p>
             <div class="splash-sig signature">- Your Sir</div>
             <button class="enter-btn" onclick="enterApp()">Build Sir a Map</button>
         </div>
@@ -172,6 +181,8 @@
             <textarea id="q-nervous" rows="3" placeholder="Confess..."></textarea>
             <label class="sub-group-label">Perfect Scene?</label>
             <textarea id="q-perfect" rows="3" placeholder="Define..."></textarea>
+            <label class="sub-group-label">Where to stretch?</label>
+            <textarea id="q-stretch" rows="3" placeholder="Where can Sir take you?"></textarea>
             <button class="enter-btn" style="margin-top: 30px;" onclick="startMap()">Proceed to Map</button>
         </div>
     </div>
@@ -188,29 +199,39 @@
         <div class="tab-intro">The Headspace.</div>
         <div class="category-section"><h2>Identity & Role</h2><div class="pill-grid" id="role-grid"></div></div>
         <div class="category-section"><h2>The Vibe</h2><div id="vibe-grid" class="pill-grid"></div></div>
-        <div class="category-section"><h2>Handling</h2><div class="pill-grid" id="handling-grid"></div></div>
+        <div class="category-section"><h2>Handling Style</h2><div class="pill-grid" id="handling-grid"></div></div>
+        <div class="category-section"><h2>Verbal Dynamics</h2><div class="pill-grid" id="verbal-grid"></div></div>
+        <div class="category-section"><h2>Subspace Goals</h2><div class="pill-grid" id="subspace-grid"></div></div>
         <button class="primary-btn" onclick="showTab('canvas')">Continue to Canvas</button>
     </div>
 
     <div id="canvas" class="tab-content">
         <div class="tab-intro">Body Preparation.</div>
         <div class="category-section"><h2>Dress Code</h2><div class="pill-grid" id="attire-grid"></div></div>
-        <div class="category-section"><h2>Erogenous Zones</h2><div class="pill-grid" id="zones-grid"></div></div>
+        <div class="category-section">
+            <h2>Erogenous Zones</h2>
+            <button class="legend-trigger" onclick="openSensoryLegend()">View Legend</button>
+            <div class="pill-grid" id="zones-grid"></div>
+        </div>
+        <div class="category-section"><h2>Sensory Exploration</h2><div class="pill-grid" id="sensory-grid"></div></div>
         <button class="primary-btn" onclick="showTab('ritual')">Continue to Scene</button>
     </div>
 
     <div id="ritual" class="tab-content">
         <div class="tab-intro">The Physicality.</div>
-        <div class="category-section"><h2>Impact</h2><div class="pill-grid" id="impact-grid"></div></div>
-        <div class="category-section"><h2>Tools</h2><div class="pill-grid" id="toys-grid"></div></div>
+        <div class="category-section"><h2>Bondage & Gags</h2><div class="pill-grid" id="bondage-grid"></div></div>
+        <div class="category-section"><h2>The Toy Box</h2><div class="pill-grid" id="toys-grid"></div></div>
+        <div class="category-section"><h2>The Heavy Hand</h2><div class="pill-grid" id="impact-grid"></div></div>
+        <div class="category-section"><h2>Edge & Climax</h2><div class="pill-grid" id="edge-grid"></div></div>
         <button class="primary-btn" onclick="showTab('seal')">Proceed to Seal</button>
     </div>
 
     <div id="seal" class="tab-content">
         <div id="submit-stage-1">
             <div class="category-section"><h2>Service to Sir</h2><div class="pill-grid" id="service-grid"></div></div>
-            <div class="category-section"><h2>Release</h2><div class="pill-grid" id="deposit-grid"></div></div>
-            <div class="category-section"><h2>The Scribbles</h2><textarea id="scenario-text" rows="4" placeholder="Fantasies..."></textarea></div>
+            <div class="category-section"><h2>Sir's Release</h2><div class="pill-grid" id="deposit-grid"></div></div>
+            <div class="category-section"><h2>Final Service</h2><div class="pill-grid" id="cleanup-grid"></div></div>
+            <div class="category-section"><h2>The Scribbles</h2><textarea id="scenario-text" rows="4" placeholder="Your fantasies..."></textarea></div>
         </div>
         <div id="submit-stage-2" style="display:none;">
             <div id="view-list" class="view-content active"></div>
@@ -228,22 +249,75 @@
     </nav>
 
     <script>
-        let state = { vibe:[], role:[], handling:[], attire:[], zones:[], impact:[], toys:[], service:[], deposit:[] };
+        let state = { vibe:[], role:[], handling:[], verbal:[], subspace:[], attire:[], zones:[], sensory:[], bondage:[], toys:[], impact:[], edge:[], service:[], deposit:[], cleanup:[] };
         let impactDetails = {}; let refineDetails = {}; let pendingPill = null; let pendingCat = null;
+        let customAttireValue = "";
 
-        // Transition Functions
-        function enterApp() { 
-            const s = document.getElementById('splash-screen');
-            s.style.opacity = '0';
-            setTimeout(() => { s.style.display = 'none'; }, 800);
-        }
-        function startMap() { 
-            const r = document.getElementById('reflections-screen');
-            r.style.opacity = '0';
-            setTimeout(() => { r.style.display = 'none'; }, 800);
+        const technicalMenu = {
+            "Suck Sir": [
+                { name: "The Hummingbird", desc: "Rapid vibration against the frenulum." },
+                { name: "Deepthroat", desc: "Relaxing the back of the tongue." },
+                { name: "Sloppy Oral", desc: "Let saliva pool for sensory effect." },
+                { name: "Pure Tongue-Tracing", desc: "Mapping from base to head." },
+                { name: "On-demand BJ", desc: "Immediate drop to knees." }
+            ],
+            "Worship Sir": {
+                isNested: true, categories: ["Cock", "Balls"],
+                "Cock": [{ name: "Ceremonial", desc: "State admiration." }, { name: "360 Mapping", desc: "Spiral patterns." }],
+                "Balls": [{ name: "Swirl Specialist", desc: "Manual/oral coordination." }, { name: "Nesting", desc: "Tucking into cheek." }]
+            },
+            "Massage Sir": [{ name: "Clock", desc: "Mapping as a clock face." }, { name: "Grounding", desc: "Heavy trap pressure." }],
+            "Ass/Prostate Work": [{ name: "Rimming", desc: "Flat tongue strokes." }, { name: "Prostate Milking", desc: "Internal stroking." }],
+            "Hand Job": [{ name: "Ruined", desc: "Timing ruin to contraction." }, { name: "Pearl Wrap", desc: "Webbing on frenulum." }]
+        };
+
+        const sections = {
+            role: ["Brat", "Good Girl", "Slave", "Sex Toy", "Submissive", "Switch", "Claimed"],
+            vibe: ["Classic Build-Up", "Primal", "Service", "Sensory", "Training", "Control"],
+            handling: ["Sir's Way", "Dominate Me", "Force Submit", "Gentle", "Manhandled", "Inspected"],
+            verbal: ["Name Calling", "Praise Me", "Degrade Me"],
+            subspace: ["Light", "Deep"],
+            attire: ["Naked", "Lingerie", "Panties", "Hoodie", "Skirt", "Heels", "Stockings", "Pantyhose", "Corset", "Other-"],
+            zones: ["Scalp", "Ears", "Neck", "Mouth", "Wrists", "Hands", "Breasts", "Thighs", "Knees", "Feet", "Genitals", "Ass"],
+            sensory: ["Blindfold", "Scent Play", "Wheel", "Feathers", "Claws", "Ice", "Hot Wax", "Breath", "Nuru", "Oil", "Lube", "Bite"],
+            bondage: ["Bed", "Door", "Spreader Bars", "Armbinder", "Rope", "Ball Gag", "Ring Gag", "Predicament"],
+            toys: ["Wand", "Ferri", "Lush 4", "Bullet", "Dildo", "Inflatable", "Clamps", "Hook"],
+            impact: ["Hand", "Crop", "Flogger", "Cane", "Paddle", "Belt"],
+            edge: ["Choking", "Hand Over Mouth", "Make Me Beg", "Forced Orgasms", "Sex"],
+            service: ["Suck Sir", "Worship Sir", "Face Fucking", "Hand Job", "Massage Sir", "Ass/Prostate"],
+            deposit: ["Mouth", "Face", "Pussy", "Panties", "Ass", "Throat", "Breasts", "Sir's Choice"],
+            cleanup: ["Lick Sir Clean", "Wipe Sir Clean", "Shower Together"]
+        };
+
+        function saveState() {
+            localStorage.setItem('sirender_state', JSON.stringify(state));
+            localStorage.setItem('sirender_impactDetails', JSON.stringify(impactDetails));
+            localStorage.setItem('sirender_refineDetails', JSON.stringify(refineDetails));
+            localStorage.setItem('sirender_customAttireValue', customAttireValue);
+            localStorage.setItem('sirender_qCraving', document.getElementById('q-craving').value);
+            localStorage.setItem('sirender_qNervous', document.getElementById('q-nervous').value);
+            localStorage.setItem('sirender_qPerfect', document.getElementById('q-perfect').value);
+            localStorage.setItem('sirender_qStretch', document.getElementById('q-stretch').value);
+            localStorage.setItem('sirender_scribble', document.getElementById('scenario-text').value);
+            updateBadges();
         }
 
-        // Bug Fix Navigation
+        function loadState() {
+            const saved = localStorage.getItem('sirender_state');
+            if (saved) {
+                state = JSON.parse(saved);
+                impactDetails = JSON.parse(localStorage.getItem('sirender_impactDetails') || '{}');
+                refineDetails = JSON.parse(localStorage.getItem('sirender_refineDetails') || '{}');
+                customAttireValue = localStorage.getItem('sirender_customAttireValue') || '';
+                document.getElementById('q-craving').value = localStorage.getItem('sirender_qCraving') || '';
+                document.getElementById('q-nervous').value = localStorage.getItem('sirender_qNervous') || '';
+                document.getElementById('q-perfect').value = localStorage.getItem('sirender_qPerfect') || '';
+                document.getElementById('q-stretch').value = localStorage.getItem('sirender_qStretch') || '';
+                document.getElementById('scenario-text').value = localStorage.getItem('sirender_scribble') || '';
+            }
+        }
+
+        // NAVIGATION BUG FIX
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -257,84 +331,87 @@
                 n.classList.remove('active');
                 if(n.dataset.tab === id) n.classList.add('active');
             });
+            const idx = ['intent', 'canvas', 'ritual', 'seal'].indexOf(id);
+            document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%';
             updateBadges();
             window.scrollTo(0,0);
         }
 
-        const technicalMenu = {
-            "Suck Sir": [
-                { name: "Hummingbird", desc: "Rapid vibration." },
-                { name: "Deepthroat", desc: "Relaxing the throat." }
-            ],
-            "Massage Sir": [
-                { name: "Grounding", desc: "Heavy trap pressure." }
-            ]
-        };
-
-        const sections = {
-            role: ["Brat", "Good Girl", "Slave", "Submissive"],
-            vibe: ["Build-Up", "Primal", "Service", "Sensory"],
-            handling: ["Sir's Way", "Dominate Me", "Gentle", "Manhandled"],
-            attire: ["Naked", "Lingerie", "Stockings", "Other-"],
-            zones: ["Neck", "Mouth", "Wrists", "Inner Thighs", "Ass"],
-            impact: ["Sir's Hand", "Crop", "Flogger", "Belt"],
-            toys: ["Wand", "Dildo", "Clamps", "Anal Hook"],
-            service: ["Suck Sir", "Face Fucking", "Massage Sir"],
-            deposit: ["Mouth", "Face", "Ass", "Breasts"]
-        };
-
-        function createPill(cat, val) { 
-            const div = document.createElement('div'); 
-            div.className = 'pill'; 
-            div.innerHTML = val;
-            div.onclick = () => togglePill(div, cat, val); 
-            return div; 
-        }
-
         function togglePill(el, cat, val) {
-            if (cat === 'impact' && !el.classList.contains('active')) { pendingPill = val; openImpactModal(val); return; }
-            if (technicalMenu[val] && !el.classList.contains('active')) { pendingPill = val; pendingCat = cat; openRefineModal(val); return; }
-            if (el.classList.contains('active')) { 
-                el.classList.remove('active'); 
-                state[cat] = state[cat].filter(i => i !== val); 
-            } else { 
-                el.classList.add('active'); 
-                state[cat].push(val); 
+            if (val === "Other-" && cat === "attire") {
+                if (el.classList.contains('active')) {
+                   el.classList.remove('active'); el.innerHTML = `Other-`;
+                   state[cat] = state[cat].filter(i => i !== "Other-");
+                   return;
+                }
+                el.classList.add('editing');
+                el.innerHTML = `<input type="text" class="pill-inline-input" placeholder="..." maxlength="25">`;
+                const input = el.querySelector('input');
+                input.focus();
+                input.onblur = () => {
+                    const txt = input.value.trim();
+                    el.classList.remove('editing');
+                    if (txt) { customAttireValue = txt; el.innerHTML = txt; el.classList.add('active'); if (!state[cat].includes("Other-")) state[cat].push("Other-"); }
+                    else { el.innerHTML = `Other-`; el.classList.remove('active'); }
+                    saveState();
+                };
+                return;
             }
+            if (cat === 'impact' && !el.classList.contains('active')) { pendingPill = val; openImpactModal(val); return; }
+            if (technicalMenu[val] && !el.classList.contains('active')) { pendingPill = val; pendingCat = cat; if(technicalMenu[val].isNested) openNestedModal(val); else openRefineModal(val); return; }
+            if (el.classList.contains('active')) { el.classList.remove('active'); el.innerHTML = val; state[cat] = state[cat].filter(i => i !== val); delete refineDetails[val]; }
+            else { el.classList.add('active'); state[cat].push(val); }
             saveState();
         }
 
         function generateFinal() {
             showTab('seal');
             const list = document.getElementById('view-list');
-            let lHTML = `<div class="list-tab-header">Final Map</div>`;
+            const qCraving = document.getElementById('q-craving').value.trim();
+            const qNervous = document.getElementById('q-nervous').value.trim();
+            const qPerfect = document.getElementById('q-perfect').value.trim();
+            const qStretch = document.getElementById('q-stretch').value.trim();
+            let lHTML = '';
+            if (qCraving || qNervous || qPerfect || qStretch) {
+                lHTML += `<div class="list-group"><div class="list-tab-header">REFLECTIONS</div>`;
+                if (qCraving) lHTML += `<div class="list-card-header">Craving</div><div>${qCraving}</div>`;
+                if (qNervous) lHTML += `<div class="list-card-header">Nervous</div><div>${qNervous}</div>`;
+                lHTML += `</div>`;
+            }
             Object.keys(state).forEach(key => {
-                if (state[key].length) {
-                    lHTML += `<div class="list-group"><div class="list-card-header">${key}</div><div>`;
+                if(state[key].length) {
+                    lHTML += `<div class="list-group"><div class="list-card-header">${key.toUpperCase()}</div><div>`;
                     lHTML += state[key].map(i => `<span class="list-pill">${i}</span>`).join('');
                     lHTML += `</div></div>`;
                 }
             });
             list.innerHTML = lHTML;
-            document.getElementById('submit-stage-1').style.display = 'none'; 
-            document.getElementById('submit-stage-2').style.display = 'block';
+            document.getElementById('submit-stage-1').style.display = 'none'; document.getElementById('submit-stage-2').style.display = 'block'; window.scrollTo(0,0);
         }
 
-        // Standard helpers
-        function saveState() { localStorage.setItem('sirender_state', JSON.stringify(state)); updateBadges(); }
-        function loadState() { const s = localStorage.getItem('sirender_state'); if(s) state = JSON.parse(s); }
-        function updateBadges() { /* counts pills per section */ }
+        // UI Helpers
+        function enterApp() { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; }, 800); }
+        function startMap() { document.getElementById('reflections-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('reflections-screen').style.display = 'none'; }, 800); }
+        function openSensoryLegend() { document.getElementById('sensory-modal').style.display = 'flex'; }
+        function closeSensoryLegend() { document.getElementById('sensory-modal').style.display = 'none'; }
         function openImpactModal(n) { document.getElementById('impact-target-name').innerText = n; document.getElementById('impact-modal').style.display = 'flex'; }
         function closeImpactModal() { document.getElementById('impact-modal').style.display = 'none'; }
-        function confirmImpact(l) { impactDetails[pendingPill] = l; findPill(pendingPill).classList.add('active'); state.impact.push(pendingPill); closeImpactModal(); saveState(); }
+        function confirmImpact(l) { const p = findPill(pendingPill); p.classList.add('active'); state.impact.push(pendingPill); impactDetails[pendingPill] = l; saveState(); closeImpactModal(); }
+        function openNestedModal(n) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; technicalMenu[n].categories.forEach(s => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerText = s; b.onclick = () => openRefineModal(n, s); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
+        function openRefineModal(n, s=null) { const list = document.getElementById('refinement-options-list'); list.innerHTML = ''; const opts = s ? technicalMenu[n][s] : technicalMenu[n]; opts.forEach(o => { const b = document.createElement('button'); b.className = 'refinement-btn'; b.innerHTML = `${o.name}<span>${o.desc}</span>`; b.onclick = () => confirmRefine(o.name); list.appendChild(b); }); document.getElementById('refinement-modal').style.display = 'flex'; }
+        function confirmRefine(s) { const p = findPill(pendingPill); p.classList.add('active'); state[pendingCat].push(pendingPill); refineDetails[pendingPill] = s; saveState(); document.getElementById('refinement-modal').style.display = 'none'; }
+        function closeRefineModal() { document.getElementById('refinement-modal').style.display = 'none'; }
         function findPill(t) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(t)); }
         function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; }
+        function updateBadges() {}
         function confirmReset() { localStorage.clear(); location.reload(); }
-        function openRefineModal(n) { /* logic to show technicalMenu options */ }
+        function openResetModal() { document.getElementById('reset-modal').style.display = 'flex'; }
+        function closeResetModal() { document.getElementById('reset-modal').style.display = 'none'; }
+        async function exportDoc() { /* docx export logic */ }
 
-        // Init
         loadState();
-        Object.keys(sections).forEach(k => { const g = document.getElementById(`${k}-grid`); if(g) sections[k].forEach(v => g.appendChild(createPill(k,v))); });
+        Object.keys(sections).forEach(k => { const grid = document.getElementById(`${k}-grid`); if(grid) sections[k].forEach(v => grid.appendChild(createPill(k, v))); });
+        renderStoredPills();
     </script>
 </body>
 </html>
