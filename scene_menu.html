@@ -91,8 +91,10 @@
         .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(212, 175, 55, 0.3); transition: 0.3s; flex: 1; cursor: pointer; position: relative; }
         .nav-item.active { color: var(--gold); }
         .nav-item.active::after { content: ''; position: absolute; bottom: -8px; width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
-        .nav-icon-wrapper { font-size: 22px; margin-bottom: 5px; }
+        .nav-icon-wrapper { font-size: 22px; margin-bottom: 3px; position: relative; display: inline-block; }
         .nav-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+        .nav-badge { position: absolute; top: -4px; right: -10px; background: var(--gold); color: #020814; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; font-weight: 800; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0); transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
+        .nav-badge.visible { opacity: 1; transform: scale(1); }
 
         /* --- FINAL PROTOCOL --- */
         .final-tabs { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -114,6 +116,20 @@
         .legend-trigger { width: 100%; background: transparent; border: 1px solid var(--gold-dim); padding: 10px; border-radius: 50px; color: var(--gold); text-transform: uppercase; font-size: 9px; letter-spacing: 2px; margin-bottom: 15px; cursor: pointer; }
 
         @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- RESET CONFIRM MODAL --- */
+        #reset-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,8,20,0.92); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 25px; }
+        #reset-modal.open { display: flex; }
+        .reset-modal-box { background: #070f1e; border: 1px solid rgba(244,67,54,0.4); border-radius: 16px; padding: 35px 25px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 0 40px rgba(244,67,54,0.15); }
+        .reset-modal-title { font-family: 'Playfair Display', serif; color: #F44336; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .reset-modal-body { color: #aaa; font-size: 13px; line-height: 1.7; margin-bottom: 30px; }
+        .reset-modal-btns { display: flex; gap: 12px; }
+        .reset-confirm-btn { flex: 1; padding: 16px; border-radius: 50px; border: 1px solid #F44336; background: rgba(244,67,54,0.1); color: #F44336; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: 0.2s; }
+        .reset-confirm-btn:hover { background: rgba(244,67,54,0.2); }
+        .reset-cancel-btn { flex: 1; padding: 16px; border-radius: 50px; border: 1px solid var(--border); background: transparent; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+
+        /* --- OTHER PILL HINT --- */
+        .pill-other-hint { font-size: 8px; color: rgba(212,175,55,0.4); display: block; margin-top: 3px; font-style: italic; letter-spacing: 0; text-transform: none; }
     </style>
 </head>
 <body class="sirender-theme">
@@ -163,6 +179,18 @@
         </div>
     </div>
 
+    <!-- RESET CONFIRM MODAL -->
+    <div id="reset-modal">
+        <div class="reset-modal-box">
+            <div class="reset-modal-title">Clear This Map?</div>
+            <div class="reset-modal-body">This will erase all your selections and reflections. This cannot be undone.</div>
+            <div class="reset-modal-btns">
+                <button class="reset-cancel-btn" onclick="closeResetModal()">Keep It</button>
+                <button class="reset-confirm-btn" onclick="confirmReset()">Yes, Reset</button>
+            </div>
+        </div>
+    </div>
+
     <div id="splash-screen">
         <div class="splash-content">
             <div class="splash-title">The Purpose: Clarity in Submission</div>
@@ -204,7 +232,7 @@
         <div style="text-align: center; margin-top: 8px;">
           <!-- <a href="index.html" style="color: var(--gold); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a> -->
             <span style="color:rgba(212, 175, 55, 0.3); margin: 0 10px;">|</span>
-            <a href="#" onclick="resetSession(); return false;" style="color: #F44336; font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">Reset Session</a>
+            <a href="#" onclick="openResetModal(); return false;" style="color: #F44336; font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">Reset Session</a>
         </div>
         <div class="progress-bar-container"><div id="progress-fill"></div></div>
     </header>
@@ -246,7 +274,6 @@
             <div class="category-section"><h2>Sir's Release</h2><div class="pill-grid" id="deposit-grid"></div></div>
             <div class="category-section"><h2>Final Service</h2><div class="pill-grid" id="cleanup-grid"></div></div>
             <div class="category-section"><h2>The Scribbles</h2><textarea id="scenario-text" rows="4" placeholder="Your unspoken fantasies..."></textarea></div>
-            <button class="primary-btn" onclick="generateFinal()">Finalize My Map</button>
         </div>
         <div id="submit-stage-2" style="display:none;">
             <div class="final-tabs">
@@ -259,10 +286,11 @@
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-item active" data-tab="intent" onclick="showTab('intent')"><div class="nav-icon-wrapper">🧭</div><span class="nav-label">Intent</span></div>
-        <div class="nav-item" data-tab="canvas" onclick="showTab('canvas')"><div class="nav-icon-wrapper">👤</div><span class="nav-label">Canvas</span></div>
-        <div class="nav-item" data-tab="ritual" onclick="showTab('ritual')"><div class="nav-icon-wrapper">🔥</div><span class="nav-label">Scene</span></div>
-        <div class="nav-item" data-tab="seal" onclick="showTab('seal')"><div class="nav-icon-wrapper">✒️</div><span class="nav-label">Seal</span></div>
+        <div class="nav-item active" data-tab="intent" onclick="showTab('intent')"><div class="nav-icon-wrapper">🧭<span class="nav-badge" id="badge-intent"></span></div><span class="nav-label">Intent</span></div>
+        <div class="nav-item" data-tab="canvas" onclick="showTab('canvas')"><div class="nav-icon-wrapper">👤<span class="nav-badge" id="badge-canvas"></span></div><span class="nav-label">Canvas</span></div>
+        <div class="nav-item" data-tab="ritual" onclick="showTab('ritual')"><div class="nav-icon-wrapper">🔥<span class="nav-badge" id="badge-ritual"></span></div><span class="nav-label">Scene</span></div>
+        <div class="nav-item" data-tab="seal" onclick="showTab('seal')"><div class="nav-icon-wrapper">✒️<span class="nav-badge" id="badge-seal"></span></div><span class="nav-label">Seal</span></div>
+        <div class="nav-item" id="nav-map" onclick="generateFinal()"><div class="nav-icon-wrapper">🗺️</div><span class="nav-label">Map</span></div>
     </nav>
 
     <script>
@@ -290,6 +318,7 @@
             localStorage.setItem('sirender_qPerfect', document.getElementById('q-perfect').value);
             localStorage.setItem('sirender_qStretch', document.getElementById('q-stretch').value);
             localStorage.setItem('sirender_scribble', document.getElementById('scenario-text').value);
+            updateBadges();
         }
 
         function loadState() {
@@ -308,17 +337,35 @@
             }
         }
 
-        function resetSession() {
-            if(confirm('Are you sure you want to clear your current map and start over?')) {
-                localStorage.clear();
-                location.reload();
+        function openResetModal() { document.getElementById('reset-modal').classList.add('open'); }
+        function closeResetModal() { document.getElementById('reset-modal').classList.remove('open'); }
+        function confirmReset() { localStorage.clear(); location.reload(); }
+
+        function resetSession() { openResetModal(); }
+
+        // Badge counts per tab
+        const tabBadgeMap = {
+            intent: ['role','vibe','handling','verbal','subspace'],
+            canvas: ['attire','zones','sensory'],
+            ritual: ['bondage','toys','impact','edge'],
+            seal:   ['service','deposit','cleanup']
+        };
+
+        function updateBadges() {
+            for (const [tab, cats] of Object.entries(tabBadgeMap)) {
+                const count = cats.reduce((sum, cat) => sum + (state[cat] ? state[cat].length : 0), 0);
+                const badge = document.getElementById(`badge-${tab}`);
+                if (badge) {
+                    if (count > 0) { badge.textContent = count > 9 ? '9+' : count; badge.classList.add('visible'); }
+                    else { badge.classList.remove('visible'); }
+                }
             }
         }
 
         function renderStoredPills() {
             Object.keys(state).forEach(cat => {
                 state[cat].forEach(val => {
-                    const pill = Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(val) || (val === "Other-" && p.innerText.includes(customAttireValue)));
+                    const pill = Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(val) || (val === "Other-" && p.innerText.includes('Other-')));
                     if (pill) {
                         pill.classList.add('active');
                         if (val === "Other-") {
@@ -337,6 +384,7 @@
                 document.getElementById('reflections-screen').style.display = 'none';
             }
             --------------------------------------------------- */
+            updateBadges();
         }
 
         loadState();
@@ -415,7 +463,17 @@
             cleanup: ["Lick Sir Clean", "Wipe Sir Clean", "Shower Together"]
         };
 
-        function createPill(cat, val) { const div = document.createElement('div'); div.className = 'pill'; div.innerHTML = val; div.onclick = (e) => togglePill(div, cat, val); return div; }
+        function createPill(cat, val) { 
+            const div = document.createElement('div'); 
+            div.className = 'pill'; 
+            if (val === "Other-" && cat === "attire") {
+                div.innerHTML = `Other-<span class="pill-other-hint">tap to type</span>`;
+            } else {
+                div.innerHTML = val; 
+            }
+            div.onclick = (e) => togglePill(div, cat, val); 
+            return div; 
+        }
         Object.keys(sections).forEach(k => { const grid = document.getElementById(`${k}-grid`); if (grid) sections[k].forEach(val => grid.appendChild(createPill(k, val))); });
         
         renderStoredPills();
@@ -430,7 +488,7 @@
 
 function startMap() { document.getElementById('reflections-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('reflections-screen').style.display = 'none'; }, 800); }
 
-        function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); if(n.dataset.tab === id) n.classList.add('active'); }); const idx = ['intent', 'canvas', 'ritual', 'seal'].indexOf(id); document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%'; window.scrollTo(0,0); }
+        function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item[data-tab]').forEach(n => { n.classList.remove('active'); if(n.dataset.tab === id) n.classList.add('active'); }); const idx = ['intent', 'canvas', 'ritual', 'seal'].indexOf(id); document.getElementById('progress-fill').style.width = ((idx + 1) * 25) + '%'; updateBadges(); window.scrollTo(0,0); }
         function openSensoryLegend() { document.getElementById('sensory-modal').style.display = 'flex'; }
         function closeSensoryLegend() { document.getElementById('sensory-modal').style.display = 'none'; }
 
@@ -438,7 +496,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             // Option 1: Morphing Pill Logic for "Other-"
             if (val === "Other-" && cat === "attire") {
                 if (el.classList.contains('active')) {
-                   el.classList.remove('active'); el.innerHTML = "Other-";
+                   el.classList.remove('active'); el.innerHTML = `Other-<span class="pill-other-hint">tap to type</span>`;
                    state[cat] = state[cat].filter(i => i !== "Other-");
                    return;
                 }
@@ -457,7 +515,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                         if (!state[cat].includes("Other-")) state[cat].push("Other-");
                     } else {
                         // Empty State Handling: Revert
-                        el.innerHTML = "Other-";
+                        el.innerHTML = `Other-<span class="pill-other-hint">tap to type</span>`;
                         el.classList.remove('active');
                     }
                     saveState();
@@ -486,6 +544,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
         function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; window.scrollTo(0,0); }
 
         function generateFinal() {
+            showTab('seal');
             // const letter = document.getElementById('view-letter'); 
             const list = document.getElementById('view-list');
             const scribble = document.getElementById('scenario-text').value;
