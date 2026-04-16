@@ -250,13 +250,11 @@
         </div>
         <div id="submit-stage-2" style="display:none;">
             <div class="final-tabs">
-                <div class="final-tab active" onclick="switchFinalTab('letter')">The Letter</div>
-                <div class="final-tab" onclick="switchFinalTab('list')">The List</div>
+                <div class="final-tab active" onclick="switchFinalTab('list')">The List</div>
             </div>
-            <div id="view-letter" class="view-content active"></div>
-            <div id="view-list" class="view-content"></div>
+            <div id="view-list" class="view-content active"></div>
             <button class="secondary-btn" onclick="returnToMap()">Return to Selections</button>
-            <button id="download-btn" onclick="exportDoc()" class="primary-btn">Download Letter (.docx)</button>
+            <button id="download-btn" onclick="exportDoc()" class="primary-btn">Download List (.docx)</button>
         </div>
     </div>
 
@@ -484,8 +482,8 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
         function findPill(txt) { return Array.from(document.querySelectorAll('.pill')).find(p => p.innerText.includes(txt)); }
         function returnToMap() { document.getElementById('submit-stage-2').style.display = 'none'; document.getElementById('submit-stage-1').style.display = 'block'; window.scrollTo(0,0); }
 
-               function generateFinal() {
-            const letter = document.getElementById('view-letter'); 
+        function generateFinal() {
+            // const letter = document.getElementById('view-letter'); 
             const list = document.getElementById('view-list');
             const scribble = document.getElementById('scenario-text').value;
             let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
@@ -498,7 +496,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
 
             const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
 
-            // --- BUILD LETTER HTML ---
+            /* --- COMMENT OUT LETTER HTML ---
             let h = `<div class="letter-container"><div class="letter-header">To My Sir,</div>`;
             
             // Inject Reflections into Letter
@@ -551,6 +549,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             if(scribble) h += `<div class="letter-body" style="border-top:1px solid rgba(212,175,55,0.2); padding-top:15px; font-style:italic;">"${scribble}"</div>`;
             h += `<div class="signature" style="text-align:right; margin-top:20px;">- Becca</div></div>`;
             letter.innerHTML = h;
+            ------------------------------------------ */
 
             // --- BUILD LIST HTML ---
             let lHTML = '';
@@ -590,6 +589,7 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             document.getElementById('submit-stage-1').style.display = 'none'; document.getElementById('submit-stage-2').style.display = 'block'; window.scrollTo(0,0);
         }
 
+        /* --- COMMENT OUT SWITCH FINAL TAB FUNCTION ---
         function switchFinalTab(tab) {
             document.querySelectorAll('.final-tab').forEach(t => t.classList.remove('active')); 
             document.querySelectorAll('.view-content').forEach(c => c.classList.remove('active'));
@@ -606,11 +606,17 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 if (downloadBtn) downloadBtn.innerText = "Download List (.docx)";
             }
         }
+        ------------------------------------------------ */
+
+        // Optional placeholder if you still want to be able to call the function without throwing an error
+        function switchFinalTab(tab) {
+            // Function deactivated, list is the only view.
+        }
 
         async function exportDoc() {
             const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
             const children = [];
-            const isListTabActive = document.getElementById('view-list').classList.contains('active');
+            
             const formatItems = (arr, detailMap) => arr.map(item => detailMap && detailMap[item] ? `${item} (${detailMap[item]})` : item).join(', ');
             
             // 2. Grab the answers for the DOCX Export
@@ -619,57 +625,58 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
             const qPerfect = document.getElementById('q-perfect').value.trim();
             const qStretch = document.getElementById('q-stretch').value.trim();
             
-            if (isListTabActive) {
-                // --- BUILD THE LIST EXPORT ---
-                children.push(new Paragraph({ text: "Sirender Protocol - The List", heading: HeadingLevel.HEADING_1, spacing: { after: 200 } }));
+            // --- BUILD THE LIST EXPORT ---
+            children.push(new Paragraph({ text: "Sirender Protocol - The List", heading: HeadingLevel.HEADING_1, spacing: { after: 200 } }));
+            
+            // Inject Reflections into DOCX List
+            if (qCraving || qNervous || qPerfect || qStretch) {
+                children.push(new Paragraph({ text: "PRE-SCENE REFLECTIONS", heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
+                if (qCraving) {
+                    children.push(new Paragraph({ text: "What are you craving?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                    children.push(new Paragraph({ text: qCraving, spacing: { after: 120 } }));
+                }
+                if (qNervous) {
+                    children.push(new Paragraph({ text: "What are you nervous about?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                    children.push(new Paragraph({ text: qNervous, spacing: { after: 120 } }));
+                }
+                if (qPerfect) {
+                    children.push(new Paragraph({ text: "What makes this a 10/10?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                    children.push(new Paragraph({ text: qPerfect, spacing: { after: 120 } }));
+                }
+                if (qStretch) {
+                    children.push(new Paragraph({ text: "Where do you want to stretch?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                    children.push(new Paragraph({ text: qStretch, spacing: { after: 120 } }));
+                }
+            }
+
+            const masterMap = { 
+                "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
+                "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
+                "III. THE SCENE": { "Bondage": "bondage", "The Toy Box": "toys", "The Heavy Hand": "impact", "Edge & Climax": "edge" },
+                "IV. THE SEAL": { "Service to Sir": "service", "Sir's Release": "deposit", "Final Service": "cleanup" }
+            };
+
+            for(const [tab, cards] of Object.entries(masterMap)) {
+                let tabHasData = false;
+                const sectionChildren = [];
+                sectionChildren.push(new Paragraph({ text: tab, heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
                 
-                // Inject Reflections into DOCX List
-                if (qCraving || qNervous || qPerfect || qStretch) {
-                    children.push(new Paragraph({ text: "PRE-SCENE REFLECTIONS", heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
-                    if (qCraving) {
-                        children.push(new Paragraph({ text: "What are you craving?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
-                        children.push(new Paragraph({ text: qCraving, spacing: { after: 120 } }));
-                    }
-                    if (qNervous) {
-                        children.push(new Paragraph({ text: "What are you nervous about?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
-                        children.push(new Paragraph({ text: qNervous, spacing: { after: 120 } }));
-                    }
-                    if (qPerfect) {
-                        children.push(new Paragraph({ text: "What makes this a 10/10?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
-                        children.push(new Paragraph({ text: qPerfect, spacing: { after: 120 } }));
-                    }
-                    if (qStretch) {
-                        children.push(new Paragraph({ text: "Where do you want to stretch?", heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
-                        children.push(new Paragraph({ text: qStretch, spacing: { after: 120 } }));
+                for(const [card, key] of Object.entries(cards)) {
+                    if(state[key] && state[key].length) {
+                        tabHasData = true;
+                        sectionChildren.push(new Paragraph({ text: card, heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
+                        const items = state[key].map(i => {
+                            let label = i === "Other-" ? customAttireValue : i;
+                            return impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label);
+                        });
+                        sectionChildren.push(new Paragraph({ text: items.join(' • '), spacing: { after: 120 } }));
                     }
                 }
-
-                const masterMap = { 
-                    "I. THE INTENT": { "Identity & Role": "role", "The Vibe": "vibe", "Handling Style": "handling", "Verbal Dynamics": "verbal", "Subspace Goals": "subspace" },
-                    "II. THE CANVAS": { "Dress Code": "attire", "Focus Zones": "zones", "Sensory Play": "sensory" },
-                    "III. THE SCENE": { "Bondage": "bondage", "The Toy Box": "toys", "The Heavy Hand": "impact", "Edge & Climax": "edge" },
-                    "IV. THE SEAL": { "Service to Sir": "service", "Sir's Release": "deposit", "Final Service": "cleanup" }
-                };
-
-                for(const [tab, cards] of Object.entries(masterMap)) {
-                    let tabHasData = false;
-                    const sectionChildren = [];
-                    sectionChildren.push(new Paragraph({ text: tab, heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } }));
-                    
-                    for(const [card, key] of Object.entries(cards)) {
-                        if(state[key] && state[key].length) {
-                            tabHasData = true;
-                            sectionChildren.push(new Paragraph({ text: card, heading: HeadingLevel.HEADING_3, spacing: { before: 120, after: 60 } }));
-                            const items = state[key].map(i => {
-                                let label = i === "Other-" ? customAttireValue : i;
-                                return impactDetails[i] ? `${label} [${impactDetails[i]}]` : (refineDetails[i] ? `${label} (${refineDetails[i]})` : label);
-                            });
-                            sectionChildren.push(new Paragraph({ text: items.join(' • '), spacing: { after: 120 } }));
-                        }
-                    }
-                    if(tabHasData) children.push(...sectionChildren);
-                }
-            } else {
+                if(tabHasData) children.push(...sectionChildren);
+            }
+            
+            /* --- COMMENT OUT LETTER DOCX EXPORT ---
+            else {
                 // --- BUILD THE LETTER EXPORT ---
                 const scribble = document.getElementById('scenario-text').value;
                 let finalAttire = state.attire.map(i => i === "Other-" ? customAttireValue : i);
@@ -737,11 +744,12 @@ function startMap() { document.getElementById('reflections-screen').style.opacit
                 
                 children.push(new Paragraph({ text: "- Becca", alignment: "right" }));
             }
+            ------------------------------------------ */
 
             const doc = new Document({ sections: [{ children: children }] });
             const now = new Date();
             const timestamp = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + '_' + String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
-            const prefix = isListTabActive ? "Scene List" : "Scene Letter";
+            const prefix = "Scene List";
             Packer.toBlob(doc).then(blob => saveAs(blob, `${prefix} ${timestamp}.docx`));
         }
 
