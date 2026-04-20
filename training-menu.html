@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Becca's Sirender | Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 25px;
+            z-index: 1;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--gold-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: 0.3s ease;
+        }
+        .back-link:hover {
+            color: var(--gold);
+        }
+
+        .training-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 30px;
+        }
+
+        .training-card {
+            display: block;
+            position: relative;
+            padding: 28px 24px;
+            background: rgba(2, 8, 20, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            text-decoration: none;
+            color: #ccc;
+            transition: all 0.35s ease;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .training-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--luxury-gradient);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .training-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .training-card:hover::before {
+            opacity: 1;
+        }
+
+        .training-card:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card-title {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            text-transform: none;
+            opacity: 0.65;
+            letter-spacing: 0.5px;
+            color: #bbb;
+            line-height: 1.5;
+        }
+
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--border);
+            margin: 5px auto 30px;
+        }
+
+        .seal-decoration {
+            margin-top: 3rem;
+            color: var(--gold);
+            font-size: 1.5rem;
+            opacity: 0.4;
+        }
+
+        /* Entrance animation */
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .training-card:nth-child(1) { animation: cardSlideIn 0.5s ease 0.1s both; }
+        .training-card:nth-child(2) { animation: cardSlideIn 0.5s ease 0.2s both; }
+        .training-card:nth-child(3) { animation: cardSlideIn 0.5s ease 0.3s both; }
+        .training-card:nth-child(4) { animation: cardSlideIn 0.5s ease 0.4s both; }
+        .training-card:nth-child(5) { animation: cardSlideIn 0.5s ease 0.5s both; }
+    </style>
+</head>
+<body class="sirender-theme">
+
+    <div class="container">
+        <a href="index.html" class="back-link">← Return to Central Hub</a>
+
+        <div class="signature" style="margin-bottom: 12px;">Becca's Sirender</div>
+        <h1 class="app-title" style="font-size: 38px; margin-bottom: 5px;">Training</h1>
+        <div class="splash-title" style="border-bottom: none; font-size: 14px; font-weight: 400; opacity: 0.85; margin-bottom: 10px;">Discipline Through Devotion</div>
+        <div class="divider"></div>
+
+        <div class="training-grid">
+            <a href="the-5-training.html" class="training-card">
+                <span class="card-icon">🖐️</span>
+                <span class="card-title">The "5" Training</span>
+                <span class="card-desc">Classical conditioning protocol to cum on Sir's command. 4-phase program with edging, trigger association, and maintenance.</span>
+            </a>
+
+            <a href="anal-plug-training.html" class="training-card">
+                <span class="card-icon">💎</span>
+                <span class="card-title">Anal Plug Training</span>
+                <span class="card-desc">Progressive size and duration training program with tracking and scheduled milestones.</span>
+            </a>
+
+            <a href="deep-throat-training.html" class="training-card">
+                <span class="card-icon">👄</span>
+                <span class="card-title">Deep Throat Training</span>
+                <span class="card-desc">Step-by-step depth and endurance conditioning with techniques and progress tracking.</span>
+            </a>
+
+            <a href="kegel-training.html" class="training-card">
+                <span class="card-icon">🔐</span>
+                <span class="card-title">Kegel Training</span>
+                <span class="card-desc">Pelvic floor strengthening routines with timed exercises and intensity progression.</span>
+            </a>
+
+            <a href="position-training.html" class="training-card">
+                <span class="card-icon">🧎‍♀️</span>
+                <span class="card-title">Position Training</span>
+                <span class="card-desc">12 submissive positions with step-by-step form instructions, hold durations, and mastery tracking.</span>
+            </a>
+        </div>
+
+        <div class="seal-decoration">❦</div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

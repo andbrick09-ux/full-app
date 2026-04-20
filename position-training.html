@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Becca's Sirender | Submissive Position Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{overflow-x:hidden;min-height:100vh}
+        .page-header{position:sticky;top:0;z-index:100;background:rgba(5,16,36,.92);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-bottom:1px solid var(--border);padding:18px 20px 14px;text-align:center}
+        .back-link{display:inline-block;color:var(--gold-dim);text-decoration:none;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;transition:.3s;margin-bottom:8px}.back-link:hover{color:var(--gold)}
+        .page-title{font-family:'Great Vibes',cursive;font-size:32px;background:var(--luxury-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:0}
+        .page-subtitle{font-family:'Playfair Display',serif;color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:3px;margin-top:4px;opacity:.7}
+        .main-content{max-width:600px;margin:0 auto;padding:25px 20px 120px}
+        @keyframes fi{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:25px}
+        .stat-card{background:rgba(5,16,36,.85);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;backdrop-filter:blur(12px)}
+        .stat-value{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:700}
+        .stat-label{font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#777;margin-top:4px;font-weight:600}
+        .section-nav{display:flex;overflow-x:auto;gap:8px;padding:0 0 20px;scrollbar-width:none;-ms-overflow-style:none}.section-nav::-webkit-scrollbar{display:none}
+        .nav-tab{flex-shrink:0;background:transparent;border:1px solid var(--border);border-radius:25px;color:var(--gold-dim);font-size:10px;font-weight:600;padding:9px 18px;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:1.5px;transition:.3s}
+        .nav-tab.active{background:var(--luxury-gradient);color:var(--midnight);border-color:transparent;font-weight:700}
+        .content-section{display:none;animation:fi .4s ease}.content-section.active{display:block}
+        .info-card{background:var(--glass);border:1.5px solid var(--border);border-radius:20px;padding:28px 22px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+        .card-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(212,175,55,.15)}
+        .card-text{font-size:13px;color:#ccc;line-height:1.8;margin-bottom:14px}.card-text em{color:var(--gold);font-style:normal;font-weight:600}
+        .card-accent{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);font-style:italic;text-align:center;padding:16px;margin-top:10px;border-top:1px solid rgba(212,175,55,.1);opacity:.85;line-height:1.6}
+        .info-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}.info-item:last-child{border-bottom:none}
+        .info-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}.info-name{font-size:13px;font-weight:600;color:#ddd;margin-bottom:3px}.info-desc{font-size:11px;color:#888;line-height:1.5}
+
+        /* Position Cards */
+        .pos-card{background:var(--glass);border:1.5px solid var(--border);border-radius:20px;margin-bottom:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.4s}
+        .pos-card.locked{opacity:.35;pointer-events:none;filter:grayscale(.6)}
+        .pos-card.mastered-card{border-color:rgba(76,175,80,.4)}
+        .pos-card.current-card{border-color:rgba(212,175,55,.5);box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 20px rgba(212,175,55,.1)}
+        .pos-header{display:flex;justify-content:space-between;align-items:center;padding:20px;cursor:pointer;transition:background .3s}.pos-header:hover{background:rgba(255,255,255,.02)}
+        .pos-num{font-family:'Playfair Display',serif;font-size:26px;color:var(--gold);font-weight:700;width:40px;text-align:center;flex-shrink:0;opacity:.6}
+        .pos-info{flex:1;margin:0 14px}
+        .pos-name{font-family:'Playfair Display',serif;font-size:16px;color:#eee;margin-bottom:3px}
+        .pos-category{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;padding:3px 8px;border-radius:10px;display:inline-block}
+        .cat-standing{color:#64B5F6;background:rgba(100,181,246,.1);border:1px solid rgba(100,181,246,.2)}
+        .cat-kneeling{color:#81C784;background:rgba(129,199,132,.1);border:1px solid rgba(129,199,132,.2)}
+        .cat-floor{color:#FFB74D;background:rgba(255,183,77,.1);border:1px solid rgba(255,183,77,.2)}
+        .pos-status-icon{font-size:1.3rem;flex-shrink:0}
+        .pos-body{display:none;padding:0 20px 20px;border-top:1px solid rgba(212,175,55,.1)}.pos-body.open{display:block;animation:fi .4s ease}
+
+        /* Reference Image */
+        .pos-image{width:100%;border-radius:14px;margin:16px 0;border:1px solid rgba(212,175,55,.15);box-shadow:0 8px 25px rgba(0,0,0,.4)}
+        .pos-image-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:600;margin-bottom:6px}
+
+        .pos-detail{font-size:12px;color:#bbb;line-height:1.7;margin:14px 0}
+        .pos-steps{margin:14px 0;padding-left:0;list-style:none;counter-reset:step}
+        .pos-steps li{counter-increment:step;font-size:12px;color:#bbb;line-height:1.6;padding:8px 0 8px 32px;position:relative;border-bottom:1px solid rgba(255,255,255,.03)}
+        .pos-steps li:last-child{border-bottom:none}
+        .pos-steps li::before{content:counter(step);position:absolute;left:0;top:8px;width:22px;height:22px;border-radius:50%;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.2);color:var(--gold);font-size:10px;font-weight:700;text-align:center;line-height:22px}
+        .pos-context{font-size:11px;color:rgba(212,175,55,.7);font-style:italic;margin-top:10px;line-height:1.5}
+        .pos-hold{display:inline-block;margin-top:12px;padding:8px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);border-radius:10px;font-size:10px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:1.5px}
+
+        /* Daily Practice Checklist */
+        .daily-section{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}
+        .daily-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:12px}
+        .daily-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+        .daily-row:last-child{border-bottom:none}
+        .daily-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.25s;font-size:12px;color:transparent}
+        .daily-check.checked{background:var(--gold);border-color:var(--gold);color:var(--midnight)}
+        .daily-check:hover{border-color:var(--gold);background:rgba(212,175,55,.1)}
+        .daily-label{font-size:11px;color:#999}
+        .day-counter{font-size:11px;color:#777;margin-top:8px;text-align:center;font-style:italic}
+
+        /* Submission */
+        .submission-section{margin-top:18px;padding:18px;background:rgba(212,175,55,.04);border:1.5px solid rgba(212,175,55,.2);border-radius:14px}
+        .submission-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:10px}
+        .submission-desc{font-size:11px;color:#aaa;line-height:1.6;margin-bottom:14px}
+        .submit-check-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+        .submit-label{font-size:12px;color:#ccc;font-weight:500}
+        .master-btn{display:block;width:100%;padding:14px;margin-top:14px;background:var(--luxury-gradient);color:var(--midnight);border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;cursor:pointer;transition:.2s;box-shadow:0 6px 20px rgba(212,175,55,.25)}
+        .master-btn:active{transform:scale(.97)}.master-btn:disabled{opacity:.3;pointer-events:none}
+        .mastered-badge{text-align:center;padding:14px;color:#4CAF50;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px}
+
+        /* Progress bar */
+        .progress-bar-container{margin-bottom:25px}
+        .progress-bar-label{display:flex;justify-content:space-between;font-size:9px;color:#777;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+        .progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+        .progress-fill{height:100%;background:var(--luxury-gradient);border-radius:3px;transition:width .5s ease}
+
+        /* Log */
+        .session-log{margin-top:30px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:20px}
+        .log-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:15px}
+        .log-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}.log-entry:last-child{border-bottom:none}
+        .log-date{color:#777;font-size:10px}.log-level{color:var(--gold);font-weight:600}.log-note{color:#aaa;font-style:italic;font-size:11px;flex:1;margin:0 12px}
+        .log-empty{color:#555;font-style:italic;font-size:12px;text-align:center;padding:20px 0}
+        .reset-btn{display:block;width:100%;margin-top:15px;padding:14px;background:transparent;border:1px solid rgba(244,67,54,.3);border-radius:12px;color:#F44336;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;transition:.3s}
+        .reset-btn:hover{border-color:#F44336;background:rgba(244,67,54,.05)}
+        .tip-card{background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.15);border-radius:12px;padding:16px;margin-top:15px}
+        .tip-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px}.tip-text{font-size:12px;color:#bbb;line-height:1.6}
+    </style>
+</head>
+<body class="sirender-theme">
+    <header class="page-header">
+        <a href="training-menu.html" class="back-link">← Back to Training</a>
+        <h1 class="page-title">Position Training</h1>
+        <div class="page-subtitle">Submissive Posture Mastery</div>
+    </header>
+    <div class="main-content">
+        <div class="stats-bar">
+            <div class="stat-card"><div class="stat-value" id="stat-mastered">0</div><div class="stat-label">Mastered</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-total">12</div><div class="stat-label">Positions</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Day Streak</div></div>
+        </div>
+        <div class="section-nav">
+            <button class="nav-tab active" onclick="showSection('positions',this)">Positions</button>
+            <button class="nav-tab" onclick="showSection('overview',this)">Overview</button>
+            <button class="nav-tab" onclick="showSection('practice',this)">Practice Guide</button>
+            <button class="nav-tab" onclick="showSection('resources',this)">Resources</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div class="content-section" id="sec-overview">
+            <div class="info-card">
+                <div class="card-title">Why Learn Positions?</div>
+                <p class="card-text">Submissive positions are the <em>physical vocabulary</em> of your service. When Sir speaks a single word — "Nadu," "Humble," "Inspection" — your body should respond instantly and correctly, without hesitation.</p>
+                <p class="card-text">This is <em>sequential training</em>. You must master each position before unlocking the next. "Mastered" means you can assume the position within 3 seconds with perfect form, hold it for the required duration, and have sent Sir <em>photo and video proof</em> of your form.</p>
+                <p class="card-text">Practice daily on your own. When you're confident in a position, text Sir your photo and video submission. Once confirmed, mark it mastered and the next position unlocks.</p>
+                <div class="card-accent">"A well-trained submissive speaks through her body before she ever opens her mouth."</div>
+            </div>
+            <div class="info-card">
+                <div class="card-title">Position Categories</div>
+                <div class="info-item"><div class="info-icon">🧍</div><div class="info-text"><div class="info-name"><span class="pos-category cat-standing">Standing</span></div><div class="info-desc">Wait, Attention, Wall, At Your Service, Inspection — upright positions for readiness, alertness, and display.</div></div></div>
+                <div class="info-item"><div class="info-icon">🧎</div><div class="info-text"><div class="info-name"><span class="pos-category cat-kneeling">Kneeling</span></div><div class="info-desc">Nadu, Collar Me, Modest Kneel, Kneel/Tower, Ready to Please — ground-level positions for service, devotion, and submission.</div></div></div>
+                <div class="info-item"><div class="info-icon">⬇️</div><div class="info-text"><div class="info-name"><span class="pos-category cat-floor">Floor</span></div><div class="info-desc">Humble, Table — full prostration or vulnerability positions for punishment, use, and deep submission.</div></div></div>
+            </div>
+        </div>
+
+        <!-- PRACTICE GUIDE -->
+        <div class="content-section" id="sec-practice">
+            <div class="info-card">
+                <div class="card-title">Daily Practice Protocol</div>
+                <div class="info-item"><div class="info-icon">📅</div><div class="info-text"><div class="info-name">Daily Practice (10–15 min)</div><div class="info-desc">Each day, practice your current unlocked position. Focus on form — use the reference image and step-by-step instructions. Practice in front of a mirror to check alignment.</div></div></div>
+                <div class="info-item"><div class="info-icon">⏱️</div><div class="info-text"><div class="info-name">Hold Training</div><div class="info-desc">Hold the position for progressively longer: Day 1–2: 1 min → Day 3–4: 2 min → Day 5–6: 5 min → Day 7+: full required hold time. Build stillness — no fidgeting.</div></div></div>
+                <div class="info-item"><div class="info-icon">📸</div><div class="info-text"><div class="info-name">Photo & Video Proof</div><div class="info-desc">When confident, set up your phone on a timer. Take a clear photo of the position from the front or side (matching the reference image). Record a 15-second video holding the position with no movement. Text both to Sir.</div></div></div>
+                <div class="info-item"><div class="info-icon">✅</div><div class="info-text"><div class="info-name">Mastery Confirmation</div><div class="info-desc">Once Sir confirms your form is correct via your photo and video, mark the position as mastered. The next position will unlock automatically.</div></div></div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-label">💡 Sir's Tip</div>
+                <div class="tip-text">Quality over speed. Spend 3–7 days on each position until it feels natural. A sloppy Nadu is worse than no Nadu at all. Sir wants perfection, not haste.</div>
+            </div>
+        </div>
+
+        <!-- RESOURCES -->
+        <div class="content-section" id="sec-resources">
+            <div class="info-card">
+                <div class="card-title">Resources & References</div>
+                <p class="card-text" style="margin-bottom:18px;opacity:.8">External guides on submissive positions and BDSM protocol.</p>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Oxy Shop — 15 Submissive Positions</div><div class="info-desc"><a href="https://www.oxy-shop.com/blogs/bdsm-blog/submissive-positions-in-15-unique-pictures" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">oxy-shop.com — submissive positions guide</a></div></div></div>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Loving BDSM — Sub Positions & Protocol</div><div class="info-desc"><a href="https://www.lovingbdsm.net/submissive-positions/" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">lovingbdsm.net — submissive positions</a></div></div></div>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Gorean Positions Reference</div><div class="info-desc"><a href="https://en.wikipedia.org/wiki/Gorean_subculture" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">Wikipedia — Gorean subculture</a></div></div></div>
+            </div>
+        </div>
+
+        <!-- POSITIONS LIST -->
+        <div class="content-section active" id="sec-positions">
+            <div class="progress-bar-container">
+                <div class="progress-bar-label"><span>Mastery Progress</span><span id="progressPct">0%</span></div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            </div>
+            <div id="posContainer"></div>
+            <div class="session-log"><div class="log-title">Training Log</div><div id="logEntries"></div></div>
+            <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
+        </div>
+    </div>
+    <script>
+    const P=[
+        {id:'wait',num:1,name:'Wait',cat:'standing',catL:'Standing',img:'positions/pos_1_wait.png',
+         detail:'The default resting position. Stand non-slouched, head upright, feet slightly apart, hands clasped behind your back with one palm in the other.',
+         steps:['Stand straight with good posture — no slouching','Feet shoulder-width apart','Head upright, eyes forward or slightly lowered','Bring both hands behind your back','Place one palm into the other, fingers relaxed','Hold still — you are waiting for Sir\'s next command'],
+         context:'Your "idle" state. When Sir has not given a specific command, this is where you default. It communicates readiness without demanding attention.',hold:'Until dismissed or given a new command'},
+        {id:'attention',num:2,name:'Attention',cat:'standing',catL:'Standing',img:'positions/pos_2_attention.png',
+         detail:'Military-inspired complete alertness. Body stiff and focused, signaling you are fully present and awaiting Sir\'s directive.',
+         steps:['Stand perfectly straight, body stiff but not tense','Feet together, touching','Legs straight','Eyes locked forward, head completely still','Arms straight at sides, hands relaxed, fingertips touching outer thighs'],
+         context:'When Sir requires your complete, undivided focus. More intense than Wait. Often used before a scene or when Sir is giving important instructions.',hold:'30 seconds to 2 minutes'},
+        {id:'wall',num:3,name:'Wall',cat:'standing',catL:'Standing',img:'positions/pos_3_wall.png',
+         detail:'Punishment or preparation position. Face the wall, bracing with palms, presenting your back and rear. Sir may instruct you to undress first.',
+         steps:['Face the wall','Place feet slightly apart, 12 inches from the wall','Lean forward slightly, palms flat against the wall at shoulder height','Keep your back straight — do not arch or sag','Head facing the wall, eyes down','If instructed, remove clothing before assuming position'],
+         context:'Punishment position or preparation for impact play. The forward lean provides stability for spanking or flogging. Makes you feel exposed and vulnerable.',hold:'Until Sir begins or completes punishment'},
+        {id:'service',num:4,name:'At Your Service',cat:'standing',catL:'Standing',img:'positions/pos_4_service.png',
+         detail:'Readiness to attend to Sir\'s personal needs. Stand with legs slightly apart, arms extended downward with hands crossed — one palm over the other.',
+         steps:['Stand with good posture','Feet slightly apart for stability','Extend both arms downward in front of your body','Cross hands — one palm placed over the other','Keep arms relaxed, not rigid','Eyes forward or respectfully lowered'],
+         context:'Signals you are ready to receive a service order: fetching, preparing, attending. The "I await your instruction" position.',hold:'Until given a service task'},
+        {id:'nadu',num:5,name:'Nadu',cat:'kneeling',catL:'Kneeling',img:'positions/pos_5_nadu.png',
+         detail:'The quintessential Gorean submission position. Back straight, kneeling on heels, knees spread wide, hands palm-up on thighs — signaling openness and willingness to please.',
+         steps:['Kneel down, sitting back on your heels','Spread your knees wide apart','Keep your back perfectly straight — no slouching','Head up, chin slightly lifted','Place your hands palm-up on your thighs','Shoulders back and relaxed'],
+         context:'Primary position of sexual availability and willing submission. Palms up = openness and desire to please. Used before play, during conversations, or as standard scene resting position.',hold:'2 to 10 minutes — endurance position'},
+        {id:'collar',num:6,name:'Collar Me',cat:'kneeling',catL:'Kneeling',img:'positions/pos_6_collar.png',
+         detail:'Offer your neck for Sir to place or adjust your collar. Kneeling with back straight, legs spread, lift your hair to expose the full neck and throat.',
+         steps:['Kneel with back straight','Spread knees wide apart, sit on heels','Reach up with both hands and gather your hair','Lift hair up and away from your neck, exposing it fully','Tilt chin slightly upward to present the throat','Hold still while Sir places, adjusts, or inspects the collar'],
+         context:'Ceremonial position. Offering your neck for collaring is one of the most intimate acts of submission — trust, ownership, and voluntary acceptance of Sir\'s authority.',hold:'Until Sir completes the collaring'},
+        {id:'modest',num:7,name:'Modest Kneel',cat:'kneeling',catL:'Kneeling',img:'positions/pos_7_modest.png',
+         detail:'Similar to Nadu but with hands placed between your legs rather than on thighs. More reserved and demure.',
+         steps:['Kneel with back straight, sitting on heels','Spread knees wide apart','Place both hands between your legs, palms down on the floor','Keep back straight, head up or slightly lowered','Shoulders relaxed'],
+         context:'Quieter, more reserved kneeling. Used when Sir wants a submissive posture without the overt sexual availability of Nadu. For waiting, contemplation, or lower-intensity moments.',hold:'2 to 5 minutes'},
+        {id:'tower',num:8,name:'Kneel / Tower',cat:'kneeling',catL:'Kneeling',img:'positions/pos_8_tower.png',
+         detail:'Similar to Nadu but with legs together and palms down. The "waiting to serve" position — alert and ready, but more contained.',
+         steps:['Kneel with back straight, sitting on heels','Keep knees together (key difference from Nadu)','Place hands on thighs, palms facing down','Back straight, head up','Eyes forward or respectfully lowered'],
+         context:'Communicates "I am ready to serve" without overt sexual openness. Knees together + palms down = contained readiness. Used at the beginning of scenes or while Sir prepares.',hold:'2 to 5 minutes'},
+        {id:'humble',num:9,name:'Humble',cat:'floor',catL:'Floor',img:'positions/pos_9_humble.png',
+         detail:'Full prostration. Crouch into a kneeling position and lower your forehead to the ground, arms extended forward, slightly crossed. Eyes see only the floor.',
+         steps:['Kneel down','Lean forward, lowering your upper body toward the floor','Touch your forehead to the ground','Extend your arms forward on the ground, slightly crossed','Keep your face turned down — you are not permitted to look up','Remain completely still'],
+         context:'Ultimate position of humility and surrender. Used for punishment, apology, or deep worship. Sir may vary hand placement: extended, clasped over head, or reaching back to grasp ankles.',hold:'1 to 5 minutes (challenging)'},
+        {id:'table',num:10,name:'Table',cat:'floor',catL:'Floor',img:'positions/pos_10_table.png',
+         detail:'On all fours with back raised high and flat — creating a "table" surface. For viewing, sexual use, or impact play. Maximum vulnerability.',
+         steps:['Get on all fours — hands and knees','Position hands directly below shoulders','Knees directly below or slightly behind hips','Raise your back to create a flat, level surface','Keep head in line with spine or slightly lowered','Spread knees apart for stability and access'],
+         context:'Offering your body for Sir\'s use. Raised back creates access for impact play, inspection, or positioning. Fully vulnerable and on display. Elbows-on-ground variant adds difficulty.',hold:'1 to 5 minutes'},
+        {id:'please',num:11,name:'Ready to Please',cat:'kneeling',catL:'Kneeling',img:'positions/pos_11_please.png',
+         detail:'Kneeling forward, hands palm-down between spread knees, wrists crossed. Mouth fully open — signaling readiness for oral service.',
+         steps:['Kneel down','Lean forward slightly','Spread knees wide to create space','Place both hands palm-down on the floor between your knees','Cross your wrists','Open your mouth fully','Keep eyes on Sir, looking up'],
+         context:'Explicitly sexual service position. Open mouth + upward gaze = "I am ready to please you, use me." Pairs with deep throat training. Open-mouth gag can be added.',hold:'Until Sir uses or dismisses you'},
+        {id:'inspection',num:12,name:'Inspection',cat:'standing',catL:'Standing',img:'positions/pos_12_inspection.png',
+         detail:'Display position for Sir to visually inspect your body, stance, or attire. Standing with feet apart, hands behind head, fully exposed.',
+         steps:['Stand straight with good posture','Feet shoulder-width apart or slightly wider','Raise both hands and place behind head, fingers interlaced','Elbows out wide — do not let them collapse forward','Chest lifted, back straight','Eyes forward, chin level'],
+         context:'Puts you completely on display for Sir\'s evaluation. Every body part visible and accessible. Sir may circle, touch, adjust, or comment. Remain perfectly still.',hold:'Until Sir completes the inspection'}
+    ];
+
+    const SK='sirender_pos_training';
+    let st=load();
+    function getDefault(){return{mastered:{},dailyPractice:{},dailyCounts:{},photoSent:{},videoSent:{},streak:0,lastDate:null,log:[]}}
+    function load(){const s=localStorage.getItem(SK);if(s)try{const d=JSON.parse(s);if(!d.photoSent)d.photoSent={};if(!d.videoSent)d.videoSent={};if(!d.dailyCounts)d.dailyCounts={};return d}catch(e){}return getDefault()}
+    function save(){localStorage.setItem(SK,JSON.stringify(st))}
+    function getMastered(){return Object.values(st.mastered).filter(Boolean).length}
+    function getCurrentIdx(){for(let i=0;i<P.length;i++){if(!st.mastered[P[i].id])return i}return P.length-1}
+    function isUnlocked(i){return i===0||st.mastered[P[i-1].id]}
+    function isMastered(i){return st.mastered[P[i].id]}
+
+    function showSection(id,btn){
+        document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
+        document.getElementById(`sec-${id}`).classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function render(){
+        const m=getMastered(),ci=getCurrentIdx();
+        document.getElementById('stat-mastered').textContent=m;
+        document.getElementById('stat-streak').textContent=st.streak;
+        const pct=Math.round((m/P.length)*100);
+        document.getElementById('progressPct').textContent=pct+'%';
+        document.getElementById('progressFill').style.width=pct+'%';
+
+        document.getElementById('posContainer').innerHTML=P.map((pos,i)=>{
+            const unlocked=isUnlocked(i),mastered=isMastered(i),current=i===ci&&!mastered;
+            let cc='pos-card';if(!unlocked)cc+=' locked';if(mastered)cc+=' mastered-card';if(current)cc+=' current-card';
+            let icon='🔒';if(mastered)icon='✅';else if(current)icon='🔥';else if(unlocked)icon='⬜';
+            const days=st.dailyCounts[pos.id]||0;
+            const photoOk=st.photoSent[pos.id],videoOk=st.videoSent[pos.id];
+            const canMaster=photoOk&&videoOk&&days>=3;
+            return `
+            <div class="${cc}" id="pos-${pos.id}">
+                <div class="pos-header" onclick="togglePos('${pos.id}')">
+                    <div class="pos-num">${pos.num}</div>
+                    <div class="pos-info">
+                        <div class="pos-name">${pos.name}</div>
+                        <span class="pos-category cat-${pos.cat}">${pos.catL}</span>
+                    </div>
+                    <div class="pos-status-icon">${icon}</div>
+                </div>
+                <div class="pos-body" id="body-${pos.id}">
+                    <div class="pos-image-label">📷 Reference Image</div>
+                    <img class="pos-image" src="${pos.img}" alt="${pos.name} position reference" loading="lazy">
+                    <div class="pos-detail">${pos.detail}</div>
+                    <ol class="pos-steps">${pos.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+                    <div class="pos-context">↳ ${pos.context}</div>
+                    <div class="pos-hold">⏱ ${pos.hold}</div>
+
+                    ${mastered?`<div class="mastered-badge">✅ Position Mastered</div>`:`
+                    <div class="daily-section">
+                        <div class="daily-title">📋 Daily Practice (${days} day${days!==1?'s':''} completed)</div>
+                        <div class="daily-row">
+                            <div class="daily-check ${st.dailyPractice[pos.id+'_'+todayKey()]?'checked':''}" onclick="markDailyPractice('${pos.id}')">${st.dailyPractice[pos.id+'_'+todayKey()]?'✓':''}</div>
+                            <div class="daily-label">I practiced <strong style="color:#ddd">${pos.name}</strong> today with correct form (mirror check)</div>
+                        </div>
+                        <div class="day-counter">${days<3?`${3-days} more day${3-days!==1?'s':''} of practice before you can submit`:'✓ Minimum practice days met'}</div>
+                    </div>
+                    <div class="submission-section">
+                        <div class="submission-title">📤 Submission to Sir</div>
+                        <div class="submission-desc">Once you're confident in your form, text Sir a photo and a 15-second video of you holding this position. Check off each after sending.</div>
+                        <div class="submit-check-row">
+                            <div class="daily-check ${photoOk?'checked':''}" onclick="toggleProof('${pos.id}','photo')">${photoOk?'✓':''}</div>
+                            <div class="submit-label">📸 Photo sent to Sir</div>
+                        </div>
+                        <div class="submit-check-row">
+                            <div class="daily-check ${videoOk?'checked':''}" onclick="toggleProof('${pos.id}','video')">${videoOk?'✓':''}</div>
+                            <div class="submit-label">🎥 Video sent to Sir</div>
+                        </div>
+                        <button class="master-btn" onclick="markMastered('${pos.id}')" ${canMaster?'':'disabled'}>
+                            ${canMaster?'Mark as Mastered ✓':'Complete all requirements above'}
+                        </button>
+                    </div>`}
+                </div>
+            </div>`;
+        }).join('');
+
+        // Auto-open current
+        if(!isMastered(ci)){const b=document.getElementById(`body-${P[ci].id}`);if(b)b.classList.add('open');}
+
+        const lc=document.getElementById('logEntries');
+        if(!st.log.length) lc.innerHTML='<div class="log-empty">No practice sessions recorded yet.</div>';
+        else lc.innerHTML=st.log.slice(0,20).map(e=>`<div class="log-entry"><span class="log-level">${e.level}</span><span class="log-note">${e.note}</span><span class="log-date">${e.date}</span></div>`).join('');
+    }
+
+    function todayKey(){return new Date().toISOString().split('T')[0]}
+
+    function togglePos(id){
+        const b=document.getElementById(`body-${id}`);
+        if(b.classList.contains('open'))b.classList.remove('open');
+        else{document.querySelectorAll('.pos-body').forEach(x=>x.classList.remove('open'));b.classList.add('open');}
+    }
+
+    function markDailyPractice(id){
+        const key=id+'_'+todayKey();
+        if(st.dailyPractice[key])return; // can only mark once per day
+        st.dailyPractice[key]=true;
+        st.dailyCounts[id]=(st.dailyCounts[id]||0)+1;
+        updateStreak();
+        const p=P.find(x=>x.id===id);
+        addLog(`#${p.num}`,`Practiced: ${p.name} (Day ${st.dailyCounts[id]})`);
+        save();render();
+    }
+
+    function toggleProof(id,type){
+        if(type==='photo') st.photoSent[id]=!st.photoSent[id];
+        else st.videoSent[id]=!st.videoSent[id];
+        save();render();
+    }
+
+    function markMastered(id){
+        if(st.mastered[id])return;
+        const p=P.find(x=>x.id===id);
+        if(!st.photoSent[id]||!st.videoSent[id]||(st.dailyCounts[id]||0)<3)return;
+        st.mastered[id]=true;
+        addLog(`#${p.num}`,`✅ MASTERED: ${p.name}`);
+        save();render();
+        if(navigator.vibrate)navigator.vibrate([200,100,200]);
+    }
+
+    function updateStreak(){
+        const t=new Date().toDateString();
+        if(st.lastDate){const d=Math.floor((new Date(t)-new Date(st.lastDate))/864e5);if(d===1)st.streak++;else if(d>1)st.streak=1;}
+        else st.streak=1;
+        st.lastDate=t;
+    }
+
+    function addLog(level,note){
+        const n=new Date();
+        st.log.unshift({level,note,date:`${n.getMonth()+1}/${n.getDate()} ${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`});
+        save();
+    }
+
+    function confirmReset(){if(confirm('Reset ALL position training progress?')){localStorage.removeItem(SK);st=getDefault();render();}}
+    render();
+    if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.error(e)));
+    </script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Becca's Sirender | The "5" Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { overflow-x: hidden; min-height: 100vh; }
+
+        .page-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 16, 36, 0.92); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border); padding: 18px 20px 14px; text-align: center;
+        }
+        .back-link { display: inline-block; color: var(--gold-dim); text-decoration: none; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s ease; margin-bottom: 8px; }
+        .back-link:hover { color: var(--gold); }
+        .page-title { font-family: 'Great Vibes', cursive; font-size: 32px; background: var(--luxury-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .page-subtitle { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-top: 4px; opacity: 0.7; }
+
+        .progress-overview { display: flex; justify-content: center; gap: 8px; padding: 12px 20px; background: rgba(2, 8, 20, 0.6); border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
+        .phase-dot { width: 50px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); transition: all 0.4s ease; cursor: pointer; }
+        .phase-dot.completed { background: var(--gold); box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        .phase-dot.active { background: rgba(212, 175, 55, 0.5); animation: dotPulse 2s ease-in-out infinite; }
+        @keyframes dotPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        .main-content { max-width: 600px; margin: 0 auto; padding: 25px 20px 120px; }
+
+        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .stat-card { background: rgba(5, 16, 36, 0.85); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; backdrop-filter: blur(12px); }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); font-weight: 700; }
+        .stat-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: #777; margin-top: 4px; font-weight: 600; }
+
+        .section-nav { display: flex; overflow-x: auto; gap: 8px; padding: 0 0 20px; scrollbar-width: none; -ms-overflow-style: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        .nav-tab { flex-shrink: 0; background: transparent; border: 1px solid var(--border); border-radius: 25px; color: var(--gold-dim); font-size: 10px; font-weight: 600; padding: 9px 18px; cursor: pointer; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
+        .nav-tab.active { background: var(--luxury-gradient); color: var(--midnight); border-color: transparent; font-weight: 700; }
+
+        .content-section { display: none; animation: fadeSlideIn 0.4s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .info-card { background: var(--glass); border: 1.5px solid var(--border); border-radius: 20px; padding: 28px 22px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        .card-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.15); }
+        .card-text { font-size: 13px; color: #ccc; line-height: 1.8; margin-bottom: 14px; }
+        .card-text em { color: var(--gold); font-style: normal; font-weight: 600; }
+        .card-accent { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--gold); font-style: italic; text-align: center; padding: 16px; margin-top: 10px; border-top: 1px solid rgba(212, 175, 55, 0.1); opacity: 0.85; line-height: 1.6; }
+
+        .info-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .info-item:last-child { border-bottom: none; }
+        .info-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+        .info-name { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 3px; }
+        .info-desc { font-size: 11px; color: #888; line-height: 1.5; }
+
+        .phase-card { background: var(--glass); border: 1.5px solid var(--border); border-radius: 20px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transition: all 0.4s ease; }
+        .phase-card.locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.5); }
+        .phase-card.completed-card { border-color: rgba(76, 175, 80, 0.4); }
+        .phase-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; cursor: pointer; transition: background 0.3s; }
+        .phase-header:hover { background: rgba(255, 255, 255, 0.02); }
+        .phase-info { flex: 1; }
+        .phase-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 4px; }
+        .phase-name { font-family: 'Playfair Display', serif; font-size: 18px; color: #eee; margin-bottom: 4px; }
+        .phase-objective { font-size: 11px; color: #888; line-height: 1.5; }
+        .phase-status { font-size: 1.5rem; margin-left: 15px; flex-shrink: 0; }
+        .phase-body { display: none; padding: 0 20px 20px; border-top: 1px solid rgba(212, 175, 55, 0.1); }
+        .phase-body.open { display: block; animation: fadeSlideIn 0.4s ease; }
+
+        .task-group-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin: 18px 0 12px; padding-bottom: 6px; border-bottom: 1px solid rgba(212, 175, 55, 0.15); }
+        .task-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .task-item:last-child { border-bottom: none; }
+        .task-check { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--border); background: rgba(255, 255, 255, 0.03); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; transition: all 0.25s ease; font-size: 12px; color: transparent; }
+        .task-check.checked { background: var(--gold); border-color: var(--gold); color: var(--midnight); }
+        .task-check:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
+        .task-text { flex: 1; }
+        .task-name { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 3px; }
+        .task-detail { font-size: 11px; color: #888; line-height: 1.6; }
+        .task-why { font-size: 11px; color: rgba(212, 175, 55, 0.7); line-height: 1.5; margin-top: 6px; font-style: italic; }
+
+        .tip-card { background: rgba(212, 175, 55, 0.04); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 12px; padding: 16px; margin-top: 15px; }
+        .tip-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 8px; }
+        .tip-text { font-size: 12px; color: #bbb; line-height: 1.6; }
+
+        .guideline-item { margin-bottom: 18px; }
+        .guideline-name { font-family: 'Playfair Display', serif; font-size: 14px; color: #ddd; margin-bottom: 5px; }
+        .guideline-desc { font-size: 12px; color: #999; line-height: 1.6; }
+
+        /* Arousal Scale */
+        .arousal-scale { display: flex; justify-content: center; gap: 6px; margin: 18px 0; }
+        .arousal-level { width: 48px; text-align: center; padding: 10px 4px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); transition: 0.3s; }
+        .arousal-num { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+        .arousal-label { font-size: 7px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; color: #777; }
+        .arousal-level:nth-child(1) .arousal-num { color: #5c6bc0; }
+        .arousal-level:nth-child(2) .arousal-num { color: #66bb6a; }
+        .arousal-level:nth-child(3) .arousal-num { color: #ffa726; }
+        .arousal-level:nth-child(4) .arousal-num { color: #ef5350; }
+        .arousal-level:nth-child(5) .arousal-num { color: var(--gold); }
+
+        /* Solo task table */
+        .solo-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .solo-table th { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(212,175,55,0.2); }
+        .solo-table td { font-size: 11px; color: #bbb; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.5; vertical-align: top; }
+        .solo-table tr:last-child td { border-bottom: none; }
+        .solo-table td:first-child { color: var(--gold); font-weight: 600; white-space: nowrap; }
+
+        .complete-phase-btn { display: block; width: 100%; padding: 16px; margin-top: 20px; background: var(--luxury-gradient); color: var(--midnight); border: none; border-radius: 14px; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.2s ease; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25); }
+        .complete-phase-btn:active { transform: scale(0.97); }
+        .complete-phase-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+        .session-log { margin-top: 30px; background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+        .log-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .log-entry { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 12px; }
+        .log-entry:last-child { border-bottom: none; }
+        .log-date { color: #777; font-size: 10px; }
+        .log-level { color: var(--gold); font-weight: 600; }
+        .log-note { color: #aaa; font-style: italic; font-size: 11px; flex: 1; margin: 0 12px; }
+        .log-empty { color: #555; font-style: italic; font-size: 12px; text-align: center; padding: 20px 0; }
+
+        .reset-btn { display: block; width: 100%; margin-top: 15px; padding: 14px; background: transparent; border: 1px solid rgba(244, 67, 54, 0.3); border-radius: 12px; color: #F44336; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
+        .reset-btn:hover { border-color: #F44336; background: rgba(244, 67, 54, 0.05); }
+    </style>
+</head>
+<body class="sirender-theme">
+
+    <header class="page-header">
+        <a href="training-menu.html" class="back-link">← Back to Training</a>
+        <h1 class="page-title">The "5" Training</h1>
+        <div class="page-subtitle">Cumming on Command</div>
+    </header>
+
+    <div class="progress-overview" id="progressDots"></div>
+
+    <div class="main-content">
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-phase">1</div>
+                <div class="stat-label">Current Phase</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-sessions">0</div>
+                <div class="stat-label">Tasks Done</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-streak">0</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+        </div>
+
+        <div class="section-nav">
+            <button class="nav-tab active" onclick="showSection('protocol', this)">Protocol</button>
+            <button class="nav-tab" onclick="showSection('overview', this)">Overview</button>
+            <button class="nav-tab" onclick="showSection('arousal', this)">Arousal Scale</button>
+            <button class="nav-tab" onclick="showSection('solo', this)">Solo Tasks</button>
+            <button class="nav-tab" onclick="showSection('rules', this)">Your Rules</button>
+            <button class="nav-tab" onclick="showSection('dominant', this)">Sir's Guide</button>
+            <button class="nav-tab" onclick="showSection('resources', this)">Resources</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div class="content-section" id="sec-overview">
+            <div class="info-card">
+                <div class="card-title">The "5" Protocol</div>
+                <p class="card-text">This protocol uses <em>classical conditioning</em> to create a reliable response where you reach orgasm upon Sir's command of <em>"5."</em> It is a structured approach that builds over 4–12 weeks depending on consistency.</p>
+                <p class="card-text">The process combines <em>edging discipline</em>, <em>arousal awareness</em>, <em>verbal trigger association</em>, and <em>emotional submission</em> into a single trained reflex. The number "5" on the arousal scale becomes both the measure and the command.</p>
+                <p class="card-text"><em>Parameters:</em> Timeline: 4–12 weeks · Frequency: 2–4 sessions per week (20–45 min each) · Key Metric: Arousal Scale (1–5)</p>
+                <div class="card-accent">"When Sir says 5 — your body answers. Not because you choose to, but because you've been conditioned to."</div>
+            </div>
+        </div>
+
+        <!-- AROUSAL SCALE -->
+        <div class="content-section" id="sec-arousal">
+            <div class="info-card">
+                <div class="card-title">The Arousal Scale (1–5)</div>
+                <p class="card-text" style="margin-bottom: 6px;">All training revolves around this scale. You must always be honest and accurate about your level.</p>
+
+                <div class="arousal-scale">
+                    <div class="arousal-level"><div class="arousal-num">1</div><div class="arousal-label">Neutral</div></div>
+                    <div class="arousal-level"><div class="arousal-num">2</div><div class="arousal-label">Warm</div></div>
+                    <div class="arousal-level"><div class="arousal-num">3</div><div class="arousal-label">Building</div></div>
+                    <div class="arousal-level"><div class="arousal-num">4</div><div class="arousal-label">Edge</div></div>
+                    <div class="arousal-level"><div class="arousal-num">5</div><div class="arousal-label">Cumming</div></div>
+                </div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">Level 1 — Neutral</div>
+                    <div class="guideline-desc">Baseline. No arousal. Relaxed state. This is where you start every session.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">Level 2 — Warm</div>
+                    <div class="guideline-desc">Awareness building. Tingle of anticipation. Non-genital teasing (neck, thighs, ears) lives here.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">Level 3 — Building</div>
+                    <div class="guideline-desc">Active arousal. Direct stimulation begins. You feel the pull toward more. This is where denial training starts.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">Level 4 — The Edge</div>
+                    <div class="guideline-desc">Pre-orgasmic. You are at the precipice. This is where edging cycles live — riding the line between 4 and 4.9 without tipping over. You MUST ask permission at this level.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">Level 5 — Cumming</div>
+                    <div class="guideline-desc">Orgasm. Release. This level is ONLY reached with Sir's explicit command of "5." You must say "5" aloud when you cum — in all scenarios, partnered or solo.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOLO TASKS -->
+        <div class="content-section" id="sec-solo">
+            <div class="info-card">
+                <div class="card-title">Solo Practice Tasks</div>
+                <p class="card-text" style="margin-bottom: 4px; opacity: 0.8;">Complete 2–4 of these per week alongside the main protocol phases.</p>
+
+                <table class="solo-table">
+                    <thead><tr><th>Task</th><th>Activity</th><th>Goal</th></tr></thead>
+                    <tbody>
+                        <tr><td>Basic Edging</td><td>Edge to level 4, pause for 60s. Repeat 3–5 times. Do not release.</td><td>Build physical stamina</td></tr>
+                        <tr><td>Denial Role-Play</td><td>Arouse yourself, ask aloud "Sir, may I please cum on 5?" and deny yourself 4–6 times.</td><td>Tie emotional need to release</td></tr>
+                        <tr><td>Sensitivity Build</td><td>Spend 10 minutes teasing non-genitals only (neck, inner thighs, nipples). Sustain level 2–3.</td><td>Increase full-body sensitivity</td></tr>
+                        <tr><td>Fantasy + Trigger</td><td>Use Sir's voice/recordings. Edge twice, release on 3rd attempt while saying "5" aloud.</td><td>Link fantasy to the trigger</td></tr>
+                        <tr><td>Random Trigger</td><td>Set phone reminders throughout the day. When they go off, visualize Sir's command and the release.</td><td>Mental reinforcement</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-card">
+                <div class="card-title">Daily & Weekly Assessments</div>
+                <div class="guideline-item">
+                    <div class="guideline-name">📋 Daily Journal</div>
+                    <div class="guideline-desc">Record: your arousal control rating (1–5), your response to the trigger "5" (did it cause a physical reaction?), and your general mood/energy level.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">📊 Weekly Summary (Sundays)</div>
+                    <div class="guideline-desc">Summarize: total sessions completed, progress on current phase, emotional state, and any struggles or breakthroughs. Share with Sir to adjust the upcoming week's plan.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- YOUR RULES -->
+        <div class="content-section" id="sec-rules">
+            <div class="info-card">
+                <div class="card-title">Your Core Responsibilities</div>
+                <div class="info-item">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-text"><div class="info-name">Honesty</div><div class="info-desc">Always be accurate about your arousal level (1–5). Never fake or exaggerate. Sir's adjustments depend on your truthful reports.</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🙏</div>
+                    <div class="info-text"><div class="info-name">Permission</div><div class="info-desc">You must ask for permission to cum in ALL scenarios — partnered and solo. No exceptions. The phrase is: "Sir, may I please cum on 5?"</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🧠</div>
+                    <div class="info-text"><div class="info-name">Mindset</div><div class="info-desc">Believe in the conditioning. Your mental focus is as important as physical touch. Doubt undermines the training. Trust the process and trust Sir.</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">💪</div>
+                    <div class="info-text"><div class="info-name">Kegels</div><div class="info-desc">Complete 3 sets of 10–20 reps daily. Strong pelvic floor muscles intensify the conditioned orgasm response. See the Kegel Training page for the full protocol.</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🗣️</div>
+                    <div class="info-text"><div class="info-name">Vocalize "5"</div><div class="info-desc">Hard rule: You MUST say "5" out loud every time you cum — whether with Sir or solo. This reinforces the verbal-physical association with every orgasm.</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIR'S GUIDE -->
+        <div class="content-section" id="sec-dominant">
+            <div class="info-card">
+                <div class="card-title">Sir's Guide — Dominance Tips</div>
+                <div class="info-item">
+                    <div class="info-icon">🔊</div>
+                    <div class="info-text"><div class="info-name">Consistency</div><div class="info-desc">Use a consistent tone of authority when delivering the command. The voice IS the trigger — keep it firm, deliberate, and unmistakable. Reinforce success with praise: "Good girl."</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📓</div>
+                    <div class="info-text"><div class="info-name">Monitoring</div><div class="info-desc">Use Becca's journal entries to track success rates. Watch for the trigger working during lower arousal states — that's the sign conditioning is taking hold.</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⏳</div>
+                    <div class="info-text"><div class="info-name">Patience</div><div class="info-desc">The timeline is 4–12 weeks. Believe in the process — your confidence directly reinforces her response. If progress plateaus, withhold reinforcement or revisit Phase 2.</div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🎭</div>
+                    <div class="info-text"><div class="info-name">Subtle Integration</div><div class="info-desc">Once the trigger is established (Phase 4+), use "5" in non-sexual contexts — via text after mild teasing, whispered in public, or casually dropped into conversation. Watch the reaction.</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESOURCES -->
+        <div class="content-section" id="sec-resources">
+            <div class="info-card">
+                <div class="card-title">Resources & References</div>
+                <p class="card-text" style="margin-bottom: 18px; opacity: 0.8;">External guides on hands-free orgasm and conditioning techniques.</p>
+                <div class="info-item">
+                    <div class="info-icon">📖</div>
+                    <div class="info-text"><div class="info-name">School of Squirt — Hands-Free Orgasm</div><div class="info-desc"><a href="https://www.schoolofsquirt.com/hands-free-orgasm/" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">schoolofsquirt.com/hands-free-orgasm</a></div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📖</div>
+                    <div class="info-text"><div class="info-name">MindBodyGreen — Hands-Free Orgasm Techniques</div><div class="info-desc"><a href="https://www.mindbodygreen.com/articles/hands-free-orgasm-techniques" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">mindbodygreen.com/articles/hands-free-orgasm-techniques</a></div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📖</div>
+                    <div class="info-text"><div class="info-name">WebMD — Hands-Free Orgasm</div><div class="info-desc"><a href="https://www.webmd.com/sex/hands-free-orgasm" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">webmd.com/sex/hands-free-orgasm</a></div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📖</div>
+                    <div class="info-text"><div class="info-name">MasterClass — Hands-Free Orgasm Explained</div><div class="info-desc"><a href="https://www.masterclass.com/articles/hands-free-orgasm-explained" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">masterclass.com/articles/hands-free-orgasm-explained</a></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROTOCOL (PHASES) -->
+        <div class="content-section active" id="sec-protocol">
+            <div id="phasesContainer"></div>
+            <div class="session-log">
+                <div class="log-title">Session Log</div>
+                <div id="logEntries"></div>
+            </div>
+            <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
+        </div>
+    </div>
+
+    <script>
+        const PHASES = [
+            {
+                id: 'phase1', badge: 'Phase 1 · Weeks 1–2', name: 'Foundation Building',
+                objective: 'Trust, control, and self-awareness. Establish consent, learn your arousal scale, and practice basic orgasm denial.',
+                tasks: [
+                    { id: 'consent', schedule: '📋 Setup', name: 'Consent & Rules Establishment', detail: 'Discuss boundaries and de-programming options with Sir. Establish the hard rule: You must say "5" out loud when you cum — every time, in every scenario (partnered or solo).', why: 'The verbal association begins here. Every orgasm from this point forward is paired with the trigger word.' },
+                    { id: 'awareness', schedule: '☀️ Sessions (2-3x/week)', name: 'Arousal Awareness Training', detail: 'Use non-genital teasing (neck, inner thighs, ears, nipples) to build tension. Practice identifying and calling out your arousal level in real-time: "I\'m at a 2... now a 3..."', why: 'Self-awareness is the foundation. You cannot be conditioned to control what you cannot accurately measure.' },
+                    { id: 'edge-id', schedule: '☀️ Sessions', name: 'Identify Your Edge', detail: 'With direct stimulation, find the precise threshold between arousal 3–4 and 4–4.5. Learn what your body feels like at each level. Map your personal arousal landscape.', why: null },
+                    { id: 'denial', schedule: '🌙 Practice', name: 'Basic Orgasm Denial', detail: 'Arouse yourself to level 3–4, then deny release. Stop all stimulation. Breathe. Let arousal drop to 2. Repeat. Aim for 3–5 denials per session.', why: 'This teaches delay and builds the psychological framework of needing permission. Your body learns that arousal does not automatically equal release.' }
+                ],
+                tip: 'The most important thing in Phase 1 is the "say 5 when you cum" rule. Do not skip this. Every single orgasm from now on must be paired with the word. This is the seed of the entire conditioning.'
+            },
+            {
+                id: 'phase2', badge: 'Phase 2 · Weeks 2–4', name: 'Edging & Permission',
+                objective: 'Heightening sensitivity and deepening emotional submission. Master the edge and integrate begging into the release cycle.',
+                tasks: [
+                    { id: 'edge-cycles', schedule: '☀️ Sessions (3-4x/week)', name: 'Edging Cycles', detail: 'Bring yourself to arousal 4–4.5, pause for 30–60 seconds to drop to level 3, then rebuild. Repeat 4–6 times per session. Use reliable tools (Magic Wand, vibrator). Each cycle should get slightly harder to pull back from.', why: 'Edging rewires your brain to tolerate high arousal without release. This creates the "pressure" that the trigger word will eventually release.' },
+                    { id: 'begging', schedule: '☀️ Sessions', name: 'Begging Integration', detail: 'At the edge (4.5+), you must explicitly beg: "Sir, please let me cum on 5." Sir will deny you 2–3 times before allowing release. When finally granted, Sir says "5" and you say "5" as you cum.', why: 'The begging creates emotional investment in the release. The denied requests build pressure. The granted "5" becomes a relief valve — powerful and addictive.' },
+                    { id: 'kegel-daily', schedule: '📋 Daily', name: 'Daily Kegel Sets', detail: 'Complete 3 sets of 10–20 Kegel reps daily to strengthen pelvic floor control and intensify the eventual conditioned climax. See the Kegel Training page for the full protocol.', why: null },
+                    { id: 'solo-edge', schedule: '🌙 Solo (2-4x/week)', name: 'Independent Edging & Journaling', detail: 'Practice solo edging sessions. After each session, journal: how many edge cycles, highest arousal reached, how the trigger word felt, and emotional state. Share journal with Sir weekly.', why: 'The journal creates accountability and gives Sir data to adjust the training. It also deepens your conscious awareness of the conditioning process.' }
+                ],
+                tip: 'The begging is not optional decoration — it is a core mechanic. The emotional desperation of begging and being denied creates a psychological charge that makes the eventual "5" explosively powerful.'
+            },
+            {
+                id: 'phase3', badge: 'Phase 3 · Weeks 4–6', name: 'Trigger Association',
+                objective: 'Linking the command directly to the physical release. The word "5" becomes the key that unlocks orgasm.',
+                tasks: [
+                    { id: 'command-intro', schedule: '☀️ Sessions (3-4x/week)', name: 'Introduce the Command', detail: 'At arousal 4.9 (absolute edge, about to tip), beg to cum. Sir says "5" firmly while simultaneously intensifying stimulation. The orgasm and the word must land at the exact same moment.', why: 'This is classical conditioning: the trigger (word) is paired with the response (orgasm) at the peak moment. Timing is everything. The word must arrive WITH the orgasm, not after.' },
+                    { id: 'low-test', schedule: '🌙 Testing', name: 'Low-Arousal Testing', detail: 'After the command is established at high arousal, test it at progressively lower states. Can "5" push you from 3 to 5? From 2.5 to 5? Track what arousal level the trigger starts working from.', why: 'The goal is to lower the threshold. Initially "5" only works at 4.9. Over time, it should work from lower and lower starting points.' },
+                    { id: 'multiples', schedule: '📋 Advanced Sessions', name: 'The "5 Again" Protocol', detail: 'After the first triggered orgasm, use "5 again" to push for consecutive orgasms. The sensitized state post-orgasm makes the trigger even more effective for multiples.', why: null },
+                    { id: 'wave-riding', schedule: '📋 Advanced Sessions', name: 'Wave-Riding (Touch-Free)', detail: 'At arousal 4+, remove all physical stimulation. Sustain the pre-orgasmic state through visualization, breathing, and Kegel contractions alone. Ride the waves. Then Sir delivers "5" — touch-free orgasm.', why: 'This is the ultimate test: can the word alone, without any physical stimulation, trigger the release? This is when you know the conditioning has fully taken hold.' }
+                ],
+                tip: 'Phase 3 is where the magic happens. The key is TIMING. When Sir says "5," it must coincide with the exact moment of release. Over dozens of repetitions, the brain fuses the word and the orgasm into a single conditioned reflex.'
+            },
+            {
+                id: 'phase4', badge: 'Phase 4 · Weeks 6+', name: 'Advanced Integration',
+                objective: 'Generalization and maintenance. Deploy the trigger in real-world contexts and keep the conditioning sharp.',
+                tasks: [
+                    { id: 'intercourse', schedule: '☀️ Partnered Sessions', name: 'Partnered Application', detail: 'Use the trigger during intercourse with Sir. Gradually reduce the amount of physical buildup required — the trigger should work with progressively less warm-up time.', why: null },
+                    { id: 'subtle', schedule: '🌙 Integration', name: 'Subtle Triggers', detail: 'Sir uses "5" in non-sexual contexts: whispered in your ear at dinner, sent via text after mild teasing earlier in the day, murmured in public. Track your body\'s reaction — does arousal spike? Does the word create a physical response even outside the bedroom?', why: 'Generalization — the trigger escapes the training context and becomes universal. This is the ultimate level of conditioning.' },
+                    { id: 'maintenance', schedule: '📋 Weekly', name: 'Maintenance Sessions', detail: 'Conduct weekly "refresh" sessions: full edge-beg-deny-trigger cycle to keep the association strong. If the trigger weakens, increase session frequency or revisit Phase 2 edging.', why: 'Like any trained skill, the conditioned response needs regular reinforcement to stay sharp. Without maintenance, the response will fade over 2–3 weeks.' },
+                    { id: 'metrics', schedule: '📋 Ongoing', name: 'Progress Metrics & Journaling', detail: 'Track: lowest arousal level the trigger works from, time from "5" to orgasm, success rate (%), and whether the response is strengthening or plateauing. Share all data with Sir.', why: null }
+                ],
+                tip: 'Maintenance is not optional. The conditioned response is a living thing — it needs feeding. Weekly refresh sessions are the minimum. If you notice the trigger weakening, do not panic. Return to Phase 2–3 intensity for a week and the response will rebuild.'
+            }
+        ];
+
+        // STATE
+        const STORAGE_KEY = 'sirender_5_training';
+        let state = loadState();
+        function getDefaultState() { return { tasks: {}, completedPhases: [], sessions: 0, streak: 0, lastDate: null, log: [] }; }
+        function loadState() { const s = localStorage.getItem(STORAGE_KEY); if (s) { try { return JSON.parse(s); } catch(e) {} } return getDefaultState(); }
+        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function getCurrent() { for (let i = 0; i < PHASES.length; i++) { if (!state.completedPhases.includes(PHASES[i].id)) return i; } return PHASES.length - 1; }
+        function isUnlocked(i) { return i === 0 || state.completedPhases.includes(PHASES[i-1].id); }
+        function isCompleted(i) { return state.completedPhases.includes(PHASES[i].id); }
+        function allDone(pid) { return PHASES.find(p => p.id === pid).tasks.every(t => state.tasks[`${pid}_${t.id}`]); }
+
+        function showSection(id, btn) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sec-${id}`).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function render() {
+            // Dots
+            document.getElementById('progressDots').innerHTML = PHASES.map((p, i) => {
+                let c = 'phase-dot';
+                if (isCompleted(i)) c += ' completed'; else if (i === getCurrent()) c += ' active';
+                return `<div class="${c}" onclick="scrollTo(${i})" title="${p.name}"></div>`;
+            }).join('');
+
+            // Stats
+            document.getElementById('stat-phase').textContent = isCompleted(PHASES.length-1) ? '✓' : (getCurrent()+1);
+            document.getElementById('stat-sessions').textContent = state.sessions;
+            document.getElementById('stat-streak').textContent = state.streak;
+
+            // Phases
+            document.getElementById('phasesContainer').innerHTML = PHASES.map((phase, i) => {
+                const unlocked = isUnlocked(i), completed = isCompleted(i), cur = i === getCurrent(), ad = allDone(phase.id);
+                let icon = '🔒'; if (completed) icon = '✅'; else if (unlocked) icon = cur ? '🔥' : '⬜';
+                let cc = 'phase-card'; if (!unlocked) cc += ' locked'; if (completed) cc += ' completed-card';
+                return `
+                    <div class="${cc}" id="phase-card-${i}">
+                        <div class="phase-header" onclick="togglePhase('${phase.id}')">
+                            <div class="phase-info">
+                                <div class="phase-badge">${phase.badge}</div>
+                                <div class="phase-name">${phase.name}</div>
+                                <div class="phase-objective">${phase.objective}</div>
+                            </div>
+                            <div class="phase-status">${icon}</div>
+                        </div>
+                        <div class="phase-body" id="body-${phase.id}">
+                            ${phase.tasks.map(t => {
+                                const k = `${phase.id}_${t.id}`, d = state.tasks[k];
+                                return `
+                                    <div class="task-group-label" style="margin-top:16px">${t.schedule}</div>
+                                    <div class="task-item">
+                                        <div class="task-check ${d?'checked':''}" onclick="toggleTask('${phase.id}','${t.id}')">${d?'✓':''}</div>
+                                        <div class="task-text">
+                                            <div class="task-name" style="${d?'text-decoration:line-through;opacity:.5':''}">${t.name}</div>
+                                            <div class="task-detail">${t.detail}</div>
+                                            ${t.why?`<div class="task-why">↳ ${t.why}</div>`:''}
+                                        </div>
+                                    </div>`;
+                            }).join('')}
+                            <div class="tip-card"><div class="tip-label">💡 Sir's Tip</div><div class="tip-text">${phase.tip}</div></div>
+                            <button class="complete-phase-btn" onclick="completePhase('${phase.id}')" ${!ad||completed?'disabled':''}>
+                                ${completed?'✓ Phase Completed':(ad?'Mark Phase Complete':'Complete all tasks to advance')}
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            const cb = document.getElementById(`body-${PHASES[getCurrent()].id}`);
+            if (cb) cb.classList.add('open');
+
+            // Log
+            const lc = document.getElementById('logEntries');
+            if (!state.log.length) lc.innerHTML = '<div class="log-empty">No sessions recorded yet.</div>';
+            else lc.innerHTML = state.log.slice(0,20).map(e => `<div class="log-entry"><span class="log-level">${e.level}</span><span class="log-note">${e.note}</span><span class="log-date">${e.date}</span></div>`).join('');
+        }
+
+        function togglePhase(pid) {
+            const b = document.getElementById(`body-${pid}`);
+            if (b.classList.contains('open')) b.classList.remove('open');
+            else { document.querySelectorAll('.phase-body').forEach(x => x.classList.remove('open')); b.classList.add('open'); }
+        }
+
+        function toggleTask(pid, tid) {
+            const k = `${pid}_${tid}`;
+            state.tasks[k] = !state.tasks[k];
+            if (state.tasks[k]) {
+                const p = PHASES.find(x => x.id === pid), t = p.tasks.find(x => x.id === tid);
+                state.sessions++; updateStreak(); addLog(p.badge, `Completed: ${t.name}`);
+            }
+            saveState(); render();
+        }
+
+        function completePhase(pid) {
+            if (!allDone(pid) || state.completedPhases.includes(pid)) return;
+            state.completedPhases.push(pid);
+            const p = PHASES.find(x => x.id === pid);
+            addLog(p.badge, `✓ ${p.name} completed!`);
+            saveState(); render();
+        }
+
+        function updateStreak() {
+            const t = new Date().toDateString();
+            if (state.lastDate) { const d = Math.floor((new Date(t)-new Date(state.lastDate))/864e5); if (d===1) state.streak++; else if (d>1) state.streak=1; }
+            else state.streak = 1;
+            state.lastDate = t;
+        }
+
+        function addLog(level, note) {
+            const n = new Date();
+            state.log.unshift({ level, note, date: `${n.getMonth()+1}/${n.getDate()} ${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}` });
+            saveState();
+        }
+
+        function scrollTo(i) {
+            showSection('protocol', document.querySelector('.nav-tab'));
+            setTimeout(() => { const c = document.getElementById(`phase-card-${i}`); if (c) c.scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+        }
+
+        function confirmReset() {
+            if (confirm('This will erase ALL your "5" training progress. Are you sure?')) {
+                localStorage.removeItem(STORAGE_KEY); state = getDefaultState(); render();
+            }
+        }
+
+        render();
+        if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.error(e)));
+    </script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Becca's Sirender | Anal Plug Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{overflow-x:hidden;min-height:100vh}
+        .page-header{position:sticky;top:0;z-index:100;background:rgba(5,16,36,.92);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-bottom:1px solid var(--border);padding:18px 20px 14px;text-align:center}
+        .back-link{display:inline-block;color:var(--gold-dim);text-decoration:none;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;transition:.3s;margin-bottom:8px}.back-link:hover{color:var(--gold)}
+        .page-title{font-family:'Great Vibes',cursive;font-size:32px;background:var(--luxury-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:0}
+        .page-subtitle{font-family:'Playfair Display',serif;color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:3px;margin-top:4px;opacity:.7}
+        .progress-overview{display:flex;justify-content:center;gap:8px;padding:12px 20px;background:rgba(2,8,20,.6);border-bottom:1px solid rgba(212,175,55,.1)}
+        .phase-dot{width:50px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);transition:.4s;cursor:pointer}
+        .phase-dot.completed{background:var(--gold);box-shadow:0 0 8px rgba(212,175,55,.4)}.phase-dot.active{background:rgba(212,175,55,.5);animation:dp 2s ease-in-out infinite}
+        @keyframes dp{0%,100%{opacity:.5}50%{opacity:1}}@keyframes fi{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        .main-content{max-width:600px;margin:0 auto;padding:25px 20px 120px}
+        .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:25px}
+        .stat-card{background:rgba(5,16,36,.85);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;backdrop-filter:blur(12px)}
+        .stat-value{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:700}
+        .stat-label{font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#777;margin-top:4px;font-weight:600}
+        .section-nav{display:flex;overflow-x:auto;gap:8px;padding:0 0 20px;scrollbar-width:none;-ms-overflow-style:none}.section-nav::-webkit-scrollbar{display:none}
+        .nav-tab{flex-shrink:0;background:transparent;border:1px solid var(--border);border-radius:25px;color:var(--gold-dim);font-size:10px;font-weight:600;padding:9px 18px;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:1.5px;transition:.3s}
+        .nav-tab.active{background:var(--luxury-gradient);color:var(--midnight);border-color:transparent;font-weight:700}
+        .content-section{display:none;animation:fi .4s ease}.content-section.active{display:block}
+        .info-card{background:var(--glass);border:1.5px solid var(--border);border-radius:20px;padding:28px 22px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+        .card-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(212,175,55,.15)}
+        .card-text{font-size:13px;color:#ccc;line-height:1.8;margin-bottom:14px}.card-text em{color:var(--gold);font-style:normal;font-weight:600}
+        .card-accent{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);font-style:italic;text-align:center;padding:16px;margin-top:10px;border-top:1px solid rgba(212,175,55,.1);opacity:.85;line-height:1.6}
+        .info-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}.info-item:last-child{border-bottom:none}
+        .info-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}.info-name{font-size:13px;font-weight:600;color:#ddd;margin-bottom:3px}.info-desc{font-size:11px;color:#888;line-height:1.5}
+        .guideline-item{margin-bottom:18px}.guideline-name{font-family:'Playfair Display',serif;font-size:14px;color:#ddd;margin-bottom:5px}.guideline-desc{font-size:12px;color:#999;line-height:1.6}
+        /* Experience Selector */
+        .exp-selector{text-align:center;margin-bottom:25px}
+        .exp-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);margin-bottom:15px}
+        .exp-options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+        .exp-btn{padding:14px 20px;background:rgba(5,16,36,.85);border:1.5px solid var(--border);border-radius:14px;color:#ccc;cursor:pointer;transition:.3s;text-align:center;flex:1;min-width:100px;max-width:160px}
+        .exp-btn:hover{border-color:rgba(212,175,55,.5)}.exp-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08)}
+        .exp-btn-label{display:block;font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:4px}
+        .exp-btn-desc{display:block;font-size:9px;color:#888;line-height:1.4}
+        /* Plug Size Cards */
+        .plug-card{background:var(--glass);border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px}
+        .plug-visual{width:40px;height:60px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--midnight);flex-shrink:0}
+        .plug-info{flex:1}.plug-size{font-size:13px;font-weight:600;color:#ddd;margin-bottom:2px}.plug-dims{font-size:10px;color:var(--gold);margin-bottom:4px}.plug-notes{font-size:11px;color:#888;line-height:1.4}
+        /* Phase Cards */
+        .phase-card{background:var(--glass);border:1.5px solid var(--border);border-radius:20px;margin-bottom:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.4s}
+        .phase-card.locked{opacity:.4;pointer-events:none;filter:grayscale(.5)}.phase-card.completed-card{border-color:rgba(76,175,80,.4)}
+        .phase-header{display:flex;justify-content:space-between;align-items:center;padding:20px;cursor:pointer;transition:background .3s}.phase-header:hover{background:rgba(255,255,255,.02)}
+        .phase-info{flex:1}.phase-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
+        .phase-name{font-family:'Playfair Display',serif;font-size:18px;color:#eee;margin-bottom:4px}.phase-objective{font-size:11px;color:#888;line-height:1.5}
+        .phase-status{font-size:1.5rem;margin-left:15px;flex-shrink:0}
+        .phase-body{display:none;padding:0 20px 20px;border-top:1px solid rgba(212,175,55,.1)}.phase-body.open{display:block;animation:fi .4s ease}
+        .task-group-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin:18px 0 12px;padding-bottom:6px;border-bottom:1px solid rgba(212,175,55,.15)}
+        .task-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}.task-item:last-child{border-bottom:none}
+        .task-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:.25s;font-size:12px;color:transparent}
+        .task-check.checked{background:var(--gold);border-color:var(--gold);color:var(--midnight)}.task-check:hover{border-color:var(--gold);background:rgba(212,175,55,.1)}
+        .task-text{flex:1}.task-name{font-size:13px;font-weight:600;color:#ddd;margin-bottom:3px}.task-detail{font-size:11px;color:#888;line-height:1.6}
+        .task-why{font-size:11px;color:rgba(212,175,55,.7);line-height:1.5;margin-top:6px;font-style:italic}
+        .tip-card{background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.15);border-radius:12px;padding:16px;margin-top:15px}
+        .tip-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px}.tip-text{font-size:12px;color:#bbb;line-height:1.6}
+        .complete-phase-btn{display:block;width:100%;padding:16px;margin-top:20px;background:var(--luxury-gradient);color:var(--midnight);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;cursor:pointer;transition:.2s;box-shadow:0 6px 20px rgba(212,175,55,.25)}
+        .complete-phase-btn:active{transform:scale(.97)}.complete-phase-btn:disabled{opacity:.3;pointer-events:none}
+        .session-log{margin-top:30px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:20px}
+        .log-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:15px}
+        .log-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}.log-entry:last-child{border-bottom:none}
+        .log-date{color:#777;font-size:10px}.log-level{color:var(--gold);font-weight:600}.log-note{color:#aaa;font-style:italic;font-size:11px;flex:1;margin:0 12px}
+        .log-empty{color:#555;font-style:italic;font-size:12px;text-align:center;padding:20px 0}
+        .reset-btn{display:block;width:100%;margin-top:15px;padding:14px;background:transparent;border:1px solid rgba(244,67,54,.3);border-radius:12px;color:#F44336;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;transition:.3s}
+        .reset-btn:hover{border-color:#F44336;background:rgba(244,67,54,.05)}
+        .trouble-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px}
+        .trouble-q{font-size:13px;font-weight:600;color:#ddd;margin-bottom:8px;font-style:italic}.trouble-a{font-size:12px;color:#aaa;line-height:1.6}.trouble-a strong{color:var(--gold);font-weight:600}
+    </style>
+</head>
+<body class="sirender-theme">
+    <header class="page-header">
+        <a href="training-menu.html" class="back-link">← Back to Training</a>
+        <h1 class="page-title">Anal Plug Training</h1>
+        <div class="page-subtitle">Progressive Size & Duration</div>
+    </header>
+    <div class="progress-overview" id="progressDots"></div>
+    <div class="main-content">
+        <div class="stats-bar">
+            <div class="stat-card"><div class="stat-value" id="stat-phase">1</div><div class="stat-label">Current Phase</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-sessions">0</div><div class="stat-label">Tasks Done</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Day Streak</div></div>
+        </div>
+        <div class="section-nav">
+            <button class="nav-tab active" onclick="showSection('protocol',this)">Protocol</button>
+            <button class="nav-tab" onclick="showSection('overview',this)">Overview</button>
+            <button class="nav-tab" onclick="showSection('plugs',this)">Plug Sizes</button>
+            <button class="nav-tab" onclick="showSection('safety',this)">Safety</button>
+            <button class="nav-tab" onclick="showSection('troubleshooting',this)">Troubleshooting</button>
+            <button class="nav-tab" onclick="showSection('resources',this)">Resources</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div class="content-section" id="sec-overview">
+            <div class="info-card">
+                <div class="card-title">Philosophy & Objective</div>
+                <p class="card-text">Anal plug training is a <em>gradual, patient process</em> of conditioning the body to accept, hold, and eventually enjoy progressively larger insertions. The anal sphincter is a muscle — it can be trained like any other.</p>
+                <p class="card-text">This protocol is designed specifically for <em>female anatomy</em>. The goal is comfortable, pleasurable extended wear that enhances sensation during other activities, demonstrates devotion to Sir, and prepares the body for anal play.</p>
+                <p class="card-text">The training adapts to your <em>experience level</em>. Select your starting point below, and the protocol will adjust phase durations, plug sizes, and wear times accordingly.</p>
+                <div class="card-accent">"The body resists what is forced. It embraces what is trained."</div>
+            </div>
+            <!-- Experience Selector -->
+            <div class="exp-selector">
+                <div class="exp-title">Select Your Experience Level</div>
+                <div class="exp-options">
+                    <div class="exp-btn" onclick="setExperience('beginner')" id="exp-beginner">
+                        <span class="exp-btn-label">Beginner</span>
+                        <span class="exp-btn-desc">New to anal play or very limited experience</span>
+                    </div>
+                    <div class="exp-btn" onclick="setExperience('intermediate')" id="exp-intermediate">
+                        <span class="exp-btn-label">Intermediate</span>
+                        <span class="exp-btn-desc">Some experience with small plugs or fingers</span>
+                    </div>
+                    <div class="exp-btn" onclick="setExperience('advanced')" id="exp-advanced">
+                        <span class="exp-btn-label">Advanced</span>
+                        <span class="exp-btn-desc">Comfortable with plugs, seeking size/duration progression</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLUG SIZES -->
+        <div class="content-section" id="sec-plugs">
+            <div class="info-card">
+                <div class="card-title">Progressive Plug Sizing</div>
+                <p class="card-text" style="margin-bottom:16px;opacity:.8">Each size must be mastered before advancing. "Mastered" means comfortable insertion, 2+ hours of wear, and removal without discomfort.</p>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#90CAF9,#64B5F6);width:28px;height:42px">XS</div><div class="plug-info"><div class="plug-size">Extra Small — The Starter</div><div class="plug-dims">~0.75" / 2cm diameter · 2.5" insertable</div><div class="plug-notes">Your entry point. Barely larger than a finger. Focus: learning to relax the sphincter for insertion and removal.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#81C784,#66BB6A);width:32px;height:48px">S</div><div class="plug-info"><div class="plug-size">Small — The Foundation</div><div class="plug-dims">~1" / 2.5cm diameter · 3" insertable</div><div class="plug-notes">The training workhorse. Most of your early wear time happens here. Goal: 2-hour comfortable wear.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#FFB74D,#FFA726);width:36px;height:52px">M</div><div class="plug-info"><div class="plug-size">Medium — The Standard</div><div class="plug-dims">~1.25" / 3.2cm diameter · 3.5" insertable</div><div class="plug-notes">Noticeable stretch. This is where you learn to move, sit, and function normally while plugged.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#E57373,#EF5350);width:40px;height:56px">L</div><div class="plug-info"><div class="plug-size">Large — The Challenge</div><div class="plug-dims">~1.5" / 3.8cm diameter · 4" insertable</div><div class="plug-notes">Significant presence. Extended wear builds real endurance. You will feel this during all activities.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,var(--gold),#c5a028);width:44px;height:60px">XL</div><div class="plug-info"><div class="plug-size">Extra Large — Sir's Pride</div><div class="plug-dims">~1.75"+ / 4.5cm diameter · 4.5" insertable</div><div class="plug-notes">The mastery size. Comfortable wear at this size means your training is complete. Reserved for advanced trainees only.</div></div></div>
+            </div>
+        </div>
+
+        <!-- SAFETY -->
+        <div class="content-section" id="sec-safety">
+            <div class="info-card">
+                <div class="card-title">Safety & Essentials</div>
+                <div class="info-item"><div class="info-icon">💧</div><div class="info-text"><div class="info-name">Lubrication Is Non-Negotiable</div><div class="info-desc">Always use high-quality, thick anal lubricant. The rectum does not self-lubricate. Reapply during extended wear. Water-based for silicone plugs; silicone-based for metal/glass plugs.</div></div></div>
+                <div class="info-item"><div class="info-icon">🧴</div><div class="info-text"><div class="info-name">Hygiene Protocol</div><div class="info-desc">Clean plugs before and after every use with antibacterial toy cleaner or hot soapy water. Never go from anal to vaginal without thorough cleaning. Consider a light anal douche before extended sessions.</div></div></div>
+                <div class="info-item"><div class="info-icon">⏱️</div><div class="info-text"><div class="info-name">Duration Limits</div><div class="info-desc">Beginners: max 30 min first sessions. Never exceed 4 hours continuous wear. Remove immediately if you feel sharp pain (dull pressure is normal), numbness, or bleeding.</div></div></div>
+                <div class="info-item"><div class="info-icon">🔑</div><div class="info-text"><div class="info-name">Flared Base Only</div><div class="info-desc">ONLY use plugs with a flared base or T-bar. The rectum creates suction — a plug without a proper base can become irretrievable and require medical attention.</div></div></div>
+                <div class="info-item"><div class="info-icon">🛑</div><div class="info-text"><div class="info-name">Stop Signals</div><div class="info-desc">Sharp/stabbing pain, bleeding, persistent discomfort after removal, or inability to remove the plug. Any of these = stop immediately. Pain is NOT part of training — pressure and stretch are; pain is not.</div></div></div>
+                <div class="info-item"><div class="info-icon">💎</div><div class="info-text"><div class="info-name">Material Guide</div><div class="info-desc"><strong style="color:#ddd">Silicone:</strong> Best for beginners. Flexible, body-safe, comfortable. <strong style="color:#ddd">Stainless steel:</strong> Smooth insertion, temperature play. <strong style="color:#ddd">Glass:</strong> Beautiful, easy to clean, temperature play. Avoid jelly/rubber/PVC — they are porous and unsafe.</div></div></div>
+            </div>
+        </div>
+
+        <!-- TROUBLESHOOTING -->
+        <div class="content-section" id="sec-troubleshooting">
+            <div class="info-card" style="padding-bottom:10px"><div class="card-title">Troubleshooting</div></div>
+            <div class="trouble-card"><div class="trouble-q">"I can't relax enough for insertion."</div><div class="trouble-a"><strong>Fix:</strong> Push out gently (as if having a bowel movement) while inserting. This counterintuitively opens the sphincter. Combine with deep breathing — exhale as you push and insert simultaneously.</div></div>
+            <div class="trouble-card"><div class="trouble-q">"The plug keeps sliding out."</div><div class="trouble-a"><strong>Fix:</strong> The neck (narrow part above the base) may be too short for your anatomy. Try a plug with a longer, thinner neck. Also practice Kegel squeezes around the neck to train retention.</div></div>
+            <div class="trouble-card"><div class="trouble-q">"It's comfortable at first but becomes painful after 20 minutes."</div><div class="trouble-a"><strong>Fix:</strong> Reapply lubricant — the lube may be absorbing or drying. Remove, re-lube generously, and reinsert. If pain persists, size down for another week.</div></div>
+            <div class="trouble-card"><div class="trouble-q">"I feel like I need to use the bathroom constantly."</div><div class="trouble-a"><strong>Fix:</strong> This is normal initially — the plug presses against the rectal wall and triggers the "fullness" sensation. Your body will adapt within 2–3 sessions. Ensure you've emptied your bowels before training.</div></div>
+            <div class="trouble-card"><div class="trouble-q">"I'm stuck between sizes — current is easy, next is too much."</div><div class="trouble-a"><strong>Fix:</strong> Use the current size for longer duration sessions (2+ hours) while doing sphincter stretching exercises. Try the larger size for short 5-minute "preview" sessions before returning to the comfortable size.</div></div>
+        </div>
+
+        <!-- RESOURCES -->
+        <div class="content-section" id="sec-resources">
+            <div class="info-card">
+                <div class="card-title">Resources & References</div>
+                <p class="card-text" style="margin-bottom:18px;opacity:.8">External guides on anal training, safety, and plug selection.</p>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Healthline — Beginner's Guide to Butt Plugs</div><div class="info-desc"><a href="https://www.healthline.com/health/healthy-sex/butt-plug" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">healthline.com/health/healthy-sex/butt-plug</a></div></div></div>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Cosmopolitan — Anal Training Guide</div><div class="info-desc"><a href="https://www.cosmopolitan.com/sex-love/a27158507/anal-training-guide/" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">cosmopolitan.com — anal training guide</a></div></div></div>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Glamour — How to Use a Butt Plug</div><div class="info-desc"><a href="https://www.glamour.com/story/how-to-use-a-butt-plug" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">glamour.com/story/how-to-use-a-butt-plug</a></div></div></div>
+                <div class="info-item"><div class="info-icon">📖</div><div class="info-text"><div class="info-name">Allure — A Beginner's Guide to Butt Plugs</div><div class="info-desc"><a href="https://www.allure.com/story/beginners-guide-to-butt-plugs" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,175,55,.3)">allure.com — beginner's guide to butt plugs</a></div></div></div>
+            </div>
+        </div>
+
+        <!-- PROTOCOL -->
+        <div class="content-section active" id="sec-protocol">
+            <div id="phasesContainer"></div>
+            <div class="session-log"><div class="log-title">Session Log</div><div id="logEntries"></div></div>
+            <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
+        </div>
+    </div>
+    <script>
+        const PROFILES={
+            beginner:{label:'Beginner',startPlug:'XS',phases:[
+                {id:'p1',badge:'Phase 1 · Weeks 1–2',name:'First Touch',objective:'Get comfortable with the concept of anal insertion. Learn relaxation, breathing, and basic finger/XS plug use.',tasks:[
+                    {id:'finger',schedule:'☀️ Week 1',name:'Finger Exploration',detail:'In a warm bath or shower, with plenty of lube, gently press a clean fingertip against the outside of the anus. Do NOT insert yet. Just apply gentle pressure and practice relaxing into it. 5 minutes.',why:'The sphincter must learn that pressure does not equal danger. External touch first builds trust with your own body.'},
+                    {id:'finger-insert',schedule:'☀️ Week 1–2',name:'Single Finger Insertion',detail:'With generous lube, slowly insert one finger to the first knuckle. Hold. Breathe. Push out gently (bearing down) to relax the sphincter. Progress to full finger depth over several sessions.',why:null},
+                    {id:'xs-intro',schedule:'🌙 Week 2',name:'XS Plug Introduction',detail:'Apply lube to both the plug and yourself. Place the tip against the anus. Exhale and push out gently while pressing the plug in. Insert just the tip. Hold 5 minutes. Remove. Repeat daily, increasing depth each session.',why:'The "push out while inserting" technique is counterintuitive but critical. It relaxes the sphincter involuntarily.'},
+                    {id:'xs-wear',schedule:'📋 End of Phase',name:'XS 15-Minute Wear',detail:'Wear the XS plug for 15 consecutive minutes while relaxing (lying down or sitting). Focus on letting the body accept the presence without clenching. This is your Phase 1 graduation test.',why:null}
+                ],tip:'Go SLOW. There is zero rush. If insertion causes sharp pain, stop. Use more lube. Try again tomorrow. The body needs time to understand that this is safe.'},
+                {id:'p2',badge:'Phase 2 · Weeks 3–4',name:'Building Duration',objective:'Extend XS wear time to 1+ hour and introduce the Small plug for short sessions.',tasks:[
+                    {id:'xs-30',schedule:'☀️ 3x/Week',name:'XS 30-Minute Wear',detail:'Wear the XS plug for 30 minutes during normal activities — watching TV, reading, light housework. Practice sitting in different positions. Notice how the plug feels in each.',why:null},
+                    {id:'xs-60',schedule:'☀️ 3x/Week',name:'XS 60-Minute Wear',detail:'Extend to 1-hour continuous wear. You should be able to walk, sit, and move comfortably. Reapply lube at the 30-minute mark if needed.',why:null},
+                    {id:'s-intro',schedule:'🌙 Week 4',name:'Small Plug Introduction',detail:'Follow the same insertion protocol as the XS — lube generously, exhale and bear down, insert slowly. The stretch will be noticeably more. Insert to the widest point, let the sphincter close around the neck. Hold 10 minutes.',why:'The jump from XS to S is the first real stretch challenge. Take 2–3 sessions to work up to full insertion.'},
+                    {id:'kegel-plug',schedule:'📋 Daily',name:'Kegel Squeezes While Plugged',detail:'With the XS or S plug inserted, perform 3 sets of 10 Kegel squeezes. Squeeze around the plug neck, hold 3 seconds, release. This trains active retention.',why:'Passive wearing is good. Active squeezing while plugged builds the muscles that keep the plug seated during movement and play.'}
+                ],tip:'When graduating from XS to Small, try inserting the XS first for 10 minutes to "warm up" before switching to the Small. The pre-stretch makes the transition much easier.'},
+                {id:'p3',badge:'Phase 3 · Weeks 5–7',name:'Size Progression',objective:'Master the Small plug for extended wear. Introduce the Medium plug. Learn to function normally while plugged.',tasks:[
+                    {id:'s-60',schedule:'☀️ 3–4x/Week',name:'Small 1-Hour Wear',detail:'Comfortable 1-hour wear sessions with the Small plug. You should now be able to insert without difficulty and wear while doing daily tasks.',why:null},
+                    {id:'s-2hr',schedule:'☀️ Weekly',name:'Small 2-Hour Extended Wear',detail:'Push to 2-hour sessions. Walk around, do chores, run errands (if comfortable). This is the endurance benchmark for the Small size. Reapply lube at 1 hour.',why:null},
+                    {id:'m-intro',schedule:'🌙 Week 6–7',name:'Medium Plug Introduction',detail:'Warm up with the Small plug for 15 minutes. Remove. Generously lube the Medium. Insert slowly with the bear-down technique. The stretch will be significant. Hold 10–15 minutes initially.',why:'Always warm up with the previous size before attempting a new one. The pre-stretch relaxes the muscles and makes the jump manageable.'},
+                    {id:'m-30',schedule:'📋 End of Phase',name:'Medium 30-Minute Wear',detail:'Wear the Medium plug for 30 minutes comfortably. This is your Phase 3 graduation. You should be able to sit, stand, and walk without significant discomfort.',why:null}
+                ],tip:'If you plateau on a size, add more lube and try different positions for insertion. Lying on your side with knees pulled up often works best for larger sizes. Squatting is also effective.'},
+                {id:'p4',badge:'Phase 4 · Weeks 8+',name:'Endurance & Mastery',objective:'Master Medium for extended wear. Introduce Large and XL for those who wish to continue. Train for on-command plugging.',tasks:[
+                    {id:'m-2hr',schedule:'☀️ Regular Sessions',name:'Medium 2-Hour Wear',detail:'Comfortable 2-hour extended wear with the Medium plug during daily activities. This is the standard training level for ongoing plug service to Sir.',why:null},
+                    {id:'l-intro',schedule:'🌙 When Ready',name:'Large Plug Introduction',detail:'For those progressing further: warm up with Medium, then attempt the Large. The jump to 1.5" diameter is significant. Expect to take 1–2 weeks of short sessions before comfortable 30-minute wear.',why:null},
+                    {id:'on-command',schedule:'📋 Practice',name:'On-Command Insertion',detail:'Practice inserting your current mastered size within 2 minutes of Sir\'s command. Keep your plug and lube accessible at all times. The goal: always ready to be plugged when Sir says so.',why:'This is the service component. Sir should be able to say "plug" and you respond within minutes, fully prepared.'},
+                    {id:'scene-wear',schedule:'📋 Ongoing',name:'Scene Integration',detail:'Wear your plug during scenes, during sex, during service. Practice Kegel squeezes around the plug during penetration to create a "tighter" sensation for Sir. The plug is no longer training — it is a tool of service.',why:null}
+                ],tip:'Maintenance is key. Wear your plug 2–3 times per week to keep your training. Without regular use, the sphincter will tighten back to baseline within 2–3 weeks.'}
+            ]},
+            intermediate:{label:'Intermediate',startPlug:'S',phases:[
+                {id:'p1',badge:'Phase 1 · Weeks 1–2',name:'Calibration',objective:'Establish baseline with the Small plug. Build consistent 1-hour wear and solidify insertion technique.',tasks:[
+                    {id:'s-warmup',schedule:'☀️ 3x/Week',name:'Small Plug — 30-Min Sessions',detail:'Confirm comfort with the Small plug. Insert with proper lube and bearing-down technique. Wear for 30 minutes during normal activities. This establishes your baseline.',why:null},
+                    {id:'s-60',schedule:'☀️ 3x/Week',name:'Small Plug — 1-Hour Wear',detail:'Extend to 1-hour sessions. Walk, sit, do chores. You should feel natural pressure but no pain. Reapply lube as needed.',why:null},
+                    {id:'kegel-plug',schedule:'📋 Daily',name:'Plugged Kegel Training',detail:'With the Small plug in, perform 3 sets of 10 Kegel squeezes (3-second holds). This builds active retention strength and enhances the sensation of wearing.',why:null},
+                    {id:'s-2hr',schedule:'📋 End of Phase',name:'Small Plug — 2-Hour Benchmark',detail:'Achieve a comfortable 2-hour continuous wear. This is your graduation to Phase 2. If you can walk, sit, and forget the plug is there, you are ready.',why:null}
+                ],tip:'If the Small plug feels too easy, you may be ready to skip ahead to Phase 2 sooner. But spend at least 1 week here to build proper Kegel-while-plugged habits.'},
+                {id:'p2',badge:'Phase 2 · Weeks 2–4',name:'Medium Mastery',objective:'Transition to the Medium plug. Build duration from short sessions to 2-hour extended wear.',tasks:[
+                    {id:'m-intro',schedule:'☀️ Week 2',name:'Medium Plug Introduction',detail:'Warm up with Small for 15 min. Switch to Medium. The 1.25" diameter will be a real stretch. Insert slowly, breathe, bear down. Hold 15 minutes.',why:null},
+                    {id:'m-30',schedule:'☀️ 3x/Week',name:'Medium — 30-Minute Wear',detail:'Build to comfortable 30-minute sessions. Experiment with sitting, standing, walking. Note any positions that cause discomfort and adjust.',why:null},
+                    {id:'m-60',schedule:'🌙 3x/Week',name:'Medium — 1-Hour Wear',detail:'Extend to 1-hour sessions. At this point, insertion should be smooth and natural. Reapply lube at 30 minutes.',why:null},
+                    {id:'m-2hr',schedule:'📋 End of Phase',name:'Medium — 2-Hour Extended Wear',detail:'Phase 2 graduation: 2-hour comfortable wear with the Medium during daily activities. No shifting, no discomfort, no constant awareness.',why:null}
+                ],tip:'The Medium plug is where most people will live long-term. There is no shame in mastering Medium and staying there — it is a perfectly complete training level.'},
+                {id:'p3',badge:'Phase 3 · Weeks 4–6',name:'Large Introduction',objective:'Introduce the Large plug. Build from short exposures to 1-hour comfortable wear.',tasks:[
+                    {id:'l-preview',schedule:'☀️ Week 4–5',name:'Large Preview Sessions',detail:'After a 30-min Medium warm-up, attempt the Large (1.5" diameter). Insert to widest point — the stretch will be intense. If you get it past the widest point and the sphincter closes around the neck, hold 5 minutes. If not, return to Medium.',why:'Preview sessions build mental confidence. Even a few minutes at the new size tells your body "this is possible."'},
+                    {id:'l-15',schedule:'☀️ When Ready',name:'Large — 15-Minute Wear',detail:'Once past the insertion barrier, build to 15-minute wear. Focus on complete relaxation. Any clenching against the larger size will cause discomfort.',why:null},
+                    {id:'l-30',schedule:'🌙 3x/Week',name:'Large — 30-Minute Wear',detail:'Build to comfortable 30-min sessions. At this size, you will be very aware of the plug during all activity. That is normal.',why:null},
+                    {id:'l-60',schedule:'📋 End of Phase',name:'Large — 1-Hour Wear',detail:'Phase 3 graduation: 1-hour comfortable wear with the Large plug. This is an advanced achievement.',why:null}
+                ],tip:'Going from Medium to Large is the hardest jump in the whole protocol. Be extremely patient. Use extra lube, warm up thoroughly with Medium, and try different positions.'},
+                {id:'p4',badge:'Phase 4 · Weeks 6+',name:'Service Integration',objective:'Deploy your training in service to Sir. Extended wear, on-command insertion, and scene integration.',tasks:[
+                    {id:'l-2hr',schedule:'☀️ Regular',name:'Large — 2-Hour Extended Wear',detail:'Push Large wear to 2 hours. This is elite-level endurance. Reapply lube at 1 hour.',why:null},
+                    {id:'on-command',schedule:'📋 Practice',name:'On-Command Insertion',detail:'Practice inserting your current mastered size within 2 minutes of Sir\'s command. Keep plug and lube accessible.',why:null},
+                    {id:'scene',schedule:'📋 Ongoing',name:'Scene & Sex Integration',detail:'Wear during scenes, during vaginal sex, during service. Perform Kegel squeezes around the plug during penetration.',why:null},
+                    {id:'xl-optional',schedule:'🌙 Optional',name:'XL Introduction (Optional)',detail:'For those who wish to continue: the XL (1.75"+) is the mastery size. Follow the same warm-up → preview → short session → build duration pattern.',why:null}
+                ],tip:'You have reached service-ready status. Maintain by wearing 2–3x per week. Sir should be able to command you to plug at any time and you comply within minutes.'}
+            ]},
+            advanced:{label:'Advanced',startPlug:'M',phases:[
+                {id:'p1',badge:'Phase 1 · Week 1',name:'Recalibration',objective:'Confirm your current baseline. Ensure proper technique and establish tracking.',tasks:[
+                    {id:'m-confirm',schedule:'☀️ 2x',name:'Medium Baseline Confirmation',detail:'Confirm comfortable 1-hour wear with Medium. If this is not achievable, select Intermediate level instead.',why:null},
+                    {id:'l-test',schedule:'☀️ 2x',name:'Large Comfort Test',detail:'Insert Large plug. Can you achieve 30-minute comfortable wear? If yes, you are correctly placed. If no, switch to Intermediate.',why:null},
+                    {id:'kegel-advanced',schedule:'📋 Daily',name:'Advanced Plugged Kegels',detail:'With Large plug: 4 sets of 15 Kegel squeezes, 5-second holds. Include "wave" contractions (front-to-back sequential squeeze).',why:null},
+                    {id:'routine',schedule:'📋 Setup',name:'Establish Routine',detail:'Set a consistent schedule: 3–4 sessions per week, times for wear, and a weekly Sir check-in for progress reporting.',why:null}
+                ],tip:'Advanced means you already have a foundation. This phase is about confirming your level and establishing disciplined tracking.'},
+                {id:'p2',badge:'Phase 2 · Weeks 1–3',name:'Large Mastery',objective:'Push Large plug to 2+ hour extended wear. Master insertion speed and comfort.',tasks:[
+                    {id:'l-2hr',schedule:'☀️ 3–4x/Week',name:'Large — 2-Hour Extended Wear',detail:'Comfortable 2-hour sessions. Walk, sit, work, exercise lightly. The plug should feel like a natural part of your body at this point.',why:null},
+                    {id:'l-active',schedule:'☀️ Weekly',name:'Large — Active Wear',detail:'Wear the Large plug during physical activity: yoga, walking, light exercise, housework. Build comfort during movement.',why:null},
+                    {id:'speed-insert',schedule:'📋 Practice',name:'Speed Insertion Drill',detail:'Time yourself: from "Sir says plug" to fully inserted and dressed. Target: under 2 minutes with proper lubrication.',why:'Service readiness means instant compliance. This drill builds the muscle memory for rapid, comfortable insertion.'},
+                    {id:'overnight',schedule:'📋 Advanced',name:'Extended Duration Test',detail:'Attempt a 3–4 hour continuous wear session (with lube reapplication). This tests maximum endurance at the Large size.',why:null}
+                ],tip:'At this level, focus shifts from "can I tolerate this?" to "can I perform while wearing this?" The plug becomes invisible through mastery.'},
+                {id:'p3',badge:'Phase 3 · Weeks 3–5',name:'XL Progression',objective:'Introduce the XL plug. The mastery size requires patience even for advanced trainees.',tasks:[
+                    {id:'xl-preview',schedule:'☀️ Week 3',name:'XL Preview Sessions',detail:'After 30-min Large warm-up, attempt XL (1.75"+). The jump is significant. Use extra-thick anal lube. Take up to 5 minutes for insertion. If past the widest point, hold 5–10 min.',why:null},
+                    {id:'xl-15',schedule:'☀️ Build',name:'XL — 15-Minute Wear',detail:'Build to comfortable 15-minute sessions. The XL creates substantial fullness. Deep breathing and complete relaxation are essential.',why:null},
+                    {id:'xl-30',schedule:'🌙 Build',name:'XL — 30-Minute Wear',detail:'Push to 30-minute sessions. If you can sit comfortably with the XL for 30 minutes, you are nearing mastery.',why:null},
+                    {id:'xl-60',schedule:'📋 End of Phase',name:'XL — 1-Hour Wear',detail:'Phase 3 graduation: 1-hour comfortable wear with XL. This is an elite achievement. Record it in your log with pride.',why:null}
+                ],tip:'The XL is a trophy size. Many will not reach it, and that is completely fine. If you can comfortably wear Large for 2+ hours, you are already at an exceptional training level.'},
+                {id:'p4',badge:'Phase 4 · Weeks 5+',name:'Full Mastery & Service',objective:'XL endurance, on-command readiness at any size, and full scene integration.',tasks:[
+                    {id:'xl-2hr',schedule:'☀️ Regular',name:'XL — 2-Hour Extended Wear',detail:'The ultimate endurance benchmark. 2-hour comfortable wear with the XL plug during daily activities.',why:null},
+                    {id:'any-command',schedule:'📋 Practice',name:'Any-Size On-Command',detail:'Sir names a size. You insert it within 2 minutes. You must be fluent with all sizes and able to switch on command.',why:null},
+                    {id:'scene-full',schedule:'📋 Ongoing',name:'Full Scene Integration',detail:'Wear during all scenes as directed. Combine with vaginal penetration, Kegel work, and other training protocols.',why:null},
+                    {id:'maintain',schedule:'📋 Weekly',name:'Maintenance Protocol',detail:'Minimum 3 sessions per week across your size range. Weekly: 1x Large extended, 1x XL session, 1x any-size speed drill.',why:null}
+                ],tip:'You are Sir\'s fully trained plug sub. Maintenance is everything. Without regular use, you will lose progress within weeks. Treat this like any athletic training — consistency is king.'}
+            ]}
+        };
+
+        const SK='sirender_plug_training';
+        let state=load();function getDefault(){return{exp:null,tasks:{},completedPhases:[],sessions:0,streak:0,lastDate:null,log:[]}}
+        function load(){const s=localStorage.getItem(SK);if(s){try{return JSON.parse(s)}catch(e){}}return getDefault()}
+        function save(){localStorage.setItem(SK,JSON.stringify(state))}
+        function getPhases(){return state.exp?PROFILES[state.exp].phases:[]}
+        function getCurrent(){const p=getPhases();for(let i=0;i<p.length;i++){if(!state.completedPhases.includes(p[i].id))return i}return Math.max(0,p.length-1)}
+        function isUnlocked(i){return i===0||state.completedPhases.includes(getPhases()[i-1].id)}
+        function isCompleted(i){return state.completedPhases.includes(getPhases()[i].id)}
+        function allDone(pid){return getPhases().find(p=>p.id===pid).tasks.every(t=>state.tasks[`${pid}_${t.id}`])}
+
+        function showSection(id,btn){
+            document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
+            document.getElementById(`sec-${id}`).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function setExperience(level){
+            if(state.exp&&state.exp!==level){if(!confirm(`Switch to ${PROFILES[level].label}? This will reset your progress.`))return;state=getDefault();}
+            state.exp=level;save();render();
+        }
+
+        function render(){
+            // Exp selector
+            ['beginner','intermediate','advanced'].forEach(e=>{
+                const el=document.getElementById(`exp-${e}`);
+                el.classList.toggle('selected',state.exp===e);
+            });
+            const phases=getPhases();
+            // Dots
+            const dots=document.getElementById('progressDots');
+            if(!phases.length){dots.innerHTML='';} else {
+                dots.innerHTML=phases.map((_,i)=>{let c='phase-dot';if(isCompleted(i))c+=' completed';else if(i===getCurrent())c+=' active';return `<div class="${c}" onclick="scrollTo(${i})"></div>`}).join('');
+            }
+            // Stats
+            document.getElementById('stat-phase').textContent=!phases.length?'—':(isCompleted(phases.length-1)?'✓':(getCurrent()+1));
+            document.getElementById('stat-sessions').textContent=state.sessions;
+            document.getElementById('stat-streak').textContent=state.streak;
+            // Phases
+            const pc=document.getElementById('phasesContainer');
+            if(!phases.length){pc.innerHTML='<div class="log-empty">Select your experience level in the Overview tab to begin.</div>';renderLog();return;}
+            pc.innerHTML=phases.map((phase,i)=>{
+                const ul=isUnlocked(i),co=isCompleted(i),cu=i===getCurrent(),ad=allDone(phase.id);
+                let icon='🔒';if(co)icon='✅';else if(ul)icon=cu?'🔥':'⬜';
+                let cc='phase-card';if(!ul)cc+=' locked';if(co)cc+=' completed-card';
+                return `<div class="${cc}" id="phase-card-${i}"><div class="phase-header" onclick="togglePhase('${phase.id}')"><div class="phase-info"><div class="phase-badge">${phase.badge}</div><div class="phase-name">${phase.name}</div><div class="phase-objective">${phase.objective}</div></div><div class="phase-status">${icon}</div></div><div class="phase-body" id="body-${phase.id}">${phase.tasks.map(t=>{const k=`${phase.id}_${t.id}`,d=state.tasks[k];return `<div class="task-group-label" style="margin-top:16px">${t.schedule}</div><div class="task-item"><div class="task-check ${d?'checked':''}" onclick="toggleTask('${phase.id}','${t.id}')">${d?'✓':''}</div><div class="task-text"><div class="task-name" style="${d?'text-decoration:line-through;opacity:.5':''}">${t.name}</div><div class="task-detail">${t.detail}</div>${t.why?`<div class="task-why">↳ ${t.why}</div>`:''}</div></div>`}).join('')}<div class="tip-card"><div class="tip-label">💡 Sir's Tip</div><div class="tip-text">${phase.tip}</div></div><button class="complete-phase-btn" onclick="completePhase('${phase.id}')" ${!ad||co?'disabled':''}>${co?'✓ Phase Completed':(ad?'Mark Phase Complete':'Complete all tasks to advance')}</button></div></div>`
+            }).join('');
+            const cb=document.getElementById(`body-${phases[getCurrent()].id}`);if(cb)cb.classList.add('open');
+            renderLog();
+        }
+
+        function renderLog(){
+            const lc=document.getElementById('logEntries');
+            if(!state.log.length){lc.innerHTML='<div class="log-empty">No sessions recorded yet.</div>';return;}
+            lc.innerHTML=state.log.slice(0,20).map(e=>`<div class="log-entry"><span class="log-level">${e.level}</span><span class="log-note">${e.note}</span><span class="log-date">${e.date}</span></div>`).join('');
+        }
+
+        function togglePhase(pid){const b=document.getElementById(`body-${pid}`);if(b.classList.contains('open'))b.classList.remove('open');else{document.querySelectorAll('.phase-body').forEach(x=>x.classList.remove('open'));b.classList.add('open');}}
+
+        function toggleTask(pid,tid){
+            const k=`${pid}_${tid}`;state.tasks[k]=!state.tasks[k];
+            if(state.tasks[k]){const p=getPhases().find(x=>x.id===pid),t=p.tasks.find(x=>x.id===tid);state.sessions++;updateStreak();addLog(p.badge,`Completed: ${t.name}`);}
+            save();render();
+        }
+
+        function completePhase(pid){
+            if(!allDone(pid)||state.completedPhases.includes(pid))return;
+            state.completedPhases.push(pid);const p=getPhases().find(x=>x.id===pid);
+            addLog(p.badge,`✓ ${p.name} completed!`);save();render();
+        }
+
+        function updateStreak(){const t=new Date().toDateString();if(state.lastDate){const d=Math.floor((new Date(t)-new Date(state.lastDate))/864e5);if(d===1)state.streak++;else if(d>1)state.streak=1;}else state.streak=1;state.lastDate=t;}
+        function addLog(level,note){const n=new Date();state.log.unshift({level,note,date:`${n.getMonth()+1}/${n.getDate()} ${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`});save();}
+        function scrollTo(i){showSection('protocol',document.querySelector('.nav-tab'));setTimeout(()=>{const c=document.getElementById(`phase-card-${i}`);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},100);}
+        function confirmReset(){if(confirm('Reset ALL plug training progress?')){localStorage.removeItem(SK);state=getDefault();render();}}
+
+        render();
+        if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.error(e)));
+    </script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sir's Public Tasks | v2.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Becca's Sirender | Sir's Public Tasks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" href="icon-512.png">
@@ -12,43 +12,17 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
-            --midnight: #01040a;
             --surface: rgba(15, 23, 42, 0.97);
             --champagne: #D4AF37;
             --punish-red: #dc2626;
         }
 
-        /* Essential Layout Utilities (Replacing Tailwind) */
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .flex-grow { flex-grow: 1; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .items-center { align-items: center; }
-        .gap-3 { gap: 0.75rem; }
-        .gap-4 { gap: 1rem; }
-        .gap-8 { gap: 2rem; }
-        .space-y-4 > * + * { margin-top: 1rem; }
-        .space-y-6 > * + * { margin-top: 1.5rem; }
-        .w-full { width: 100%; }
-        .max-w-md { max-width: 448px; }
-        .text-center { text-align: center; }
-        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
-        .pt-16 { padding-top: 4rem; }
-        .pb-4 { padding-bottom: 1rem; }
-        .mb-4 { margin-bottom: 1rem; }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--midnight);
-            background-image: radial-gradient(circle at 50% 0%, #0f172a 0%, #01040a 100%);
-            color: #f1f5f9;
             height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            margin: 0;
         }
 
         /* Status Bar Fix */
@@ -75,7 +49,7 @@
             letter-spacing: 1px;
         }
 
-        .serif { font-family: 'Cinzel', serif; }
+        .serif { font-family: 'Playfair Display', serif; }
 
         @keyframes shuffle-blur {
             0%   { transform: translateY(0) scaleX(1);       filter: blur(0px);  opacity: 1; }
@@ -113,9 +87,9 @@
         .urgency-pulse { animation: urgencyPulse 1.2s ease-in-out infinite; }
 
         .glass-card {
-            background: var(--surface);
+            background: var(--glass);
             backdrop-filter: blur(25px);
-            border: 1px solid rgba(212, 175, 55, 0.25);
+            border: 1px solid var(--border);
             border-radius: 40px;
             box-shadow: 0 35px 90px rgba(0,0,0,1);
             transition: border-color 0.4s ease;
@@ -187,7 +161,7 @@
         }
 
         #timer-start-btn {
-            font-family: 'Cinzel', serif;
+            font-family: 'Playfair Display', serif;
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.25em;
@@ -215,7 +189,7 @@
             transition: stroke 0.5s ease;
         }
         #timer-text {
-            font-family: 'Cinzel', serif; font-size: 1.1rem;
+            font-family: 'Playfair Display', serif; font-size: 1.1rem;
             fill: var(--champagne); dominant-baseline: middle;
             text-anchor: middle; transition: fill 0.5s ease;
         }
@@ -224,7 +198,7 @@
             letter-spacing: 0.25em; color: rgba(212,175,55,0.45); margin-top: 0.5rem;
         }
         #timer-expired {
-            display: none; font-family: 'Cinzel', serif; font-size: 0.75rem;
+            display: none; font-family: 'Playfair Display', serif; font-size: 0.75rem;
             color: var(--punish-red); text-transform: uppercase;
             letter-spacing: 0.2em; margin-top: 0.75rem;
             animation: revealResult 0.4s ease both;
@@ -266,7 +240,7 @@
         .slide-modal-overlay.open { transform: translateY(0); }
     </style>
 </head>
-<body class="px-5 pt-2 pb-6">
+<body class="sirender-theme" style="padding: 0 1.25rem;">
 
 
     <button onclick="toggleDatabase(true)" class="btn-corner" style="left: 1.25rem;">
@@ -279,10 +253,11 @@
         <span class="btn-corner-label">Rules</span>
     </button>
 
-    <header class="text-center pt-16 pb-4">
-        <h1 class="serif" style="font-size: 32px; margin-bottom: 5px; color: var(--champagne);">Sir's Public Tasks</h1>
-        <div style="text-align: center;">
-            <a href="index.html" style="color: rgba(212,175,55,0.4); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
+    <header class="text-center" style="padding-top: 3.5rem; padding-bottom: 0.5rem;">
+        <div class="signature" style="margin-bottom: 8px; font-size: 28px;">Becca's Sirender</div>
+        <h1 class="app-title" style="font-size: 32px; margin-bottom: 5px;">Sir's Public Tasks</h1>
+        <div style="text-align: center; margin-top: 6px;">
+            <a href="index.html" style="color: var(--gold-dim); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;">&larr; Return to Central Hub</a>
         </div>
     </header>
 

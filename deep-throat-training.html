@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Becca's Sirender | Deep Throat Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { overflow-x: hidden; min-height: 100vh; }
+
+        /* ─── HEADER ─── */
+        .page-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 16, 36, 0.92); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border); padding: 18px 20px 14px; text-align: center;
+        }
+        .back-link { display: inline-block; color: var(--gold-dim); text-decoration: none; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s ease; margin-bottom: 8px; }
+        .back-link:hover { color: var(--gold); }
+        .page-title { font-family: 'Great Vibes', cursive; font-size: 32px; background: var(--luxury-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .page-subtitle { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-top: 4px; opacity: 0.7; }
+
+        /* ─── PROGRESS DOTS ─── */
+        .progress-overview { display: flex; justify-content: center; gap: 8px; padding: 12px 20px; background: rgba(2, 8, 20, 0.6); border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
+        .week-dot { width: 50px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); transition: all 0.4s ease; cursor: pointer; }
+        .week-dot.completed { background: var(--gold); box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        .week-dot.active { background: rgba(212, 175, 55, 0.5); animation: dotPulse 2s ease-in-out infinite; }
+        @keyframes dotPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* ─── MAIN CONTENT ─── */
+        .main-content { max-width: 600px; margin: 0 auto; padding: 25px 20px 120px; }
+
+        /* ─── STATS ─── */
+        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .stat-card { background: rgba(5, 16, 36, 0.85); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; backdrop-filter: blur(12px); }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); font-weight: 700; }
+        .stat-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: #777; margin-top: 4px; font-weight: 600; }
+
+        /* ─── TAB NAV (Sections) ─── */
+        .section-nav { display: flex; overflow-x: auto; gap: 8px; padding: 0 0 20px; scrollbar-width: none; -ms-overflow-style: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        .nav-tab { flex-shrink: 0; background: transparent; border: 1px solid var(--border); border-radius: 25px; color: var(--gold-dim); font-size: 10px; font-weight: 600; padding: 9px 18px; cursor: pointer; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
+        .nav-tab.active { background: var(--luxury-gradient); color: var(--midnight); border-color: transparent; font-weight: 700; }
+
+        /* ─── CONTENT SECTIONS ─── */
+        .content-section { display: none; animation: fadeSlideIn 0.4s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ─── PHILOSOPHY CARD ─── */
+        .philosophy-card {
+            background: var(--glass); border: 1.5px solid var(--border); border-radius: 20px;
+            padding: 28px 22px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .philosophy-title {
+            font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;
+            padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .philosophy-text { font-size: 13px; color: #ccc; line-height: 1.8; margin-bottom: 14px; }
+        .philosophy-text em { color: var(--gold); font-style: normal; font-weight: 600; }
+        .philosophy-accent {
+            font-family: 'Playfair Display', serif; font-size: 14px; color: var(--gold);
+            font-style: italic; text-align: center; padding: 16px; margin-top: 10px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            opacity: 0.85; line-height: 1.6;
+        }
+
+        /* ─── TOOLS / SAFETY CARD ─── */
+        .tool-item {
+            display: flex; gap: 14px; padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .tool-item:last-child { border-bottom: none; }
+        .tool-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+        .tool-name { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 3px; }
+        .tool-desc { font-size: 11px; color: #888; line-height: 1.5; }
+        .safety-alert {
+            background: rgba(244, 67, 54, 0.06); border: 1px solid rgba(244, 67, 54, 0.25);
+            border-radius: 12px; padding: 16px; margin-top: 15px;
+        }
+        .safety-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #F44336; margin-bottom: 6px; }
+        .safety-text { font-size: 12px; color: #ccc; line-height: 1.6; }
+
+        /* ─── WEEK CARD ─── */
+        .week-card {
+            background: var(--glass); border: 1.5px solid var(--border); border-radius: 20px;
+            margin-bottom: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+        .week-card.locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.5); }
+        .week-card.completed-card { border-color: rgba(76, 175, 80, 0.4); }
+
+        .week-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; cursor: pointer; transition: background 0.3s;
+        }
+        .week-header:hover { background: rgba(255, 255, 255, 0.02); }
+        .week-info { flex: 1; }
+        .week-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 4px; }
+        .week-name { font-family: 'Playfair Display', serif; font-size: 18px; color: #eee; margin-bottom: 4px; }
+        .week-objective { font-size: 11px; color: #888; line-height: 1.5; }
+        .week-status { font-size: 1.5rem; margin-left: 15px; flex-shrink: 0; }
+
+        .week-body { display: none; padding: 0 20px 20px; border-top: 1px solid rgba(212, 175, 55, 0.1); }
+        .week-body.open { display: block; animation: fadeSlideIn 0.4s ease; }
+
+        /* ─── TASK ITEMS ─── */
+        .task-group-label {
+            font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--gold); margin: 18px 0 12px; padding-bottom: 6px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .task-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .task-item:last-child { border-bottom: none; }
+        .task-check {
+            width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--border);
+            background: rgba(255, 255, 255, 0.03); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 2px; transition: all 0.25s ease;
+            font-size: 12px; color: transparent;
+        }
+        .task-check.checked { background: var(--gold); border-color: var(--gold); color: var(--midnight); }
+        .task-check:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
+        .task-text { flex: 1; }
+        .task-name { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 3px; }
+        .task-detail { font-size: 11px; color: #888; line-height: 1.6; }
+        .task-why { font-size: 11px; color: rgba(212, 175, 55, 0.7); line-height: 1.5; margin-top: 6px; font-style: italic; }
+        .task-schedule { font-size: 9px; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+
+        /* ─── TIMER ─── */
+        .timer-section { margin-top: 20px; text-align: center; }
+        .timer-track { fill: none; stroke: rgba(212, 175, 55, 0.1); stroke-width: 5; }
+        .timer-fill { fill: none; stroke: var(--gold); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 0; transition: stroke 0.5s ease; }
+        .timer-display { font-family: 'Playfair Display', serif; font-size: 1.3rem; fill: var(--gold); dominant-baseline: middle; text-anchor: middle; transition: fill 0.5s ease; }
+        .timer-btn {
+            display: inline-block; padding: 12px 30px; background: var(--luxury-gradient);
+            color: var(--midnight); border: none; border-radius: 25px;
+            font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.2s ease;
+        }
+        .timer-btn:active { transform: scale(0.95); }
+        .timer-btn.secondary { background: transparent; color: var(--gold); border: 1px solid var(--border); margin-left: 8px; }
+        .timer-complete-msg { display: none; color: #4CAF50; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-top: 10px; animation: fadeSlideIn 0.4s ease; }
+
+        /* ─── TIPS / GUIDELINES ─── */
+        .tip-card {
+            background: rgba(212, 175, 55, 0.04); border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 12px; padding: 16px; margin-top: 15px;
+        }
+        .tip-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 8px; }
+        .tip-text { font-size: 12px; color: #bbb; line-height: 1.6; }
+
+        /* ─── GUIDELINE ITEMS ─── */
+        .guideline-item { margin-bottom: 18px; }
+        .guideline-name { font-family: 'Playfair Display', serif; font-size: 14px; color: #ddd; margin-bottom: 5px; }
+        .guideline-desc { font-size: 12px; color: #999; line-height: 1.6; }
+
+        /* ─── TROUBLESHOOTING ─── */
+        .trouble-card {
+            background: var(--glass); border: 1px solid var(--border); border-radius: 14px;
+            padding: 18px; margin-bottom: 12px;
+        }
+        .trouble-q { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 8px; font-style: italic; }
+        .trouble-a { font-size: 12px; color: #aaa; line-height: 1.6; }
+        .trouble-a strong { color: var(--gold); font-weight: 600; }
+
+        /* ─── COMPLETE BUTTON ─── */
+        .complete-week-btn {
+            display: block; width: 100%; padding: 16px; margin-top: 20px;
+            background: var(--luxury-gradient); color: var(--midnight); border: none;
+            border-radius: 14px; font-family: 'Montserrat', sans-serif; font-size: 11px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+            transition: 0.2s ease; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
+        }
+        .complete-week-btn:active { transform: scale(0.97); }
+        .complete-week-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+        /* ─── LOG ─── */
+        .session-log { margin-top: 30px; background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+        .log-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .log-entry { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 12px; }
+        .log-entry:last-child { border-bottom: none; }
+        .log-date { color: #777; font-size: 10px; }
+        .log-level { color: var(--gold); font-weight: 600; }
+        .log-note { color: #aaa; font-style: italic; font-size: 11px; flex: 1; margin: 0 12px; }
+        .log-empty { color: #555; font-style: italic; font-size: 12px; text-align: center; padding: 20px 0; }
+
+        /* ─── SUBMISSION ─── */
+        .submission-card {
+            background: rgba(212, 175, 55, 0.03); border: 1.5px solid rgba(212, 175, 55, 0.2);
+            border-radius: 16px; padding: 22px; margin-top: 15px;
+        }
+        .submission-title { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .submission-rule { font-size: 12px; color: #bbb; line-height: 1.6; margin-bottom: 10px; padding-left: 16px; border-left: 2px solid rgba(212, 175, 55, 0.2); }
+
+        /* ─── RESET ─── */
+        .reset-btn {
+            display: block; width: 100%; margin-top: 15px; padding: 14px;
+            background: transparent; border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 12px; color: #F44336; font-size: 10px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s;
+        }
+        .reset-btn:hover { border-color: #F44336; background: rgba(244, 67, 54, 0.05); }
+    </style>
+</head>
+<body class="sirender-theme">
+
+    <header class="page-header">
+        <a href="training-menu.html" class="back-link">← Back to Training</a>
+        <h1 class="page-title">Deep Throat Training</h1>
+        <div class="page-subtitle">Sir's Protocol</div>
+    </header>
+
+    <div class="progress-overview" id="progressDots"></div>
+
+    <div class="main-content">
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-week">1</div>
+                <div class="stat-label">Current Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-sessions">0</div>
+                <div class="stat-label">Tasks Done</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-streak">0</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+        </div>
+
+        <!-- Section Nav -->
+        <div class="section-nav">
+            <button class="nav-tab active" onclick="showSection('protocol', this)">Protocol</button>
+            <button class="nav-tab" onclick="showSection('philosophy', this)">Philosophy</button>
+            <button class="nav-tab" onclick="showSection('tools', this)">Tools & Safety</button>
+            <button class="nav-tab" onclick="showSection('aesthetic', this)">The Aesthetic</button>
+            <button class="nav-tab" onclick="showSection('troubleshooting', this)">Troubleshooting</button>
+            <button class="nav-tab" onclick="showSection('maintenance', this)">Maintenance</button>
+            <button class="nav-tab" onclick="showSection('submission', this)">Submission</button>
+            <button class="nav-tab" onclick="showSection('references', this)">References</button>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: PHILOSOPHY -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-philosophy">
+            <div class="philosophy-card">
+                <div class="philosophy-title">I. Philosophy & Objective</div>
+                <p class="philosophy-text">This protocol is not merely about physical depth; it is about <em>psychological surrender</em> and raw, primal service. The gag reflex is a defense mechanism. To suppress it is to trust your Dominant more than your own biological instinct to reject intrusion.</p>
+                <p class="philosophy-text"><em>The Aesthetic of Service:</em> True deep throating is not a sterile act. It is wet, chaotic, and visceral. We do not wipe away the evidence of your effort; we wear it. You will learn to embrace the "Glaze" — the mix of saliva, tears, and lubrication that coats your face. You will learn that the sound of a "wet gag" is not a failure, but an audible signal of your depth.</p>
+                <div class="philosophy-accent">
+                    "To accept full depth with enthusiastic surrender, allowing the fluids to flow freely, maintaining eye contact, and transforming a service act into a mutual exchange of power and pleasure."
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: TOOLS & SAFETY -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-tools">
+            <div class="philosophy-card">
+                <div class="philosophy-title">II. Tools & Safety</div>
+
+                <div class="task-group-label">Required Tools</div>
+                <div class="tool-item">
+                    <div class="tool-icon">🔩</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Flexible Suction Cup Dildo</div>
+                        <div class="tool-desc">Mount to a wall, headboard, or floor. Forces you to move your head and throat over the object rather than pushing it passively with your hand. Mimics the stability of a partner's hips.</div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">🔧</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Flexible Hand-Held Dildo</div>
+                        <div class="tool-desc">While the suction cup trains your movement (Service), the flexible hand-held trains your capacity (Depth). You must use your hand to push past your biological limits.</div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">💧</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Lubrication</div>
+                        <div class="tool-desc">High-quality water-based lubricant. A dry mouth is a painful mouth.</div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">🪞</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Mirror</div>
+                        <div class="tool-desc">For self-correction during solo drills. Watch your form and posture.</div>
+                    </div>
+                </div>
+
+                <div class="task-group-label" style="margin-top: 22px;">Anatomy — The Trigger Points</div>
+                <p class="philosophy-text" style="margin-bottom: 0;">The gag reflex is triggered primarily by the <em>glossopharyngeal nerve</em>. Sensitivity is highest at the base of the tongue (the glossopharyngeal arch) and the uvula. Week 1 is dedicated to desensitizing these specific zones.</p>
+
+                <div class="safety-alert">
+                    <div class="safety-label">🛑 The "Red" Signal</div>
+                    <div class="safety-text">Since you cannot speak during depth work, use a <strong style="color:#F44336;">Double Tap</strong> on your thigh (or Sir's). This signals: <em>"Airway blocked. Stop."</em></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: THE AESTHETIC -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-aesthetic">
+            <div class="philosophy-card">
+                <div class="philosophy-title">IV. The "Messy" Aesthetic</div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">The "Glaze"</div>
+                    <div class="guideline-desc">A dry mouth is a painful mouth. You will use excessive lubrication and stimulate your own saliva. You are <strong style="color:var(--gold)">prohibited from wiping your face</strong> during the act. The visual of saliva connecting your mouth to the base is desired.</div>
+                </div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">Audio Feedback</div>
+                    <div class="guideline-desc" style="margin-bottom: 8px;">Silence is boring. Two sounds are expected:</div>
+                    <div class="guideline-desc" style="padding-left: 14px; border-left: 2px solid rgba(212,175,55,0.15); margin-bottom: 6px;"><strong style="color:#ddd;">The Hollow Sound:</strong> Shape your mouth to create a "gawk gawk" vacuum sound.</div>
+                    <div class="guideline-desc" style="padding-left: 14px; border-left: 2px solid rgba(212,175,55,0.15);"><strong style="color:#ddd;">The Wet Gag:</strong> If you hit depth and gag, do not panic. Turn the gag into a groan. Let Sir hear your throat working.</div>
+                </div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">The Aftermath</div>
+                    <div class="guideline-desc">When you pull off, do not clean yourself immediately. Keep your mouth open, tongue out, displaying the mess you have made.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: TROUBLESHOOTING -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-troubleshooting">
+            <div class="philosophy-card" style="padding-bottom: 10px;">
+                <div class="philosophy-title">VI. Troubleshooting & Blockages</div>
+            </div>
+
+            <div class="trouble-card">
+                <div class="trouble-q">"The dildo keeps falling off the wall."</div>
+                <div class="trouble-a"><strong>Fix:</strong> Clean the suction cup and the surface with rubbing alcohol. Use a tiny bit of water (not lube) on the rim of the cup for a better seal.</div>
+            </div>
+
+            <div class="trouble-card">
+                <div class="trouble-q">"I'm choking on the fluids."</div>
+                <div class="trouble-a"><strong>Fix — The Tilt:</strong> If on your back, tilt your head way back so fluids pool in the sinuses (nasopharynx). If upright (wall training), lean forward so fluids drain out of the mouth ("The Glaze") rather than down the windpipe.</div>
+            </div>
+
+            <div class="trouble-card">
+                <div class="trouble-q">"My throat hurts/scratches."</div>
+                <div class="trouble-a"><strong>Fix — Chin Up:</strong> You are tucking your chin. Look at the ceiling to straighten the airway.</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: MAINTENANCE -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-maintenance">
+            <div class="philosophy-card">
+                <div class="philosophy-title">VII. Maintenance Protocol</div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">✊</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Pre-Game Ritual</div>
+                        <div class="tool-desc">Left Thumb Squeeze + 3 Deep Breaths before every session or service.</div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">💆</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Jaw Health</div>
+                        <div class="tool-desc">Massage masseter muscles for 2 minutes post-session to prevent tension buildup and TMJ issues.</div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">📹</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Weekly Calibration</div>
+                        <div class="tool-desc">Submit a 2-minute "Sloppy Bobbing" video (dildo suctioned to shower wall) to ensure the reflex stays suppressed.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: SUBMISSION PROTOCOL -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-submission">
+            <div class="philosophy-card">
+                <div class="philosophy-title">V. Video Submission Protocol</div>
+                <p class="philosophy-text" style="margin-bottom: 18px; opacity: 0.8;">Sundays are verification day. Submit evidence of your progress to Sir.</p>
+
+                <div class="submission-card">
+                    <div class="submission-title">Submission Rules</div>
+                    <div class="submission-rule"><strong style="color:var(--gold);">Setup:</strong> Dildo must be suctioned to a surface (floor/wall) to prove you are moving your head, not your hand.</div>
+                    <div class="submission-rule"><strong style="color:var(--gold);">State:</strong> Messy. If you are clean at the end of the video, you have not worked hard enough.</div>
+                    <div class="submission-rule"><strong style="color:var(--gold);">The Statement:</strong> Text accompanying video: <em>"Sir, I have completed the task. Depth: [X]. Hold: [Y]s."</em></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: REFERENCES -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-references">
+            <div class="philosophy-card">
+                <div class="philosophy-title">VIII. Resources & References</div>
+                <p class="philosophy-text" style="margin-bottom: 18px; opacity: 0.8;">External guides and further reading to supplement Sir's protocol.</p>
+
+                <div class="tool-item">
+                    <div class="tool-icon">📖</div>
+                    <div class="tool-text">
+                        <div class="tool-name">School of Squirt — Face Fuck Guide</div>
+                        <div class="tool-desc"><a href="https://www.schoolofsquirt.com/face-fuck/" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">schoolofsquirt.com/face-fuck</a></div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">📖</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Brandon The Dom — Face Fucking Advice</div>
+                        <div class="tool-desc"><a href="https://www.brandonthedom.com/advice/face-fucking" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">brandonthedom.com/advice/face-fucking</a></div>
+                    </div>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon">📖</div>
+                    <div class="tool-text">
+                        <div class="tool-name">Sofia Gray — Ultimate Guide to Facefucking</div>
+                        <div class="tool-desc"><a href="https://sofiagray.com/blog/the-ultimate-guide-to-facefucking/" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3);">sofiagray.com/blog/the-ultimate-guide-to-facefucking</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: PROTOCOL (WEEKS) -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section active" id="sec-protocol">
+            <div id="weeksContainer"></div>
+
+            <div class="session-log">
+                <div class="log-title">Session Log</div>
+                <div id="logEntries"></div>
+            </div>
+
+            <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ════════════════════════════════════════
+        // TRAINING DATA — SIR'S PROTOCOL
+        // ════════════════════════════════════════
+        const WEEKS = [
+            {
+                id: 'week1',
+                badge: 'Week 1',
+                name: 'The Awakening',
+                objective: 'Rewiring the brain to stop associating an object in the throat with vomiting. Desensitization of the glossopharyngeal nerve.',
+                timerDuration: 120,
+                tasks: [
+                    {
+                        id: 'toothbrush',
+                        schedule: '☀️ Daily — Morning',
+                        name: 'The Toothbrush Extension',
+                        detail: 'Brush the tongue 1cm further back than comfortable. Focus on the sides of the rear tongue (the glossopharyngeal arch). Hold for 10 seconds.',
+                        why: null
+                    },
+                    {
+                        id: 'diaphragm',
+                        schedule: '🌙 Daily — Evening',
+                        name: 'Diaphragmatic Anchoring',
+                        detail: 'Lie back. Place hand on stomach. Inhale through nose, exhale through mouth saying "Haaa." Visualize the throat opening like a tunnel. 2 minutes.',
+                        why: null
+                    },
+                    {
+                        id: 'static-hold',
+                        schedule: '📋 Weekly Submission',
+                        name: 'The Static Hold',
+                        detail: 'Stick the dildo to a flat surface (table or floor). Lower your mouth onto it to your "edge." Hold motionless for 60 seconds.',
+                        why: 'Panic causes movement; submission requires stillness. This trains composure at depth.'
+                    }
+                ],
+                tip: 'Start with the toothbrush — it seems simple but it is the foundation. The sides of the rear tongue are the primary trigger zone. Attack them specifically.'
+            },
+            {
+                id: 'week2',
+                badge: 'Week 2',
+                name: 'The Acceptance',
+                objective: 'Opening the esophageal sphincter and overcoming the mental block. Learning the critical Swallow technique.',
+                timerDuration: 180,
+                tasks: [
+                    {
+                        id: 'false-swallow',
+                        schedule: '☀️ Daily — Morning',
+                        name: 'The "False Swallow"',
+                        detail: 'With the dildo inserted, "swallow" hard around the shaft. This pulls the head of the dildo past the Uvula and anchors it deep. 10 reps per session.',
+                        why: 'The swallowing motion opens the throat and suppresses the gag reflex. This is the single most important technique in the protocol.'
+                    },
+                    {
+                        id: 'thumb-squeeze',
+                        schedule: '🌙 Daily — Evening',
+                        name: 'The Left Thumb Squeeze',
+                        detail: 'Squeeze your left thumb inside your fist during depth work. This "neural gating" technique distracts the brain from the throat sensation.',
+                        why: null
+                    },
+                    {
+                        id: 'humming-test',
+                        schedule: '📋 Weekly Submission',
+                        name: 'The Humming Test',
+                        detail: 'Take the dildo deep and hum a song. You cannot hum if you are not breathing — this is your self-verification that your airway is clear at depth.',
+                        why: 'If you can hum, you are breathing. If you are breathing, you are safe. This is your confidence builder.'
+                    }
+                ],
+                tip: 'The Left Thumb Squeeze is surprisingly effective. Use it as your "cheat code" whenever you hit a depth wall. Combine it with the False Swallow for maximum effect.'
+            },
+            {
+                id: 'week3',
+                badge: 'Week 3',
+                name: 'The Glutton',
+                objective: 'Dynamic movement and the embracement of "Sloppiness." You will learn to stop fighting the mess and start performing through it.',
+                timerDuration: 240,
+                tasks: [
+                    {
+                        id: 'drool-drill',
+                        schedule: '☀️ Daily — Morning',
+                        name: 'The Drool Drill',
+                        detail: 'Mount the dildo to a wall or mirror at mouth height. Lean forward. Insert. DO NOT SWALLOW YOUR SPIT. Let the saliva pool in your mouth until it overflows onto your chin, the dildo base, and your chest. Bob rhythmically for 2 minutes.',
+                        why: 'You must learn to breathe through your nose while your mouth is full of fluid. Breaking suction to wipe your face is forbidden.'
+                    },
+                    {
+                        id: 'wet-gag',
+                        schedule: '🌙 Daily — Evening',
+                        name: 'The Wet Gag',
+                        detail: 'Push deeply to trigger a gag intentionally, but do not pull out. Instead, let the throat spasm around the dildo head while you moan through it.',
+                        why: 'Turning the sound of "gagging" into a sound of "pleasure/effort." This transforms your reflex from a stop signal into a performance element.'
+                    },
+                    {
+                        id: 'facefuck-sim',
+                        schedule: '📋 Weekly Submission',
+                        name: 'The Face-Fucking Sim',
+                        detail: 'Suction cup dildo firmly attached to headboard or wall. Move your head onto it. Rhythm: 1 stroke per second for 2 full minutes.',
+                        why: 'You may not wipe your face. By the end, your chin and neck should be "glazed." This is the graduation test.'
+                    }
+                ],
+                tip: 'This week is about embracing the visceral reality of service. The mess IS the point. If you finish clean, you have not pushed hard enough.'
+            }
+        ];
+
+        // ════════════════════════════════════════
+        // STATE MANAGEMENT
+        // ════════════════════════════════════════
+        const STORAGE_KEY = 'sirender_dt_training';
+        let state = loadState();
+
+        function getDefaultState() {
+            return { tasks: {}, completedWeeks: [], sessions: 0, streak: 0, lastSessionDate: null, log: [] };
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) { try { return JSON.parse(saved); } catch(e) { return getDefaultState(); } }
+            return getDefaultState();
+        }
+
+        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+        function getCurrentWeek() {
+            for (let i = 0; i < WEEKS.length; i++) {
+                if (!state.completedWeeks.includes(WEEKS[i].id)) return i;
+            }
+            return WEEKS.length - 1;
+        }
+
+        function isWeekUnlocked(idx) { return idx === 0 || state.completedWeeks.includes(WEEKS[idx - 1].id); }
+        function isWeekCompleted(idx) { return state.completedWeeks.includes(WEEKS[idx].id); }
+        function areAllTasksDone(weekId) {
+            const week = WEEKS.find(w => w.id === weekId);
+            return week.tasks.every(t => state.tasks[`${weekId}_${t.id}`]);
+        }
+
+        // ════════════════════════════════════════
+        // SECTION NAV
+        // ════════════════════════════════════════
+        function showSection(id, btn) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sec-${id}`).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // ════════════════════════════════════════
+        // TIMER
+        // ════════════════════════════════════════
+        let activeTimer = null;
+        let timerInterval = null;
+        const RING_CIRC = 377;
+
+        function startTimer(weekId, duration) {
+            stopTimer();
+            activeTimer = { weekId, total: duration, remaining: duration };
+            document.getElementById(`timer-start-${weekId}`).style.display = 'none';
+            document.getElementById(`timer-ring-${weekId}`).style.display = 'flex';
+            document.getElementById(`timer-done-${weekId}`).style.display = 'none';
+            renderTimer(weekId);
+            timerInterval = setInterval(() => {
+                activeTimer.remaining--;
+                renderTimer(weekId);
+                if (activeTimer.remaining <= 0) {
+                    clearInterval(timerInterval);
+                    const fill = document.getElementById(`timer-fill-${weekId}`);
+                    const text = document.getElementById(`timer-text-${weekId}`);
+                    fill.style.stroke = '#4CAF50'; text.style.fill = '#4CAF50'; text.textContent = '✓';
+                    document.getElementById(`timer-done-${weekId}`).style.display = 'block';
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                }
+            }, 1000);
+        }
+
+        function renderTimer(weekId) {
+            const fill = document.getElementById(`timer-fill-${weekId}`);
+            const text = document.getElementById(`timer-text-${weekId}`);
+            const progress = activeTimer.remaining / activeTimer.total;
+            fill.style.strokeDashoffset = RING_CIRC * (1 - progress);
+            const m = Math.floor(activeTimer.remaining / 60), s = activeTimer.remaining % 60;
+            text.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function stopTimer() { if (timerInterval) clearInterval(timerInterval); activeTimer = null; }
+
+        function resetTimerUI(weekId) {
+            stopTimer();
+            document.getElementById(`timer-start-${weekId}`).style.display = 'inline-block';
+            document.getElementById(`timer-ring-${weekId}`).style.display = 'none';
+            document.getElementById(`timer-done-${weekId}`).style.display = 'none';
+        }
+
+        // ════════════════════════════════════════
+        // RENDERING
+        // ════════════════════════════════════════
+        function render() {
+            renderProgressDots();
+            renderStats();
+            renderWeeks();
+            renderLog();
+        }
+
+        function renderProgressDots() {
+            document.getElementById('progressDots').innerHTML = WEEKS.map((w, i) => {
+                let cls = 'week-dot';
+                if (isWeekCompleted(i)) cls += ' completed';
+                else if (i === getCurrentWeek()) cls += ' active';
+                return `<div class="${cls}" onclick="scrollToWeek(${i})" title="${w.name}"></div>`;
+            }).join('');
+        }
+
+        function renderStats() {
+            const cw = getCurrentWeek();
+            document.getElementById('stat-week').textContent = isWeekCompleted(WEEKS.length - 1) ? '✓' : (cw + 1);
+            document.getElementById('stat-sessions').textContent = state.sessions;
+            document.getElementById('stat-streak').textContent = state.streak;
+        }
+
+        function renderWeeks() {
+            document.getElementById('weeksContainer').innerHTML = WEEKS.map((week, i) => {
+                const unlocked = isWeekUnlocked(i);
+                const completed = isWeekCompleted(i);
+                const isCurrent = i === getCurrentWeek();
+                const allDone = areAllTasksDone(week.id);
+
+                let statusIcon = '🔒';
+                if (completed) statusIcon = '✅';
+                else if (unlocked) statusIcon = isCurrent ? '🔥' : '⬜';
+
+                let cardClass = 'week-card';
+                if (!unlocked) cardClass += ' locked';
+                if (completed) cardClass += ' completed-card';
+
+                return `
+                    <div class="${cardClass}" id="week-card-${i}">
+                        <div class="week-header" onclick="toggleWeek('${week.id}')">
+                            <div class="week-info">
+                                <div class="week-badge">${week.badge}</div>
+                                <div class="week-name">${week.name}</div>
+                                <div class="week-objective">${week.objective}</div>
+                            </div>
+                            <div class="week-status">${statusIcon}</div>
+                        </div>
+                        <div class="week-body" id="body-${week.id}">
+                            ${week.tasks.map(task => {
+                                const key = `${week.id}_${task.id}`;
+                                const done = state.tasks[key];
+                                return `
+                                    <div class="task-group-label" style="margin-top: 16px;">${task.schedule}</div>
+                                    <div class="task-item">
+                                        <div class="task-check ${done ? 'checked' : ''}" onclick="toggleTask('${week.id}', '${task.id}')">
+                                            ${done ? '✓' : ''}
+                                        </div>
+                                        <div class="task-text">
+                                            <div class="task-name" style="${done ? 'text-decoration: line-through; opacity: 0.5;' : ''}">${task.name}</div>
+                                            <div class="task-detail">${task.detail}</div>
+                                            ${task.why ? `<div class="task-why">↳ ${task.why}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+
+                            <div class="timer-section">
+                                <div class="task-group-label" style="text-align: center; border: none;">Session Timer — ${Math.floor(week.timerDuration / 60)} min</div>
+                                <button class="timer-btn" id="timer-start-${week.id}" onclick="startTimer('${week.id}', ${week.timerDuration})">Start Session</button>
+                                <div id="timer-ring-${week.id}" style="display: none; flex-direction: column; align-items: center;">
+                                    <svg width="130" height="130" viewBox="0 0 130 130" style="transform: rotate(-90deg);">
+                                        <circle class="timer-track" cx="65" cy="65" r="60"/>
+                                        <circle class="timer-fill" id="timer-fill-${week.id}" cx="65" cy="65" r="60"/>
+                                        <text class="timer-display" id="timer-text-${week.id}" x="65" y="65" transform="rotate(90,65,65)">--:--</text>
+                                    </svg>
+                                    <button class="timer-btn secondary" onclick="resetTimerUI('${week.id}')" style="margin-top: 10px;">Reset Timer</button>
+                                </div>
+                                <div class="timer-complete-msg" id="timer-done-${week.id}">✓ Session Complete</div>
+                            </div>
+
+                            <div class="tip-card">
+                                <div class="tip-label">💡 Sir's Tip</div>
+                                <div class="tip-text">${week.tip}</div>
+                            </div>
+
+                            <button class="complete-week-btn" onclick="completeWeek('${week.id}')" ${!allDone || completed ? 'disabled' : ''}>
+                                ${completed ? '✓ Week Completed' : (allDone ? 'Mark Week Complete' : 'Complete all tasks to advance')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Auto-open current week
+            const currentIdx = getCurrentWeek();
+            const currentBody = document.getElementById(`body-${WEEKS[currentIdx].id}`);
+            if (currentBody) currentBody.classList.add('open');
+        }
+
+        function renderLog() {
+            const container = document.getElementById('logEntries');
+            if (!state.log.length) {
+                container.innerHTML = '<div class="log-empty">No sessions recorded yet. Complete your first task to begin.</div>';
+                return;
+            }
+            container.innerHTML = state.log.slice(0, 20).map(entry => `
+                <div class="log-entry">
+                    <span class="log-level">${entry.level}</span>
+                    <span class="log-note">${entry.note}</span>
+                    <span class="log-date">${entry.date}</span>
+                </div>
+            `).join('');
+        }
+
+        // ════════════════════════════════════════
+        // INTERACTIONS
+        // ════════════════════════════════════════
+        function toggleWeek(weekId) {
+            const body = document.getElementById(`body-${weekId}`);
+            if (body.classList.contains('open')) {
+                body.classList.remove('open');
+            } else {
+                document.querySelectorAll('.week-body').forEach(b => b.classList.remove('open'));
+                body.classList.add('open');
+            }
+        }
+
+        function toggleTask(weekId, taskId) {
+            const key = `${weekId}_${taskId}`;
+            state.tasks[key] = !state.tasks[key];
+            if (state.tasks[key]) {
+                const week = WEEKS.find(w => w.id === weekId);
+                const task = week.tasks.find(t => t.id === taskId);
+                state.sessions++;
+                updateStreak();
+                addLogEntry(week.badge, `Completed: ${task.name}`);
+            }
+            saveState();
+            render();
+        }
+
+        function completeWeek(weekId) {
+            if (!areAllTasksDone(weekId) || state.completedWeeks.includes(weekId)) return;
+            state.completedWeeks.push(weekId);
+            const week = WEEKS.find(w => w.id === weekId);
+            addLogEntry(week.badge, `✓ ${week.name} completed!`);
+            saveState();
+            render();
+        }
+
+        function updateStreak() {
+            const today = new Date().toDateString();
+            if (state.lastSessionDate) {
+                const last = new Date(state.lastSessionDate);
+                const diff = Math.floor((new Date(today) - last) / (1000 * 60 * 60 * 24));
+                if (diff === 1) state.streak++;
+                else if (diff > 1) state.streak = 1;
+            } else { state.streak = 1; }
+            state.lastSessionDate = today;
+        }
+
+        function addLogEntry(level, note) {
+            const now = new Date();
+            const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            state.log.unshift({ level, note, date: dateStr });
+            saveState();
+        }
+
+        function scrollToWeek(idx) {
+            showSection('protocol', document.querySelector('.nav-tab'));
+            setTimeout(() => {
+                const card = document.getElementById(`week-card-${idx}`);
+                if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function confirmReset() {
+            if (confirm('This will erase ALL your deep throat training progress. Are you sure?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                state = getDefaultState();
+                render();
+            }
+        }
+
+        // ════════════════════════════════════════
+        // INIT
+        // ════════════════════════════════════════
+        render();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(e => console.error(e));
+            });
+        }
+    </script>
+</body>
+</html>

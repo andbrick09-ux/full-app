@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Becca's Sirender | Kegel Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#051024">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { overflow-x: hidden; min-height: 100vh; }
+
+        /* ─── HEADER ─── */
+        .page-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 16, 36, 0.92); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border); padding: 18px 20px 14px; text-align: center;
+        }
+        .back-link { display: inline-block; color: var(--gold-dim); text-decoration: none; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s ease; margin-bottom: 8px; }
+        .back-link:hover { color: var(--gold); }
+        .page-title { font-family: 'Great Vibes', cursive; font-size: 32px; background: var(--luxury-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .page-subtitle { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-top: 4px; opacity: 0.7; }
+
+        /* ─── PROGRESS DOTS ─── */
+        .progress-overview { display: flex; justify-content: center; gap: 8px; padding: 12px 20px; background: rgba(2, 8, 20, 0.6); border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
+        .week-dot { width: 50px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); transition: all 0.4s ease; cursor: pointer; }
+        .week-dot.completed { background: var(--gold); box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        .week-dot.active { background: rgba(212, 175, 55, 0.5); animation: dotPulse 2s ease-in-out infinite; }
+        @keyframes dotPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* ─── MAIN CONTENT ─── */
+        .main-content { max-width: 600px; margin: 0 auto; padding: 25px 20px 120px; }
+
+        /* ─── STATS ─── */
+        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .stat-card { background: rgba(5, 16, 36, 0.85); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; backdrop-filter: blur(12px); }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); font-weight: 700; }
+        .stat-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: #777; margin-top: 4px; font-weight: 600; }
+
+        /* ─── TAB NAV ─── */
+        .section-nav { display: flex; overflow-x: auto; gap: 8px; padding: 0 0 20px; scrollbar-width: none; -ms-overflow-style: none; }
+        .section-nav::-webkit-scrollbar { display: none; }
+        .nav-tab { flex-shrink: 0; background: transparent; border: 1px solid var(--border); border-radius: 25px; color: var(--gold-dim); font-size: 10px; font-weight: 600; padding: 9px 18px; cursor: pointer; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
+        .nav-tab.active { background: var(--luxury-gradient); color: var(--midnight); border-color: transparent; font-weight: 700; }
+
+        /* ─── CONTENT SECTIONS ─── */
+        .content-section { display: none; animation: fadeSlideIn 0.4s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ─── CARDS ─── */
+        .info-card {
+            background: var(--glass); border: 1.5px solid var(--border); border-radius: 20px;
+            padding: 28px 22px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .card-title {
+            font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;
+            padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .card-text { font-size: 13px; color: #ccc; line-height: 1.8; margin-bottom: 14px; }
+        .card-text em { color: var(--gold); font-style: normal; font-weight: 600; }
+        .card-accent {
+            font-family: 'Playfair Display', serif; font-size: 14px; color: var(--gold);
+            font-style: italic; text-align: center; padding: 16px; margin-top: 10px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1); opacity: 0.85; line-height: 1.6;
+        }
+
+        /* ─── TOOL / INFO ITEMS ─── */
+        .info-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .info-item:last-child { border-bottom: none; }
+        .info-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+        .info-name { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 3px; }
+        .info-desc { font-size: 11px; color: #888; line-height: 1.5; }
+
+        /* ─── WEEK CARD ─── */
+        .week-card {
+            background: var(--glass); border: 1.5px solid var(--border); border-radius: 20px;
+            margin-bottom: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+        .week-card.locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.5); }
+        .week-card.completed-card { border-color: rgba(76, 175, 80, 0.4); }
+
+        .week-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; cursor: pointer; transition: background 0.3s;
+        }
+        .week-header:hover { background: rgba(255, 255, 255, 0.02); }
+        .week-info { flex: 1; }
+        .week-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 4px; }
+        .week-name { font-family: 'Playfair Display', serif; font-size: 18px; color: #eee; margin-bottom: 4px; }
+        .week-objective { font-size: 11px; color: #888; line-height: 1.5; }
+        .week-status { font-size: 1.5rem; margin-left: 15px; flex-shrink: 0; }
+
+        .week-body { display: none; padding: 0 20px 20px; border-top: 1px solid rgba(212, 175, 55, 0.1); }
+        .week-body.open { display: block; animation: fadeSlideIn 0.4s ease; }
+
+        /* ─── TASK ITEMS ─── */
+        .task-group-label {
+            font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--gold); margin: 18px 0 12px; padding-bottom: 6px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .task-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        .task-item:last-child { border-bottom: none; }
+        .task-check {
+            width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--border);
+            background: rgba(255, 255, 255, 0.03); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 2px; transition: all 0.25s ease;
+            font-size: 12px; color: transparent;
+        }
+        .task-check.checked { background: var(--gold); border-color: var(--gold); color: var(--midnight); }
+        .task-check:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
+        .task-text { flex: 1; }
+        .task-name { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 3px; }
+        .task-detail { font-size: 11px; color: #888; line-height: 1.6; }
+        .task-why { font-size: 11px; color: rgba(212, 175, 55, 0.7); line-height: 1.5; margin-top: 6px; font-style: italic; }
+
+        /* ─── GUIDED EXERCISE ─── */
+        .guided-exercise {
+            background: rgba(212, 175, 55, 0.03); border: 1.5px solid rgba(212, 175, 55, 0.2);
+            border-radius: 18px; padding: 25px; margin-top: 20px; text-align: center;
+        }
+        .guided-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+        .guided-desc { font-size: 11px; color: #999; margin-bottom: 18px; }
+
+        .exercise-ring-container { position: relative; display: inline-block; margin: 10px 0; }
+        .exercise-ring-container svg { transform: rotate(-90deg); }
+        .ex-track { fill: none; stroke: rgba(212, 175, 55, 0.1); stroke-width: 6; }
+        .ex-fill { fill: none; stroke: var(--gold); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 0.3s linear, stroke 0.5s ease; }
+        .ex-display { font-family: 'Playfair Display', serif; font-size: 1.6rem; fill: var(--gold); dominant-baseline: middle; text-anchor: middle; transition: fill 0.5s ease; }
+
+        .exercise-phase {
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px;
+            color: var(--gold); margin-top: 10px; min-height: 20px;
+        }
+        .exercise-phase.squeeze { color: #4CAF50; }
+        .exercise-phase.release { color: #FF9800; }
+        .exercise-phase.rest { color: #777; }
+
+        .rep-counter { font-size: 11px; color: #777; margin-top: 5px; letter-spacing: 1px; }
+
+        .ex-btn {
+            display: inline-block; padding: 12px 30px; background: var(--luxury-gradient);
+            color: var(--midnight); border: none; border-radius: 25px;
+            font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.2s ease;
+            margin-top: 15px;
+        }
+        .ex-btn:active { transform: scale(0.95); }
+        .ex-btn.secondary { background: transparent; color: var(--gold); border: 1px solid var(--border); margin-left: 8px; }
+        .ex-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+        .ex-complete-msg {
+            display: none; color: #4CAF50; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 2px; font-weight: 700; margin-top: 12px; animation: fadeSlideIn 0.4s ease;
+        }
+
+        /* ─── TIPS ─── */
+        .tip-card { background: rgba(212, 175, 55, 0.04); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 12px; padding: 16px; margin-top: 15px; }
+        .tip-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 8px; }
+        .tip-text { font-size: 12px; color: #bbb; line-height: 1.6; }
+
+        /* ─── GUIDELINE ITEMS ─── */
+        .guideline-item { margin-bottom: 18px; }
+        .guideline-name { font-family: 'Playfair Display', serif; font-size: 14px; color: #ddd; margin-bottom: 5px; }
+        .guideline-desc { font-size: 12px; color: #999; line-height: 1.6; }
+
+        /* ─── COMPLETE BUTTON ─── */
+        .complete-week-btn {
+            display: block; width: 100%; padding: 16px; margin-top: 20px;
+            background: var(--luxury-gradient); color: var(--midnight); border: none;
+            border-radius: 14px; font-family: 'Montserrat', sans-serif; font-size: 11px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+            transition: 0.2s ease; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
+        }
+        .complete-week-btn:active { transform: scale(0.97); }
+        .complete-week-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+        /* ─── LOG ─── */
+        .session-log { margin-top: 30px; background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+        .log-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .log-entry { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 12px; }
+        .log-entry:last-child { border-bottom: none; }
+        .log-date { color: #777; font-size: 10px; }
+        .log-level { color: var(--gold); font-weight: 600; }
+        .log-note { color: #aaa; font-style: italic; font-size: 11px; flex: 1; margin: 0 12px; }
+        .log-empty { color: #555; font-style: italic; font-size: 12px; text-align: center; padding: 20px 0; }
+
+        /* ─── RESET ─── */
+        .reset-btn {
+            display: block; width: 100%; margin-top: 15px; padding: 14px;
+            background: transparent; border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 12px; color: #F44336; font-size: 10px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s;
+        }
+        .reset-btn:hover { border-color: #F44336; background: rgba(244, 67, 54, 0.05); }
+    </style>
+</head>
+<body class="sirender-theme">
+
+    <header class="page-header">
+        <a href="training-menu.html" class="back-link">← Back to Training</a>
+        <h1 class="page-title">Kegel Training</h1>
+        <div class="page-subtitle">Pelvic Floor Mastery</div>
+    </header>
+
+    <div class="progress-overview" id="progressDots"></div>
+
+    <div class="main-content">
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-week">1</div>
+                <div class="stat-label">Current Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-sessions">0</div>
+                <div class="stat-label">Tasks Done</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-streak">0</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+        </div>
+
+        <!-- Section Nav -->
+        <div class="section-nav">
+            <button class="nav-tab active" onclick="showSection('protocol', this)">Protocol</button>
+            <button class="nav-tab" onclick="showSection('why', this)">Why Kegels</button>
+            <button class="nav-tab" onclick="showSection('anatomy', this)">Anatomy</button>
+            <button class="nav-tab" onclick="showSection('techniques', this)">Techniques</button>
+            <button class="nav-tab" onclick="showSection('integration', this)">Scene Use</button>
+            <button class="nav-tab" onclick="showSection('troubleshooting', this)">Troubleshooting</button>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: WHY KEGELS -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-why">
+            <div class="info-card">
+                <div class="card-title">Why Kegel Training Matters</div>
+                <p class="card-text">Kegel exercises strengthen the <em>pelvic floor muscles</em> — the hammock of muscles that supports the bladder, uterus, and rectum. These are the same muscles that contract during orgasm.</p>
+                <p class="card-text">A strong pelvic floor means: <em>stronger orgasms</em>, the ability to <em>grip and squeeze Sir during penetration</em>, enhanced <em>squirting potential</em>, better <em>anal plug retention</em>, and greater <em>bladder control</em> during intense scenes.</p>
+                <p class="card-text">For Sir, the difference is immediately noticeable. A trained pelvic floor creates an <em>active, responsive grip</em> rather than a passive experience. You become a participant in penetration, not just a recipient.</p>
+                <div class="card-accent">"A well-trained pelvic floor is the difference between a vessel and a vice."</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: ANATOMY -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-anatomy">
+            <div class="info-card">
+                <div class="card-title">Anatomy & Identification</div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">Finding Your Pelvic Floor</div>
+                    <div class="guideline-desc">The easiest way to identify your pelvic floor muscles: <strong style="color:#ddd;">stop your urine mid-stream</strong>. The muscles you use to do that are your pelvic floor. Once identified, never practice Kegels while urinating — this is only for identification.</div>
+                </div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">The Three Muscle Zones</div>
+                    <div class="guideline-desc" style="margin-bottom: 8px;">Your pelvic floor has three key zones you'll learn to isolate:</div>
+                    <div class="guideline-desc" style="padding-left: 14px; border-left: 2px solid rgba(212,175,55,0.15); margin-bottom: 6px;"><strong style="color:#ddd;">Anterior (Front):</strong> Around the urethra. Controls bladder and clitoral engorgement. Squeeze as if stopping urine.</div>
+                    <div class="guideline-desc" style="padding-left: 14px; border-left: 2px solid rgba(212,175,55,0.15); margin-bottom: 6px;"><strong style="color:#ddd;">Middle (Vaginal):</strong> The vaginal canal walls. This is the "grip" Sir feels during penetration. Squeeze as if gripping a finger.</div>
+                    <div class="guideline-desc" style="padding-left: 14px; border-left: 2px solid rgba(212,175,55,0.15);"><strong style="color:#ddd;">Posterior (Back):</strong> Around the anus. Controls anal grip and plug retention. Squeeze as if holding in gas.</div>
+                </div>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">The "Elevator" Visualization</div>
+                    <div class="guideline-desc">Imagine your pelvic floor is an elevator. Floor 1 is fully relaxed. Floor 5 is maximum contraction. Training involves learning to hold at specific floors — not just all-or-nothing squeezes.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: TECHNIQUES -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-techniques">
+            <div class="info-card">
+                <div class="card-title">Core Techniques</div>
+
+                <div class="info-item">
+                    <div class="info-icon">⚡</div>
+                    <div class="info-text">
+                        <div class="info-name">Quick Flicks (Fast-Twitch)</div>
+                        <div class="info-desc">Rapid squeeze-release cycles at maximum intensity. 1 second squeeze, 1 second release. Trains the fast-twitch muscle fibers responsible for orgasmic contractions.</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🏔️</div>
+                    <div class="info-text">
+                        <div class="info-name">Sustained Holds (Slow-Twitch)</div>
+                        <div class="info-desc">Squeeze and hold at maximum contraction for extended durations. Trains the slow-twitch endurance fibers. The goal is 10-second holds progressing to 30 seconds.</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🔺</div>
+                    <div class="info-text">
+                        <div class="info-name">The Elevator</div>
+                        <div class="info-desc">Progressive contraction in stages: clench to 25%, hold 2s → 50%, hold 2s → 75%, hold 2s → 100%, hold 5s → release to 75% → 50% → 25% → fully relaxed. Builds control over partial engagement.</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🌊</div>
+                    <div class="info-text">
+                        <div class="info-name">The Wave</div>
+                        <div class="info-desc">Contract front-to-back in sequence: urethra first, then vaginal canal, then anus. Hold all three, then release back-to-front. Develops isolated zone control for advanced service.</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">💎</div>
+                    <div class="info-text">
+                        <div class="info-name">Weighted Kegels</div>
+                        <div class="info-desc">Using Ben Wa balls or Kegel weights inserted vaginally during exercises. The added resistance dramatically accelerates strength gains. Introduced in Week 3.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: SCENE INTEGRATION -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-integration">
+            <div class="info-card">
+                <div class="card-title">Scene Integration</div>
+                <p class="card-text" style="margin-bottom: 18px; opacity: 0.8;">How to deploy your training during service to Sir.</p>
+
+                <div class="guideline-item">
+                    <div class="guideline-name">The Greeting Squeeze</div>
+                    <div class="guideline-desc">Upon initial penetration, perform 3 strong squeeze-release cycles to signal readiness and demonstrate training. Sir should feel each contraction distinctly.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">The Rhythmic Milk</div>
+                    <div class="guideline-desc">During penetration, match your squeeze rhythm to Sir's thrusts — squeeze on the out-stroke, release on the in-stroke. This creates a "milking" sensation.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">The Vice Grip</div>
+                    <div class="guideline-desc">On Sir's command, clench at maximum contraction and hold. Do not release until told. This is the endurance hold — your sustained holds training applies here.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">Orgasm Amplification</div>
+                    <div class="guideline-desc">When approaching orgasm, perform rapid quick flicks to intensify the contractions. A strong pelvic floor turns mild orgasms into full-body events. When Sir edges you, maintain a light constant clench to stay at threshold.</div>
+                </div>
+                <div class="guideline-item">
+                    <div class="guideline-name">Plug Lock</div>
+                    <div class="guideline-desc">During anal plug wear, perform periodic squeeze sets to keep the plug firmly seated and active. This simultaneously trains the posterior zone and maintains awareness of the plug.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: TROUBLESHOOTING -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section" id="sec-troubleshooting">
+            <div class="info-card" style="padding-bottom: 10px;">
+                <div class="card-title">Troubleshooting</div>
+            </div>
+
+            <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px;">
+                <div style="font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 8px; font-style: italic;">"I'm not sure I'm squeezing the right muscles."</div>
+                <div style="font-size: 12px; color: #aaa; line-height: 1.6;"><strong style="color: var(--gold);">Fix:</strong> Insert a clean finger into the vagina and squeeze. You should feel pressure around your finger. If you're clenching your abs, glutes, or thighs instead, you're using the wrong muscles. Isolate: only the internal muscles should fire.</div>
+            </div>
+
+            <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px;">
+                <div style="font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 8px; font-style: italic;">"I can't hold for more than a few seconds."</div>
+                <div style="font-size: 12px; color: #aaa; line-height: 1.6;"><strong style="color: var(--gold);">Fix:</strong> This is completely normal at first. The pelvic floor is a muscle group that most people have never consciously trained. Start with 2–3 second holds and add 1 second per week. Consistency beats intensity.</div>
+            </div>
+
+            <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px;">
+                <div style="font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 8px; font-style: italic;">"I feel discomfort or fatigue."</div>
+                <div style="font-size: 12px; color: #aaa; line-height: 1.6;"><strong style="color: var(--gold);">Fix:</strong> You're overtraining. The pelvic floor can fatigue like any muscle. Rest for 24 hours between intense sessions. If you feel pain (not just fatigue), consult a pelvic floor physical therapist.</div>
+            </div>
+
+            <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px;">
+                <div style="font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 8px; font-style: italic;">"I keep forgetting to do them."</div>
+                <div style="font-size: 12px; color: #aaa; line-height: 1.6;"><strong style="color: var(--gold);">Fix:</strong> Stack them onto existing habits. Do Kegels every time you're at a red light, every time you sit down at your desk, or every time you check your phone. Pair them with the guided exercise timer on this page.</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECTION: PROTOCOL (WEEKS) -->
+        <!-- ═══════════════════════════════════════ -->
+        <div class="content-section active" id="sec-protocol">
+            <div id="weeksContainer"></div>
+
+            <div class="session-log">
+                <div class="log-title">Session Log</div>
+                <div id="logEntries"></div>
+            </div>
+
+            <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
+        </div>
+    </div>
+
+    <script>
+        // ════════════════════════════════════════
+        // TRAINING DATA
+        // ════════════════════════════════════════
+        const WEEKS = [
+            {
+                id: 'week1',
+                badge: 'Week 1',
+                name: 'Discovery & Isolation',
+                objective: 'Identify the correct muscles, learn to isolate them from abs/glutes, and establish a daily habit.',
+                exercise: { sets: 3, squeezeTime: 3, releaseTime: 3, reps: 10 },
+                tasks: [
+                    { id: 'identify', schedule: '☀️ Day 1', name: 'Muscle Identification', detail: 'During urination, stop the flow mid-stream. The muscles you engaged are your pelvic floor. Repeat 2-3 times to confirm. Do NOT use this as a regular exercise — only for identification.', why: null },
+                    { id: 'finger-test', schedule: '☀️ Day 1', name: 'The Finger Verification', detail: 'Insert a clean finger into the vagina. Squeeze. You should feel distinct pressure around your finger without clenching your abs, buttocks, or thighs.', why: 'This verification ensures you are isolating the correct muscle group. Many people unknowingly clench their abs instead.' },
+                    { id: 'basic-squeeze', schedule: '📋 Daily (AM & PM)', name: 'Basic Squeeze & Release', detail: '3 sets of 10 reps: Squeeze for 3 seconds, release for 3 seconds. Rest 30 seconds between sets. Keep abs, glutes, and thighs completely relaxed.', why: null },
+                    { id: 'breathing', schedule: '📋 Daily', name: 'Breath Coordination', detail: 'Inhale to relax, exhale to squeeze. Never hold your breath during Kegels. Practice coordinating the squeeze with your exhale for all 3 sets.', why: 'Holding your breath recruits the wrong muscles and reduces effectiveness. Breath-squeeze coordination is the foundation of all advanced techniques.' }
+                ],
+                tip: 'The most common mistake is squeezing the wrong muscles. If your stomach tenses, your buttocks clench, or your thighs tighten — you are doing it wrong. The movement should be entirely internal and invisible.'
+            },
+            {
+                id: 'week2',
+                badge: 'Week 2',
+                name: 'Endurance Building',
+                objective: 'Increase hold duration and introduce fast-twitch training. Build the stamina for scene-level performance.',
+                exercise: { sets: 3, squeezeTime: 5, releaseTime: 5, reps: 10 },
+                tasks: [
+                    { id: 'long-holds', schedule: '☀️ Daily — Morning', name: '5-Second Sustained Holds', detail: '3 sets of 10 reps: Squeeze at maximum intensity for 5 full seconds, then fully relax for 5 seconds. Focus on maintaining constant intensity — no fading.', why: null },
+                    { id: 'quick-flicks', schedule: '🌙 Daily — Evening', name: 'Quick Flick Drills', detail: '3 sets of 15 reps: Rapid squeeze-release at maximum speed. 1 second squeeze, 1 second release. These train the fast-twitch fibers responsible for orgasm intensity.', why: 'Fast-twitch fibers fatigue quickly but generate the most force. They are responsible for the rhythmic contractions during orgasm.' },
+                    { id: 'elevator', schedule: '📋 3x Per Week', name: 'The Elevator (Graduated Hold)', detail: 'Squeeze to 25% → hold 3s → 50% → hold 3s → 75% → hold 3s → 100% → hold 5s. Then reverse: 75% → 50% → 25% → fully relaxed. 5 complete cycles.', why: 'This develops fine motor control over your pelvic floor. During scenes, you will need to modulate grip intensity on command — not just on/off.' }
+                ],
+                tip: 'You can do Kegels anywhere — at your desk, in the car, watching TV. Nobody can see them. Use idle moments throughout the day as bonus training time.'
+            },
+            {
+                id: 'week3',
+                badge: 'Week 3',
+                name: 'Resistance & Isolation',
+                objective: 'Introduce weighted training with Ben Wa balls and learn front-to-back zone isolation for advanced service techniques.',
+                exercise: { sets: 4, squeezeTime: 8, releaseTime: 4, reps: 10 },
+                tasks: [
+                    { id: 'weighted', schedule: '☀️ Daily — Morning', name: 'Weighted Kegel Training', detail: 'Insert Ben Wa balls or Kegel weights. Perform standard squeeze-hold-release sets while standing. The added weight forces the muscles to work harder to retain the balls. 4 sets of 10 reps, 8-second holds.', why: 'Weight training applies to the pelvic floor just as it does to any muscle group. Added resistance accelerates strength gains dramatically.' },
+                    { id: 'wave', schedule: '🌙 Daily — Evening', name: 'The Wave (Zone Isolation)', detail: 'Contract front-to-back in sequence: urethra zone first, hold → vaginal canal, hold → anal zone, hold all three for 5 seconds. Then release back-to-front: anal → vaginal → urethra. 8 complete waves.', why: 'Zone isolation lets you independently control different areas. During penetration, you can squeeze the vaginal zone while keeping the anal zone engaged around a plug.' },
+                    { id: 'endurance-test', schedule: '📋 Weekly Test', name: 'The Endurance Benchmark', detail: 'Maximum sustained hold at full contraction. Time yourself. Your goal is 15 seconds by end of week 3, 30 seconds by end of week 4. Record your time in the session log.', why: null }
+                ],
+                tip: 'When using Ben Wa balls, start in a standing position — gravity adds natural resistance. If the balls slip out easily, you need lighter weights with a stronger internal grip. Work up to walking with them inserted.'
+            },
+            {
+                id: 'week4',
+                badge: 'Week 4',
+                name: 'Performance & Integration',
+                objective: 'Apply all techniques in real-world contexts. Learn to deploy Kegel control during active service to Sir.',
+                exercise: { sets: 4, squeezeTime: 10, releaseTime: 3, reps: 12 },
+                tasks: [
+                    { id: 'rhythm-match', schedule: '☀️ Daily — Morning', name: 'Rhythm Matching Practice', detail: 'Using a dildo or during penetration: squeeze on the out-stroke, release on the in-stroke. Maintain this rhythm for 2 minutes continuously. This is the "milking" technique.', why: 'Matching your contractions to the penetration rhythm creates an active, responsive experience for Sir rather than passive reception.' },
+                    { id: 'command-holds', schedule: '🌙 Daily — Evening', name: 'On-Command Holds', detail: 'Practice holding at maximum contraction for 10+ seconds in various positions: lying, sitting, standing, and on all fours. You must be able to clench hard in any position Sir places you in.', why: null },
+                    { id: 'orgasm-control', schedule: '📋 Practice Session', name: 'Orgasm Amplification Drill', detail: 'During solo play, practice rapid quick flicks as you approach orgasm. Note the difference in orgasm intensity. Then practice maintaining a light constant clench during edging to sustain arousal at threshold.', why: 'A trained pelvic floor transforms your orgasms from localized contractions to full-body waves. This is the payoff of the entire protocol.' },
+                    { id: 'ball-walk', schedule: '📋 Bonus Challenge', name: 'The Walk', detail: 'Insert Ben Wa balls and go about normal activities for 30 minutes — walking, cleaning, cooking. Periodically perform squeeze sets to keep them seated. This is the ultimate retention and endurance test.', why: null }
+                ],
+                tip: 'The "Greeting Squeeze" — when Sir first enters you, perform 3 strong squeeze-release cycles to demonstrate your training. This is your way of telling Sir: "I have been practicing for you."'
+            }
+        ];
+
+        // ════════════════════════════════════════
+        // STATE
+        // ════════════════════════════════════════
+        const STORAGE_KEY = 'sirender_kegel_training';
+        let state = loadState();
+
+        function getDefaultState() { return { tasks: {}, completedWeeks: [], sessions: 0, streak: 0, lastSessionDate: null, log: [] }; }
+        function loadState() { const s = localStorage.getItem(STORAGE_KEY); if (s) { try { return JSON.parse(s); } catch(e) {} } return getDefaultState(); }
+        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function getCurrentWeek() { for (let i = 0; i < WEEKS.length; i++) { if (!state.completedWeeks.includes(WEEKS[i].id)) return i; } return WEEKS.length - 1; }
+        function isWeekUnlocked(i) { return i === 0 || state.completedWeeks.includes(WEEKS[i - 1].id); }
+        function isWeekCompleted(i) { return state.completedWeeks.includes(WEEKS[i].id); }
+        function areAllTasksDone(wid) { return WEEKS.find(w => w.id === wid).tasks.every(t => state.tasks[`${wid}_${t.id}`]); }
+
+        // ════════════════════════════════════════
+        // SECTION NAV
+        // ════════════════════════════════════════
+        function showSection(id, btn) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`sec-${id}`).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // ════════════════════════════════════════
+        // GUIDED EXERCISE ENGINE
+        // ════════════════════════════════════════
+        let exState = null;
+        let exInterval = null;
+
+        function startExercise(weekId) {
+            const week = WEEKS.find(w => w.id === weekId);
+            const cfg = week.exercise;
+            exState = {
+                weekId, totalSets: cfg.sets, currentSet: 1,
+                totalReps: cfg.reps, currentRep: 1,
+                squeezeTime: cfg.squeezeTime, releaseTime: cfg.releaseTime,
+                phase: 'squeeze', phaseRemaining: cfg.squeezeTime,
+                totalPhaseTime: cfg.squeezeTime
+            };
+
+            document.getElementById(`ex-start-${weekId}`).style.display = 'none';
+            document.getElementById(`ex-ring-${weekId}`).style.display = 'block';
+            document.getElementById(`ex-done-${weekId}`).style.display = 'none';
+            updateExerciseUI(weekId);
+
+            exInterval = setInterval(() => {
+                exState.phaseRemaining--;
+                if (exState.phaseRemaining <= 0) {
+                    if (exState.phase === 'squeeze') {
+                        exState.phase = 'release';
+                        exState.phaseRemaining = exState.releaseTime;
+                        exState.totalPhaseTime = exState.releaseTime;
+                    } else {
+                        exState.currentRep++;
+                        if (exState.currentRep > exState.totalReps) {
+                            exState.currentSet++;
+                            if (exState.currentSet > exState.totalSets) {
+                                clearInterval(exInterval);
+                                completeExercise(weekId);
+                                return;
+                            }
+                            exState.currentRep = 1;
+                        }
+                        exState.phase = 'squeeze';
+                        exState.phaseRemaining = exState.squeezeTime;
+                        exState.totalPhaseTime = exState.squeezeTime;
+                    }
+                }
+                updateExerciseUI(weekId);
+            }, 1000);
+        }
+
+        function updateExerciseUI(weekId) {
+            const fill = document.getElementById(`ex-fill-${weekId}`);
+            const text = document.getElementById(`ex-text-${weekId}`);
+            const phaseEl = document.getElementById(`ex-phase-${weekId}`);
+            const repEl = document.getElementById(`ex-rep-${weekId}`);
+            const CIRC = 377;
+
+            const progress = exState.phaseRemaining / exState.totalPhaseTime;
+            fill.style.strokeDashoffset = CIRC * progress;
+
+            if (exState.phase === 'squeeze') {
+                fill.style.stroke = '#4CAF50';
+                text.style.fill = '#4CAF50';
+                phaseEl.className = 'exercise-phase squeeze';
+                phaseEl.textContent = 'SQUEEZE';
+            } else {
+                fill.style.stroke = '#FF9800';
+                text.style.fill = '#FF9800';
+                phaseEl.className = 'exercise-phase release';
+                phaseEl.textContent = 'RELEASE';
+            }
+            text.textContent = exState.phaseRemaining;
+            repEl.textContent = `Set ${exState.currentSet}/${exState.totalSets} · Rep ${exState.currentRep}/${exState.totalReps}`;
+        }
+
+        function completeExercise(weekId) {
+            const text = document.getElementById(`ex-text-${weekId}`);
+            const fill = document.getElementById(`ex-fill-${weekId}`);
+            const phaseEl = document.getElementById(`ex-phase-${weekId}`);
+            fill.style.stroke = '#4CAF50'; fill.style.strokeDashoffset = '0';
+            text.style.fill = '#4CAF50'; text.textContent = '✓';
+            phaseEl.textContent = ''; 
+            document.getElementById(`ex-done-${weekId}`).style.display = 'block';
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+
+        function stopExercise(weekId) {
+            if (exInterval) clearInterval(exInterval);
+            exState = null;
+            document.getElementById(`ex-start-${weekId}`).style.display = 'inline-block';
+            document.getElementById(`ex-ring-${weekId}`).style.display = 'none';
+            document.getElementById(`ex-done-${weekId}`).style.display = 'none';
+        }
+
+        // ════════════════════════════════════════
+        // RENDERING
+        // ════════════════════════════════════════
+        function render() {
+            // Progress dots
+            document.getElementById('progressDots').innerHTML = WEEKS.map((w, i) => {
+                let c = 'week-dot';
+                if (isWeekCompleted(i)) c += ' completed';
+                else if (i === getCurrentWeek()) c += ' active';
+                return `<div class="${c}" onclick="scrollToWeek(${i})" title="${w.name}"></div>`;
+            }).join('');
+
+            // Stats
+            const cw = getCurrentWeek();
+            document.getElementById('stat-week').textContent = isWeekCompleted(WEEKS.length - 1) ? '✓' : (cw + 1);
+            document.getElementById('stat-sessions').textContent = state.sessions;
+            document.getElementById('stat-streak').textContent = state.streak;
+
+            // Weeks
+            document.getElementById('weeksContainer').innerHTML = WEEKS.map((week, i) => {
+                const unlocked = isWeekUnlocked(i);
+                const completed = isWeekCompleted(i);
+                const isCurrent = i === getCurrentWeek();
+                const allDone = areAllTasksDone(week.id);
+                const cfg = week.exercise;
+
+                let statusIcon = '🔒';
+                if (completed) statusIcon = '✅';
+                else if (unlocked) statusIcon = isCurrent ? '🔥' : '⬜';
+
+                let cardClass = 'week-card';
+                if (!unlocked) cardClass += ' locked';
+                if (completed) cardClass += ' completed-card';
+
+                return `
+                    <div class="${cardClass}" id="week-card-${i}">
+                        <div class="week-header" onclick="toggleWeek('${week.id}')">
+                            <div class="week-info">
+                                <div class="week-badge">${week.badge}</div>
+                                <div class="week-name">${week.name}</div>
+                                <div class="week-objective">${week.objective}</div>
+                            </div>
+                            <div class="week-status">${statusIcon}</div>
+                        </div>
+                        <div class="week-body" id="body-${week.id}">
+                            ${week.tasks.map(task => {
+                                const key = `${week.id}_${task.id}`;
+                                const done = state.tasks[key];
+                                return `
+                                    <div class="task-group-label" style="margin-top: 16px;">${task.schedule}</div>
+                                    <div class="task-item">
+                                        <div class="task-check ${done ? 'checked' : ''}" onclick="toggleTask('${week.id}', '${task.id}')">
+                                            ${done ? '✓' : ''}
+                                        </div>
+                                        <div class="task-text">
+                                            <div class="task-name" style="${done ? 'text-decoration: line-through; opacity: 0.5;' : ''}">${task.name}</div>
+                                            <div class="task-detail">${task.detail}</div>
+                                            ${task.why ? `<div class="task-why">↳ ${task.why}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+
+                            <div class="guided-exercise">
+                                <div class="guided-title">Guided Session</div>
+                                <div class="guided-desc">${cfg.sets} sets × ${cfg.reps} reps · ${cfg.squeezeTime}s squeeze / ${cfg.releaseTime}s release</div>
+                                <button class="ex-btn" id="ex-start-${week.id}" onclick="startExercise('${week.id}')">Start Guided Exercise</button>
+                                <div id="ex-ring-${week.id}" style="display: none;">
+                                    <div class="exercise-ring-container">
+                                        <svg width="140" height="140" viewBox="0 0 130 130">
+                                            <circle class="ex-track" cx="65" cy="65" r="60"/>
+                                            <circle class="ex-fill" id="ex-fill-${week.id}" cx="65" cy="65" r="60"/>
+                                            <text class="ex-display" id="ex-text-${week.id}" x="65" y="65" transform="rotate(90,65,65)">--</text>
+                                        </svg>
+                                    </div>
+                                    <div class="exercise-phase" id="ex-phase-${week.id}"></div>
+                                    <div class="rep-counter" id="ex-rep-${week.id}"></div>
+                                    <button class="ex-btn secondary" onclick="stopExercise('${week.id}')" style="margin-top: 12px;">Stop</button>
+                                </div>
+                                <div class="ex-complete-msg" id="ex-done-${week.id}">✓ Session Complete</div>
+                            </div>
+
+                            <div class="tip-card">
+                                <div class="tip-label">💡 Sir's Tip</div>
+                                <div class="tip-text">${week.tip}</div>
+                            </div>
+
+                            <button class="complete-week-btn" onclick="completeWeek('${week.id}')" ${!allDone || completed ? 'disabled' : ''}>
+                                ${completed ? '✓ Week Completed' : (allDone ? 'Mark Week Complete' : 'Complete all tasks to advance')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Auto-open current
+            const cb = document.getElementById(`body-${WEEKS[getCurrentWeek()].id}`);
+            if (cb) cb.classList.add('open');
+
+            // Log
+            const lc = document.getElementById('logEntries');
+            if (!state.log.length) { lc.innerHTML = '<div class="log-empty">No sessions recorded yet.</div>'; }
+            else { lc.innerHTML = state.log.slice(0, 20).map(e => `<div class="log-entry"><span class="log-level">${e.level}</span><span class="log-note">${e.note}</span><span class="log-date">${e.date}</span></div>`).join(''); }
+        }
+
+        // ════════════════════════════════════════
+        // INTERACTIONS
+        // ════════════════════════════════════════
+        function toggleWeek(wid) {
+            const b = document.getElementById(`body-${wid}`);
+            if (b.classList.contains('open')) b.classList.remove('open');
+            else { document.querySelectorAll('.week-body').forEach(x => x.classList.remove('open')); b.classList.add('open'); }
+        }
+
+        function toggleTask(wid, tid) {
+            const key = `${wid}_${tid}`;
+            state.tasks[key] = !state.tasks[key];
+            if (state.tasks[key]) {
+                const w = WEEKS.find(x => x.id === wid), t = w.tasks.find(x => x.id === tid);
+                state.sessions++; updateStreak();
+                addLogEntry(w.badge, `Completed: ${t.name}`);
+            }
+            saveState(); render();
+        }
+
+        function completeWeek(wid) {
+            if (!areAllTasksDone(wid) || state.completedWeeks.includes(wid)) return;
+            state.completedWeeks.push(wid);
+            const w = WEEKS.find(x => x.id === wid);
+            addLogEntry(w.badge, `✓ ${w.name} completed!`);
+            saveState(); render();
+        }
+
+        function updateStreak() {
+            const today = new Date().toDateString();
+            if (state.lastSessionDate) {
+                const diff = Math.floor((new Date(today) - new Date(state.lastSessionDate)) / 86400000);
+                if (diff === 1) state.streak++; else if (diff > 1) state.streak = 1;
+            } else state.streak = 1;
+            state.lastSessionDate = today;
+        }
+
+        function addLogEntry(level, note) {
+            const n = new Date();
+            state.log.unshift({ level, note, date: `${n.getMonth()+1}/${n.getDate()} ${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}` });
+            saveState();
+        }
+
+        function scrollToWeek(i) {
+            showSection('protocol', document.querySelector('.nav-tab'));
+            setTimeout(() => { const c = document.getElementById(`week-card-${i}`); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+        }
+
+        function confirmReset() {
+            if (confirm('This will erase ALL your Kegel training progress. Are you sure?')) {
+                localStorage.removeItem(STORAGE_KEY); state = getDefaultState(); render();
+            }
+        }
+
+        // ════════════════════════════════════════
+        // INIT
+        // ════════════════════════════════════════
+        render();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.error(e)); });
+        }
+    </script>
+</body>
+</html>
