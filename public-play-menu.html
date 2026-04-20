@@ -65,6 +65,14 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.5) !important;
             transition: 0.5s all ease;
         }
+        .glass-card:hover {
+            border-color: var(--gold) !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 25px rgba(212, 175, 55, 0.15) !important;
+            transform: translateY(-2px);
+        }
+        .glass-card:active {
+            transform: scale(0.98) translateY(0);
+        }
         .card-soaked { animation: card-pulse 2s infinite ease-in-out; }
 
         .sticky-header {

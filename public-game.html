@@ -92,7 +92,17 @@
             border: 1px solid var(--border);
             border-radius: 40px;
             box-shadow: 0 35px 90px rgba(0,0,0,1);
-            transition: border-color 0.4s ease;
+            transition: all 0.4s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 35px 90px rgba(0,0,0,1), 0 0 30px rgba(212, 175, 55, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .glass-card:active {
+            transform: scale(0.98) translateY(0);
         }
 
         .directive-display {
