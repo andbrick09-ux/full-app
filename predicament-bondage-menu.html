@@ -22,11 +22,10 @@
         }
 
         .dashboard { 
-            background: rgba(2, 8, 20, 0.95); 
+            background: rgba(2, 8, 20, 0.6); 
             padding: 15px; 
             border-bottom: 1px solid var(--border); 
-            position: sticky; top: 0; z-index: 1000; 
-            backdrop-filter: blur(25px); text-align: center; 
+            text-align: center; 
         }
 
         .app-title { 
@@ -97,13 +96,7 @@
             margin-top: 10px; min-height: 80px; resize: vertical; font-size: 13px; line-height: 1.5; 
         }
         
-        .idx-toggle { 
-            position: fixed; bottom: 25px; right: 25px; background: var(--luxury-gradient); 
-            color: var(--midnight); border: none; padding: 15px 25px; border-radius: 50px; 
-            font-weight: 700; cursor: pointer; z-index: 1500; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3); 
-            font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s ease;
-        }
-        .idx-toggle:active { transform: scale(0.97) translateY(2px); }
+        .idx-toggle { display: none; }
         
         @media (min-width: 600px) { 
             .row { flex-direction: row; align-items: baseline; } 
@@ -116,7 +109,7 @@
 
 <!-- Topbar -->
 <div class="topbar">
-  <a href="assessment-menu.html" class="back-btn" aria-label="Back">
+  <a href="index.html" class="back-btn" aria-label="Back">
     <span class="material-symbols-rounded">arrow_back</span>
   </a>
   <div class="topbar-center">
@@ -138,7 +131,7 @@
     </div>
 </section>
 
-<button class="idx-toggle" onclick="toggleMenu(true)">INDEX MENU</button>
+
 
 <aside id="sidebar">
     <h2>Categories</h2>
