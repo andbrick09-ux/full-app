@@ -62,12 +62,43 @@
 
   </div>
 
+  <div id="toast" class="toast">Locked by Sir</div>
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('sw.js').catch(e => console.error(e));
       });
     }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if(t) {
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem('sp_settings') || '{}'); } catch(e){}
+      
+      // Default fallback if no settings found
+      const active = s.activeTrainings || ['anal-plug-training.html', 'position-training.html', 'kegel-training.html'];
+      
+      const cards = document.querySelectorAll('.menu-card');
+      cards.forEach(c => {
+        const h = c.getAttribute('href');
+        if (h && !active.includes(h)) {
+          c.classList.add('locked');
+          c.removeAttribute('href');
+          c.onclick = (e) => { e.preventDefault(); showToast("This training is currently locked by Sir"); };
+          const icon = c.querySelector('.menu-card-icon');
+          if (icon) icon.innerHTML = "🔒";
+        }
+      });
+    });
   </script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
