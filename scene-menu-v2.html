@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <title>Sir's Protocol — Scene Builder</title>
+  <title>Dom Sub Hub — Scene Builder</title>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
@@ -1384,7 +1384,7 @@
       </button>
       <a class="intro-back" href="index.html" style="margin-left:auto;">
         <span class="material-symbols-rounded">arrow_back</span>
-        Sir's Protocol
+        Dom Sub Hub
       </a>
     </div>
     <div class="intro-eyebrow">Scene Builder</div>
@@ -1449,7 +1449,7 @@
     </button>
     <div class="topbar-center">
       <div class="topbar-title" id="topbar-title">Scene Builder</div>
-      <div class="topbar-sub" id="topbar-sub">Sir's Protocol</div>
+      <div class="topbar-sub" id="topbar-sub">Dom Sub Hub</div>
     </div>
     <div class="mode-badge" id="modeBadge">
       <span class="material-symbols-rounded">gavel</span>
@@ -2475,7 +2475,7 @@
 <div class="menu-back" id="menuBack">
   <div class="menu-drawer">
     <div class="menu-drawer-head">
-      <div class="menu-drawer-title">Sir's Protocol</div>
+      <div class="menu-drawer-title">Dom Sub Hub</div>
       <div class="menu-drawer-sub">Scene Builder</div>
     </div>
     <div class="menu-items">
@@ -2971,7 +2971,7 @@ let appMode = 'sub'; // 'sub' | 'sir'
 const MODES = {
   sub: {
     topbarTitle: 'Scene Builder',
-    topbarSub: "Sir's Protocol",
+    topbarSub: "Dom Sub Hub",
     step0Eyebrow: 'Step 1 — Headspace',
     step0Title: 'Before We Begin',
     step0Desc: 'Tell Sir where your head is at before the map is built.',
@@ -2988,7 +2988,7 @@ const MODES = {
     summaryTitle: 'The Blueprint',
     summarySub: 'Review before sharing with Sir',
     shareBtnLabel: 'Share with Sir',
-    mapHeader: "SIR'S PROTOCOL — SCENE MAP",
+    mapHeader: "Dom Sub Hub — SCENE MAP",
     serviceLabel: 'Service to Sir',
     releaseLabel: "Sir's Release",
     headspaceLabel: 'HEADSPACE',
@@ -3158,7 +3158,7 @@ async function shareMap() {
   const text = buildMapText();
   if (navigator.share) {
     try {
-      await navigator.share({ title: appMode === 'sir' ? "Sir's Directive" : "Sir's Protocol — Scene Map", text });
+      await navigator.share({ title: appMode === 'sir' ? "Sir's Directive" : "Dom Sub Hub — Scene Map", text });
       showToast('Map shared ✓');
     } catch(e) { if (e.name !== 'AbortError') copyMap(); }
   } else { copyMap(); }
@@ -3988,7 +3988,7 @@ updateProgress();
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">
   <div class="sidebar-header">
-    <div class="sidebar-brand">Becca's Surrender</div>
+    <div class="sidebar-brand">Dom Sub Hub</div>
   </div>
   <div class="sidebar-nav">
     <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>

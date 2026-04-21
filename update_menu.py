@@ -6,7 +6,7 @@ sidebar_html = """
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">
   <div class="sidebar-header">
-    <div class="sidebar-brand">Sir's Protocol</div>
+    <div class="sidebar-brand">Dom Sub Hub</div>
   </div>
   <div class="sidebar-nav">
     <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
