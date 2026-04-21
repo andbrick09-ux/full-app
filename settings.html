@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#051024"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>Sir's Protocol — Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body { min-height: 100dvh; background: var(--bg); color: var(--cream); overflow-x: hidden; position: relative; }
+    .glow-orb { position: fixed; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%); top: -120px; left: 50%; transform: translateX(-50%); pointer-events: none; z-index: 0; }
+    .shell { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+    .settings-container { padding: 24px 20px 40px; }
+    .settings-group { margin-bottom:28px; }
+    .settings-group-label { font-family:'Playfair Display',serif; font-size:10px; font-weight:600; letter-spacing:3px; color:var(--gold); text-transform:uppercase; margin-bottom:14px; display:block; border-bottom:1px solid var(--border); padding-bottom:6px; }
+    .settings-field { margin-bottom:16px; }
+    .settings-field label { font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; color:var(--cream-dim); margin-bottom:6px; display:block; }
+    .settings-input { width:100%; padding:14px 16px; background:rgba(5,16,36,.85); border:1px solid var(--border); border-radius:12px; color:var(--cream); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; transition:all .2s; }
+    .settings-input:focus { border-color:var(--gold); transform:scale(1.01); background:rgba(5,16,36,1); }
+    .theme-options { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
+    .theme-option { padding:10px; border-radius:12px; background:rgba(5,16,36,.85); border:1px solid var(--border); cursor:pointer; text-align:center; transition:all .2s; }
+    .theme-option.selected { border-color:var(--gold); background:rgba(212,175,55,.1); box-shadow:0 0 10px rgba(212,175,55,.15); }
+    .theme-swatch { height:36px; border-radius:8px; margin-bottom:8px; border:1px solid rgba(255,255,255,.1); }
+    .theme-name { font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; color:var(--cream-dim); }
+    .theme-option.selected .theme-name { color:var(--gold); }
+    .limits-input-row { display:flex; gap:10px; margin-bottom:12px; }
+    .limits-add-btn { width:46px; border-radius:12px; background:rgba(212,175,55,.12); border:1px solid rgba(212,175,55,.3); color:var(--gold); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
+    .limits-add-btn:active { transform:scale(.95); }
+    .limits-list { display:flex; flex-direction:column; gap:8px; }
+    .limits-empty { font-family:'Montserrat',sans-serif; font-size:11px; color:var(--cream-mute); font-style:italic; }
+    .limits-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px; background:rgba(244,67,54,.08); border:1px solid rgba(244,67,54,.2); }
+    .limits-item-text { flex:1; font-family:'Montserrat',sans-serif; font-size:13px; color:#ffcdd2; }
+    .limits-item-del { background:transparent; border:none; color:rgba(244,67,54,.8); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; }
+    .limits-item-del:active { transform:scale(.9); }
+    .dynamic-pill { padding:10px 18px; border-radius:20px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; background:rgba(5,16,36,.85); border:1px solid var(--border); color:var(--cream-dim); cursor:pointer; transition:all .2s; flex:1; text-align:center; }
+    .dynamic-pill.selected { background:rgba(212,175,55,.15); border-color:var(--gold); color:var(--gold-light); }
+    .settings-save-btn { width:100%; padding:16px; border-radius:14px; background:var(--luxury-gradient); color:#051024; font-family:'Playfair Display',serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:none; cursor:pointer; transition:all .2s; margin-top:10px; box-shadow:0 6px 20px rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .settings-save-btn:active { transform:scale(.98); }
+    .settings-danger-btn { width:100%; padding:16px; border-radius:14px; background:transparent; border:1px solid rgba(244,67,54,.4); color:#e57373; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; cursor:pointer; transition:all .2s; margin-top:16px; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .settings-danger-btn:active { background:rgba(244,67,54,.15); }
+    
+    .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--gold); color:#051024; padding:12px 24px; border-radius:30px; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; box-shadow:0 8px 25px rgba(212,175,55,0.4); opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.22,.68,0,1.2); z-index:1000; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="glow-orb"></div>
+  
+  <div class="shell">
+    <div class="topbar">
+      <button class="back-btn" onclick="openSidebar()" aria-label="Menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+      <div class="topbar-center">
+        <h1 class="topbar-title">Settings</h1>
+        <div class="topbar-sub">App Preferences</div>
+      </div>
+    </div>
+
+    <div class="settings-container" id="settingsSheet">
+      <div class="settings-group">
+        <span class="settings-group-label">Personalization</span>
+        <div class="settings-field">
+          <label>Your Name (Sub)</label>
+          <input class="settings-input" id="settingName" type="text" maxlength="30" placeholder="e.g. Becca"/>
+        </div>
+        <div class="settings-field">
+          <label>Partner's Name (Dominant)</label>
+          <input class="settings-input" id="settingPartnerName" type="text" maxlength="30" placeholder="e.g. Sir"/>
+        </div>
+        <div class="settings-field">
+          <label>Safeword</label>
+          <input class="settings-input" id="settingSafeWord" type="text" maxlength="30" placeholder="e.g. Red" style="color:var(--red); font-weight: 600;"/>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <span class="settings-group-label">Theme Engine</span>
+        <div class="theme-options" id="themeOptions">
+          <!-- Themes populated by JS -->
+          <div class="theme-option selected" data-theme="midnight" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#051024,#0a1b3f)"></div>
+            <div class="theme-name">Midnight Gold</div>
+          </div>
+          <div class="theme-option" data-theme="rose" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#2a0815,#4a0f25)"></div>
+            <div class="theme-name">Deep Rose</div>
+          </div>
+          <div class="theme-option" data-theme="obsidian" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#0a0a0a,#1a1a1a)"></div>
+            <div class="theme-name">Obsidian</div>
+          </div>
+          <div class="theme-option" data-theme="light" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#f5ede0,#e8d5b8)"></div>
+            <div class="theme-name">Parchment</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="settings-group">
+        <span class="settings-group-label">Hard Limits</span>
+        <div class="limits-input-row">
+          <input class="settings-input" id="limitInput" type="text" maxlength="40" placeholder="Add a hard limit..." onkeydown="if(event.key==='Enter') addLimit()"/>
+          <button class="limits-add-btn" onclick="addLimit()">
+            <span class="material-symbols-rounded">add</span>
+          </button>
+        </div>
+        <div class="limits-list" id="limitsList"></div>
+      </div>
+  
+      <div class="settings-group">
+        <span class="settings-group-label">Typography & Display</span>
+        <div class="settings-field">
+          <label>Global Text Size</label>
+          <div style="display:flex;gap:8px;margin-top:8px;" id="fontSizePills">
+            <div class="dynamic-pill" data-size="fs-small" onclick="selectFontSize(this)">Small</div>
+            <div class="dynamic-pill selected" data-size="fs-medium" onclick="selectFontSize(this)">Medium</div>
+            <div class="dynamic-pill" data-size="fs-large" onclick="selectFontSize(this)">Large</div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="settings-save-btn" onclick="saveSettings()">
+        <span class="material-symbols-rounded">save</span>
+        Save Changes
+      </button>
+
+      <button class="settings-danger-btn" onclick="clearHistory()">
+        <span class="material-symbols-rounded">delete_forever</span>
+        Clear All App Data (Scenes & Progress)
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Changes Saved</div>
+
+  <script src="globalNavigationLoader.js"></script> <!-- Placeholder for structural reasons, but we use injected HTML below -->
+
+  <script>
+    // LocalStorage Interface
+    function getSettings() {
+      try { return JSON.parse(localStorage.getItem('sp_settings') || '{}'); } catch { return {}; }
+    }
+    
+    function loadSettings() {
+      const s = getSettings();
+      document.getElementById('settingName').value = s.subName || '';
+      document.getElementById('settingPartnerName').value = s.domName || '';
+      document.getElementById('settingSafeWord').value = s.safeWord || '';
+      
+      const theme = s.theme || 'midnight';
+      document.querySelectorAll('.theme-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.theme === theme);
+      });
+      
+      const size = s.fontSize || 'fs-medium';
+      document.querySelectorAll('.dynamic-pill').forEach(el => {
+        el.classList.toggle('selected', el.dataset.size === size);
+      });
+      
+      renderLimitsList();
+    }
+    
+    function saveSettings() {
+      const existing = getSettings();
+      const themeEl = document.querySelector('.theme-option.selected');
+      const sizeEl = document.querySelector('.dynamic-pill.selected');
+      
+      const s = {
+        ...existing,
+        subName: document.getElementById('settingName').value.trim(),
+        domName: document.getElementById('settingPartnerName').value.trim(),
+        safeWord: document.getElementById('settingSafeWord').value.trim(),
+        theme: themeEl ? themeEl.dataset.theme : 'midnight',
+        fontSize: sizeEl ? sizeEl.dataset.size : 'fs-medium'
+      };
+      
+      localStorage.setItem('sp_settings', JSON.stringify(s));
+      showToast('Settings saved successfully');
+    }
+    
+    function selectTheme(el) {
+      document.querySelectorAll('.theme-option').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    
+    function selectFontSize(el) {
+      document.querySelectorAll('#fontSizePills .dynamic-pill').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    
+    function renderLimitsList() {
+      const list = document.getElementById('limitsList');
+      const limits = getSettings().limits || [];
+      if (!limits.length) { 
+        list.innerHTML = '<div class="limits-empty">No hard limits active. Sir will have full creative freedom.</div>'; 
+        return; 
+      }
+      list.innerHTML = limits.map((l,i) => `
+        <div class="limits-item">
+          <span class="material-symbols-rounded" style="font-size:18px;color:rgba(244,67,54,.8);flex-shrink:0">block</span>
+          <span class="limits-item-text">${l}</span>
+          <button class="limits-item-del" onclick="removeLimit(${i})">
+            <span class="material-symbols-rounded" style="font-size:20px;">close</span>
+          </button>
+        </div>`).join('');
+    }
+    
+    function addLimit() {
+      const input = document.getElementById('limitInput');
+      const val = (input.value||'').trim();
+      if (!val) return;
+      
+      const s = getSettings();
+      const limits = s.limits || [];
+      if (!limits.includes(val)) { 
+        limits.push(val); 
+        s.limits = limits; 
+        localStorage.setItem('sp_settings', JSON.stringify(s)); 
+      }
+      input.value = '';
+      renderLimitsList();
+    }
+    
+    function removeLimit(i) {
+      const s = getSettings();
+      const limits = s.limits || [];
+      limits.splice(i, 1);
+      s.limits = limits;
+      localStorage.setItem('sp_settings', JSON.stringify(s));
+      renderLimitsList();
+    }
+    
+    function clearHistory() {
+      if (confirm('Are you absolutely sure you want to clear ALL scenes, histories, and progression check-ins? This cannot be undone.')) {
+        localStorage.removeItem('sp_history');
+        if(confirm('Do you also want to clear all your global profile settings and limits?')) {
+          localStorage.removeItem('sp_settings');
+          localStorage.removeItem('bdsm_checklist');
+          localStorage.removeItem('sp_onboarded');
+        }
+        showToast('Application Data Cleared');
+        setTimeout(() => location.reload(), 1500);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    
+    loadSettings();
+  </script>
+<!-- Global Sidebar Menu -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="global-sidebar" id="globalSidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">Becca's Surrender</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
+    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
+    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
+    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
+  </div>
+</div>
+<script>
+  function openSidebar() {
+    document.getElementById('sidebarOverlay').classList.add('open');
+    document.getElementById('globalSidebar').classList.add('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.getElementById('globalSidebar').classList.remove('open');
+  }
+</script>
+</body>
+</html>
