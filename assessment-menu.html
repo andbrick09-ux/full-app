@@ -1,168 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Becca's Sirender | Assessments & Ratings</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="apple-touch-icon" href="icon-512.png">
-    <meta name="theme-color" content="#051024">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 2.5rem 1.5rem 4rem;
-            text-align: center;
-        }
-
-        .back-link {
-            display: inline-block;
-            color: var(--gold-dim);
-            font-size: 10px;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.3s;
-            margin-bottom: 2rem;
-        }
-        
-        .back-link:hover {
-            color: var(--gold);
-        }
-
-        .rating-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            margin-top: 30px;
-        }
-
-        .rating-card {
-            display: block;
-            position: relative;
-            padding: 28px 24px;
-            background: rgba(2, 8, 20, 0.55);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            text-decoration: none;
-            color: #ccc;
-            transition: all 0.35s ease;
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-            text-align: left;
-        }
-
-        .rating-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--luxury-gradient);
-            opacity: 0;
-            transition: opacity 0.35s ease;
-        }
-
-        .rating-card:hover {
-            border-color: rgba(212, 175, 55, 0.5);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
-            transform: translateY(-3px);
-        }
-
-        .rating-card:hover::before {
-            opacity: 1;
-        }
-
-        .rating-card:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .card-icon {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .card-title {
-            display: block;
-            font-family: 'Playfair Display', serif;
-            font-size: 18px;
-            color: var(--gold);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .card-desc {
-            display: block;
-            font-size: 11px;
-            font-weight: 400;
-            text-transform: none;
-            opacity: 0.65;
-            letter-spacing: 0.5px;
-            color: #bbb;
-            line-height: 1.5;
-        }
-
-        .divider {
-            width: 40px;
-            height: 1px;
-            background: var(--border);
-            margin: 5px auto 30px;
-        }
-
-        /* Entrance animation */
-        @keyframes cardSlideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .rating-card:nth-child(1) { animation: cardSlideIn 0.5s ease 0.1s both; }
-        .rating-card:nth-child(2) { animation: cardSlideIn 0.5s ease 0.2s both; }
-        .rating-card:nth-child(3) { animation: cardSlideIn 0.5s ease 0.3s both; }
-        .rating-card:nth-child(4) { animation: cardSlideIn 0.5s ease 0.4s both; }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#080c14"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Sir's Protocol — Assessments &amp; Ratings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="apple-touch-icon" href="icon-512.png"/>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="sirender-theme">
+<body>
 
-    <div class="container">
-        <a href="index.html" class="back-link">← Return to Central Hub</a>
+  <!-- Topbar -->
+  <div class="topbar">
+    <a href="index.html" class="back-btn" aria-label="Back">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </a>
+    <div class="topbar-center">
+      <div class="topbar-title">Becca's Surrender</div>
+      <div class="topbar-sub">Assessments &amp; Ratings</div>
+    </div>
+  </div>
 
-        <div class="signature" style="margin-bottom: 12px;">Becca's Sirender</div>
-        <h1 class="app-title" style="font-size: 38px; margin-bottom: 5px;">Assessments</h1>
-        <div class="splash-title" style="border-bottom: none; font-size: 14px; font-weight: 400; opacity: 0.85; margin-bottom: 10px;">Knowing Your Limits</div>
-        <div class="divider"></div>
+  <div class="main">
 
-        <div class="rating-grid">
-            <a href="sub-bdsm-checklist.html" class="rating-card">
-                <span class="card-icon">📖</span>
-                <span class="card-title">Submissive Protocol Checklist</span>
-                <span class="card-desc">Specific tasks, chores, and submissive responsibilities for review and rating from Sir.</span>
-            </a>
+    <div class="menu-grid">
+      <a href="sub-bdsm-checklist.html" class="menu-card">
+        <span class="menu-card-icon">📖</span>
+        <span class="menu-card-title">Submissive Protocol Checklist</span>
+        <span class="menu-card-desc">Specific tasks, chores, and submissive responsibilities for review and rating from Sir.</span>
+      </a>
 
-            <a href="predicament-bondage-menu.html" class="rating-card">
-                <span class="card-icon">🪢</span>
-                <span class="card-title">Predicament Bondage Menu</span>
-                <span class="card-desc">Review and rate complex predicament bondage scenarios and proposals for Sir.</span>
-            </a>
+      <a href="predicament-bondage-menu.html" class="menu-card">
+        <span class="menu-card-icon">🪢</span>
+        <span class="menu-card-title">Predicament Bondage Menu</span>
+        <span class="menu-card-desc">Review and rate complex predicament bondage scenarios and proposals for Sir.</span>
+      </a>
 
-            <a href="public-play-menu.html" class="rating-card">
-                <span class="card-icon">🍽️</span>
-                <span class="card-title">Public Play Menu</span>
-                <span class="card-desc">Rate risks, toys, and discrete public tasks. Perfect for restaurants and outings.</span>
-            </a>
-        </div>
+      <a href="public-play-menu.html" class="menu-card">
+        <span class="menu-card-icon">🍽️</span>
+        <span class="menu-card-title">Public Play Menu</span>
+        <span class="menu-card-desc">Rate risks, toys, and discrete public tasks. Perfect for restaurants and outings.</span>
+      </a>
     </div>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
-            });
-        }
-    </script>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
 </body>
 </html>

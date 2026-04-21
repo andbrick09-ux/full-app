@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predicament Bondage Menu • Vault of Predicaments</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="apple-touch-icon" href="icon-512.png">
-    <meta name="theme-color" content="#051024">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#080c14"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Sir's Protocol — Predicament Bondage Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="apple-touch-icon" href="icon-512.png"/>
+  <link rel="stylesheet" href="styles.css"/>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
@@ -108,14 +112,20 @@
         @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="sirender-theme">
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <a href="assessment-menu.html" class="back-btn" aria-label="Back">
+    <span class="material-symbols-rounded">arrow_back</span>
+  </a>
+  <div class="topbar-center">
+    <div class="topbar-title">Predicament Menu</div>
+    <div class="topbar-sub">Vault of Predicaments</div>
+  </div>
+</div>
 
 <section class="dashboard">
-    <div class="signature" style="text-align: center; margin-bottom: 12px;">Becca's Sirender</div>
-    <h1 class="app-title" style="font-size: 38px; margin-bottom: 5px;">Predicament Menu</h1>
-    <div style="text-align: center; margin-bottom: 25px;">
-        <a href="index.html" style="color: var(--gold); font-size: 10px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">&larr; Return to Central Hub</a>
-    </div>
     <div class="stats">
         <div class="stat-item"><span class="stat-val" id="stat-ok">0</span><span class="stat-lbl">OK</span></div>
         <div class="stat-item"><span class="stat-val" id="stat-maybe">0</span><span class="stat-lbl">MAYBE</span></div>
