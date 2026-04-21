@@ -123,9 +123,7 @@ body {
 
 <!-- Topbar -->
 <div class="topbar">
-  <a href="index.html" class="back-btn" aria-label="Back">
-    <span class="material-symbols-rounded">arrow_back</span>
-  </a>
+  <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span class="material-symbols-rounded">menu</span></button>
   <div class="topbar-center">
     <div class="topbar-title">BDSM Portal</div>
     <div class="topbar-sub">Compatibility &amp; Cloud Sync</div>
@@ -462,6 +460,32 @@ function compareHistory(id) {
     if(snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
 }
 function resetApp() { if(confirm("Wipe local cache? App will reload from cloud.")) { localStorage.removeItem('bdsm_portal_vTRAD_SYNC_2026'); location.reload(); } }
+</script>
+<!-- Global Sidebar Menu -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="global-sidebar" id="globalSidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">Becca's Surrender</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
+    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
+    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">settings</span> Profile & Settings</a>
+    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
+  </div>
+</div>
+<script>
+  function openSidebar() {
+    document.getElementById('sidebarOverlay').classList.add('open');
+    document.getElementById('globalSidebar').classList.add('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.getElementById('globalSidebar').classList.remove('open');
+  }
 </script>
 </body>
 </html>

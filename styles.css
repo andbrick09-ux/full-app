@@ -570,3 +570,41 @@ body {
 .\!text-black    { color: #000 !important; }
 .\!text-white    { color: #fff !important; }
 .\!border-transparent { border-color: transparent !important; }
+
+/* ============================================================
+   GLOBAL SIDEBAR & MENU
+   ============================================================ */
+.floating-menu-btn {
+  position: fixed; top: calc(18px + var(--safe-t)); left: 20px; z-index: 90;
+  backdrop-filter: blur(10px);
+}
+.sidebar-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+  z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+.global-sidebar {
+  position: fixed; top: 0; left: -300px; width: 280px; height: 100vh;
+  background: rgba(5,16,36,0.98); border-right: 1px solid var(--border);
+  z-index: 2001; transition: left 0.3s cubic-bezier(0.22, 0.68, 0, 1.2);
+  display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+.global-sidebar.open { left: 0; }
+.sidebar-header {
+  padding: calc(24px + var(--safe-t)) 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.sidebar-brand {
+  font-family: 'Great Vibes', cursive; font-size: 32px;
+  background: var(--luxury-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sidebar-nav {
+  padding: 20px 0; flex: 1; overflow-y: auto;
+}
+.sidebar-link {
+  display: flex; align-items: center; gap: 16px; padding: 14px 24px;
+  text-decoration: none; color: #ddd; font-weight: 500; font-size: 13px;
+  transition: 0.2s;
+  font-family: 'Montserrat', sans-serif;
+}
+.sidebar-link:active, .sidebar-link:hover { background: rgba(212,175,55,0.1); color: var(--gold); }
+.sidebar-icon { font-size: 20px; opacity: 0.8; color: var(--gold); }
