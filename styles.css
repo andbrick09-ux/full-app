@@ -23,6 +23,9 @@
   --gold-light:      #F5E6A3;
   --gold-dim:        rgba(212,175,55,0.3);
   --border:          rgba(212,175,55,0.15);
+  --cream:           #f0e6d2;
+  --cream-dim:       rgba(240,230,211,0.7);
+  --cream-mute:      rgba(240,230,211,0.35);
   --luxury-gradient: linear-gradient(135deg, #D4AF37, #F5E6A3);
   --red:             #F44336;
   --green:           #4CAF50;
