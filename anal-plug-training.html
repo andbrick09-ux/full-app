@@ -116,24 +116,7 @@
                 <p class="card-text">The training adapts to your <em>experience level</em>. Select your starting point below, and the protocol will adjust phase durations, plug sizes, and wear times accordingly.</p>
                 <div class="card-accent">"The body resists what is forced. It embraces what is trained."</div>
             </div>
-            <!-- Experience Selector -->
-            <div class="exp-selector">
-                <div class="exp-title">Select Your Experience Level</div>
-                <div class="exp-options">
-                    <div class="exp-btn" onclick="setExperience('beginner')" id="exp-beginner">
-                        <span class="exp-btn-label">Beginner</span>
-                        <span class="exp-btn-desc">New to anal play or very limited experience</span>
-                    </div>
-                    <div class="exp-btn" onclick="setExperience('intermediate')" id="exp-intermediate">
-                        <span class="exp-btn-label">Intermediate</span>
-                        <span class="exp-btn-desc">Some experience with small plugs or fingers</span>
-                    </div>
-                    <div class="exp-btn" onclick="setExperience('advanced')" id="exp-advanced">
-                        <span class="exp-btn-label">Advanced</span>
-                        <span class="exp-btn-desc">Comfortable with plugs, seeking size/duration progression</span>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
         <!-- PLUG SIZES -->
@@ -186,6 +169,25 @@
 
         <!-- PROTOCOL -->
         <div class="content-section active" id="sec-protocol">
+            <!-- Experience Selector -->
+            <div class="exp-selector">
+                <div class="exp-title" id="expTitle">Select Your Experience Level</div>
+                <div class="exp-options">
+                    <div class="exp-btn" onclick="setExperience('beginner')" id="exp-beginner">
+                        <span class="exp-btn-label">Beginner</span>
+                        <span class="exp-btn-desc">New to anal play/limited experience</span>
+                    </div>
+                    <div class="exp-btn" onclick="setExperience('intermediate')" id="exp-intermediate">
+                        <span class="exp-btn-label">Intermediate</span>
+                        <span class="exp-btn-desc">Familiar with small plugs/fingering</span>
+                    </div>
+                    <div class="exp-btn" onclick="setExperience('advanced')" id="exp-advanced">
+                        <span class="exp-btn-label">Advanced</span>
+                        <span class="exp-btn-desc">Comfortable with plugs, seeking endurance</span>
+                    </div>
+                </div>
+            </div>
+            
             <div id="phasesContainer"></div>
             <div class="session-log"><div class="log-title">Session Log</div><div id="logEntries"></div></div>
             <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
@@ -314,13 +316,11 @@
             // Phases
             const pc=document.getElementById('phasesContainer');
             if(!phases.length){
-                pc.innerHTML=`<div class="log-empty" style="padding:40px 20px">
-                    <div style="font-size:16px; margin-bottom:15px; color:var(--gold);">Training Not Started</div>
-                    <p style="margin-bottom:20px;">You must select your current experience level to generate your custom protocol.</p>
-                    <button class="reset-btn" style="border-color:var(--gold); color:var(--gold); display:inline-block; width:auto; padding:12px 24px;" onclick="showSection('overview', document.querySelectorAll('.nav-tab')[1])">Configure Training Plan</button>
-                </div>`;
+                document.getElementById('expTitle').textContent = 'Select Your Experience Level';
+                pc.innerHTML=`<div class="log-empty" style="padding-top:20px; font-style:italic;">Choose a level above to generate your training protocol.</div>`;
                 renderLog();return;
             }
+            document.getElementById('expTitle').textContent = 'Current Training Level';
             pc.innerHTML=phases.map((phase,i)=>{
                 const ul=isUnlocked(i),co=isCompleted(i),cu=i===getCurrent(),ad=allDone(phase.id);
                 let icon='🔒';if(co)icon='✅';else if(ul)icon=cu?'🔥':'⬜';
