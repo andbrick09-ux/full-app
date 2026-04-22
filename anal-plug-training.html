@@ -40,20 +40,23 @@
         .info-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}.info-item:last-child{border-bottom:none}
         .info-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}.info-name{font-size:13px;font-weight:600;color:#ddd;margin-bottom:3px}.info-desc{font-size:11px;color:#888;line-height:1.5}
         .guideline-item{margin-bottom:18px}.guideline-name{font-family:'Playfair Display',serif;font-size:14px;color:#ddd;margin-bottom:5px}.guideline-desc{font-size:12px;color:#999;line-height:1.6}
-        /* Experience Selector */
-        .exp-selector{text-align:center;margin-bottom:25px}
-        .exp-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);margin-bottom:15px}
-        .exp-options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-        .exp-btn{padding:14px 20px;background:rgba(5,16,36,.85);border:1.5px solid var(--border);border-radius:14px;color:#ccc;cursor:pointer;transition:.3s;text-align:center;flex:1;min-width:100px;max-width:160px}
-        .exp-btn:hover{border-color:rgba(212,175,55,.5)}.exp-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08)}
-        .exp-btn-label{display:block;font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:4px}
-        .exp-btn-desc{display:block;font-size:9px;color:#888;line-height:1.4}
-        /* Compact Mode */
-        .exp-selector.compact{margin-bottom:20px}
-        .exp-selector.compact .exp-title{font-size:12px;margin-bottom:8px;opacity:0.7}
-        .exp-selector.compact .exp-btn{padding:8px 10px;min-width:0;max-width:none;border-radius:10px}
-        .exp-selector.compact .exp-btn-desc{display:none}
-        .exp-selector.compact .exp-btn-label{font-size:12px;margin-bottom:0}
+        /* Level Header */
+        .level-header{background:var(--glass);border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:.3s;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+        .level-header:active{transform:scale(.98)}
+        .level-header-title{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+        .level-header-value{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);font-weight:600}
+        /* Level Modal */
+        .exp-modal-back{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:2000;opacity:0;pointer-events:none;transition:.3s;display:flex;align-items:flex-end}
+        .exp-modal-back.open{opacity:1;pointer-events:auto}
+        .exp-modal-sheet{width:100%;max-height:85vh;overflow-y:auto;background:rgba(5,16,36,.95);border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:25px 20px 40px;transform:translateY(100%);transition:.4s cubic-bezier(.22,.68,0,1.2)}
+        .exp-modal-back.open .exp-modal-sheet{transform:translateY(0)}
+        .exp-modal-handle{width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 20px}
+        .exp-modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:20px}
+        .exp-options-modal{display:flex;flex-direction:column;gap:12px}
+        .exp-btn{padding:16px 20px;background:rgba(2,8,20,.8);border:1.5px solid var(--border);border-radius:14px;color:#ccc;cursor:pointer;transition:.2s;text-align:center}
+        .exp-btn:active{transform:scale(.98)}.exp-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08)}
+        .exp-btn-label{display:block;font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);margin-bottom:6px}
+        .exp-btn-desc{display:block;font-size:11px;color:#888;line-height:1.4}
         /* Plug Size Cards */
         .plug-card{background:var(--glass);border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px}
         .plug-visual{width:40px;height:60px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--midnight);flex-shrink:0}
@@ -175,23 +178,10 @@
 
         <!-- PROTOCOL -->
         <div class="content-section active" id="sec-protocol">
-            <!-- Experience Selector -->
-            <div class="exp-selector">
-                <div class="exp-title" id="expTitle">Select Your Experience Level</div>
-                <div class="exp-options">
-                    <div class="exp-btn" onclick="setExperience('beginner')" id="exp-beginner">
-                        <span class="exp-btn-label">Beginner</span>
-                        <span class="exp-btn-desc">New to anal play/limited experience</span>
-                    </div>
-                    <div class="exp-btn" onclick="setExperience('intermediate')" id="exp-intermediate">
-                        <span class="exp-btn-label">Intermediate</span>
-                        <span class="exp-btn-desc">Familiar with small plugs/fingering</span>
-                    </div>
-                    <div class="exp-btn" onclick="setExperience('advanced')" id="exp-advanced">
-                        <span class="exp-btn-label">Advanced</span>
-                        <span class="exp-btn-desc">Comfortable with plugs, seeking endurance</span>
-                    </div>
-                </div>
+            <!-- Experience Header -->
+            <div class="level-header" onclick="openLevelModal()">
+                <div class="level-header-title">Current Training Level</div>
+                <div class="level-header-value" id="currentLevelDisplay">Not Set</div>
             </div>
             
             <div id="phasesContainer"></div>
@@ -301,16 +291,18 @@
         function setExperience(level){
             if(state.exp&&state.exp!==level){if(!confirm(`Switch to ${PROFILES[level].label}? This will reset your progress.`))return;state=getDefault();}
             state.exp=level;save();render();
+            closeLevelModal();
         }
+        function openLevelModal(){document.getElementById('levelModal').classList.add('open');}
+        function closeLevelModal(){document.getElementById('levelModal').classList.remove('open');}
 
         function render(){
             // Exp selector
-            const expSelector = document.getElementById('expSelector');
-            if (expSelector) expSelector.classList.toggle('compact', !!state.exp);
+            document.getElementById('currentLevelDisplay').textContent = state.exp ? PROFILES[state.exp].label : 'Not Set';
             
             ['beginner','intermediate','advanced'].forEach(e=>{
                 const el=document.getElementById(`exp-${e}`);
-                el.classList.toggle('selected',state.exp===e);
+                if(el) el.classList.toggle('selected',state.exp===e);
             });
             const phases=getPhases();
             // Dots
@@ -325,11 +317,9 @@
             // Phases
             const pc=document.getElementById('phasesContainer');
             if(!phases.length){
-                document.getElementById('expTitle').textContent = 'Select Your Experience Level';
-                pc.innerHTML=`<div class="log-empty" style="padding-top:20px; font-style:italic;">Choose a level above to generate your training protocol.</div>`;
+                pc.innerHTML=`<div class="log-empty" style="padding-top:20px; font-style:italic;">Tap "Current Training Level" above to choose your experience level and generate your protocol.</div>`;
                 renderLog();return;
             }
-            document.getElementById('expTitle').textContent = 'Current Training Level';
             pc.innerHTML=phases.map((phase,i)=>{
                 const ul=isUnlocked(i),co=isCompleted(i),cu=i===getCurrent(),ad=allDone(phase.id);
                 let icon='🔒';if(co)icon='✅';else if(ul)icon=cu?'🔥':'⬜';
@@ -384,6 +374,27 @@
     <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
     <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
   </div>
+</div>
+<!-- Experience Level Modal -->
+<div class="exp-modal-back" id="levelModal" onclick="if(event.target===this)closeLevelModal()">
+    <div class="exp-modal-sheet">
+        <div class="exp-modal-handle"></div>
+        <div class="exp-modal-title">Select Experience Level</div>
+        <div class="exp-options-modal">
+            <div class="exp-btn" onclick="setExperience('beginner')" id="exp-beginner">
+                <span class="exp-btn-label">Beginner</span>
+                <span class="exp-btn-desc">New to anal play or limited experience</span>
+            </div>
+            <div class="exp-btn" onclick="setExperience('intermediate')" id="exp-intermediate">
+                <span class="exp-btn-label">Intermediate</span>
+                <span class="exp-btn-desc">Familiar with small plugs or fingering</span>
+            </div>
+            <div class="exp-btn" onclick="setExperience('advanced')" id="exp-advanced">
+                <span class="exp-btn-label">Advanced</span>
+                <span class="exp-btn-desc">Comfortable with plugs, seeking endurance</span>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
   function openSidebar() {
