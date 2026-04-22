@@ -287,7 +287,7 @@ body {
 <div class="topbar">
   <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span class="material-symbols-rounded">menu</span></button>
   <div class="topbar-center">
-    <div class="topbar-title">Becca's Checklist</div>
+    <div class="topbar-title" id="checklistTitle">Becca's Checklist</div>
     <div class="topbar-sub">Submissive Protocol</div>
   </div>
 </div>
@@ -435,6 +435,14 @@ function init() {
     updateHistDropdown();
   }
   
+  // Dynamic Title from Settings
+  try {
+    const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
+    if (s.subName) {
+      document.getElementById('checklistTitle').textContent = `${s.subName}'s BDSM Checklist`;
+    }
+  } catch(e) {}
+
   // Build Tabs
   const nav = document.getElementById('tabsNav');
   RAW_CATS.forEach(c => {

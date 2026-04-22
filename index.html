@@ -361,7 +361,7 @@
       <div class="sub-items">
         <a href="sub-bdsm-checklist.html" class="sub-item">
           <span class="sub-item-emoji">📖</span>
-          <span class="sub-item-label">Submissive Protocol Checklist</span>
+          <span class="sub-item-label" id="bdsmChecklistLabel">Submissive Protocol Checklist</span>
         </a>
         <a href="predicament-bondage-menu.html" class="sub-item">
           <span class="sub-item-emoji">🪢</span>
@@ -453,10 +453,23 @@
       const status = document.getElementById('greetingStatus');
       const dateEl = document.getElementById('greetingDate');
 
-      if (h >= 5 && h < 12)       { icon.textContent='☀️'; line.textContent='Good morning, Becca'; status.textContent='Start the day with devotion'; }
-      else if (h >= 12 && h < 17) { icon.textContent='🌤️'; line.textContent='Good afternoon, Becca'; status.textContent='Awaiting Sir\'s direction'; }
-      else if (h >= 17 && h < 21) { icon.textContent='🌆'; line.textContent='Good evening, Becca'; status.textContent='Ready to serve Sir tonight'; }
-      else                         { icon.textContent='🌙'; line.textContent='Good night, Becca'; status.textContent='Late night devotion'; }
+      // Load name from settings
+      let subName = 'Becca';
+      try {
+        const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
+        if (s.subName) subName = s.subName;
+      } catch(e) {}
+
+      if (h >= 5 && h < 12)       { icon.textContent='☀️'; line.textContent=`Good morning, ${subName}`; status.textContent='Start the day with devotion'; }
+      else if (h >= 12 && h < 17) { icon.textContent='🌤️'; line.textContent=`Good afternoon, ${subName}`; status.textContent='Awaiting Sir\'s direction'; }
+      else if (h >= 17 && h < 21) { icon.textContent='🌆'; line.textContent=`Good evening, ${subName}`; status.textContent='Ready to serve Sir tonight'; }
+      else                         { icon.textContent='🌙'; line.textContent=`Good night, ${subName}`; status.textContent='Late night devotion'; }
+
+      // Update Checklist Label
+      const checklistLabel = document.getElementById('bdsmChecklistLabel');
+      if (checklistLabel) {
+        checklistLabel.textContent = `${subName}'s BDSM Checklist`;
+      }
 
       const n = new Date();
       const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];

@@ -261,6 +261,13 @@ const response = await fetch(`${API_URL}?token=${APP_TOKEN}&t=${new Date().getTi
     nav.appendChild(b);
   });
 
+  // Dynamic Profile Names from Settings
+  try {
+    const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
+    if (s.domName) document.getElementById('p1-btn').textContent = s.domName;
+    if (s.subName) document.getElementById('p2-btn').textContent = s.subName;
+  } catch(e) {}
+
   render(); 
   updateHistDropdown(); 
   renderFilterDashboard();
