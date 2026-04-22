@@ -1014,8 +1014,10 @@
       if (t.startDate && t.startDate > ds) return false;
       if (t.endDate   && t.endDate   < ds) return false;
       if (t.exceptions && t.exceptions.includes(ds)) return false;
-      if (t.frequency === 'daily') return true;
-      if (t.frequency === 'weekly' || t.frequency === 'custom') return t.daysOfWeek.includes(dow);
+      if (t.frequency === 'once')   return t.startDate === ds;
+      if (t.frequency === 'daily')  return true;
+      if (t.frequency === 'weekly' || t.frequency === 'custom') return (t.daysOfWeek || []).includes(dow);
+      if (t.frequency === 'monthly') return d.getDate() === new Date(t.startDate + 'T12:00:00').getDate();
       return false;
     });
   }
@@ -1482,7 +1484,7 @@
         <div class="task-meta">
           <span class="task-owner-badge">${ownerBadge}</span>
           <span class="task-cat-chip" style="background:${cat.bg};color:${cat.color};">${t.category}</span>
-          ${t.frequency ? `<span style="font-size:8px;color:#444;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">↻ ${t.frequency}</span>` : ''}
+          ${t.frequency && t.frequency !== 'once' ? `<span style="font-size:8px;color:#444;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">↻ ${t.frequency}</span>` : ''}
         </div>
       </div>
       ${taskActions}
@@ -1667,10 +1669,11 @@
     if (!t) return;
 
     editingEventId = taskId;
+    const isRecurring = t.frequency && t.frequency !== 'once';
     formState = {
       type: 'task', isSurprise: false,
-      isRecurring: true,
-      freq: t.frequency || 'daily',
+      isRecurring,
+      freq: isRecurring ? (t.frequency || 'daily') : 'daily',
       cat: t.category || 'ritual',
       daysOfWeek: t.daysOfWeek || [],
       workDays: []
@@ -1691,9 +1694,9 @@
     setType('task');
     setCat(t.category || 'ritual');
     updateToggleUI('surprise-toggle', false);
-    updateToggleUI('recur-toggle', true);
-    document.getElementById('recur-fields').style.display = 'block';
-    setFreq(t.frequency || 'daily');
+    updateToggleUI('recur-toggle', isRecurring);
+    document.getElementById('recur-fields').style.display = isRecurring ? 'block' : 'none';
+    setFreq(isRecurring ? (t.frequency || 'daily') : 'daily');
     document.querySelectorAll('.dow-btn').forEach(b => {
       b.classList.toggle('active', formState.daysOfWeek.includes(+b.dataset.dow));
     });
@@ -1786,24 +1789,24 @@
       recurEnd:    recurEnd,
     } : { recurring: false };
 
-    // Tasks with recurring go into recurTasks store (existing system)
-    if (type === 'task' && formState.isRecurring) {
+    // ALL tasks go into recurTasks store — recurring or single-date
+    if (type === 'task') {
       const task = {
         id: editingEventId || uid(),
         title, category: formState.cat,
-        frequency: formState.freq,
-        daysOfWeek: formState.daysOfWeek,
+        frequency: formState.isRecurring ? formState.freq : 'once',
+        daysOfWeek: formState.isRecurring ? formState.daysOfWeek : [],
         owner: activeProfile,
         startDate: date,
-        endDate: recurEnd,
+        endDate: formState.isRecurring ? recurEnd : date,
       };
       if (editingEventId) {
         const idx = recurTasks.findIndex(t => t.id === editingEventId);
         if (idx > -1) recurTasks[idx] = task; else recurTasks.push(task);
-        showToast('Recurring task updated');
+        showToast('Task updated');
       } else {
         recurTasks.push(task);
-        showToast('Recurring task added ✦');
+        showToast(formState.isRecurring ? 'Recurring task added ✦' : 'Task added ✦');
       }
       persist(); closeModal('add-modal'); renderCurrentView(); return;
     }
