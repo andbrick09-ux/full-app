@@ -43,15 +43,8 @@
     }
 
     @keyframes orbFloat {
-
-      0%,
-      100% {
-        transform: translateX(-50%) translateY(0);
-      }
-
-      50% {
-        transform: translateX(-50%) translateY(28px);
-      }
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(28px); }
     }
 
     /* ── Hero ── */
@@ -64,15 +57,8 @@
     }
 
     @keyframes heroIn {
-      from {
-        opacity: 0;
-        transform: translateY(-14px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .hero-eyebrow {
@@ -99,17 +85,9 @@
     }
 
     @keyframes shimmer {
-      0% {
-        background-position: 0% center;
-      }
-
-      50% {
-        background-position: 100% center;
-      }
-
-      100% {
-        background-position: 0% center;
-      }
+      0%   { background-position: 0% center; }
+      50%  { background-position: 100% center; }
+      100% { background-position: 0% center; }
     }
 
     .hero-tagline {
@@ -158,15 +136,8 @@
       animation: fadeUp 0.5s ease 0.1s both;
     }
 
-    .greeting-icon {
-      font-size: 24px;
-      flex-shrink: 0;
-    }
-
-    .greeting-text {
-      flex: 1;
-      min-width: 0;
-    }
+    .greeting-icon  { font-size: 24px; flex-shrink: 0; }
+    .greeting-text  { flex: 1; min-width: 0; }
 
     .greeting-line1 {
       font-family: 'Playfair Display', serif;
@@ -255,15 +226,8 @@
     }
 
     @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     /* ── Menu groups ── */
@@ -276,7 +240,7 @@
       gap: 8px;
     }
 
-    /* ── Top-level row (direct link OR accordion trigger) ── */
+    /* ── Top-level row ── */
     .menu-row {
       border-radius: 18px;
       overflow: hidden;
@@ -288,51 +252,25 @@
       animation: cardIn 0.5s ease forwards;
     }
 
-    .menu-row:nth-child(1) {
-      animation-delay: 0.1s;
-    }
+    .menu-row:nth-child(1)  { animation-delay: 0.10s; }
+    .menu-row:nth-child(2)  { animation-delay: 0.17s; }
+    .menu-row:nth-child(3)  { animation-delay: 0.24s; }
+    .menu-row:nth-child(4)  { animation-delay: 0.31s; }
+    .menu-row:nth-child(5)  { animation-delay: 0.38s; }
+    .menu-row:nth-child(6)  { animation-delay: 0.45s; }
+    .menu-row:nth-child(7)  { animation-delay: 0.52s; }
+    .menu-row:nth-child(8)  { animation-delay: 0.59s; }
+    .menu-row:nth-child(9)  { animation-delay: 0.66s; }
+    .menu-row:nth-child(10) { animation-delay: 0.73s; }
 
-    .menu-row:nth-child(2) {
-      animation-delay: 0.17s;
-    }
-
-    .menu-row:nth-child(3) {
-      animation-delay: 0.24s;
-    }
-
-    .menu-row:nth-child(4) {
-      animation-delay: 0.31s;
-    }
-
-    .menu-row:nth-child(5) {
-      animation-delay: 0.38s;
-    }
-
-    .menu-row:nth-child(6) {
-      animation-delay: 0.45s;
-    }
-
-    .menu-row:nth-child(7) {
-      animation-delay: 0.52s;
-    }
-
-    .menu-row.open {
-      border-color: rgba(212, 175, 55, 0.28);
-    }
+    .menu-row.open { border-color: rgba(212, 175, 55, 0.28); }
 
     @keyframes cardIn {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Parent row header ── */
+    /* ── Row header ── */
     .row-header {
       display: flex;
       align-items: center;
@@ -347,25 +285,19 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .row-header:active {
-      background: rgba(255, 255, 255, 0.02);
-    }
+    .row-header:active { background: rgba(255, 255, 255, 0.02); }
 
     .row-header::before {
       content: '';
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      left: 0; top: 0; bottom: 0;
       width: 3px;
       background: var(--luxury-gradient);
       opacity: 0;
       transition: opacity 0.3s;
     }
 
-    .menu-row.open .row-header::before {
-      opacity: 1;
-    }
+    .menu-row.open .row-header::before { opacity: 1; }
 
     .row-icon-wrap {
       width: 42px;
@@ -378,10 +310,7 @@
       font-size: 20px;
     }
 
-    .row-label {
-      flex: 1;
-      min-width: 0;
-    }
+    .row-label  { flex: 1; min-width: 0; }
 
     .row-title {
       font-family: 'Playfair Display', serif;
@@ -426,7 +355,6 @@
       color: var(--gold);
     }
 
-    /* Direct link arrow (no rotation) */
     .row-arrow {
       font-size: 18px;
       color: rgba(212, 175, 55, 0.2);
@@ -464,13 +392,8 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .sub-item:last-child {
-      border-bottom: none;
-    }
-
-    .sub-item:active {
-      background: rgba(212, 175, 55, 0.04);
-    }
+    .sub-item:last-child   { border-bottom: none; }
+    .sub-item:active       { background: rgba(212, 175, 55, 0.04); }
 
     .sub-item-dot {
       width: 7px;
@@ -480,10 +403,7 @@
       background: rgba(212, 175, 55, 0.25);
     }
 
-    .sub-item-emoji {
-      font-size: 16px;
-      flex-shrink: 0;
-    }
+    .sub-item-emoji  { font-size: 16px; flex-shrink: 0; }
 
     .sub-item-label {
       flex: 1;
@@ -504,68 +424,23 @@
     }
 
     /* ── Color themes ── */
-    .t-gold .row-icon-wrap {
-      background: rgba(212, 175, 55, 0.1);
-    }
+    .t-gold   .row-icon-wrap { background: rgba(212, 175, 55, 0.1); }
+    .t-blue   .row-icon-wrap { background: rgba(100, 181, 246, 0.1); }
+    .t-purple .row-icon-wrap { background: rgba(186, 104, 200, 0.1); }
+    .t-rose   .row-icon-wrap { background: rgba(244, 67, 54, 0.1); }
+    .t-green  .row-icon-wrap { background: rgba(76, 175, 80, 0.1); }
+    .t-gray   .row-icon-wrap { background: rgba(255, 255, 255, 0.05); }
+    .t-amber  .row-icon-wrap { background: rgba(255, 193, 7, 0.1); }
+    .t-teal   .row-icon-wrap { background: rgba(0, 184, 148, 0.1); }
 
-    .t-blue .row-icon-wrap {
-      background: rgba(100, 181, 246, 0.1);
-    }
-
-    .t-purple .row-icon-wrap {
-      background: rgba(186, 104, 200, 0.1);
-    }
-
-    .t-rose .row-icon-wrap {
-      background: rgba(244, 67, 54, 0.1);
-    }
-
-    .t-green .row-icon-wrap {
-      background: rgba(76, 175, 80, 0.1);
-    }
-
-    .t-gray .row-icon-wrap {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .t-amber .row-icon-wrap {
-      background: rgba(255, 193, 7, 0.1);
-    }
-
-    .t-gold .row-badge {
-      background: rgba(212, 175, 55, 0.1);
-      color: var(--gold);
-    }
-
-    .t-blue .row-badge {
-      background: rgba(100, 181, 246, 0.1);
-      color: #64B5F6;
-    }
-
-    .t-purple .row-badge {
-      background: rgba(186, 104, 200, 0.1);
-      color: #BA68C8;
-    }
-
-    .t-rose .row-badge {
-      background: rgba(244, 67, 54, 0.1);
-      color: #F44336;
-    }
-
-    .t-green .row-badge {
-      background: rgba(76, 175, 80, 0.1);
-      color: #4CAF50;
-    }
-
-    .t-gray .row-badge {
-      background: rgba(255, 255, 255, 0.07);
-      color: #888;
-    }
-
-    .t-amber .row-badge {
-      background: rgba(255, 193, 7, 0.1);
-      color: #FFC107;
-    }
+    .t-gold   .row-badge { background: rgba(212, 175, 55, 0.1);  color: var(--gold); }
+    .t-blue   .row-badge { background: rgba(100, 181, 246, 0.1); color: #64B5F6; }
+    .t-purple .row-badge { background: rgba(186, 104, 200, 0.1); color: #BA68C8; }
+    .t-rose   .row-badge { background: rgba(244, 67, 54, 0.1);   color: #F44336; }
+    .t-green  .row-badge { background: rgba(76, 175, 80, 0.1);   color: #4CAF50; }
+    .t-gray   .row-badge { background: rgba(255, 255, 255, 0.07);color: #888; }
+    .t-amber  .row-badge { background: rgba(255, 193, 7, 0.1);   color: #FFC107; }
+    .t-teal   .row-badge { background: rgba(0, 184, 148, 0.1);   color: #00b894; }
 
     /* ── Footer ── */
     .app-footer {
@@ -594,8 +469,11 @@
 
 <body>
 
-  <div class="glow-orb"></div> <button class="back-btn floating-menu-btn" onclick="openSidebar()"
-    aria-label="Menu"><span class="material-symbols-rounded">menu</span></button>
+  <div class="glow-orb"></div>
+
+  <button class="back-btn floating-menu-btn" onclick="openSidebar()" aria-label="Menu">
+    <span class="material-symbols-rounded">menu</span>
+  </button>
 
   <!-- Hero -->
   <header class="hero">
@@ -609,7 +487,15 @@
     <span class="divider-ornament">❦</span>
     <div class="divider-line"></div>
   </div>
-  <div class="greeting-date" id="greetingDate"></div>
+
+  <!-- Greeting strip -->
+  <div class="greeting-strip">
+    <div class="greeting-icon" id="greetingIcon">☀️</div>
+    <div class="greeting-text">
+      <div class="greeting-line1" id="greetingLine">Good morning</div>
+      <div class="greeting-line2" id="greetingStatus">Start the day with devotion</div>
+    </div>
+    <div class="greeting-date" id="greetingDate"></div>
   </div>
 
   <!-- Stats -->
@@ -644,6 +530,7 @@
           <div class="row-title">Scene Menu</div>
           <div class="row-desc">Set the guardrails for Sir to craft the perfect scene</div>
         </div>
+        <span class="row-arrow material-symbols-rounded">chevron_right</span>
       </a>
     </div>
 
@@ -655,6 +542,7 @@
           <div class="row-title">Training Programs</div>
           <div class="row-desc">Structured conditioning protocols and progress tracking</div>
         </div>
+        <span class="row-chevron material-symbols-rounded">expand_more</span>
       </div>
       <div class="sub-items">
         <a href="deepthroat-training.html" class="sub-item">
@@ -688,6 +576,7 @@
           <div class="row-title">Assessments &amp; Ratings</div>
           <div class="row-desc">Checklists, predicament ratings, and public play rating</div>
         </div>
+        <span class="row-chevron material-symbols-rounded">expand_more</span>
       </div>
       <div class="sub-items">
         <a href="sub-bdsm-checklist.html" class="sub-item">
@@ -696,7 +585,7 @@
         </a>
         <a href="bdsm-checklist.html" class="sub-item">
           <span class="sub-item-emoji">📖</span>
-          <span class="sub-item-label" id="bdsmChecklistLabel">Sir's BDSM Checklist</span>
+          <span class="sub-item-label">Sir's BDSM Checklist</span>
         </a>
         <a href="predicament-bondage-menu.html" class="sub-item">
           <span class="sub-item-emoji">🪢</span>
@@ -717,6 +606,43 @@
           <div class="row-title">Sir's Public Play Game</div>
           <div class="row-desc">Interactive directives and discrete public play challenges</div>
         </div>
+        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      </a>
+    </div>
+
+    <!-- Toy Vault — direct link -->
+    <div class="menu-row t-teal">
+      <a href="toy-vault.html" class="row-header">
+        <div class="row-icon-wrap">🔒</div>
+        <div class="row-label">
+          <div class="row-title">Toy Vault</div>
+          <div class="row-desc">Full inventory of every toy, plug, impact tool, and bondage item — with ratings</div>
+        </div>
+        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      </a>
+    </div>
+
+    <!-- Notes — direct link -->
+    <div class="menu-row t-purple">
+      <a href="notes.html" class="row-header">
+        <div class="row-icon-wrap">📝</div>
+        <div class="row-label">
+          <div class="row-title">Notes</div>
+          <div class="row-desc">Fantasies, kinks, ideas, private thoughts — searchable and taggable</div>
+        </div>
+        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      </a>
+    </div>
+
+    <!-- Calendar — direct link -->
+    <div class="menu-row t-blue">
+      <a href="calendar.html" class="row-header">
+        <div class="row-icon-wrap">📅</div>
+        <div class="row-label">
+          <div class="row-title">Calendar</div>
+          <div class="row-desc">Scene schedule, training deadlines, protocol check-ins &amp; upcoming tasks</div>
+        </div>
+        <span class="row-arrow material-symbols-rounded">chevron_right</span>
       </a>
     </div>
 
@@ -728,6 +654,7 @@
           <div class="row-title">Profile &amp; Settings</div>
           <div class="row-desc">Cloud sync, compatibility data, and profile management</div>
         </div>
+        <span class="row-chevron material-symbols-rounded">expand_more</span>
       </div>
       <div class="sub-items">
         <a href="bdsm-checklist.html" class="sub-item">
@@ -737,45 +664,6 @@
       </div>
     </div>
 
-<!-- TOY VAULT CARD -->
-<div class="feature-card glass-card" onclick="window.location.href='toy-vault.html'" style="cursor:pointer;">
-  <div class="card-image">
-    <img src="images/toy-vault.jpg" alt="Toy Vault" style="width:100%; height:180px; object-fit:cover; border-radius:16px 16px 0 0;">
-  </div>
-  <div class="card-content">
-    <div class="card-badge gold">NEW</div>
-    <h3 style="color:#D4AF37; margin:12px 0 8px 0;">Toy Vault</h3>
-    <p style="font-size:0.95rem; line-height:1.4; color:#ddd;">Full inventory of every toy, plug, impact tool, and bondage item you own. Track favorites and usage.</p>
-    <button class="gold-btn" style="width:100%; margin-top:12px;">Open Toy Vault →</button>
-  </div>
-</div>
-
-<!-- NOTES CARD -->
-<div class="feature-card glass-card" onclick="window.location.href='notes.html'" style="cursor:pointer;">
-  <div class="card-image">
-    <img src="images/notes-cover.jpg" alt="Notes" style="width:100%; height:180px; object-fit:cover; border-radius:16px 16px 0 0;">
-  </div>
-  <div class="card-content">
-    <div class="card-badge gold">NEW</div>
-    <h3 style="color:#D4AF37; margin:12px 0 8px 0;">Notes</h3>
-    <p style="font-size:0.95rem; line-height:1.4; color:#ddd;">Fantasies, kinks, ideas, private thoughts — searchable, taggable, with private toggle.</p>
-    <button class="gold-btn" style="width:100%; margin-top:12px;">Open Notes →</button>
-  </div>
-</div>
-
-<!-- CALENDAR CARD -->
-<div class="feature-card glass-card" onclick="window.location.href='calendar.html'" style="cursor:pointer;">
-  <div class="card-image">
-    <img src="images/calendar-cover.jpg" alt="Calendar" style="width:100%; height:180px; object-fit:cover; border-radius:16px 16px 0 0;">
-  </div>
-  <div class="card-content">
-    <div class="card-badge gold">NEW</div>
-    <h3 style="color:#D4AF37; margin:12px 0 8px 0;">Calendar</h3>
-    <p style="font-size:0.95rem; line-height:1.4; color:#ddd;">Scene schedule, training deadlines, protocol check-ins &amp; upcoming tasks.</p>
-    <button class="gold-btn" style="width:100%; margin-top:12px;">Open Calendar →</button>
-  </div>
-</div>
-
     <!-- Help & Info — expandable -->
     <div class="menu-row t-amber" id="row-help">
       <div class="row-header" onclick="toggle('row-help')">
@@ -784,6 +672,7 @@
           <div class="row-title">Help &amp; Info</div>
           <div class="row-desc">Getting started, safety guidelines, and app information</div>
         </div>
+        <span class="row-chevron material-symbols-rounded">expand_more</span>
       </div>
       <div class="sub-items">
         <a href="help.html#getting-started" class="sub-item">
@@ -814,7 +703,6 @@
     function toggle(id) {
       const row = document.getElementById(id);
       const isOpen = row.classList.contains('open');
-      // Close all others
       document.querySelectorAll('.menu-row').forEach(r => r.classList.remove('open'));
       if (!isOpen) row.classList.add('open');
     }
@@ -822,44 +710,45 @@
     // ── Greeting ──
     (function () {
       const h = new Date().getHours();
-      const icon = document.getElementById('greetingIcon');
-      const line = document.getElementById('greetingLine');
+      const icon   = document.getElementById('greetingIcon');
+      const line   = document.getElementById('greetingLine');
       const status = document.getElementById('greetingStatus');
       const dateEl = document.getElementById('greetingDate');
 
-      // Load name from settings
       let subName = 'Becca';
       try {
         const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
         if (s.subName) subName = s.subName;
-      } catch (e) { }
+      } catch (e) {}
 
-      if (h >= 5 && h < 12) { icon.textContent = '☀️'; line.textContent = `Good morning, ${subName}`; status.textContent = 'Start the day with devotion'; }
-      else if (h >= 12 && h < 17) { icon.textContent = '🌤️'; line.textContent = `Good afternoon, ${subName}`; status.textContent = 'Awaiting Sir\'s direction'; }
-      else if (h >= 17 && h < 21) { icon.textContent = '🌆'; line.textContent = `Good evening, ${subName}`; status.textContent = 'Ready to serve Sir tonight'; }
-      else { icon.textContent = '🌙'; line.textContent = `Good night, ${subName}`; status.textContent = 'Late night devotion'; }
+      if      (h >= 5  && h < 12) { icon.textContent = '☀️'; line.textContent = `Good morning, ${subName}`;   status.textContent = 'Start the day with devotion'; }
+      else if (h >= 12 && h < 17) { icon.textContent = '🌤️'; line.textContent = `Good afternoon, ${subName}`; status.textContent = "Awaiting Sir's direction"; }
+      else if (h >= 17 && h < 21) { icon.textContent = '🌆'; line.textContent = `Good evening, ${subName}`;   status.textContent = 'Ready to serve Sir tonight'; }
+      else                         { icon.textContent = '🌙'; line.textContent = `Good night, ${subName}`;     status.textContent = 'Late night devotion'; }
 
-      // Update Checklist Label
       const checklistLabel = document.getElementById('bdsmChecklistLabel');
-      if (checklistLabel) {
-        checklistLabel.textContent = `${subName}'s BDSM Checklist`;
-      }
+      if (checklistLabel) checklistLabel.textContent = `${subName}'s BDSM Checklist`;
 
       const n = new Date();
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       dateEl.innerHTML = `${days[n.getDay()]}<br>${months[n.getMonth()]} ${n.getDate()}`;
     })();
 
     // ── Streak ──
     (function () {
-      const keys = ['sirender_kegel_training', 'sirender_5_training', 'sirender_plug_training', 'sirender_pos_training'];
+      const keys = ['sirender_kegel_training','sirender_5_training','sirender_plug_training','sirender_pos_training'];
       let max = 0;
-      keys.forEach(k => { try { const s = localStorage.getItem(k); if (s) { const d = JSON.parse(s); const v = d.streak || 0; if (v > max) max = v; } } catch (e) { } });
+      keys.forEach(k => {
+        try {
+          const s = localStorage.getItem(k);
+          if (s) { const d = JSON.parse(s); const v = d.streak || 0; if (v > max) max = v; }
+        } catch (e) {}
+      });
       if (max > 0) document.getElementById('statStreak').textContent = max;
     })();
 
-    // ── Scroll to anchor if returning from help.html ──
+    // ── Scroll to anchor ──
     (function () {
       const hash = window.location.hash;
       if (hash) { const el = document.querySelector(hash); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
@@ -870,30 +759,28 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.error(e)));
     }
   </script>
-  <!-- Global Sidebar Menu -->
+
+  <!-- Global Sidebar -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
   <div class="global-sidebar" id="globalSidebar">
     <div class="sidebar-header">
       <div class="sidebar-brand">Dom Sub Hub</div>
     </div>
     <div class="sidebar-nav">
-      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-      <a href="scene-menu.html" class="sidebar-link"><span
-          class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-      <a href="training-menu.html" class="sidebar-link"><span
-          class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-      <a href="assessment-menu.html" class="sidebar-link"><span
-          class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span>
-        Sir's Public Tasks</a>
-      <a href="bdsm-checklist.html" class="sidebar-link"><span
-          class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help &
-        Info</a>
-      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon"
-          style="color:var(--gold);">settings</span> Settings</a>
+      <a href="index.html"           class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+      <a href="scene-menu.html"      class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+      <a href="training-menu.html"   class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+      <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments &amp; Ratings</a>
+      <a href="public-game.html"     class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
+      <a href="bdsm-checklist.html"  class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+      <a href="toy-vault.html"       class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">lock</span> Toy Vault</a>
+      <a href="notes.html"           class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">note</span> Notes</a>
+      <a href="calendar.html"        class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">calendar_month</span> Calendar</a>
+      <a href="help.html"            class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help &amp; Info</a>
+      <a href="settings.html"        class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
     </div>
   </div>
+
   <script>
     function openSidebar() {
       document.getElementById('sidebarOverlay').classList.add('open');
@@ -904,6 +791,6 @@
       document.getElementById('globalSidebar').classList.remove('open');
     }
   </script>
-</body>
 
+</body>
 </html>
