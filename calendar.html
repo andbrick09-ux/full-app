@@ -171,31 +171,42 @@
       margin-bottom: 14px; animation: fadeUp 0.3s ease both;
     }
     .week-label {
-      font-family: 'Playfair Display', serif; font-size: 15px; color: #ccc; text-align: center;
+      font-family: 'Playfair Display', serif; font-size: 14px; color: #ccc; text-align: center;
     }
-    .week-grid {
-      display: grid; grid-template-columns: repeat(7,1fr); gap: 6px;
+    /* Scrollable outer wrapper — clips to page, scrolls internally */
+    .week-scroll-wrap {
+      overflow-x: auto; overflow-y: visible;
+      margin: 0 -16px;            /* bleed past page-wrap padding */
+      padding: 0 16px 12px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
       animation: fadeUp 0.3s ease 0.05s both;
     }
+    .week-scroll-wrap::-webkit-scrollbar { display: none; }
+    .week-grid {
+      display: flex; gap: 8px;
+      width: max-content;         /* lets columns dictate natural width */
+    }
     .week-col {
+      width: 80px; flex-shrink: 0;
       border-radius: 14px; background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.05);
-      padding: 10px 4px; display: flex; flex-direction: column;
-      align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; min-height: 140px;
+      padding: 10px 6px; display: flex; flex-direction: column;
+      align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; min-height: 150px;
     }
     .week-col:hover { border-color: rgba(212,175,55,0.2); background: rgba(212,175,55,0.03); }
-    .week-col.today-col { border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.05); }
+    .week-col.today-col { border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.06); }
     .week-col-day { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #555; }
-    .week-col-num { font-family: 'Playfair Display', serif; font-size: 16px; color: #ccc; }
+    .week-col-num { font-family: 'Playfair Display', serif; font-size: 18px; color: #ccc; }
     .week-col.today-col .week-col-num { color: var(--gold); }
-    .week-pills { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+    .week-pills { display: flex; flex-direction: column; gap: 4px; width: 100%; }
     .week-pill {
-      width: 100%; padding: 3px 4px; border-radius: 6px;
-      font-size: 7px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; text-align: center; color: var(--midnight);
+      width: 100%; padding: 4px 6px; border-radius: 7px;
+      font-size: 8px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.3px; text-align: center;
       overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
     }
-    .week-more { font-size: 8px; color: #555; margin-top: 2px; }
+    .week-more { font-size: 8px; color: #555; margin-top: 2px; text-align: center; }
 
     /* ══════════════════════════════
        DAY VIEW
@@ -644,7 +655,9 @@
         <div class="week-label" id="week-label"></div>
         <button class="month-nav-btn" onclick="changeWeek(1)">›</button>
       </div>
-      <div class="week-grid" id="week-grid"></div>
+      <div class="week-scroll-wrap">
+        <div class="week-grid" id="week-grid"></div>
+      </div>
     </div>
 
     <!-- ══ DAY VIEW ══ -->
@@ -1094,6 +1107,14 @@
       </div>`;
     }
     document.getElementById('week-grid').innerHTML = html;
+
+    // Auto-scroll so today's column is visible
+    const todayCol = document.querySelector('.week-col.today-col');
+    if (todayCol) {
+      const wrap = document.querySelector('.week-scroll-wrap');
+      const offset = todayCol.offsetLeft - wrap.offsetWidth / 2 + todayCol.offsetWidth / 2;
+      wrap.scrollTo({ left: offset, behavior: 'smooth' });
+    }
   }
 
   /* ══════════════════════════════════════════════════════
