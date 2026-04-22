@@ -1,11 +1,11 @@
 {
-  "name": "Becca's Sirender",
-  "short_name": "Sirender",
+  "name": "Dom Sub Hub",
+  "short_name": "BDSM Hun",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#051024",
   "theme_color": "#051024",
-  "description": "Progressive Web App for Becca's Sirender",
+  "description": "",
   "icons": [
     {
       "src": "./favicon.svg",
