@@ -870,6 +870,39 @@
     </div>
   </div>
 
+  <!-- ══ DELETE SCOPE MODAL ══ -->
+  <div id="delete-modal" class="modal-back" onclick="handleModalClick(event,'delete-modal')">
+    <div class="modal-sheet" style="padding-bottom:calc(20px + var(--safe-b));">
+      <div class="modal-handle"></div>
+      <div class="modal-heading" style="font-size:24px;">Remove Event</div>
+      <div class="modal-subheading">Choose what to delete</div>
+
+      <button onclick="deleteScope('one')" style="
+        display:flex; align-items:center; gap:16px; width:100%; margin-bottom:10px;
+        background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+        border-radius:16px; padding:18px 20px; cursor:pointer; text-align:left; transition:all 0.2s;">
+        <span style="font-size:22px;">📅</span>
+        <div>
+          <div style="font-family:'Playfair Display',serif; font-size:15px; color:#ddd; margin-bottom:3px;">This occurrence only</div>
+          <div style="font-size:11px; color:#555; font-family:'Montserrat',sans-serif;">Removes just this date, keeps the rest</div>
+        </div>
+      </button>
+
+      <button onclick="deleteScope('all')" style="
+        display:flex; align-items:center; gap:16px; width:100%; margin-bottom:20px;
+        background:rgba(244,67,54,0.05); border:1px solid rgba(244,67,54,0.2);
+        border-radius:16px; padding:18px 20px; cursor:pointer; text-align:left; transition:all 0.2s;">
+        <span style="font-size:22px;">🗑</span>
+        <div>
+          <div style="font-family:'Playfair Display',serif; font-size:15px; color:#F44336; margin-bottom:3px;">All occurrences</div>
+          <div style="font-size:11px; color:#555; font-family:'Montserrat',sans-serif;">Permanently removes the entire recurring event</div>
+        </div>
+      </button>
+
+      <button class="modal-cancel" onclick="closeModal('delete-modal')">Cancel</button>
+    </div>
+  </div>
+
   <!-- ══ PIN MODAL ══ -->
   <div id="pin-modal" class="pin-modal-back">
     <div class="pin-card">
@@ -980,6 +1013,7 @@
     return recurTasks.filter(t => {
       if (t.startDate && t.startDate > ds) return false;
       if (t.endDate   && t.endDate   < ds) return false;
+      if (t.exceptions && t.exceptions.includes(ds)) return false;
       if (t.frequency === 'daily') return true;
       if (t.frequency === 'weekly' || t.frequency === 'custom') return t.daysOfWeek.includes(dow);
       return false;
@@ -996,6 +1030,7 @@
         if (e.date > ds) return false;
         if (e.endDate && e.endDate < ds) return false;
         if (e.recurEnd && e.recurEnd < ds) return false;
+        if (e.exceptions && e.exceptions.includes(ds)) return false;
         return e.workDays.includes(dow);
       }
 
@@ -1009,6 +1044,7 @@
       // Recurring: must be on or after start date
       if (e.date > ds) return false;
       if (e.recurEnd && e.recurEnd < ds) return false;
+      if (e.exceptions && e.exceptions.includes(ds)) return false;
 
       const start = new Date(e.date + 'T12:00:00');
       if (e.frequency === 'daily') return true;
@@ -1290,7 +1326,7 @@
       const spanLabel = ev.endDate && ev.endDate !== ev.date ? ` — ${ev.endDate}` : '';
       const actions = `<div class="work-card-actions">
         <button class="work-card-edit-btn" onclick="editEvent('${ev.id}')">Edit</button>
-        <button class="work-card-del-btn"  onclick="deleteEvent('${ev.id}')">🗑</button>
+        <button class="work-card-del-btn"  onclick="confirmDelete('${ev.id}','event')">🗑</button>
       </div>`;
       html += `<div class="work-card">
         <div class="work-card-icon">💼</div>
@@ -1308,7 +1344,7 @@
       const spanLabel = ev.endDate && ev.endDate !== ev.date ? `${ev.date} → ${ev.endDate}` : ev.date;
       const actions = `<div class="vacation-card-actions">
         <button class="vacation-edit-btn" onclick="editEvent('${ev.id}')">Edit</button>
-        <button class="vacation-del-btn"  onclick="deleteEvent('${ev.id}')">🗑</button>
+        <button class="vacation-del-btn"  onclick="confirmDelete('${ev.id}','event')">🗑</button>
       </div>`;
       html += `<div class="vacation-card">
         <div class="vacation-card-header">
@@ -1337,7 +1373,7 @@
           <div class="scene-dom-actions">
             <button class="scene-edit-btn" onclick="editEvent('${scene.id}')">Edit</button>
             ${scene.visibility==='surprise'&&!scene.unlocked ? `<button class="scene-unlock-btn" onclick="unlockScene('${scene.id}')">✦ Reveal to Sub</button>` : ''}
-            <button class="scene-delete-btn" onclick="deleteEvent('${scene.id}')">🗑</button>
+            <button class="scene-delete-btn" onclick="confirmDelete('${scene.id}','event')">🗑</button>
           </div>` : '';
 
         html += `<div class="scene-card-full">
@@ -1360,7 +1396,7 @@
     otherEvents.forEach(ev => {
       const actions = `<div class="work-card-actions">
         <button class="work-card-edit-btn" onclick="editEvent('${ev.id}')">Edit</button>
-        <button class="work-card-del-btn"  onclick="deleteEvent('${ev.id}')">🗑</button>
+        <button class="work-card-del-btn"  onclick="confirmDelete('${ev.id}','event')">🗑</button>
       </div>`;
       html += `<div class="work-card" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);">
         <div class="work-card-icon">📌</div>
@@ -1480,6 +1516,62 @@
   function unlockScene(id) {
     const ev = events.find(e => e.id === id);
     if (ev) { ev.unlocked = true; persist(); renderDay(); showToast('Scene revealed to Sub ✦'); }
+  }
+
+  /* ── Delete logic ── */
+  let _deleteTarget = null; // { id, store } store = 'event' | 'task'
+
+  function confirmDelete(id, store) {
+    const ev = store === 'task'
+      ? recurTasks.find(t => t.id === id)
+      : events.find(e => e.id === id);
+
+    if (!ev) return;
+
+    // Non-recurring: delete immediately, no modal needed
+    const isRecurring = store === 'task' || ev.recurring || (ev.workDays && ev.workDays.length > 0);
+    if (!isRecurring) {
+      events = events.filter(e => e.id !== id);
+      persist(); renderDay(); showToast('Event deleted'); return;
+    }
+
+    // Recurring: show scope picker
+    _deleteTarget = { id, store };
+    document.getElementById('delete-modal').classList.add('open');
+  }
+
+  function deleteScope(scope) {
+    closeModal('delete-modal');
+    if (!_deleteTarget) return;
+    const { id, store } = _deleteTarget;
+    _deleteTarget = null;
+
+    if (scope === 'all') {
+      // Remove entirely from whichever store
+      if (store === 'task') {
+        recurTasks = recurTasks.filter(t => t.id !== id);
+      } else {
+        events = events.filter(e => e.id !== id);
+      }
+      persist(); renderCurrentView(); showToast('Recurring event removed');
+
+    } else {
+      // Skip just this date — add to an exceptions list on the event
+      const ev = events.find(e => e.id === id);
+      if (ev) {
+        if (!ev.exceptions) ev.exceptions = [];
+        ev.exceptions.push(currentDayStr);
+        persist(); renderDay(); showToast('Removed from this date');
+      } else {
+        // For recurring tasks, add date exception directly on the task object
+        const task = recurTasks.find(t => t.id === id);
+        if (task) {
+          if (!task.exceptions) task.exceptions = [];
+          task.exceptions.push(currentDayStr);
+          persist(); renderDay(); showToast('Removed from this date');
+        }
+      }
+    }
   }
 
   function deleteEvent(id) {
