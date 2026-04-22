@@ -299,6 +299,9 @@
 
         function render(){
             // Exp selector
+            const expSelector = document.getElementById('expSelector');
+            if (expSelector) expSelector.classList.toggle('compact', !!state.exp);
+            
             ['beginner','intermediate','advanced'].forEach(e=>{
                 const el=document.getElementById(`exp-${e}`);
                 el.classList.toggle('selected',state.exp===e);
