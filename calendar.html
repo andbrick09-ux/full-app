@@ -528,7 +528,8 @@
     }
     .type-btn.active-scene    { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.4); color: var(--gold); }
     .type-btn.active-task     { background: rgba(186,104,200,0.15); border-color: rgba(186,104,200,0.4); color: #BA68C8; }
-    .type-btn.active-unavail  { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #888; }
+    .type-btn.active-unavail  { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #aaa; }
+    .type-btn.active-work     { background: rgba(120,144,156,0.15); border-color: rgba(120,144,156,0.35); color: #90A4AE; }
     .type-btn.active-vacation { background: rgba(38,198,218,0.15);  border-color: rgba(38,198,218,0.4);  color: #26C6DA; }
 
     .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
@@ -754,7 +755,7 @@
         <button class="type-btn"              id="type-task"     onclick="setType('task')">✦ Task</button>
         <button class="type-btn"              id="type-work"     onclick="setType('work')">💼 Work</button>
         <button class="type-btn"              id="type-vacation" onclick="setType('vacation')">✈️ Vacation</button>
-        <button class="type-btn"              id="type-unavail"  onclick="setType('unavail')">🚫 Unavailable</button>
+        <button class="type-btn"              id="type-unavail"  onclick="setType('unavail')">📌 Other</button>
       </div>
 
       <label class="field-label">Title</label>
@@ -771,14 +772,32 @@
 
       <!-- Work fields -->
       <div id="work-fields" style="display:none;">
-        <label class="field-label">Shift / Notes</label>
+        <label class="field-label">Shift / Hours</label>
         <input id="ev-shift" class="field-input" type="text" placeholder="e.g. 9am–5pm, Night shift, WFH…" />
+
+        <label class="field-label">Work Days <span style="opacity:0.5;">(select which days you work)</span></label>
+        <div class="dow-picker" id="work-dow-picker">
+          <button class="dow-btn" data-wdow="0" onclick="toggleWorkDow(0)">S</button>
+          <button class="dow-btn" data-wdow="1" onclick="toggleWorkDow(1)">M</button>
+          <button class="dow-btn" data-wdow="2" onclick="toggleWorkDow(2)">T</button>
+          <button class="dow-btn" data-wdow="3" onclick="toggleWorkDow(3)">W</button>
+          <button class="dow-btn" data-wdow="4" onclick="toggleWorkDow(4)">T</button>
+          <button class="dow-btn" data-wdow="5" onclick="toggleWorkDow(5)">F</button>
+          <button class="dow-btn" data-wdow="6" onclick="toggleWorkDow(6)">S</button>
+        </div>
+        <p style="font-size:10px;color:#555;margin:-10px 0 18px;font-family:'Playfair Display',serif;font-style:italic;">Leave all unselected to apply to the chosen date only</p>
       </div>
 
       <!-- Vacation fields -->
       <div id="vacation-fields" style="display:none;">
         <label class="field-label">Destination / Details</label>
         <textarea id="ev-vac-desc" class="field-textarea" placeholder="Where are you going? Any notes…" style="min-height:70px;"></textarea>
+      </div>
+
+      <!-- Other fields -->
+      <div id="other-fields" style="display:none;">
+        <label class="field-label">Notes <span style="opacity:0.5;">(optional)</span></label>
+        <textarea id="ev-other-desc" class="field-textarea" placeholder="Any details about this event…" style="min-height:70px;"></textarea>
       </div>
 
       <!-- Scene-specific -->
@@ -969,6 +988,17 @@
 
   function getEventsForDate(ds) {
     return events.filter(e => {
+      const check = new Date(ds + 'T12:00:00');
+      const dow = check.getDay();
+
+      // Work with specific days selected — treat as its own recurring rule
+      if (e.type === 'work' && e.workDays && e.workDays.length > 0) {
+        if (e.date > ds) return false;
+        if (e.endDate && e.endDate < ds) return false;
+        if (e.recurEnd && e.recurEnd < ds) return false;
+        return e.workDays.includes(dow);
+      }
+
       // Non-recurring: exact date match, or multi-day span
       if (!e.recurring) {
         if (e.date === ds) return true;
@@ -978,23 +1008,15 @@
 
       // Recurring: must be on or after start date
       if (e.date > ds) return false;
-      // Must be before recurEnd if set
       if (e.recurEnd && e.recurEnd < ds) return false;
 
       const start = new Date(e.date + 'T12:00:00');
-      const check = new Date(ds    + 'T12:00:00');
-
       if (e.frequency === 'daily') return true;
-
-      if (e.frequency === 'weekly' || e.frequency === 'custom') {
-        const dow = check.getDay();
-        return (e.daysOfWeek || []).includes(dow);
-      }
-
-      if (e.frequency === 'monthly') {
-        // Same day-of-month as start date
-        return check.getDate() === start.getDate();
-      }
+      if (e.frequency === 'weekly' || e.frequency === 'custom') return (e.daysOfWeek || []).includes(dow);
+      if (e.frequency === 'monthly') return check.getDate() === start.getDate();
+      return false;
+    });
+  }
 
       return false;
     });
@@ -1215,7 +1237,7 @@
           if (e.type === 'scene')       return { color:'#D4AF37', bg:'rgba(212,175,55,0.75)',  title: e.title };
           if (e.type === 'work')        return { color:'#546E7A', bg:'rgba(120,144,156,0.65)', title: e.title };
           if (e.type === 'vacation')    return { color:'#006064', bg:'rgba(38,198,218,0.7)',   title: e.title };
-          if (e.type === 'unavailable') return { color:'#444',    bg:'rgba(100,100,100,0.45)', title: e.title };
+          if (e.type === 'unavailable') return { color:'#888', bg:'rgba(150,150,150,0.35)', title: e.title };
           return { color:'#aaa', bg:'rgba(200,200,200,0.2)', title: e.title };
         }),
         ...dayTasks.slice(0,3).map(t => ({ color: CAT_COLORS[t.category]?.color||'#aaa', bg: CAT_COLORS[t.category]?.bg||'rgba(200,200,200,0.2)', title: t.title }))
@@ -1277,8 +1299,8 @@
       html += `<div class="work-card">
         <div class="work-card-icon">💼</div>
         <div class="work-card-body">
-          <div class="work-card-title">${escHtml(ev.title)}${ev.recurring ? ' <span style="font-size:9px;color:#78909C;font-family:\'Montserrat\',sans-serif;font-weight:700;letter-spacing:1px;">↻ RECURRING</span>' : ''}</div>
-          <div class="work-card-meta">${ev.shift ? escHtml(ev.shift) : ''}${spanLabel ? ' · ' + spanLabel : ''}</div>
+          <div class="work-card-title">${escHtml(ev.title)}${(ev.workDays&&ev.workDays.length)||ev.recurring ? ' <span style="font-size:9px;color:#78909C;font-family:\'Montserrat\',sans-serif;font-weight:700;letter-spacing:1px;">↻</span>' : ''}</div>
+          <div class="work-card-meta">${ev.shift ? escHtml(ev.shift) : ''}${ev.workDays&&ev.workDays.length ? ' · ' + ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].filter((_,i)=>ev.workDays.includes(i)).join(', ') : spanLabel ? ' · '+spanLabel : ''}</div>
         </div>
         ${actions}
       </div>`;
@@ -1337,6 +1359,23 @@
       }
     });
 
+    /* ── Other event cards ── */
+    const otherEvents = dayEvents.filter(e => e.type === 'unavailable');
+    otherEvents.forEach(ev => {
+      const actions = `<div class="work-card-actions">
+        <button class="work-card-edit-btn" onclick="editEvent('${ev.id}')">Edit</button>
+        <button class="work-card-del-btn"  onclick="deleteEvent('${ev.id}')">🗑</button>
+      </div>`;
+      html += `<div class="work-card" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);">
+        <div class="work-card-icon">📌</div>
+        <div class="work-card-body">
+          <div class="work-card-title" style="color:#ccc;">${escHtml(ev.title)}${ev.recurring?' <span style="font-size:9px;color:#666;font-family:\'Montserrat\',sans-serif;font-weight:700;letter-spacing:1px;">↻</span>':''}</div>
+          ${ev.otherDesc ? `<div class="work-card-meta">${escHtml(ev.otherDesc)}</div>` : ''}
+        </div>
+        ${actions}
+      </div>`;
+    });
+
     /* ── Tasks ── */
     const domTasks = dayTasks.filter(t => t.owner === 'dom');
     const subTasks = dayTasks.filter(t => t.owner === 'sub');
@@ -1363,7 +1402,7 @@
       html += '</div>';
     }
 
-    if (!scenes.length && !dayTasks.length && !workEvents.length && !vacEvents.length) {
+    if (!scenes.length && !dayTasks.length && !workEvents.length && !vacEvents.length && !otherEvents.length) {
       html += `<div class="day-empty">
         <div class="day-empty-icon">✦</div>
         <div class="day-empty-text">${isFuture ? 'Nothing scheduled yet' : 'No entries for this day'}</div>
@@ -1463,7 +1502,7 @@
 
   function openAddModal(evId) {
     editingEventId = evId || null;
-    formState = { type:'scene', isSurprise:false, isRecurring:false, freq:'daily', cat:'training', daysOfWeek:[] };
+    formState = { type:'scene', isSurprise:false, isRecurring:false, freq:'daily', cat:'training', daysOfWeek:[], workDays:[] };
 
     if (evId) {
       const ev = events.find(e => e.id === evId);
@@ -1474,7 +1513,8 @@
       document.getElementById('ev-desc').value    = ev.desc  || '';
       document.getElementById('ev-dress').value   = ev.dressCode || '';
       document.getElementById('ev-shift').value   = ev.shift || '';
-      document.getElementById('ev-vac-desc').value= ev.vacDesc || '';
+      document.getElementById('ev-vac-desc').value   = ev.vacDesc   || '';
+      document.getElementById('ev-other-desc').value = ev.otherDesc || '';
       document.getElementById('ev-enddate').value = ev.endDate || '';
       formState.type = ['scene','task','work','vacation','unavailable'].includes(ev.type)
         ? (ev.type === 'unavailable' ? 'unavail' : ev.type) : 'scene';
@@ -1482,7 +1522,12 @@
       formState.isRecurring = ev.recurring || false;
       formState.freq        = ev.frequency || 'daily';
       formState.daysOfWeek  = ev.daysOfWeek || [];
+      formState.workDays    = ev.workDays || [];
       document.getElementById('ev-recur-end').value = ev.recurEnd || '';
+      // Restore work DOW picker
+      document.querySelectorAll('#work-dow-picker .dow-btn').forEach(b => {
+        b.classList.toggle('active', formState.workDays.includes(+b.dataset.wdow));
+      });
     } else {
       document.getElementById('add-modal-heading').textContent = 'New Entry';
       document.getElementById('add-modal-sub').textContent     = 'Schedule your protocol';
@@ -1491,12 +1536,15 @@
       document.getElementById('ev-desc').value     = '';
       document.getElementById('ev-dress').value    = '';
       document.getElementById('ev-shift').value    = '';
-      document.getElementById('ev-vac-desc').value = '';
+      document.getElementById('ev-vac-desc').value   = '';
+      document.getElementById('ev-other-desc').value = '';
       document.getElementById('ev-enddate').value  = '';
       document.getElementById('ev-recur-end').value= '';
       formState.isRecurring = false;
       formState.freq        = 'daily';
       formState.daysOfWeek  = [];
+      formState.workDays    = [];
+      document.querySelectorAll('#work-dow-picker .dow-btn').forEach(b => b.classList.remove('active'));
     }
 
     setType(formState.type);
@@ -1517,18 +1565,17 @@
 
   function setType(t) {
     formState.type = t;
+    const activeClasses = { scene:'active-scene', task:'active-task', work:'active-work', vacation:'active-vacation', unavail:'active-unavail' };
     ['scene','task','unavail','work','vacation'].forEach(k => {
       const btn = document.getElementById('type-'+k);
       if (!btn) return;
-      const activeClass = k === 'work' ? 'active-unavail'
-                        : k === 'vacation' ? 'active-vacation'
-                        : `active-${k}`;
-      btn.className = 'type-btn' + (k===t ? ` ${activeClass}` : '');
+      btn.className = 'type-btn' + (k===t ? ` ${activeClasses[k]||'active-unavail'}` : '');
     });
     document.getElementById('scene-fields').style.display    = t==='scene'    ? 'block' : 'none';
     document.getElementById('task-fields').style.display     = t==='task'     ? 'block' : 'none';
     document.getElementById('work-fields').style.display     = t==='work'     ? 'block' : 'none';
     document.getElementById('vacation-fields').style.display = t==='vacation' ? 'block' : 'none';
+    document.getElementById('other-fields').style.display    = t==='unavail'  ? 'block' : 'none';
     document.getElementById('enddate-field').style.display   = (t==='work'||t==='vacation') ? 'block' : 'none';
   }
 
@@ -1549,6 +1596,14 @@
       if (btn) btn.classList.toggle('active', k===f);
     });
     document.getElementById('dow-row').style.display = (f==='weekly'||f==='custom') ? 'block' : 'none';
+  }
+
+  function toggleWorkDow(d) {
+    const idx = formState.workDays.indexOf(d);
+    if (idx > -1) formState.workDays.splice(idx,1); else formState.workDays.push(d);
+    document.querySelectorAll('#work-dow-picker .dow-btn').forEach(b => {
+      b.classList.toggle('active', formState.workDays.includes(+b.dataset.wdow));
+    });
   }
 
   function toggleDow(d) {
@@ -1617,7 +1672,9 @@
       desc:      document.getElementById('ev-desc').value.trim(),
       dressCode: document.getElementById('ev-dress').value.trim(),
       shift:     document.getElementById('ev-shift').value.trim(),
+      workDays:  formState.workDays,
       vacDesc:   document.getElementById('ev-vac-desc').value.trim(),
+      otherDesc: document.getElementById('ev-other-desc').value.trim(),
       endDate:   document.getElementById('ev-enddate').value || null,
       createdBy: activeProfile,
       visibility: formState.isSurprise ? 'surprise' : 'both',
@@ -1632,7 +1689,7 @@
       showToast('Event updated');
     } else {
       events.push(payload);
-      const toasts = { scene:'Scene scheduled ✦', work:'Work schedule saved', vacation:'Vacation added ✈️', unavailable:'Marked unavailable' };
+      const toasts = { scene:'Scene scheduled ✦', work:'Work schedule saved', vacation:'Vacation added ✈️', unavailable:'Other event saved' };
       showToast(toasts[type] || 'Entry saved');
     }
 
