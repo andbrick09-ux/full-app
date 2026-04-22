@@ -1,499 +1,964 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="theme-color" content="#080c14"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Dom Sub Hub — BDSM Compatibility Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
-<link rel="manifest" href="manifest.json"/>
-<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-<link rel="apple-touch-icon" href="icon-512.png"/>
-<link rel="stylesheet" href="styles.css"/>
-<style>
-:root {
-  --midnight: #051024; --paper-dark: #081226; --gold: #d4af37; --gold-dim: rgba(212,175,55,0.4);
-  --glass: rgba(5,16,36,0.85); --border: rgba(212,175,55,0.25); --green: #4CAF50; --red: #F44336;
-  --luxury-gradient: linear-gradient(135deg,#bf953f 0%,#fcf6ba 50%,#b38728 100%);
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body {
-  background-color: var(--midnight); color:#f0f0f0; font-family:'Montserrat',sans-serif;
-  background-image: radial-gradient(ellipse at top,#0f172a 0%,transparent 80%);
-  min-height:100vh; overflow-x: hidden;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#080c14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Dom Sub Hub — BDSM Compatibility Portal</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap"
+    rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="icon-512.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --midnight: #051024;
+      --paper-dark: #081226;
+      --gold: #d4af37;
+      --gold-dim: rgba(212, 175, 55, 0.4);
+      --glass: rgba(5, 16, 36, 0.85);
+      --border: rgba(212, 175, 55, 0.25);
+      --green: #4CAF50;
+      --red: #F44336;
+      --luxury-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
+    }
 
-/* HEADER & SWITCHER */
-.header { text-align:center; padding:25px 15px; border-bottom:1px solid var(--border); background:rgba(5,16,36,0.7); backdrop-filter:blur(15px); position:sticky; top:0; z-index:100; }
-.brand { font-family:'Great Vibes',cursive; font-size:36px; background:var(--luxury-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; }
-.profile-switcher { display:inline-flex; background:rgba(8,18,38,0.8); border:1px solid var(--border); border-radius:30px; padding:4px; position:relative; width: 220px; }
-.profile-btn { width: 50%; padding:8px 0; border-radius:25px; border:none; background:transparent; color:var(--gold-dim); font-size:10px; font-weight:700; text-transform:uppercase; cursor:pointer; position:relative; z-index:2; transition: 0.4s; }
-.profile-btn.active { color:var(--midnight); }
-.slider-bg { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:var(--luxury-gradient); border-radius:25px; transition:0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index:1; }
-.p2-active .slider-bg { transform:translateX(100%); }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-.persistence-bar { display:flex; justify-content:center; align-items:center; gap:12px; padding:10px; background:rgba(8,18,38,0.7); border-bottom:1px solid var(--border); font-size:10px; color:var(--gold-dim); flex-wrap: wrap; }
-.btn-mini { background:transparent; border: 1.5px solid var(--gold-dim); color: var(--gold); padding: 5px 15px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; transition: 0.3s; }
+    body {
+      background-color: var(--midnight);
+      color: #f0f0f0;
+      font-family: 'Montserrat', sans-serif;
+      background-image: radial-gradient(ellipse at top, #0f172a 0%, transparent 80%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-/* COMPATIBILITY SCORE */
-.score-card { background: var(--glass); border: 1px solid var(--gold); border-radius: 20px; margin: 20px auto; padding: 25px; max-width: 600px; text-align: center; display: none; }
-.score-ring { display: inline-block; position: relative; width: 120px; height: 120px; border-radius: 50%; margin-bottom: 15px; }
-.score-ring::after { content: attr(data-score); position: absolute; top: 10px; left: 10px; width: 100px; height: 100px; background: var(--midnight); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display'; font-size: 28px; font-weight: 700; color: var(--gold); }
-.score-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #888; }
+    /* HEADER & SWITCHER */
+    .header {
+      text-align: center;
+      padding: 25px 15px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(5, 16, 36, 0.7);
+      backdrop-filter: blur(15px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-/* SEARCH & FILTERS */
-.filter-bar { display:flex; flex-direction: column; gap:15px; padding:20px 15px; border-bottom:1px solid rgba(212,175,55,0.15); align-items:stretch; }
-.search-container { display: flex; gap: 10px; align-items: center; }
-.search-input { background:rgba(8,18,38,0.9); border: 1.5px solid var(--border); border-radius:30px; color:white; padding:14px 25px; font-size:14px; flex:1; outline:none; transition: 0.3s; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
-.adv-filter-btn { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); border-radius: 30px; padding: 0 20px; font-size: 10px; font-weight: 800; height: 48px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-.adv-filter-btn.active { background: var(--gold); color: var(--midnight); }
+    .brand {
+      font-family: 'Great Vibes', cursive;
+      font-size: 36px;
+      background: var(--luxury-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
 
-/* TAB NAV */
-.tabs-nav { display:flex; overflow-x:auto; gap:10px; padding:15px; border-bottom:1px solid var(--border); scrollbar-width:none; }
-.tab-btn { flex-shrink:0; background:transparent; border:1px solid var(--border); border-radius:25px; color:var(--gold-dim); font-size:11px; padding:8px 18px; cursor:pointer; white-space:nowrap; text-transform: uppercase; letter-spacing: 1px; }
-.tab-btn.active { background:var(--luxury-gradient); color:var(--midnight); border-color:transparent; font-weight: 700; }
+    .profile-switcher {
+      display: inline-flex;
+      background: rgba(8, 18, 38, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 4px;
+      position: relative;
+      width: 220px;
+    }
 
-/* CONTENT */
-.main { padding:15px; max-width:1200px; margin:0 auto; }
-.category-section { background:var(--glass); border:1px solid var(--border); border-radius:15px; margin-bottom:40px; overflow:hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.category-header { padding:18px 25px; background:rgba(212,175,55,0.04); border-bottom: 1px solid rgba(212,175,55,0.1); }
-.category-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--gold); text-transform: uppercase; letter-spacing: 3px; }
+    .profile-btn {
+      width: 50%;
+      padding: 8px 0;
+      border-radius: 25px;
+      border: none;
+      background: transparent;
+      color: var(--gold-dim);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      transition: 0.4s;
+    }
 
-.activity-item { padding:25px; border-bottom:1px solid rgba(212,175,55,0.08); transition:0.3s; }
-.activity-item.match { border-left:6px solid var(--green); background:rgba(76,175,80,0.03); }
+    .profile-btn.active {
+      color: var(--midnight);
+    }
 
-.item-grid { display:flex; gap:30px; align-items:flex-start; width: 100%; flex-direction: column; }
-.name-area { width: 100%; }
-.name-col { font-weight:700; font-size:20px; color: #fff; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
-.desc-text { font-size: 12px; color: #888; font-style: italic; line-height: 1.6; display: block; max-width: 850px; }
+    .slider-bg {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background: var(--luxury-gradient);
+      border-radius: 25px;
+      transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index: 1;
+    }
 
-.profile-cols { display:flex; gap:30px; width: 100%; }
-.profile-cell { flex:1; display:flex; flex-direction:column; gap:12px; min-width: 0; }
+    .p2-active .slider-bg {
+      transform: translateX(100%);
+    }
 
-/* INTERACTION GRID */
-.kink-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.kink-grid-row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+    .persistence-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(8, 18, 38, 0.7);
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--gold-dim);
+      flex-wrap: wrap;
+    }
 
-.kink-pill { 
-  padding:14px 10px; border-radius:10px; background:rgba(255,255,255,0.02); 
-  border:1.5px solid var(--border); cursor:pointer; text-align:center;
-  display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 65px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.pill-title { font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
-.pill-value { font-size: 10px; font-weight: 700; color: transparent; text-transform: uppercase; line-height: 1.3; margin-top: 6px; }
+    .btn-mini {
+      background: transparent;
+      border: 1.5px solid var(--gold-dim);
+      color: var(--gold);
+      padding: 5px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: 0.3s;
+    }
 
-.kink-pill.filled { border-color: rgba(212,175,55,0.5); background: rgba(255,255,255,0.04); border-width: 2px; }
-.kink-pill.filled .pill-title { color: var(--gold); }
-.kink-pill.filled .pill-value { color: #fff; }
+    /* COMPATIBILITY SCORE */
+    .score-card {
+      background: var(--glass);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      margin: 20px auto;
+      padding: 25px;
+      max-width: 600px;
+      text-align: center;
+      display: none;
+    }
 
-.kink-pill.status-yes { border-color: var(--green); }
-.kink-pill.status-yes .pill-title, .kink-pill.status-yes .pill-value { color: var(--green); }
-.kink-pill.status-want { border-color: var(--gold); }
-.kink-pill.status-want .pill-title, .kink-pill.status-want .pill-value { color: var(--gold); }
-.kink-pill.status-limit { border-color: var(--red); }
-.kink-pill.status-limit .pill-title, .kink-pill.status-limit .pill-value { color: var(--red); }
+    .score-ring {
+      display: inline-block;
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
 
-.note-input { width:100%; margin-top:20px; background:transparent; border:none; border-left:3px solid rgba(212,175,55,0.2); color:#bbb; font-style:italic; font-size:13px; padding: 8px 15px; outline:none; }
+    .score-ring::after {
+      content: attr(data-score);
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 100px;
+      height: 100px;
+      background: var(--midnight);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display';
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gold);
+    }
 
-/* MODALS */
-#sheetOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:2000; }
-#bottomSheet, #filterSheet { position:fixed; bottom:-100%; left:0; width:100%; background:rgba(8, 18, 38, 0.98); border-top: 3px solid var(--gold); border-radius: 30px 30px 0 0; padding: 30px; z-index:2001; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y:auto; }
-#bottomSheet.open, #filterSheet.open { bottom:0; }
-.filter-category { margin-bottom: 25px; }
-.filter-cat-title { color: var(--gold); font-size: 11px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 10px; letter-spacing: 1px; }
-.filter-options { display: flex; flex-wrap: wrap; gap: 8px; }
-.filter-opt { padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 10px; font-weight: 700; color: #888; cursor: pointer; text-transform: uppercase; }
-.filter-opt.selected { background: var(--gold); color: var(--midnight); border-color: var(--gold); }
-.sheet-option { background:rgba(255,255,255,0.04); border:1px solid rgba(212,175,55,0.1); padding:20px; border-radius:18px; margin-bottom:12px; display:flex; align-items:center; gap:25px; cursor:pointer; font-size: 16px; color: #fff; font-weight: 600; transition: 0.2s; }
+    .score-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #888;
+    }
 
-@media(min-width: 900px) {
-    .filter-bar { flex-direction: row; justify-content: space-between; }
-    .item-grid { flex-direction: row; align-items: center; }
-    .profile-cols { flex: 2; }
-    .name-area { flex: 1; }
-}
-</style>
+    /* SEARCH & FILTERS */
+    .filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px 15px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+      align-items: stretch;
+    }
+
+    .search-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-input {
+      background: rgba(8, 18, 38, 0.9);
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
+      color: white;
+      padding: 14px 25px;
+      font-size: 14px;
+      flex: 1;
+      outline: none;
+      transition: 0.3s;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .adv-filter-btn {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      border-radius: 30px;
+      padding: 0 20px;
+      font-size: 10px;
+      font-weight: 800;
+      height: 48px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .adv-filter-btn.active {
+      background: var(--gold);
+      color: var(--midnight);
+    }
+
+    /* TAB NAV */
+    .tabs-nav {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 15px;
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+
+    .tab-btn {
+      flex-shrink: 0;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      color: var(--gold-dim);
+      font-size: 11px;
+      padding: 8px 18px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .tab-btn.active {
+      background: var(--luxury-gradient);
+      color: var(--midnight);
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    /* CONTENT */
+    .main {
+      padding: 15px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .category-section {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      margin-bottom: 40px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .category-header {
+      padding: 18px 25px;
+      background: rgba(212, 175, 55, 0.04);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .category-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .activity-item {
+      padding: 25px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+      transition: 0.3s;
+    }
+
+    .activity-item.match {
+      border-left: 6px solid var(--green);
+      background: rgba(76, 175, 80, 0.03);
+    }
+
+    .item-grid {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .name-area {
+      width: 100%;
+    }
+
+    .name-col {
+      font-weight: 700;
+      font-size: 20px;
+      color: #fff;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .desc-text {
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+      line-height: 1.6;
+      display: block;
+      max-width: 850px;
+    }
+
+    .profile-cols {
+      display: flex;
+      gap: 30px;
+      width: 100%;
+    }
+
+    .profile-cell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    /* INTERACTION GRID */
+    .kink-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .kink-grid-row2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .kink-pill {
+      padding: 14px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 65px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pill-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: 0.3s;
+    }
+
+    .pill-value {
+      font-size: 10px;
+      font-weight: 700;
+      color: transparent;
+      text-transform: uppercase;
+      line-height: 1.3;
+      margin-top: 6px;
+    }
+
+    .kink-pill.filled {
+      border-color: rgba(212, 175, 55, 0.5);
+      background: rgba(255, 255, 255, 0.04);
+      border-width: 2px;
+    }
+
+    .kink-pill.filled .pill-title {
+      color: var(--gold);
+    }
+
+    .kink-pill.filled .pill-value {
+      color: #fff;
+    }
+
+    .kink-pill.status-yes {
+      border-color: var(--green);
+    }
+
+    .kink-pill.status-yes .pill-title,
+    .kink-pill.status-yes .pill-value {
+      color: var(--green);
+    }
+
+    .kink-pill.status-want {
+      border-color: var(--gold);
+    }
+
+    .kink-pill.status-want .pill-title,
+    .kink-pill.status-want .pill-value {
+      color: var(--gold);
+    }
+
+    .kink-pill.status-limit {
+      border-color: var(--red);
+    }
+
+    .kink-pill.status-limit .pill-title,
+    .kink-pill.status-limit .pill-value {
+      color: var(--red);
+    }
+
+    .note-input {
+      width: 100%;
+      margin-top: 20px;
+      background: transparent;
+      border: none;
+      border-left: 3px solid rgba(212, 175, 55, 0.2);
+      color: #bbb;
+      font-style: italic;
+      font-size: 13px;
+      padding: 8px 15px;
+      outline: none;
+    }
+
+    /* MODALS */
+    #sheetOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+    }
+
+    #bottomSheet,
+    #filterSheet {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      width: 100%;
+      background: rgba(8, 18, 38, 0.98);
+      border-top: 3px solid var(--gold);
+      border-radius: 30px 30px 0 0;
+      padding: 30px;
+      z-index: 2001;
+      transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    #bottomSheet.open,
+    #filterSheet.open {
+      bottom: 0;
+    }
+
+    .filter-category {
+      margin-bottom: 25px;
+    }
+
+    .filter-cat-title {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-opt {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #888;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .filter-opt.selected {
+      background: var(--gold);
+      color: var(--midnight);
+      border-color: var(--gold);
+    }
+
+    .sheet-option {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      padding: 20px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      color: #fff;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    @media(min-width: 900px) {
+      .filter-bar {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .item-grid {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .profile-cols {
+        flex: 2;
+      }
+
+      .name-area {
+        flex: 1;
+      }
+    }
+  </style>
 </head>
+
 <body onload="init()">
 
-<!-- Topbar -->
-<div class="topbar">
-  <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span class="material-symbols-rounded">menu</span></button>
-  <div class="topbar-center">
-    <div class="topbar-title">BDSM Portal</div>
-    <div class="topbar-sub">Compatibility &amp; Cloud Sync</div>
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span
+        class="material-symbols-rounded">menu</span></button>
+    <div class="topbar-center">
+      <div class="topbar-title">BDSM Portal</div>
+      <div class="topbar-sub">Compatibility &amp; Cloud Sync</div>
+    </div>
   </div>
-</div>
 
 
-<div style="display:flex; justify-content:center; padding:12px 20px; background:rgba(2,8,20,0.6); border-bottom:1px solid rgba(212,175,55,0.12);">
-  <div class="profile-switcher" id="profileSwitcher">
-    <div class="slider-bg"></div>
-    <button class="profile-btn active" id="p1-btn" onclick="setProfile('p1')">Andy</button>
-    <button class="profile-btn" id="p2-btn" onclick="setProfile('p2')">Becca</button>
+  <div
+    style="display:flex; justify-content:center; padding:12px 20px; background:rgba(2,8,20,0.6); border-bottom:1px solid rgba(212,175,55,0.12);">
+    <div class="profile-switcher" id="profileSwitcher">
+      <div class="slider-bg"></div>
+      <button class="profile-btn active" id="p1-btn" onclick="setProfile('p1')">Andy</button>
+      <button class="profile-btn" id="p2-btn" onclick="setProfile('p2')">Becca</button>
+    </div>
   </div>
-</div>
 
-<div class="persistence-bar">
-  <span id="saveLabel">Connecting...</span>
-  <button class="btn-mini" onclick="openSnapshotModal()">Snapshot</button>
-  <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)" style="background:#081226; max-width: 150px;">
-    <option value="">History Vault</option>
-  </select>
-  <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison Mode</button>
-  <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset UI Cache</button>
-</div>
+  <div class="persistence-bar">
+    <span id="saveLabel">Connecting...</span>
+    <button class="btn-mini" onclick="openSnapshotModal()">Snapshot</button>
+    <select class="btn-mini" id="historySelect" onchange="compareHistory(this.value)"
+      style="background:#081226; max-width: 150px;">
+      <option value="">History Vault</option>
+    </select>
+    <button id="btnCompare" class="btn-mini" onclick="toggleCompare()">Partner Comparison Mode</button>
+    <button class="btn-mini" onclick="resetApp()" style="color:var(--red); border-color:var(--red);">Reset UI
+      Cache</button>
+  </div>
 
-<div id="scoreCard" class="score-card">
+  <div id="scoreCard" class="score-card">
     <div id="scoreRing" class="score-ring" data-score="0%"></div>
     <div class="score-label">Synergy Score</div>
-</div>
-
-<div class="tabs-nav" id="tabsNav">
   </div>
 
-<div class="filter-bar">
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="🔍 Search activity or description..." oninput="handleSearch(this.value)" class="search-input">
-    <button class="adv-filter-btn" id="advFilterBtn" onclick="openFilterSheet()">Filters <span id="filterCount"></span></button>
+  <div class="tabs-nav" id="tabsNav">
   </div>
-</div>
 
-<div class="main" id="mainContent"></div>
+  <div class="filter-bar">
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="🔍 Search activity or description..."
+        oninput="handleSearch(this.value)" class="search-input">
+      <button class="adv-filter-btn" id="advFilterBtn" onclick="openFilterSheet()">Filters <span
+          id="filterCount"></span></button>
+    </div>
+  </div>
 
-<div id="sheetOverlay" onclick="closeSheets()"></div>
+  <div class="main" id="mainContent"></div>
 
-<div id="bottomSheet">
-  <div id="sheetTitle" style="color:var(--gold); font-family:'Playfair Display'; font-size:22px; text-transform: uppercase; text-align:center;">Selection</div>
-  <div id="sheetSubtitle" style="font-size:12px; color:#888; text-align:center; margin: 10px 0 20px;">Item</div>
-  <div id="sheetOptions"></div>
-  <button onclick="closeSheets()" style="width:100%; padding:20px; margin-top:15px; background:transparent; border:none; color:#888; text-transform:uppercase;">Cancel</button>
-</div>
+  <div id="sheetOverlay" onclick="closeSheets()"></div>
 
-<div id="filterSheet">
+  <div id="bottomSheet">
+    <div id="sheetTitle"
+      style="color:var(--gold); font-family:'Playfair Display'; font-size:22px; text-transform: uppercase; text-align:center;">
+      Selection</div>
+    <div id="sheetSubtitle" style="font-size:12px; color:#888; text-align:center; margin: 10px 0 20px;">Item</div>
+    <div id="sheetOptions"></div>
+    <button onclick="closeSheets()"
+      style="width:100%; padding:20px; margin-top:15px; background:transparent; border:none; color:#888; text-transform:uppercase;">Cancel</button>
+  </div>
+
+  <div id="filterSheet">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h2 style="color: var(--gold); font-family: 'Playfair Display'; text-transform: uppercase;">Advanced Filters</h2>
-        <button onclick="clearFilters()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); border-radius: 20px; padding: 5px 15px; font-size: 10px;">Reset</button>
+      <h2 style="color: var(--gold); font-family: 'Playfair Display'; text-transform: uppercase;">Advanced Filters</h2>
+      <button onclick="clearFilters()"
+        style="background: transparent; border: 1px solid var(--gold); color: var(--gold); border-radius: 20px; padding: 5px 15px; font-size: 10px;">Reset</button>
     </div>
     <div id="filterDashboard"></div>
-    <button onclick="closeSheets()" style="width:100%; padding:18px; margin-top:20px; background:var(--gold); border:none; border-radius: 12px; color:var(--midnight); text-transform:uppercase; font-weight: 800;">Show Results</button>
-</div>
+    <button onclick="closeSheets()"
+      style="width:100%; padding:18px; margin-top:20px; background:var(--gold); border:none; border-radius: 12px; color:var(--midnight); text-transform:uppercase; font-weight: 800;">Show
+      Results</button>
+  </div>
 
-<div id="snapModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; backdrop-filter:blur(10px);">
-  <div style="background:var(--paper-dark); margin: 20% auto; padding:40px; border:1px solid var(--gold); border-radius:20px; max-width:450px; width:90%; text-align:center;">
-    <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:20px; font-size:24px;">Create Snapshot</h3>
-    <input type="text" id="snapName" style="width:100%; padding:18px; margin:25px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:10px;" placeholder="Snapshot Name">
-    <div style="display:flex; gap:15px;">
-      <button class="btn-mini" style="flex:1; height: 50px;" onclick="saveSnapshot()">Save</button>
-      <button class="btn-mini" style="flex:1; border-color:#555; color:#888; height: 50px;" onclick="closeSnapshotModal()">Cancel</button>
+  <div id="snapModal" class="modal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; backdrop-filter:blur(10px);">
+    <div
+      style="background:var(--paper-dark); margin: 20% auto; padding:40px; border:1px solid var(--gold); border-radius:20px; max-width:450px; width:90%; text-align:center;">
+      <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:20px; font-size:24px;">Create Snapshot
+      </h3>
+      <input type="text" id="snapName"
+        style="width:100%; padding:18px; margin:25px 0; background:#051024; border:1px solid var(--border); color:white; border-radius:10px;"
+        placeholder="Snapshot Name">
+      <div style="display:flex; gap:15px;">
+        <button class="btn-mini" style="flex:1; height: 50px;" onclick="saveSnapshot()">Save</button>
+        <button class="btn-mini" style="flex:1; border-color:#555; color:#888; height: 50px;"
+          onclick="closeSnapshotModal()">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-// --- CLOUD API CONFIGURATION ---
-const API_URL =  "https://script.google.com/macros/s/AKfycbyTBm0qNlaCPg22tTBpsv1chX5zbaY7jvU1f_hDn1vwksyxLOlaz6dtT4lEsBwNHWWR/exec"; 
-const APP_TOKEN = "8zhd0ajdfa8";
+  <script>
+    // --- CLOUD API CONFIGURATION ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbyTBm0qNlaCPg22tTBpsv1chX5zbaY7jvU1f_hDn1vwksyxLOlaz6dtT4lEsBwNHWWR/exec";
+    const APP_TOKEN = "8zhd0ajdfa8";
 
-// App State
-let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
-let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '';
-let filters = { tried: [], rating: [], limit: [], role: [], motive: [] };
+    // App State
+    let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
+    let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '';
+    let filters = { tried: [], rating: [], limit: [], role: [], motive: [] };
 
-// API Fetch and Initialize
-async function init() {
-  document.getElementById('saveLabel').textContent = 'Connecting to Cloud...';
-  
-  try {
-    // The &t=... adds a millisecond timestamp so the URL is uniquely fresh every time
-const response = await fetch(`${API_URL}?token=${APP_TOKEN}&t=${new Date().getTime()}`);
+    // API Fetch and Initialize
+    async function init() {
+      document.getElementById('saveLabel').textContent = 'Connecting to Cloud...';
 
-    const sheetData = await response.json();
+      try {
+        // The &t=... adds a millisecond timestamp so the URL is uniquely fresh every time
+        const response = await fetch(`${API_URL}?token=${APP_TOKEN}&t=${new Date().getTime()}`);
 
-    if (sheetData.error) throw new Error(sheetData.error);
+        const sheetData = await response.json();
 
-    // Group the flat spreadsheet rows into categories
-    const categories = [...new Set(sheetData.map(row => row.Category))];
-    
-    categories.forEach(cat => {
-      const itemsInCat = sheetData.filter(row => row.Category === cat);
-      const catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '');
-      
-      let p1Items = itemsInCat.map(row => ({
-        n: row.Activity, d: row.Description || '',
-        tried: row.Andy_Tried || '', rating: row.Andy_Rating || '', role: row.Andy_Role || '', limit: row.Andy_Limit || '', motive: row.Andy_Motive || '', note: row.Andy_Note || ''
-      }));
-      
-      let p2Items = itemsInCat.map(row => ({
-        n: row.Activity, d: row.Description || '',
-        tried: row.Becca_Tried || '', rating: row.Becca_Rating || '', role: row.Becca_Role || '', limit: row.Becca_Limit || '', motive: row.Becca_Motive || '', note: row.Becca_Note || ''
-      }));
+        if (sheetData.error) throw new Error(sheetData.error);
 
-      APP_STATE.p1.data.push({ id: catId, label: cat, items: p1Items });
-      APP_STATE.p2.data.push({ id: catId, label: cat, items: p2Items });
-    });
+        // Group the flat spreadsheet rows into categories
+        const categories = [...new Set(sheetData.map(row => row.Category))];
 
-    document.getElementById('saveLabel').textContent = 'Synced with Cloud';
-    document.getElementById('saveLabel').style.color = 'var(--green)';
-    save(); // Cache to local storage as fallback
+        categories.forEach(cat => {
+          const itemsInCat = sheetData.filter(row => row.Category === cat);
+          const catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-  } catch (error) {
-    console.error("Failed to load cloud data:", error);
-    document.getElementById('saveLabel').textContent = 'Offline (Using Cache)';
-    document.getElementById('saveLabel').style.color = 'var(--red)';
-    const saved = localStorage.getItem('bdsm_portal_vTRAD_SYNC_2026');
-    if (saved) APP_STATE = JSON.parse(saved);
-  }
+          let p1Items = itemsInCat.map(row => ({
+            n: row.Activity, d: row.Description || '',
+            tried: row.Andy_Tried || '', rating: row.Andy_Rating || '', role: row.Andy_Role || '', limit: row.Andy_Limit || '', motive: row.Andy_Motive || '', note: row.Andy_Note || ''
+          }));
 
-  // Inject category tabs dynamically
-  const nav = document.getElementById('tabsNav');
-  nav.innerHTML = '<button class="tab-btn active" id="tab-all" onclick="setTab(\'all\', this)">All Categories</button>';
-  APP_STATE.p1.data.forEach(c => {
-    const b = document.createElement('button'); 
-    b.className = 'tab-btn'; 
-    b.textContent = c.label;
-    b.onclick = () => setTab(c.id, b); 
-    nav.appendChild(b);
-  });
+          let p2Items = itemsInCat.map(row => ({
+            n: row.Activity, d: row.Description || '',
+            tried: row.Becca_Tried || '', rating: row.Becca_Rating || '', role: row.Becca_Role || '', limit: row.Becca_Limit || '', motive: row.Becca_Motive || '', note: row.Becca_Note || ''
+          }));
 
-  // Dynamic Profile Names from Settings
-  try {
-    const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
-    if (s.domName) document.getElementById('p1-btn').textContent = s.domName;
-    if (s.subName) document.getElementById('p2-btn').textContent = s.subName;
-  } catch(e) {}
+          APP_STATE.p1.data.push({ id: catId, label: cat, items: p1Items });
+          APP_STATE.p2.data.push({ id: catId, label: cat, items: p2Items });
+        });
 
-  render(); 
-  updateHistDropdown(); 
-  renderFilterDashboard();
-}
+        document.getElementById('saveLabel').textContent = 'Synced with Cloud';
+        document.getElementById('saveLabel').style.color = 'var(--green)';
+        save(); // Cache to local storage as fallback
 
-// API Post (Live Sync)
-async function syncToCloud(itemName, profile, field, value) {
-  const payload = { token: APP_TOKEN, profile: profile, itemName: itemName, field: field, value: value };
+      } catch (error) {
+        console.error("Failed to load cloud data:", error);
+        document.getElementById('saveLabel').textContent = 'Offline (Using Cache)';
+        document.getElementById('saveLabel').style.color = 'var(--red)';
+        const saved = localStorage.getItem('bdsm_portal_vTRAD_SYNC_2026');
+        if (saved) APP_STATE = JSON.parse(saved);
+      }
 
-  try {
-    document.getElementById('saveLabel').textContent = 'Syncing...';
-    document.getElementById('saveLabel').style.color = 'var(--gold)';
+      // Inject category tabs dynamically
+      const nav = document.getElementById('tabsNav');
+      nav.innerHTML = '<button class="tab-btn active" id="tab-all" onclick="setTab(\'all\', this)">All Categories</button>';
+      APP_STATE.p1.data.forEach(c => {
+        const b = document.createElement('button');
+        b.className = 'tab-btn';
+        b.textContent = c.label;
+        b.onclick = () => setTab(c.id, b);
+        nav.appendChild(b);
+      });
 
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      document.getElementById('saveLabel').textContent = 'Live Synced';
-      document.getElementById('saveLabel').style.color = 'var(--green)';
-    } else {
-      console.error("Cloud Error:", result.error);
-      document.getElementById('saveLabel').textContent = 'Sync Error';
-      document.getElementById('saveLabel').style.color = 'var(--red)';
+      render();
+      updateHistDropdown();
+      renderFilterDashboard();
     }
-  } catch (err) {
-    console.error("Network Error:", err);
-    document.getElementById('saveLabel').textContent = 'Offline (Saved Locally)';
-    document.getElementById('saveLabel').style.color = 'var(--red)';
-  }
-}
 
-function save() { localStorage.setItem('bdsm_portal_vTRAD_SYNC_2026', JSON.stringify(APP_STATE)); }
+    // API Post (Live Sync)
+    async function syncToCloud(itemName, profile, field, value) {
+      const payload = { token: APP_TOKEN, profile: profile, itemName: itemName, field: field, value: value };
 
-// --- UI LOGIC ---
-function setProfile(p) {
-  activeP = p; isCompare = false; document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
-  document.getElementById('p1-btn').classList.toggle('active', p === 'p1');
-  document.getElementById('p2-btn').classList.toggle('active', p === 'p2');
-  render(); updateHistDropdown();
-}
+      try {
+        document.getElementById('saveLabel').textContent = 'Syncing...';
+        document.getElementById('saveLabel').style.color = 'var(--gold)';
 
-function setTab(id, b) { activeTab = id; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); render(); }
-function toggleCompare() { isCompare = !isCompare; render(); }
-function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
-function clearFilters() { searchQ = ''; document.getElementById('searchInput').value = ''; Object.keys(filters).forEach(k => filters[k] = []); renderFilterDashboard(); render(); }
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
 
-function render() {
-  const main = document.getElementById('mainContent');
-  if(!APP_STATE[activeP] || !APP_STATE[activeP].data.length) { main.innerHTML = '<div style="text-align:center; padding:40px; color:#444;">No data loaded.</div>'; return; }
-  
-  const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
-  let html = '';
-  
-  if (isCompare) { document.getElementById('scoreCard').style.display = 'block'; calculateSynergy(); } 
-  else { document.getElementById('scoreCard').style.display = 'none'; }
+        const result = await response.json();
+        if (result.success) {
+          document.getElementById('saveLabel').textContent = 'Live Synced';
+          document.getElementById('saveLabel').style.color = 'var(--green)';
+        } else {
+          console.error("Cloud Error:", result.error);
+          document.getElementById('saveLabel').textContent = 'Sync Error';
+          document.getElementById('saveLabel').style.color = 'var(--red)';
+        }
+      } catch (err) {
+        console.error("Network Error:", err);
+        document.getElementById('saveLabel').textContent = 'Offline (Saved Locally)';
+        document.getElementById('saveLabel').style.color = 'var(--red)';
+      }
+    }
 
-  let fC = 0; Object.values(filters).forEach(v => fC += v.length);
-  document.getElementById('advFilterBtn').classList.toggle('active', fC > 0);
-  document.getElementById('filterCount').textContent = fC > 0 ? `(${fC})` : '';
+    function save() { localStorage.setItem('bdsm_portal_vTRAD_SYNC_2026', JSON.stringify(APP_STATE)); }
 
-  cats.forEach(cat => {
-    const vis = cat.items.filter(i => {
-        const mT = i.n.toLowerCase().includes(searchQ) || i.d.toLowerCase().includes(searchQ);
-        const matchF = Object.keys(filters).every(k => filters[k].length === 0 || filters[k].includes(i[k]));
-        return mT && matchF;
-    });
-    if (vis.length === 0) return;
-    html += `<div class="category-section"><div class="category-header"><span class="category-title">${cat.label}</span></div><div class="category-body">`;
-    vis.forEach((item) => {
-      const idx = cat.items.indexOf(item);
-      const p1 = APP_STATE.p1.data.find(c=>c.id===cat.id).items[idx];
-      const p2 = APP_STATE.p2.data.find(c=>c.id===cat.id).items[idx];
-      const isM = (p1.tried==='yes' || p1.tried==='no-want') && (p2.tried==='yes' || p2.tried==='no-want');
+    // --- UI LOGIC ---
+    function setProfile(p) {
+      activeP = p; isCompare = false; document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
+      document.getElementById('p1-btn').classList.toggle('active', p === 'p1');
+      document.getElementById('p2-btn').classList.toggle('active', p === 'p2');
+      render(); updateHistDropdown();
+    }
 
-      html += `<div class="activity-item ${isCompare && isM ? 'match' : ''}">
+    function setTab(id, b) { activeTab = id; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); render(); }
+    function toggleCompare() { isCompare = !isCompare; render(); }
+    function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
+    function clearFilters() { searchQ = ''; document.getElementById('searchInput').value = ''; Object.keys(filters).forEach(k => filters[k] = []); renderFilterDashboard(); render(); }
+
+    function render() {
+      const main = document.getElementById('mainContent');
+      if (!APP_STATE[activeP] || !APP_STATE[activeP].data.length) { main.innerHTML = '<div style="text-align:center; padding:40px; color:#444;">No data loaded.</div>'; return; }
+
+      const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
+      let html = '';
+
+      if (isCompare) { document.getElementById('scoreCard').style.display = 'block'; calculateSynergy(); }
+      else { document.getElementById('scoreCard').style.display = 'none'; }
+
+      let fC = 0; Object.values(filters).forEach(v => fC += v.length);
+      document.getElementById('advFilterBtn').classList.toggle('active', fC > 0);
+      document.getElementById('filterCount').textContent = fC > 0 ? `(${fC})` : '';
+
+      cats.forEach(cat => {
+        const vis = cat.items.filter(i => {
+          const mT = i.n.toLowerCase().includes(searchQ) || i.d.toLowerCase().includes(searchQ);
+          const matchF = Object.keys(filters).every(k => filters[k].length === 0 || filters[k].includes(i[k]));
+          return mT && matchF;
+        });
+        if (vis.length === 0) return;
+        html += `<div class="category-section"><div class="category-header"><span class="category-title">${cat.label}</span></div><div class="category-body">`;
+        vis.forEach((item) => {
+          const idx = cat.items.indexOf(item);
+          const p1 = APP_STATE.p1.data.find(c => c.id === cat.id).items[idx];
+          const p2 = APP_STATE.p2.data.find(c => c.id === cat.id).items[idx];
+          const isM = (p1.tried === 'yes' || p1.tried === 'no-want') && (p2.tried === 'yes' || p2.tried === 'no-want');
+
+          html += `<div class="activity-item ${isCompare && isM ? 'match' : ''}">
         <div class="item-grid"><div class="name-area"><span class="name-col">${item.n} ${isCompare && isM ? '✦ MUTUAL' : ''}</span><span class="desc-text">${item.d}</span></div><div class="profile-cols">
             ${isCompare ? renderCell(p1, 'Andy', 'p1', cat.id, idx) : ''}
             ${isCompare ? renderCell(p2, 'Becca', 'p2', cat.id, idx) : ''}
-            ${!isCompare ? renderCell(item, activeP==='p1'?'Andy':'Becca', activeP, cat.id, idx) : ''}
+            ${!isCompare ? renderCell(item, activeP === 'p1' ? 'Andy' : 'Becca', activeP, cat.id, idx) : ''}
         </div></div>${!isCompare ? `<input type="text" class="note-input" placeholder="Notes & Reflections..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}</div>`;
-    });
-    html += `</div></div>`;
-  });
-  main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No results found.</div>';
-}
+        });
+        html += `</div></div>`;
+      });
+      main.innerHTML = html || '<div style="text-align:center; padding:40px; color:#444;">No results found.</div>';
+    }
 
-function renderCell(res, name, pKey, cid, idx) {
-  const isE = activeP === pKey && !isCompare;
-  const sS = res.tried !== ''; const eS = res.rating !== ''; const bS = res.limit !== '';
-  const statusLabel = res.tried === 'yes' ? 'TRIED IT' : (res.tried === 'no-want' ? 'WANT' : (res.tried === 'no-dont' ? 'NO' : ''));
-  
-  return `<div class="profile-cell" style="opacity:${isCompare || activeP===pKey ? '1' : '0.2'}">
+    function renderCell(res, name, pKey, cid, idx) {
+      const isE = activeP === pKey && !isCompare;
+      const sS = res.tried !== ''; const eS = res.rating !== ''; const bS = res.limit !== '';
+      const statusLabel = res.tried === 'yes' ? 'TRIED IT' : (res.tried === 'no-want' ? 'WANT' : (res.tried === 'no-dont' ? 'NO' : ''));
+
+      return `<div class="profile-cell" style="opacity:${isCompare || activeP === pKey ? '1' : '0.2'}">
         ${isCompare ? `<div style="font-size:9px; color:var(--gold); font-weight:700; margin-bottom:5px; text-transform:uppercase;">${name}</div>` : ''}
         <div class="kink-grid">
-            <div class="kink-pill ${sS?'filled':''} ${res.tried==='yes'?'status-yes':(res.tried==='no-want'?'status-want':'')}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${statusLabel}</span></div>
-            <div class="kink-pill ${eS?'filled':''} ${res.rating==='Loved it'?'status-yes':''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}"><span class="pill-title">Enthusiasm</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : ''}</span></div>
-            <div class="kink-pill ${bS?'filled':''} ${res.limit ? 'status-limit' : ''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}"><span class="pill-title">Boundary</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : ''}</span></div>
+            <div class="kink-pill ${sS ? 'filled' : ''} ${res.tried === 'yes' ? 'status-yes' : (res.tried === 'no-want' ? 'status-want' : '')}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${statusLabel}</span></div>
+            <div class="kink-pill ${eS ? 'filled' : ''} ${res.rating === 'Loved it' ? 'status-yes' : ''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'rating')` : ''}"><span class="pill-title">Enthusiasm</span><span class="pill-value">${res.rating ? res.rating.toUpperCase() : ''}</span></div>
+            <div class="kink-pill ${bS ? 'filled' : ''} ${res.limit ? 'status-limit' : ''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'limit')` : ''}"><span class="pill-title">Boundary</span><span class="pill-value">${res.limit ? res.limit.toUpperCase() : ''}</span></div>
         </div><div class="kink-grid-row2">
             <div class="kink-pill ${res.role !== '' ? 'filled' : ''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'role')` : ''}"><span class="pill-title">Dynamic</span><span class="pill-value">${res.role ? res.role.toUpperCase() : ''}</span></div>
             <div class="kink-pill ${res.motive !== '' ? 'filled' : ''}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'motive')` : ''}"><span class="pill-title">Motivation</span><span class="pill-value">${res.motive ? res.motive.toUpperCase() : ''}</span></div>
         </div></div>`;
-}
+    }
 
-function calculateSynergy() {
-    let total = 0, mutual = 0;
-    APP_STATE.p1.data.forEach((cat, cIdx) => {
+    function calculateSynergy() {
+      let total = 0, mutual = 0;
+      APP_STATE.p1.data.forEach((cat, cIdx) => {
         const p2Cat = APP_STATE.p2.data[cIdx];
         cat.items.forEach((i1, idx) => {
-            const i2 = p2Cat.items[idx];
-            const hasP1 = i1.tried === 'yes' || i1.tried === 'no-want';
-            const hasP2 = i2.tried === 'yes' || i2.tried === 'no-want';
-            if (hasP1 || hasP2) total++;
-            if (hasP1 && hasP2) mutual++;
+          const i2 = p2Cat.items[idx];
+          const hasP1 = i1.tried === 'yes' || i1.tried === 'no-want';
+          const hasP2 = i2.tried === 'yes' || i2.tried === 'no-want';
+          if (hasP1 || hasP2) total++;
+          if (hasP1 && hasP2) mutual++;
         });
-    });
-    const percent = total > 0 ? Math.round((mutual / total) * 100) : 0;
-    const ring = document.getElementById('scoreRing');
-    ring.setAttribute('data-score', percent + '%');
-    ring.style.background = `conic-gradient(var(--green) ${percent}%, #111 ${percent}%)`;
-}
+      });
+      const percent = total > 0 ? Math.round((mutual / total) * 100) : 0;
+      const ring = document.getElementById('scoreRing');
+      ring.setAttribute('data-score', percent + '%');
+      ring.style.background = `conic-gradient(var(--green) ${percent}%, #111 ${percent}%)`;
+    }
 
-function renderFilterDashboard() {
-    const dash = document.getElementById('filterDashboard'); dash.innerHTML = '';
-    const CONFIG = {
-        tried: { t: 'Status', o: ['yes','no-want','no-dont'] },
-        rating: { t: 'Enthusiasm', o: ['Loved it','Liked it','Take it or leave it','Fetish'] },
-        limit: { t: 'Boundary', o: ['Soft Limit','Hard Limit'] },
-        role: { t: 'Dynamic', o: ['Giving','Receiving','Both','Wearing','Others Wearing'] },
-        motive: { t: 'Motivation', o: ['Arousal','Discipline','Fun','Stress Relief'] }
-    };
-    Object.keys(CONFIG).forEach(key => {
+    function renderFilterDashboard() {
+      const dash = document.getElementById('filterDashboard'); dash.innerHTML = '';
+      const CONFIG = {
+        tried: { t: 'Status', o: ['yes', 'no-want', 'no-dont'] },
+        rating: { t: 'Enthusiasm', o: ['Loved it', 'Liked it', 'Take it or leave it', 'Fetish'] },
+        limit: { t: 'Boundary', o: ['Soft Limit', 'Hard Limit'] },
+        role: { t: 'Dynamic', o: ['Giving', 'Receiving', 'Both', 'Wearing', 'Others Wearing'] },
+        motive: { t: 'Motivation', o: ['Arousal', 'Discipline', 'Fun', 'Stress Relief'] }
+      };
+      Object.keys(CONFIG).forEach(key => {
         const cat = CONFIG[key];
         let h = `<div class="filter-category"><div class="filter-cat-title">${cat.t}</div><div class="filter-options">`;
         cat.o.forEach(opt => {
-            const isSel = filters[key].includes(opt);
-            const label = opt === 'yes' ? 'Tried It' : (opt === 'no-want' ? 'Want to try' : (opt === 'no-dont' ? 'No interest' : opt));
-            h += `<div class="filter-opt ${isSel?'selected':''}" onclick="toggleFilterValue('${key}', '${opt}')">${label}</div>`;
+          const isSel = filters[key].includes(opt);
+          const label = opt === 'yes' ? 'Tried It' : (opt === 'no-want' ? 'Want to try' : (opt === 'no-dont' ? 'No interest' : opt));
+          h += `<div class="filter-opt ${isSel ? 'selected' : ''}" onclick="toggleFilterValue('${key}', '${opt}')">${label}</div>`;
         });
         h += `</div></div>`; dash.innerHTML += h;
-    });
-}
+      });
+    }
 
-function toggleFilterValue(key, val) { if(filters[key].includes(val)) filters[key] = filters[key].filter(v => v !== val); else filters[key].push(val); renderFilterDashboard(); render(); }
-function openFilterSheet() { document.getElementById('sheetOverlay').style.display='block'; document.getElementById('filterSheet').classList.add('open'); }
+    function toggleFilterValue(key, val) { if (filters[key].includes(val)) filters[key] = filters[key].filter(v => v !== val); else filters[key].push(val); renderFilterDashboard(); render(); }
+    function openFilterSheet() { document.getElementById('sheetOverlay').style.display = 'block'; document.getElementById('filterSheet').classList.add('open'); }
 
-function triggerSheet(cid, i, f) {
-  const item = APP_STATE[activeP].data.find(c=>c.id==cid).items[i];
-  const CONFIGS = {
-      limit: [{lab:'No Limit', val:''}, {lab:'Soft Limit', val:'Soft Limit'}, {lab:'Hard Limit', val:'Hard Limit'}],
-      tried: [{lab:'Tried It', val:'yes'}, {lab:'Want to try', val:'no-want'}, {lab:'No Interest', val:'no-dont'}, {lab:'Clear Selection', val:''}],
-      rating: [{lab:'Loved it', val:'Loved it'}, {lab:'Liked it', val:'Liked it'}, {lab:'Take it or leave it', val:'Take it or leave it'}, {lab:'Clear Selection', val:''}],
-      role: [{lab:'Giving', val:'Giving'}, {lab:'Receiving', val:'Receiving'}, {lab:'Both', val:'Both'}, {lab:'Wearing', val:'Wearing'}, {lab:'Others Wearing', val:'Others Wearing'}, {lab:'Clear Selection', val:''}],
-      motive: [{lab:'Arousal', val:'Arousal'}, {lab:'Discipline', val:'Discipline'}, {lab:'Fun', val:'Fun'}, {lab:'Stress Relief', val:'Stress Relief'}, {lab:'Clear Selection', val:''}]
-  };
-  document.getElementById('sheetSubtitle').textContent = item.n;
-  const cont = document.getElementById('sheetOptions'); cont.innerHTML = '';
-  CONFIGS[f].forEach(o => {
-    const d = document.createElement('div'); d.className = 'sheet-option';
-    d.onclick = () => { 
-        item[f] = o.val; 
-        save(); 
-        syncToCloud(item.n, activeP, f, o.val); 
-        render(); 
-        closeSheets(); 
-    };
-    d.textContent = o.lab; cont.appendChild(d);
-  });
-  document.getElementById('sheetOverlay').style.display='block'; document.getElementById('bottomSheet').classList.add('open');
-}
+    function triggerSheet(cid, i, f) {
+      const item = APP_STATE[activeP].data.find(c => c.id == cid).items[i];
+      const CONFIGS = {
+        limit: [{ lab: 'No Limit', val: '' }, { lab: 'Soft Limit', val: 'Soft Limit' }, { lab: 'Hard Limit', val: 'Hard Limit' }],
+        tried: [{ lab: 'Tried It', val: 'yes' }, { lab: 'Want to try', val: 'no-want' }, { lab: 'No Interest', val: 'no-dont' }, { lab: 'Clear Selection', val: '' }],
+        rating: [{ lab: 'Loved it', val: 'Loved it' }, { lab: 'Liked it', val: 'Liked it' }, { lab: 'Take it or leave it', val: 'Take it or leave it' }, { lab: 'Clear Selection', val: '' }],
+        role: [{ lab: 'Giving', val: 'Giving' }, { lab: 'Receiving', val: 'Receiving' }, { lab: 'Both', val: 'Both' }, { lab: 'Wearing', val: 'Wearing' }, { lab: 'Others Wearing', val: 'Others Wearing' }, { lab: 'Clear Selection', val: '' }],
+        motive: [{ lab: 'Arousal', val: 'Arousal' }, { lab: 'Discipline', val: 'Discipline' }, { lab: 'Fun', val: 'Fun' }, { lab: 'Stress Relief', val: 'Stress Relief' }, { lab: 'Clear Selection', val: '' }]
+      };
+      document.getElementById('sheetSubtitle').textContent = item.n;
+      const cont = document.getElementById('sheetOptions'); cont.innerHTML = '';
+      CONFIGS[f].forEach(o => {
+        const d = document.createElement('div'); d.className = 'sheet-option';
+        d.onclick = () => {
+          item[f] = o.val;
+          save();
+          syncToCloud(item.n, activeP, f, o.val);
+          render();
+          closeSheets();
+        };
+        d.textContent = o.lab; cont.appendChild(d);
+      });
+      document.getElementById('sheetOverlay').style.display = 'block'; document.getElementById('bottomSheet').classList.add('open');
+    }
 
-function closeSheets() { document.getElementById('sheetOverlay').style.display='none'; document.getElementById('bottomSheet').classList.remove('open'); document.getElementById('filterSheet').classList.remove('open'); }
-function updateNote(cid, idx, val) { 
-    const item = APP_STATE[activeP].data.find(c=>c.id==cid).items[idx];
-    item.note = val; 
-    save(); 
-    syncToCloud(item.n, activeP, 'note', val); 
-}
+    function closeSheets() { document.getElementById('sheetOverlay').style.display = 'none'; document.getElementById('bottomSheet').classList.remove('open'); document.getElementById('filterSheet').classList.remove('open'); }
+    function updateNote(cid, idx, val) {
+      const item = APP_STATE[activeP].data.find(c => c.id == cid).items[idx];
+      item.note = val;
+      save();
+      syncToCloud(item.n, activeP, 'note', val);
+    }
 
-function openSnapshotModal() { document.getElementById('snapModal').style.display='block'; }
-function closeSnapshotModal() { document.getElementById('snapModal').style.display='none'; }
-function saveSnapshot() {
-  const name = document.getElementById('snapName').value || 'Snapshot';
-  APP_STATE[activeP].history.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE[activeP].data)) });
-  save(); updateHistDropdown(); closeSnapshotModal(); render();
-}
-function updateHistDropdown() {
-  const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">Vault</option>';
-  if(!APP_STATE[activeP] || !APP_STATE[activeP].history) return;
-  APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
-}
-function compareHistory(id) { 
-    const snap = APP_STATE[activeP].history.find(h => h.id == id);
-    if(snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
-}
-function resetApp() { if(confirm("Wipe local cache? App will reload from cloud.")) { localStorage.removeItem('bdsm_portal_vTRAD_SYNC_2026'); location.reload(); } }
-</script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
+    function openSnapshotModal() { document.getElementById('snapModal').style.display = 'block'; }
+    function closeSnapshotModal() { document.getElementById('snapModal').style.display = 'none'; }
+    function saveSnapshot() {
+      const name = document.getElementById('snapName').value || 'Snapshot';
+      APP_STATE[activeP].history.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE[activeP].data)) });
+      save(); updateHistDropdown(); closeSnapshotModal(); render();
+    }
+    function updateHistDropdown() {
+      const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">Vault</option>';
+      if (!APP_STATE[activeP] || !APP_STATE[activeP].history) return;
+      APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
+    }
+    function compareHistory(id) {
+      const snap = APP_STATE[activeP].history.find(h => h.id == id);
+      if (snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
+    }
+    function resetApp() { if (confirm("Wipe local cache? App will reload from cloud.")) { localStorage.removeItem('bdsm_portal_vTRAD_SYNC_2026'); location.reload(); } }
+  </script>
+  <!-- Global Sidebar Menu -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="global-sidebar" id="globalSidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">Dom Sub Hub</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+      <a href="scene-menu.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+      <a href="training-menu.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+      <a href="assessment-menu.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
+      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span>
+        Sir's Public Tasks</a>
+      <a href="bdsm-checklist.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help &
+        Info</a>
+      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon"
+          style="color:var(--gold);">settings</span> Settings</a>
+    </div>
   </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
-</script>
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebarOverlay').classList.add('open');
+      document.getElementById('globalSidebar').classList.add('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebarOverlay').classList.remove('open');
+      document.getElementById('globalSidebar').classList.remove('open');
+    }
+  </script>
 </body>
+
 </html>
