@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sir’s Protocol • Dom Sub Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json">
+</head>
+<body class="theme-midnight dark-theme">
+
+  <!-- Header (exact match to your other pages) -->
+  <header class="app-header">
+    <a href="index.html" class="back-link">← Dom Sub Hub</a>
+    <h1>Sir’s Protocol</h1>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Hero Cover Image (uses the exact image from your document) -->
+    <div class="hero-cover" style="position:relative; margin-bottom:24px;">
+      <img src="images/sirs-protocol-cover.jpg" 
+           alt="Sir’s Desires & Expectations" 
+           style="width:100%; height:auto; display:block; border-radius:20px 20px 0 0;">
+      <div style="position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(transparent, rgba(5,16,36,0.85)); border-radius:20px 20px 0 0; display:flex; align-items:flex-end; padding:24px;">
+        <div>
+          <h1 style="font-family:'Great Vibes', cursive; font-size:2.8rem; color:#D4AF37; margin:0; line-height:1;">SIR’S PROTOCOL</h1>
+          <p style="color:#F5E6A3; margin:4px 0 0; font-size:1.1rem;">A Guide to Her Surrender</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card" style="margin-bottom:24px;">
+      <p>I’ve put these thoughts together to define exactly what I expect of you. It details how I want you to carry yourself while we are apart, maintaining the discipline that keeps you in the right headspace and exactly how I expect you to inhabit every scene we share. This is the vision for our dynamic, built around your honest cravings, your real-time feedback, and my commitment to teaching you new pleasures through your willing service.</p>
+      <p class="gold-text" style="font-style:italic;">Read it slowly. Let it sink in. Then come kneel in front of me and tell your Sir what kind of scene you’re craving tonight so I can build it for you.</p>
+    </div>
+
+    <!-- Our Core -->
+    <div class="glass-card">
+      <h2 class="section-title gold">Our Core</h2>
+      <p class="section-subtitle">The foundation of your submission</p>
+      
+      <div class="rule-list" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="rule-item"><strong>Titles:</strong> You call me “Sir” in scenes and when you’re deep in that submissive headspace.</div>
+        <div class="rule-item"><strong>Opening Ritual:</strong> You kneel at the start of every scene, naked or in the outfit I have chosen, and say: “I’m ready for today’s lesson and to please you, Sir” etc.</div>
+        <div class="rule-item"><strong>Open Communication:</strong> Total honesty is required. Never push through discomfort just to please me; true service is being honest about your limits.</div>
+        <div class="rule-item"><strong>Orgasm Reporting:</strong> Every time you cum you have to tell me. I need to know when you have pleasured yourself so I can keep an accurate pulse on your sexual needs and manage your energy levels.</div>
+        <div class="rule-item"><strong>Porn Reporting:</strong> When you watch porn, you must send me what you watched afterwards.</div>
+        <div class="rule-item"><strong>Consent & Safety:</strong> I will whisper “Color?” to check in. Yellow means slow down but keep touching; Red is a soft stop while I continue to hold you.</div>
+        <div class="rule-item"><strong>Aftercare:</strong> Every session concludes with a dedicated aftercare period followed by a debrief talk to process what we learned.</div>
+      </div>
+
+      <button onclick="acceptProtocol()" class="gold-btn" style="margin-top:24px;">I Accept Sir’s Protocol</button>
+    </div>
+
+    <!-- Quick Jump to other Protocol pages -->
+    <div class="quick-jump-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:32px;">
+      <a href="protocol-daily.html" class="glass-card jump-card" style="padding:20px; text-align:center;">Daily &amp; Weekly Protocol →</a>
+      <a href="protocol-maintenance.html" class="glass-card jump-card" style="padding:20px; text-align:center;">Submissive Maintenance →</a>
+      <a href="protocol-scene.html" class="glass-card jump-card" style="padding:20px; text-align:center; grid-column:span 2;">Scene &amp; Growth →</a>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation (will be updated by your script) -->
+  <nav class="bottom-nav">
+    <!-- Your existing nav items + the new Protocol one will go here once you run update_menu.py -->
+  </nav>
+
+  <script>
+    function acceptProtocol() {
+      localStorage.setItem('acceptedSirProtocol', 'true');
+      alert('✅ Sir’s Protocol accepted. You are now officially devoted.');
+    }
+  </script>
+</body>
+</html>
