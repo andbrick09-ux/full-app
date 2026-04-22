@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sirender-cache-v4';
+const CACHE_NAME = 'sirender-cache-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -15,7 +15,7 @@ const urlsToCache = [
   // Hubs
   './training-menu.html',
   './assessment-menu.html',
-  './deep-throat-training.html',
+  './deepthroat-training.html',
   './kegel-training.html',
   './the-5-training.html',
   './anal-plug-training.html',
