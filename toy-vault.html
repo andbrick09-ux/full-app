@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vault — Toy Collection & Wishlist</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --midnight: #0a0e1a;
+    --deep-blue: #0d1528;
+    --card: rgba(18, 26, 45, 0.85);
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.18);
+    --gold-border: rgba(201,168,76,0.35);
+    --dom-color: #c0392b;
+    --dom-soft: rgba(192,57,43,0.18);
+    --sub-color: #6c5ce7;
+    --sub-soft: rgba(108,92,231,0.18);
+    --shared-color: #00b894;
+    --shared-soft: rgba(0,184,148,0.18);
+    --text: #e8dcc8;
+    --text-dim: rgba(232,220,200,0.55);
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+    --shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--midnight);
+    color: var(--text);
+    font-family: 'Josefin Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(108,92,231,0.05) 0%, transparent 50%);
+  }
+
+  /* ── Header ── */
+  .site-header { text-align:center; padding:48px 24px 32px; position:relative; }
+  .site-header::after {
+    content:''; display:block; width:240px; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    margin:20px auto 0;
+  }
+  .script-title {
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(2.2rem,6vw,3.5rem);
+    color:var(--gold-light);
+    text-shadow:0 0 40px rgba(201,168,76,0.4);
+  }
+  .subtitle {
+    font-size:0.68rem; letter-spacing:0.35em; text-transform:uppercase;
+    color:var(--text-dim); margin-top:6px;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display:flex; justify-content:center; margin:28px auto 0;
+    max-width:500px; border:1px solid var(--gold-border);
+    border-radius:4px; overflow:hidden;
+  }
+  .tab-btn {
+    flex:1; background:transparent; border:none;
+    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
+    font-size:0.68rem; letter-spacing:0.25em; text-transform:uppercase;
+    padding:12px 8px; cursor:pointer; transition:all 0.3s;
+  }
+  .tab-btn + .tab-btn { border-left:1px solid var(--gold-border); }
+  .tab-btn.active { background:var(--gold-dim); color:var(--gold-light); }
+  .tab-btn:hover:not(.active) { background:var(--glass); color:var(--text); }
+
+  /* ── Layout ── */
+  .container { max-width:1100px; margin:0 auto; padding:32px 20px 80px; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  /* ── Controls ── */
+  .controls-bar {
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px;
+  }
+  .search-wrap { flex:1; min-width:180px; position:relative; }
+  .search-wrap input {
+    width:100%; background:var(--card); border:1px solid var(--gold-border);
+    border-radius:3px; color:var(--text); font-family:'Josefin Sans',sans-serif;
+    font-size:0.75rem; letter-spacing:0.1em; padding:10px 14px 10px 36px;
+    outline:none; transition:border-color 0.3s;
+  }
+  .search-wrap input:focus { border-color:var(--gold); }
+  .search-wrap::before {
+    content:'⌕'; position:absolute; left:12px; top:50%;
+    transform:translateY(-50%); color:var(--gold); font-size:1.1rem; pointer-events:none;
+  }
+  .filter-group { display:flex; gap:8px; flex-wrap:wrap; }
+  .filter-pill {
+    background:transparent; border:1px solid var(--gold-border); border-radius:2px;
+    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
+    font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase;
+    padding:7px 14px; cursor:pointer; transition:all 0.25s;
+  }
+  .filter-pill.active, .filter-pill:hover { border-color:var(--gold); color:var(--gold-light); background:var(--gold-dim); }
+  .filter-pill.dom.active  { border-color:var(--dom-color); color:#e57373; background:var(--dom-soft); }
+  .filter-pill.sub.active  { border-color:var(--sub-color); color:#b39ddb; background:var(--sub-soft); }
+  .filter-pill.shared.active { border-color:var(--shared-color); color:#80cbc4; background:var(--shared-soft); }
+
+  /* Category pills */
+  .cat-filter-row { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:22px; }
+  .cat-pill {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:20px;
+    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
+    font-size:0.6rem; letter-spacing:0.17em; text-transform:uppercase;
+    padding:5px 13px; cursor:pointer; transition:all 0.22s; white-space:nowrap;
+  }
+  .cat-pill.active { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+  .cat-pill:hover:not(.active) { border-color:var(--gold-border); color:var(--text); }
+
+  .btn-add {
+    background:linear-gradient(135deg,#b8860b,var(--gold)); border:none; border-radius:3px;
+    color:var(--midnight); font-family:'Josefin Sans',sans-serif;
+    font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase;
+    padding:10px 20px; cursor:pointer; transition:opacity 0.2s,transform 0.2s; white-space:nowrap;
+  }
+  .btn-add:hover { opacity:0.88; transform:translateY(-1px); }
+
+  /* ── Stats ── */
+  .stats-bar { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-pill {
+    background:var(--card); border:1px solid var(--glass-border);
+    border-radius:40px; padding:5px 15px;
+    font-size:0.63rem; letter-spacing:0.15em; color:var(--text-dim);
+  }
+  .stat-pill span { color:var(--gold-light); font-weight:600; margin-right:4px; }
+
+  /* ── Grid ── */
+  .vault-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(285px,1fr)); gap:18px; }
+
+  /* ── Toy Card ── */
+  .toy-card {
+    background:var(--card); border:1px solid var(--glass-border); border-radius:6px;
+    padding:20px; position:relative; backdrop-filter:blur(12px);
+    transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+    animation:cardIn 0.35s ease both;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .toy-card:hover { transform:translateY(-3px); box-shadow:0 16px 50px rgba(0,0,0,0.5),0 0 0 1px var(--gold-border); }
+
+  .ownership-badge {
+    position:absolute; top:14px; right:14px;
+    font-size:0.57rem; letter-spacing:0.2em; text-transform:uppercase;
+    padding:3px 9px; border-radius:2px; font-family:'Josefin Sans',sans-serif;
+  }
+  .badge-dom    { background:var(--dom-soft); color:#e57373; border:1px solid var(--dom-color); }
+  .badge-sub    { background:var(--sub-soft); color:#b39ddb; border:1px solid var(--sub-color); }
+  .badge-shared { background:var(--shared-soft); color:#80cbc4; border:1px solid var(--shared-color); }
+
+  .toy-category { font-size:0.57rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
+  .toy-name {
+    font-family:'Playfair Display',serif; font-size:1.08rem; font-weight:600;
+    color:var(--text); margin-bottom:5px; padding-right:64px;
+  }
+  .toy-notes {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:0.84rem; color:var(--text-dim); margin-bottom:12px; line-height:1.5; min-height:16px;
+  }
+  .divider { width:100%; height:1px; background:var(--glass-border); margin:10px 0; }
+
+  /* Stars */
+  .ratings-section { display:flex; flex-direction:column; gap:9px; }
+  .rating-row { display:flex; align-items:center; gap:8px; }
+  .rating-label { font-size:0.57rem; letter-spacing:0.18em; text-transform:uppercase; width:32px; flex-shrink:0; }
+  .rating-label.dom-label { color:#e57373; }
+  .rating-label.sub-label { color:#b39ddb; }
+  .star-row { display:flex; gap:3px; flex:1; }
+  .star { font-size:0.92rem; cursor:pointer; color:#1e2640; transition:color 0.15s,transform 0.15s; user-select:none; }
+  .star:hover { transform:scale(1.25); }
+  .star.fd { color:#e57373; }
+  .star.fs { color:#b39ddb; }
+  .rating-val { font-size:0.66rem; color:var(--text-dim); width:26px; text-align:right; }
+
+  /* Card actions */
+  .card-actions { display:flex; gap:8px; margin-top:13px; padding-top:11px; border-top:1px solid var(--glass-border); }
+  .btn-icon {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:3px;
+    color:var(--text-dim); font-size:0.61rem; letter-spacing:0.15em; text-transform:uppercase;
+    padding:6px 10px; cursor:pointer; font-family:'Josefin Sans',sans-serif;
+    transition:all 0.2s; flex:1;
+  }
+  .btn-icon:hover { border-color:var(--gold-border); color:var(--gold); }
+  .btn-delete:hover { border-color:#e57373; color:#e57373; }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.78); backdrop-filter:blur(6px);
+    z-index:100; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--deep-blue); border:1px solid var(--gold-border); border-radius:8px;
+    padding:34px 30px; width:100%; max-width:480px;
+    box-shadow:var(--shadow),0 0 80px rgba(201,168,76,0.1);
+    animation:modalIn 0.3s ease both; max-height:90vh; overflow-y:auto;
+  }
+  @keyframes modalIn { from{opacity:0;transform:scale(.94) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .modal-title { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gold-light); margin-bottom:4px; }
+  .modal-subtitle { font-size:0.63rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); margin-bottom:26px; }
+  .form-group { margin-bottom:16px; }
+  .form-label { display:block; font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+  .form-input,.form-select,.form-textarea {
+    width:100%; background:var(--card); border:1px solid var(--glass-border); border-radius:3px;
+    color:var(--text); font-family:'Josefin Sans',sans-serif; font-size:0.78rem; letter-spacing:0.06em;
+    padding:10px 14px; outline:none; transition:border-color 0.3s;
+  }
+  .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--gold); }
+  .form-select option { background:var(--deep-blue); }
+  .form-textarea { resize:vertical; min-height:68px; line-height:1.5; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .modal-actions { display:flex; gap:12px; margin-top:24px; }
+  .btn-primary {
+    flex:1; background:linear-gradient(135deg,#b8860b,var(--gold)); border:none; border-radius:3px;
+    color:var(--midnight); font-family:'Josefin Sans',sans-serif;
+    font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; padding:12px; cursor:pointer; transition:opacity 0.2s;
+  }
+  .btn-primary:hover { opacity:0.88; }
+  .btn-cancel {
+    background:transparent; border:1px solid var(--glass-border); border-radius:3px;
+    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
+    font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; padding:12px 20px; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-cancel:hover { border-color:var(--gold-border); color:var(--text); }
+
+  /* ── Wishlist ── */
+  .wish-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(268px,1fr)); gap:16px; }
+  .wish-card {
+    background:var(--card); border:1px solid var(--glass-border); border-radius:6px;
+    padding:20px; display:flex; flex-direction:column; gap:8px;
+    transition:transform 0.25s,box-shadow 0.25s; animation:cardIn 0.35s ease both; position:relative;
+  }
+  .wish-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+  .wish-priority {
+    position:absolute; top:14px; right:14px;
+    font-size:0.57rem; letter-spacing:0.18em; text-transform:uppercase; padding:3px 8px; border-radius:2px;
+  }
+  .priority-high { background:rgba(192,57,43,0.2); color:#e57373; border:1px solid rgba(192,57,43,0.4); }
+  .priority-med  { background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid var(--gold-border); }
+  .priority-low  { background:var(--glass); color:var(--text-dim); border:1px solid var(--glass-border); }
+  .wish-name { font-family:'Playfair Display',serif; font-size:1.02rem; color:var(--text); padding-right:64px; }
+  .wish-meta { font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); }
+  .wish-notes { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.84rem; color:var(--text-dim); line-height:1.5; }
+  .wish-link { font-size:0.62rem; color:rgba(201,168,76,0.5); text-decoration:none; word-break:break-all; transition:color 0.2s; }
+  .wish-link:hover { color:var(--gold); }
+  .wish-actions { display:flex; gap:8px; margin-top:6px; }
+  .btn-wa {
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:3px;
+    color:var(--text-dim); font-size:0.59rem; letter-spacing:0.14em; text-transform:uppercase;
+    padding:6px 9px; cursor:pointer; font-family:'Josefin Sans',sans-serif; transition:all 0.2s; flex:1;
+  }
+  .btn-wa:hover { border-color:var(--gold-border); color:var(--gold); }
+  .btn-wa.acquire:hover { border-color:var(--shared-color); color:#80cbc4; }
+  .btn-wa.wdel:hover { border-color:var(--dom-color); color:#e57373; }
+
+  /* ── Empty ── */
+  .empty-state { text-align:center; padding:70px 20px; color:var(--text-dim); grid-column:1/-1; }
+  .empty-icon { font-size:2.2rem; margin-bottom:14px; opacity:0.4; }
+  .empty-title { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--gold-dim); margin-bottom:8px; }
+  .empty-sub { font-size:0.72rem; letter-spacing:0.1em; }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:var(--midnight); }
+  ::-webkit-scrollbar-thumb { background:var(--gold-dim); border-radius:4px; }
+
+  @media(max-width:500px) {
+    .form-row { grid-template-columns:1fr; }
+    .modal { padding:22px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="script-title">The Vault</div>
+  <div class="subtitle">Toy Collection &amp; Wishlist</div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('vault',this)">The Collection</button>
+    <button class="tab-btn" onclick="switchTab('wishlist',this)">Wishlist</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- VAULT -->
+  <div id="tab-vault" class="tab-panel active">
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <input type="text" id="vault-search" placeholder="Search collection…" oninput="renderVault()">
+      </div>
+      <div class="filter-group">
+        <button class="filter-pill active" onclick="setOwnerF(this,'all')">All</button>
+        <button class="filter-pill dom"    onclick="setOwnerF(this,'Dom')">Dom</button>
+        <button class="filter-pill sub"    onclick="setOwnerF(this,'Sub')">Sub</button>
+        <button class="filter-pill shared" onclick="setOwnerF(this,'Shared')">Shared</button>
+      </div>
+      <button class="btn-add" onclick="openToyModal()">+ Add Toy</button>
+    </div>
+    <div id="cat-row" class="cat-filter-row"></div>
+    <div id="stats-bar" class="stats-bar"></div>
+    <div id="vault-grid" class="vault-grid"></div>
+  </div>
+
+  <!-- WISHLIST -->
+  <div id="tab-wishlist" class="tab-panel">
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <input type="text" id="wish-search" placeholder="Search wishlist…" oninput="renderWishlist()">
+      </div>
+      <div class="filter-group">
+        <button class="filter-pill active" onclick="setWishF(this,'all')">All</button>
+        <button class="filter-pill" onclick="setWishF(this,'High')">High</button>
+        <button class="filter-pill" onclick="setWishF(this,'Medium')">Medium</button>
+        <button class="filter-pill" onclick="setWishF(this,'Low')">Low</button>
+      </div>
+      <button class="btn-add" onclick="openWishModal()">+ Add Item</button>
+    </div>
+    <div id="wish-grid" class="wish-grid"></div>
+  </div>
+
+</main>
+
+<!-- TOY MODAL -->
+<div id="toy-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="tmt">Add to Collection</div>
+    <div class="modal-subtitle" id="tms">Document a new toy for the vault</div>
+    <div class="form-group">
+      <label class="form-label">Toy Name</label>
+      <input type="text" class="form-input" id="t-name">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="t-cat">
+          <option>Vibration</option><option>Insertion</option><option>Anal Play</option>
+          <option>Pumps</option><option>Internal</option><option>Nipple Play</option>
+          <option>Clamps &amp; Spreaders</option><option>Impact</option><option>Restraint</option>
+          <option>Sensation</option><option>Gag &amp; Blindfold</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Belongs To</label>
+        <select class="form-select" id="t-owner">
+          <option>Shared</option><option>Dom</option><option>Sub</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="t-notes" placeholder="Material, brand, how it's used…"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Dom Rating (0–5)</label>
+        <input type="number" class="form-input" id="t-drat" min="0" max="5" step="0.5" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub Rating (0–5)</label>
+        <input type="number" class="form-input" id="t-srat" min="0" max="5" step="0.5" placeholder="0">
+      </div>
+    </div>
+    <input type="hidden" id="t-id">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveToy()">Save to Vault</button>
+    </div>
+  </div>
+</div>
+
+<!-- WISH MODAL -->
+<div id="wish-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Add to Wishlist</div>
+    <div class="modal-subtitle">Curate desires for the collection</div>
+    <div class="form-group">
+      <label class="form-label">Item Name</label>
+      <input type="text" class="form-input" id="w-name">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="w-cat">
+          <option>Vibration</option><option>Insertion</option><option>Anal Play</option>
+          <option>Pumps</option><option>Internal</option><option>Nipple Play</option>
+          <option>Clamps &amp; Spreaders</option><option>Impact</option><option>Restraint</option>
+          <option>Sensation</option><option>Gag &amp; Blindfold</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-select" id="w-pri">
+          <option>High</option><option selected>Medium</option><option>Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="w-notes" placeholder="Why you want it, specific brand…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Link (optional)</label>
+      <input type="url" class="form-input" id="w-link" placeholder="https://…">
+    </div>
+    <input type="hidden" id="w-id">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeWishModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveWish()">Add to Wishlist</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── SEED (all toys from scene planner toy box) ───────────────────────────
+const SEED = [
+  // Vibration
+  {name:'Wand',            cat:'Vibration',          owner:'Shared'},
+  {name:'Ferri',           cat:'Vibration',          owner:'Sub'},
+  {name:'Lush 4',          cat:'Vibration',          owner:'Sub'},
+  {name:'Bullet Vib',      cat:'Vibration',          owner:'Sub'},
+  {name:'Flexer',          cat:'Vibration',          owner:'Sub'},
+  {name:'Pinpoint Vib',    cat:'Vibration',          owner:'Sub'},
+  // Insertion
+  {name:'Dildo',           cat:'Insertion',          owner:'Shared'},
+  {name:'Glass Dildo',     cat:'Insertion',          owner:'Shared'},
+  {name:'Double End',      cat:'Insertion',          owner:'Shared'},
+  {name:'Njoy Wand',       cat:'Insertion',          owner:'Shared'},
+  // Anal Play
+  {name:'Anal Plug',       cat:'Anal Play',          owner:'Sub'},
+  {name:'Hollow Plug',     cat:'Anal Play',          owner:'Dom'},
+  {name:'Inflatable',      cat:'Anal Play',          owner:'Dom'},
+  {name:'Anal Hook',       cat:'Anal Play',          owner:'Dom'},
+  {name:'Ping Pong Balls', cat:'Anal Play',          owner:'Dom'},
+  // Pumps
+  {name:'Pussy Pump',      cat:'Pumps',              owner:'Dom'},
+  {name:'Penis Pump',      cat:'Pumps',              owner:'Shared'},
+  {name:'Clit Pump',       cat:'Pumps',              owner:'Dom'},
+  // Internal
+  {name:'Ben Wa Balls',    cat:'Internal',           owner:'Dom'},
+  // Nipple Play
+  {name:'Nipple Clamps',   cat:'Nipple Play',        owner:'Dom'},
+  // Clamps & Spreaders
+  {name:'Liba Spreader',   cat:'Clamps & Spreaders', owner:'Dom'},
+  {name:'Pussy Clamp',     cat:'Clamps & Spreaders', owner:'Dom'},
+  // Sensation
+  {name:'Fuck Saw',        cat:'Sensation',          owner:'Dom'},
+  {name:'Waterberg Wheel', cat:'Sensation',          owner:'Dom'},
+  {name:'Wax Candles',     cat:'Sensation',          owner:'Dom'},
+  // Impact
+  {name:"Sir's Hand",      cat:'Impact',             owner:'Dom'},
+  {name:'Crop',            cat:'Impact',             owner:'Dom'},
+  {name:'Flogger',         cat:'Impact',             owner:'Dom'},
+  {name:'Cane',            cat:'Impact',             owner:'Dom'},
+  {name:'Paddle',          cat:'Impact',             owner:'Dom'},
+  {name:'Slapper',         cat:'Impact',             owner:'Dom'},
+  {name:'Cat O 9',         cat:'Impact',             owner:'Dom'},
+  {name:'Whip',            cat:'Impact',             owner:'Dom'},
+  {name:"Dragon's Tongue", cat:'Impact',             owner:'Dom'},
+  {name:'Belt',            cat:'Impact',             owner:'Dom'},
+  // Restraint
+  {name:'Spreader Bar',    cat:'Restraint',          owner:'Dom'},
+  {name:'Armbinder',       cat:'Restraint',          owner:'Dom'},
+  {name:'Rope',            cat:'Restraint',          owner:'Dom'},
+  {name:'Wrist Cuffs',     cat:'Restraint',          owner:'Dom'},
+  {name:'Ankle Cuffs',     cat:'Restraint',          owner:'Dom'},
+  {name:'Bondage Tape',    cat:'Restraint',          owner:'Dom'},
+  // Gag & Blindfold
+  {name:'Ball Gag',        cat:'Gag & Blindfold',    owner:'Dom'},
+  {name:'Ring Gag',        cat:'Gag & Blindfold',    owner:'Dom'},
+  {name:'Fully Restrained',cat:'Gag & Blindfold',    owner:'Dom'},
+  {name:'Blindfold',       cat:'Gag & Blindfold',    owner:'Dom'},
+];
+
+const CATS = [
+  'Vibration','Insertion','Anal Play','Pumps','Internal',
+  'Nipple Play','Clamps & Spreaders','Impact','Restraint',
+  'Sensation','Gag & Blindfold','Other'
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+let toys   = [];
+let wishes = [];
+let ownerF = 'all';
+let catF   = 'all';
+let wishF  = 'all';
+
+function loadData() {
+  const st = localStorage.getItem('vault_toys_v3');
+  if (st) {
+    toys = JSON.parse(st);
+  } else {
+    toys = SEED.map((s, i) => ({
+      id: 'seed_' + i,
+      name: s.name,
+      category: s.cat,
+      owner: s.owner,
+      notes: '',
+      domRating: 0,
+      subRating: 0,
+      added: Date.now() - (SEED.length - i) * 500
+    }));
+    saveToys();
+  }
+  const sw = localStorage.getItem('vault_wishes_v3');
+  wishes = sw ? JSON.parse(sw) : [];
+}
+function saveToys()   { localStorage.setItem('vault_toys_v3',   JSON.stringify(toys));   }
+function saveWishes() { localStorage.setItem('vault_wishes_v3', JSON.stringify(wishes)); }
+
+// ─── TABS ────────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────
+function setOwnerF(el, v) {
+  ownerF = v;
+  document.querySelectorAll('#tab-vault .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderVault();
+}
+function setCatF(v) {
+  catF = v;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.dataset.cat === v));
+  renderVault();
+}
+function setWishF(el, v) {
+  wishF = v;
+  document.querySelectorAll('#tab-wishlist .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderWishlist();
+}
+
+// ─── BUILD CATEGORY PILLS ────────────────────────────────────────────────
+function buildCatPills() {
+  const row = document.getElementById('cat-row');
+  row.innerHTML =
+    `<button class="cat-pill active" data-cat="all" onclick="setCatF('all')">All</button>` +
+    CATS.map(c => `<button class="cat-pill" data-cat="${c}" onclick="setCatF('${c.replace(/'/g,"\\'")}') ">${c}</button>`).join('');
+}
+
+// ─── MODALS ───────────────────────────────────────────────────────────────
+function openToyModal(id) {
+  document.getElementById('t-id').value = id || '';
+  if (id) {
+    const t = toys.find(x => x.id === id);
+    document.getElementById('tmt').textContent = 'Edit Toy';
+    document.getElementById('tms').textContent = 'Update the details for this toy';
+    document.getElementById('t-name').value  = t.name;
+    document.getElementById('t-cat').value   = t.category;
+    document.getElementById('t-owner').value = t.owner;
+    document.getElementById('t-notes').value = t.notes;
+    document.getElementById('t-drat').value  = t.domRating || '';
+    document.getElementById('t-srat').value  = t.subRating || '';
+  } else {
+    document.getElementById('tmt').textContent = 'Add to Collection';
+    document.getElementById('tms').textContent = 'Document a new toy for the vault';
+    ['t-name','t-notes','t-drat','t-srat'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('t-cat').value   = 'Vibration';
+    document.getElementById('t-owner').value = 'Shared';
+  }
+  document.getElementById('toy-modal').classList.add('open');
+}
+function closeToyModal() { document.getElementById('toy-modal').classList.remove('open'); }
+
+function openWishModal(id) {
+  document.getElementById('w-id').value = id || '';
+  if (id) {
+    const w = wishes.find(x => x.id === id);
+    document.getElementById('w-name').value  = w.name;
+    document.getElementById('w-cat').value   = w.category;
+    document.getElementById('w-pri').value   = w.priority;
+    document.getElementById('w-notes').value = w.notes;
+    document.getElementById('w-link').value  = w.link || '';
+  } else {
+    ['w-name','w-notes','w-link'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('w-pri').value = 'Medium';
+  }
+  document.getElementById('wish-modal').classList.add('open');
+}
+function closeWishModal() { document.getElementById('wish-modal').classList.remove('open'); }
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────
+function saveToy() {
+  const name = document.getElementById('t-name').value.trim();
+  if (!name) return;
+  const id = document.getElementById('t-id').value;
+  const toy = {
+    id: id || 'toy_' + Date.now(),
+    name,
+    category:  document.getElementById('t-cat').value,
+    owner:     document.getElementById('t-owner').value,
+    notes:     document.getElementById('t-notes').value.trim(),
+    domRating: parseFloat(document.getElementById('t-drat').value) || 0,
+    subRating: parseFloat(document.getElementById('t-srat').value) || 0,
+    added: id ? (toys.find(t => t.id === id)?.added || Date.now()) : Date.now()
+  };
+  toys = id ? toys.map(t => t.id === id ? toy : t) : [toy, ...toys];
+  saveToys(); closeToyModal(); renderVault();
+}
+
+function saveWish() {
+  const name = document.getElementById('w-name').value.trim();
+  if (!name) return;
+  const id = document.getElementById('w-id').value;
+  const wish = {
+    id: id || 'wish_' + Date.now(),
+    name,
+    category: document.getElementById('w-cat').value,
+    priority: document.getElementById('w-pri').value,
+    notes:    document.getElementById('w-notes').value.trim(),
+    link:     document.getElementById('w-link').value.trim(),
+    added: id ? (wishes.find(w => w.id === id)?.added || Date.now()) : Date.now()
+  };
+  wishes = id ? wishes.map(w => w.id === id ? wish : w) : [wish, ...wishes];
+  saveWishes(); closeWishModal(); renderWishlist();
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────────────
+function deleteToy(id) {
+  if (!confirm('Remove this toy from the vault?')) return;
+  toys = toys.filter(t => t.id !== id);
+  saveToys(); renderVault();
+}
+function deleteWish(id) {
+  wishes = wishes.filter(w => w.id !== id);
+  saveWishes(); renderWishlist();
+}
+
+// ─── ACQUIRE ─────────────────────────────────────────────────────────────
+function acquireWish(id) {
+  const w = wishes.find(x => x.id === id);
+  if (!w) return;
+  wishes = wishes.filter(x => x.id !== id);
+  saveWishes(); renderWishlist();
+  // Switch to vault and open toy modal pre-filled
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-vault').classList.add('active');
+  document.querySelectorAll('.tab-btn')[0].classList.add('active');
+  openToyModal();
+  document.getElementById('t-name').value  = w.name;
+  document.getElementById('t-cat').value   = w.category;
+  document.getElementById('t-notes').value = w.notes;
+}
+
+// ─── STARS HTML ───────────────────────────────────────────────────────────
+function starsHtml(rating, type) {
+  let h = '';
+  const filled = Math.round(rating);
+  for (let i = 1; i <= 5; i++) {
+    h += `<span class="star${i <= filled ? ' f' + type[0] : ''}">★</span>`;
+  }
+  return h;
+}
+
+// ─── RENDER VAULT ─────────────────────────────────────────────────────────
+function renderVault() {
+  const q = document.getElementById('vault-search').value.toLowerCase();
+  const filtered = toys.filter(t => {
+    const mo = ownerF === 'all' || t.owner === ownerF;
+    const mc = catF   === 'all' || t.category === catF;
+    const mq = !q || t.name.toLowerCase().includes(q)
+                  || t.category.toLowerCase().includes(q)
+                  || t.notes.toLowerCase().includes(q);
+    return mo && mc && mq;
+  });
+
+  const total   = toys.length;
+  const domC    = toys.filter(t => t.owner === 'Dom').length;
+  const subC    = toys.filter(t => t.owner === 'Sub').length;
+  const sharedC = toys.filter(t => t.owner === 'Shared').length;
+  const rated   = toys.filter(t => t.domRating > 0 || t.subRating > 0).length;
+  document.getElementById('stats-bar').innerHTML = [
+    `<div class="stat-pill"><span>${total}</span>Total</div>`,
+    `<div class="stat-pill"><span>${domC}</span>Dom's</div>`,
+    `<div class="stat-pill"><span>${subC}</span>Sub's</div>`,
+    `<div class="stat-pill"><span>${sharedC}</span>Shared</div>`,
+    `<div class="stat-pill"><span>${rated}</span>Rated</div>`,
+    `<div class="stat-pill"><span>${total - rated}</span>Unrated</div>`,
+  ].join('');
+
+  const grid = document.getElementById('vault-grid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-title">Nothing found</div><div class="empty-sub">Try adjusting your filters</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    const bc = t.owner === 'Dom' ? 'badge-dom' : t.owner === 'Sub' ? 'badge-sub' : 'badge-shared';
+    return `<div class="toy-card">
+      <span class="ownership-badge ${bc}">${t.owner}</span>
+      <div class="toy-category">${esc(t.category)}</div>
+      <div class="toy-name">${esc(t.name)}</div>
+      <div class="toy-notes">${t.notes ? esc(t.notes) : ''}</div>
+      <div class="divider"></div>
+      <div class="ratings-section">
+        <div class="rating-row">
+          <span class="rating-label dom-label">Dom</span>
+          <div class="star-row">${starsHtml(t.domRating,'dom')}</div>
+          <span class="rating-val">${t.domRating > 0 ? t.domRating.toFixed(1) : '—'}</span>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label sub-label">Sub</span>
+          <div class="star-row">${starsHtml(t.subRating,'sub')}</div>
+          <span class="rating-val">${t.subRating > 0 ? t.subRating.toFixed(1) : '—'}</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="openToyModal('${t.id}')">Edit</button>
+        <button class="btn-icon btn-delete" onclick="deleteToy('${t.id}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── RENDER WISHLIST ──────────────────────────────────────────────────────
+function renderWishlist() {
+  const q = document.getElementById('wish-search').value.toLowerCase();
+  const filtered = wishes.filter(w => {
+    const mp = wishF === 'all' || w.priority === wishF;
+    const mq = !q || w.name.toLowerCase().includes(q) || w.category.toLowerCase().includes(q);
+    return mp && mq;
+  });
+
+  const grid = document.getElementById('wish-grid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">✦</div><div class="empty-title">Desires Await</div><div class="empty-sub">Add items to your wishlist</div></div>`;
+    return;
+  }
+  const pc = p => p === 'High' ? 'priority-high' : p === 'Medium' ? 'priority-med' : 'priority-low';
+  grid.innerHTML = filtered.map(w => `
+    <div class="wish-card">
+      <span class="wish-priority ${pc(w.priority)}">${w.priority}</span>
+      <div class="wish-meta">${esc(w.category)}</div>
+      <div class="wish-name">${esc(w.name)}</div>
+      ${w.notes ? `<div class="wish-notes">${esc(w.notes)}</div>` : ''}
+      ${w.link  ? `<a class="wish-link" href="${esc(w.link)}" target="_blank" rel="noopener">↗ ${esc(w.link)}</a>` : ''}
+      <div class="wish-actions">
+        <button class="btn-wa acquire" onclick="acquireWish('${w.id}')">Acquired ✓</button>
+        <button class="btn-wa" onclick="openWishModal('${w.id}')">Edit</button>
+        <button class="btn-wa wdel" onclick="deleteWish('${w.id}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); })
+);
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+loadData();
+buildCatPills();
+renderVault();
+renderWishlist();
+</script>
+</body>
+</html>
