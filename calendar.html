@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#051024" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Calendar • Dom Sub Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    body { min-height: 100dvh; overflow-x: hidden; }
+
+    /* ── Glow orb ── */
+    .glow-orb {
+      position: fixed; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 70%);
+      top: -140px; left: 50%; transform: translateX(-50%);
+      pointer-events: none; z-index: 0;
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+    @keyframes orbFloat {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(24px); }
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; padding-top: calc(14px + var(--safe-t));
+      background: rgba(5,16,36,0.95); backdrop-filter: blur(25px);
+      border-bottom: 1px solid var(--border);
+    }
+    .back-btn {
+      flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2);
+      text-decoration: none; cursor: pointer; transition: all .2s;
+    }
+    .back-btn .material-symbols-rounded { font-size: 20px; color: var(--gold); }
+    .topbar-center { flex: 1; min-width: 0; }
+    .topbar-title {
+      font-family: 'Great Vibes', cursive; font-size: 26px;
+      background: var(--luxury-gradient);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; margin: 0; line-height: 1.1;
+    }
+    .topbar-sub {
+      font-family: 'Playfair Display', serif; color: var(--gold);
+      font-size: 10px; text-transform: uppercase; letter-spacing: 2.5px;
+      margin-top: 1px; opacity: 0.6;
+    }
+
+    /* ── Profile pill ── */
+    .profile-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 12px; border-radius: 20px;
+      background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2);
+      cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    }
+    .profile-pill:active { transform: scale(0.95); }
+    .profile-pill-icon { font-size: 14px; }
+    .profile-pill-name {
+      font-family: 'Montserrat', sans-serif; font-size: 10px;
+      font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .profile-pill-arrow { font-size: 12px; color: rgba(212,175,55,0.5); }
+
+    /* ── View toggle ── */
+    .view-toggle {
+      display: flex; gap: 6px; padding: 10px 16px 8px;
+      background: rgba(5,16,36,0.95); border-bottom: 1px solid rgba(212,175,55,0.06);
+      position: sticky; top: calc(68px + var(--safe-t)); z-index: 99;
+    }
+    .view-btn {
+      flex: 1; padding: 9px 6px; border-radius: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      color: #666; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .view-btn.active {
+      background: var(--luxury-gradient); color: var(--midnight);
+      border-color: transparent; box-shadow: 0 3px 12px rgba(212,175,55,0.3);
+    }
+
+    /* ── Page wrap ── */
+    .page-wrap {
+      position: relative; z-index: 1; max-width: 600px; margin: 0 auto;
+      padding: 16px 16px calc(100px + var(--safe-b));
+    }
+
+    /* ══════════════════════════════
+       MONTH VIEW
+    ══════════════════════════════ */
+    .month-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; padding: 0 4px;
+      animation: fadeUp 0.3s ease both;
+    }
+    .month-nav-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(212,175,55,0.07); border: 1px solid rgba(212,175,55,0.15);
+      color: var(--gold); font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .month-nav-btn:active { transform: scale(0.92); background: rgba(212,175,55,0.15); }
+    .month-label {
+      font-family: 'Playfair Display', serif; font-size: 20px;
+      font-weight: 600; color: #ddd; text-align: center;
+    }
+    .month-year { font-size: 12px; color: rgba(212,175,55,0.5); display: block; text-align: center; }
+
+    /* Day headers */
+    .day-headers {
+      display: grid; grid-template-columns: repeat(7,1fr);
+      margin-bottom: 6px; gap: 3px;
+    }
+    .day-header {
+      text-align: center; font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: #444; padding: 4px 0;
+    }
+
+    /* Calendar grid */
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 3px;
+      animation: fadeUp 0.3s ease 0.05s both;
+    }
+    .cal-cell {
+      aspect-ratio: 1; border-radius: 12px; padding: 5px 4px 4px;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+      cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
+      align-items: center; gap: 2px; position: relative; overflow: hidden;
+    }
+    .cal-cell:hover { background: rgba(212,175,55,0.05); border-color: rgba(212,175,55,0.15); }
+    .cal-cell:active { transform: scale(0.93); }
+    .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; pointer-events: none; }
+    .cal-cell.today {
+      border-color: rgba(212,175,55,0.5);
+      background: rgba(212,175,55,0.06);
+      box-shadow: 0 0 12px rgba(212,175,55,0.1);
+    }
+    .cal-cell.other-month .cal-date { opacity: 0.2; }
+    .cal-cell.selected { border-color: var(--gold); background: rgba(212,175,55,0.1); }
+
+    .cal-date {
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+      color: #ccc; line-height: 1;
+    }
+    .cal-cell.today .cal-date { color: var(--gold); }
+
+    .cal-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; margin-top: 1px; }
+    .cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .dot-scene    { background: var(--gold); box-shadow: 0 0 4px rgba(212,175,55,0.6); }
+    .dot-training { background: #64B5F6; }
+    .dot-ritual   { background: #BA68C8; }
+    .dot-protocol { background: #4CAF50; }
+    .dot-personal { background: #FF8A65; }
+    .dot-unavail  { background: #555; }
+
+    /* ══════════════════════════════
+       WEEK VIEW
+    ══════════════════════════════ */
+    .week-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; animation: fadeUp 0.3s ease both;
+    }
+    .week-label {
+      font-family: 'Playfair Display', serif; font-size: 15px; color: #ccc; text-align: center;
+    }
+    .week-grid {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 6px;
+      animation: fadeUp 0.3s ease 0.05s both;
+    }
+    .week-col {
+      border-radius: 14px; background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 10px 4px; display: flex; flex-direction: column;
+      align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; min-height: 140px;
+    }
+    .week-col:hover { border-color: rgba(212,175,55,0.2); background: rgba(212,175,55,0.03); }
+    .week-col.today-col { border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.05); }
+    .week-col-day { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #555; }
+    .week-col-num { font-family: 'Playfair Display', serif; font-size: 16px; color: #ccc; }
+    .week-col.today-col .week-col-num { color: var(--gold); }
+    .week-pills { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+    .week-pill {
+      width: 100%; padding: 3px 4px; border-radius: 6px;
+      font-size: 7px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; text-align: center; color: var(--midnight);
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    }
+    .week-more { font-size: 8px; color: #555; margin-top: 2px; }
+
+    /* ══════════════════════════════
+       DAY VIEW
+    ══════════════════════════════ */
+    .day-header-bar {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+      animation: fadeUp 0.3s ease both;
+    }
+    .day-back-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(212,175,55,0.07); border: 1px solid rgba(212,175,55,0.15);
+      color: var(--gold); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; transition: all 0.2s;
+    }
+    .day-date-display { flex: 1; }
+    .day-date-main {
+      font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: #ddd;
+    }
+    .day-date-sub {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: rgba(212,175,55,0.5); margin-top: 2px;
+    }
+
+    /* Scene card — surprise */
+    .scene-card-surprise {
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.03));
+      border: 1px solid rgba(212,175,55,0.35); border-radius: 20px;
+      padding: 28px 24px; text-align: center; margin-bottom: 18px;
+      box-shadow: 0 8px 28px rgba(212,175,55,0.12), inset 0 1px 0 rgba(212,175,55,0.2);
+      animation: fadeUp 0.4s ease both;
+    }
+    .scene-card-surprise::before {
+      content: ''; position: absolute; inset: 0; border-radius: 20px;
+      background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(212,175,55,0.015) 10px, rgba(212,175,55,0.015) 11px);
+    }
+    .surprise-ornament { font-size: 28px; margin-bottom: 10px; opacity: 0.6; display: block; }
+    .surprise-script {
+      font-family: 'Great Vibes', cursive; font-size: 32px;
+      background: var(--luxury-gradient); -webkit-background-clip: text;
+      background-clip: text; -webkit-text-fill-color: transparent;
+      display: block; margin-bottom: 6px; line-height: 1.2;
+    }
+    .surprise-tagline {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: 11px; color: rgba(212,175,55,0.5); letter-spacing: 2px;
+      text-transform: uppercase; display: block; margin-bottom: 14px;
+    }
+    .surprise-prep {
+      font-size: 11px; color: #888; background: rgba(0,0,0,0.2);
+      border-radius: 10px; padding: 10px 16px; display: inline-block;
+    }
+
+    /* Scene card — full (Dom view or unlocked) */
+    .scene-card-full {
+      position: relative; overflow: hidden;
+      background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 20px; padding: 20px; margin-bottom: 18px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .scene-card-full::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--luxury-gradient); border-radius: 20px 20px 0 0;
+    }
+    .scene-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;
+    }
+    .scene-card-title {
+      font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--gold);
+    }
+    .scene-badge {
+      font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      padding: 4px 10px; border-radius: 20px;
+      background: rgba(212,175,55,0.12); color: var(--gold); border: 1px solid rgba(212,175,55,0.2);
+      white-space: nowrap;
+    }
+    .scene-detail-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .scene-detail-chip {
+      font-size: 9px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #aaa;
+    }
+    .scene-desc { font-size: 12px; font-weight: 300; color: #999; line-height: 1.7; }
+    .scene-dom-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .scene-edit-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2);
+      color: var(--gold); font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .scene-unlock-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      background: var(--luxury-gradient); color: var(--midnight);
+      border: none; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .scene-delete-btn {
+      padding: 10px 14px; border-radius: 10px;
+      background: rgba(244,67,54,0.07); border: 1px solid rgba(244,67,54,0.2);
+      color: #F44336; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+
+    /* ── Task sections ── */
+    .task-section { margin-bottom: 20px; animation: fadeUp 0.4s ease 0.1s both; }
+    .task-section-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    }
+    .task-section-icon { font-size: 14px; }
+    .task-section-title {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2.5px; color: #555; flex: 1;
+    }
+    .task-section-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+    .task-count-badge {
+      font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+      background: rgba(255,255,255,0.05); color: #555;
+    }
+
+    .task-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px; margin-bottom: 6px;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px; transition: all 0.2s;
+    }
+    .task-item:hover { border-color: rgba(255,255,255,0.08); }
+    .task-check {
+      width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
+      border: 1.5px solid rgba(212,175,55,0.25); background: rgba(255,255,255,0.02);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; margin-top: 1px; transition: all .25s ease;
+      font-size: 12px; color: transparent;
+    }
+    .task-check.checked { background: var(--gold); border-color: var(--gold); color: var(--midnight); font-size: 13px; }
+    .task-info { flex: 1; min-width: 0; }
+    .task-name { font-size: 13px; font-weight: 500; color: #ddd; margin-bottom: 2px; }
+    .task-name.done { text-decoration: line-through; opacity: 0.4; }
+    .task-meta { font-size: 10px; color: #666; display: flex; align-items: center; gap: 6px; }
+    .task-owner-badge { font-size: 9px; }
+    .task-cat-chip {
+      font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+      padding: 2px 7px; border-radius: 10px; color: var(--midnight);
+    }
+
+    /* ── Reflection prompt ── */
+    .reflection-prompt {
+      background: rgba(186,104,200,0.06); border: 1px solid rgba(186,104,200,0.2);
+      border-radius: 18px; padding: 20px; text-align: center; margin-top: 8px;
+      animation: fadeUp 0.4s ease 0.2s both;
+    }
+    .reflection-title {
+      font-family: 'Playfair Display', serif; font-size: 15px; font-style: italic;
+      color: #BA68C8; margin-bottom: 6px;
+    }
+    .reflection-sub { font-size: 11px; color: #888; margin-bottom: 14px; }
+    .reflection-moods { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .mood-btn {
+      padding: 7px 14px; border-radius: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      color: #888; font-size: 11px; cursor: pointer; transition: all 0.2s;
+    }
+    .mood-btn.selected { background: rgba(186,104,200,0.15); border-color: rgba(186,104,200,0.4); color: #BA68C8; }
+    .reflection-textarea {
+      width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 12px; color: #ddd;
+      font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 300;
+      outline: none; resize: none; min-height: 80px; margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .reflection-textarea:focus { border-color: rgba(186,104,200,0.3); }
+    .reflection-save-btn {
+      width: 100%; padding: 12px; border-radius: 12px;
+      background: rgba(186,104,200,0.15); border: 1px solid rgba(186,104,200,0.3);
+      color: #BA68C8; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .reflection-saved {
+      font-size: 11px; color: #4CAF50; margin-top: 8px; text-align: center;
+      font-family: 'Playfair Display', serif; font-style: italic;
+    }
+
+    /* ── No events placeholder ── */
+    .day-empty {
+      text-align: center; padding: 40px 20px;
+      background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 18px; margin-bottom: 14px;
+    }
+    .day-empty-icon { font-size: 28px; opacity: 0.25; margin-bottom: 10px; }
+    .day-empty-text { font-size: 12px; color: #555; font-family: 'Playfair Display', serif; font-style: italic; }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: calc(24px + var(--safe-b)); right: 22px;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: var(--luxury-gradient); color: var(--midnight);
+      border: none; font-size: 26px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 90;
+      box-shadow: 0 8px 24px rgba(212,175,55,0.45); transition: all 0.2s;
+    }
+    .fab:hover { transform: scale(1.06); }
+    .fab:active { transform: scale(0.94); }
+
+    /* ══════════════════════════════
+       MODALS
+    ══════════════════════════════ */
+    .modal-back {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.82); backdrop-filter: blur(10px);
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-back.open { opacity: 1; pointer-events: all; }
+    .modal-sheet {
+      background: rgba(5,16,36,0.98); backdrop-filter: blur(24px);
+      border: 1px solid var(--border); border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 600px;
+      padding: 0 22px calc(28px + var(--safe-b));
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-back.open .modal-sheet { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); margin: 14px auto 20px; }
+    .modal-heading {
+      font-family: 'Great Vibes', cursive; font-size: 30px;
+      background: var(--luxury-gradient); -webkit-background-clip: text;
+      background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
+    }
+    .modal-subheading {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 3px; color: rgba(212,175,55,0.4); margin-bottom: 22px;
+    }
+
+    .field-label {
+      font-size: 8px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: rgba(212,175,55,0.5); margin-bottom: 8px; display: block;
+    }
+    .field-input, .field-textarea, .field-select {
+      width: 100%; background: rgba(2,8,20,0.6);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 13px 16px; color: #ddd;
+      font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 400;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 18px;
+    }
+    .field-textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+    .field-input:focus, .field-textarea:focus, .field-select:focus {
+      border-color: rgba(212,175,55,0.4); box-shadow: 0 0 0 3px rgba(212,175,55,0.07);
+    }
+    .field-input::placeholder, .field-textarea::placeholder { color: rgba(255,255,255,0.18); }
+
+    .type-toggle { display: flex; gap: 6px; margin-bottom: 20px; }
+    .type-btn {
+      flex: 1; padding: 10px 6px; border-radius: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      color: #666; font-family: 'Montserrat', sans-serif; font-size: 9px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+      cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .type-btn.active-scene    { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.4); color: var(--gold); }
+    .type-btn.active-task     { background: rgba(100,181,246,0.15); border-color: rgba(100,181,246,0.4); color: #64B5F6; }
+    .type-btn.active-unavail  { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #888; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .toggle-label { font-size: 12px; color: #bbb; }
+    .toggle-switch {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+      position: relative; cursor: pointer; transition: all 0.3s;
+    }
+    .toggle-switch.on { background: var(--gold); border-color: var(--gold); }
+    .toggle-knob {
+      position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .toggle-switch.on .toggle-knob { transform: translateX(20px); }
+
+    .freq-btns { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+    .freq-btn {
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      color: #777; font-family: 'Montserrat', sans-serif; font-size: 9px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; transition: all 0.2s;
+    }
+    .freq-btn.active { background: rgba(100,181,246,0.12); border-color: rgba(100,181,246,0.3); color: #64B5F6; }
+
+    .dow-picker { display: flex; gap: 5px; margin-bottom: 18px; }
+    .dow-btn {
+      flex: 1; aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      color: #666; font-size: 9px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .dow-btn.active { background: rgba(100,181,246,0.12); border-color: rgba(100,181,246,0.3); color: #64B5F6; }
+
+    .cat-btns { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+    .cat-btn {
+      padding: 7px 12px; border-radius: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      color: #777; font-family: 'Montserrat', sans-serif; font-size: 9px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; transition: all 0.2s;
+    }
+    .cat-btn.active { color: var(--midnight); border-color: transparent; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .modal-cancel {
+      flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03); color: #666;
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.2s;
+    }
+    .modal-save {
+      flex: 2; padding: 14px; border-radius: 14px; border: none;
+      background: var(--luxury-gradient); color: var(--midnight);
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212,175,55,0.25); transition: all 0.2s;
+    }
+    .modal-save:active, .modal-cancel:active { transform: scale(0.97); }
+
+    /* ── PIN modal (centered) ── */
+    .pin-modal-back {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,0.9); backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 20px;
+    }
+    .pin-modal-back.open { opacity: 1; pointer-events: all; }
+    .pin-card {
+      background: rgba(5,16,36,0.98); border: 1px solid var(--border);
+      border-radius: 28px; padding: 32px 28px; width: 100%; max-width: 340px; text-align: center;
+      transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.22,0.68,0,1.2);
+    }
+    .pin-modal-back.open .pin-card { transform: scale(1); }
+    .pin-profile-name {
+      font-family: 'Great Vibes', cursive; font-size: 36px;
+      background: var(--luxury-gradient); -webkit-background-clip: text;
+      background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
+    }
+    .pin-subtitle {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 3px; color: rgba(212,175,55,0.4); margin-bottom: 24px;
+    }
+    .pin-dots { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+    .pin-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 1.5px solid rgba(212,175,55,0.3); background: transparent; transition: all 0.15s;
+    }
+    .pin-dot.filled { background: var(--gold); border-color: var(--gold); transform: scale(1.1); }
+    .pin-keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+    .pin-key {
+      aspect-ratio: 1; border-radius: 16px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08); color: #ddd;
+      font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+    }
+    .pin-key:active { background: rgba(212,175,55,0.15); transform: scale(0.92); color: var(--gold); }
+    .pin-key.del { font-size: 14px; color: #666; }
+    .pin-key.empty { background: transparent; border: none; cursor: default; }
+    .pin-error { font-size: 11px; color: #F44336; margin-top: 4px; min-height: 18px; font-family: 'Playfair Display', serif; font-style: italic; }
+    .pin-setup-note { font-size: 10px; color: #555; margin-bottom: 16px; line-height: 1.5; }
+    .pin-cancel-btn {
+      width: 100%; padding: 12px; border-radius: 12px;
+      background: transparent; border: 1px solid rgba(255,255,255,0.07);
+      color: #555; font-family: 'Montserrat', sans-serif; font-size: 9px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pageIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    .view-panel { animation: pageIn 0.25s ease both; }
+
+    /* Shimmer unlock animation */
+    @keyframes goldShimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .unlocking {
+      animation: goldShimmer 0.8s ease forwards;
+      background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+      background-size: 200% auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="glow-orb"></div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a href="index.html" class="back-btn" aria-label="Back">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </a>
+    <div class="topbar-center">
+      <div class="topbar-title">Calendar</div>
+      <div class="topbar-sub">Protocol Schedule</div>
+    </div>
+    <div class="profile-pill" onclick="openProfileSwitch()" id="profile-pill">
+      <span class="profile-pill-icon" id="profile-icon">👑</span>
+      <span class="profile-pill-name" id="profile-name">Dom</span>
+      <span class="profile-pill-arrow">⌄</span>
+    </div>
+  </div>
+
+  <!-- View toggle -->
+  <div class="view-toggle">
+    <button class="view-btn active" id="vbtn-month" onclick="switchView('month')">Month</button>
+    <button class="view-btn"        id="vbtn-week"  onclick="switchView('week')">Week</button>
+    <button class="view-btn"        id="vbtn-day"   onclick="switchView('day')">Day</button>
+  </div>
+
+  <!-- Main content -->
+  <div class="page-wrap">
+
+    <!-- ══ MONTH VIEW ══ -->
+    <div id="view-month" class="view-panel">
+      <div class="month-nav">
+        <button class="month-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <div>
+          <div class="month-label" id="month-label"></div>
+          <div class="month-year"  id="month-year"></div>
+        </div>
+        <button class="month-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="day-headers">
+        <div class="day-header">S</div><div class="day-header">M</div>
+        <div class="day-header">T</div><div class="day-header">W</div>
+        <div class="day-header">T</div><div class="day-header">F</div>
+        <div class="day-header">S</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <!-- ══ WEEK VIEW ══ -->
+    <div id="view-week" class="view-panel" style="display:none;">
+      <div class="week-nav">
+        <button class="month-nav-btn" onclick="changeWeek(-1)">‹</button>
+        <div class="week-label" id="week-label"></div>
+        <button class="month-nav-btn" onclick="changeWeek(1)">›</button>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+
+    <!-- ══ DAY VIEW ══ -->
+    <div id="view-day" class="view-panel" style="display:none;">
+      <div class="day-header-bar">
+        <button class="day-back-btn" onclick="switchView('month')">‹</button>
+        <div class="day-date-display">
+          <div class="day-date-main" id="day-date-main"></div>
+          <div class="day-date-sub"  id="day-date-sub"></div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="month-nav-btn" onclick="changeDayView(-1)" style="width:32px;height:32px;">‹</button>
+          <button class="month-nav-btn" onclick="changeDayView(1)"  style="width:32px;height:32px;">›</button>
+        </div>
+      </div>
+      <div id="day-content"></div>
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openAddModal()" aria-label="Add event">+</button>
+
+  <!-- ══ ADD / EDIT EVENT MODAL ══ -->
+  <div id="add-modal" class="modal-back" onclick="handleModalClick(event,'add-modal')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-heading" id="add-modal-heading">New Entry</div>
+      <div class="modal-subheading" id="add-modal-sub">Schedule your protocol</div>
+
+      <!-- Type selector -->
+      <label class="field-label">Type</label>
+      <div class="type-toggle" id="type-toggle">
+        <button class="type-btn active-scene" id="type-scene"   onclick="setType('scene')">🎭 Scene</button>
+        <button class="type-btn"              id="type-task"    onclick="setType('task')">✦ Task</button>
+        <button class="type-btn"              id="type-unavail" onclick="setType('unavail')">🚫 Unavailable</button>
+      </div>
+
+      <label class="field-label">Title</label>
+      <input id="ev-title" class="field-input" type="text" placeholder="e.g. Evening Scene, Morning Ritual…" />
+
+      <label class="field-label">Date</label>
+      <input id="ev-date" class="field-input" type="date" />
+
+      <!-- Scene-specific -->
+      <div id="scene-fields">
+        <label class="field-label">Description / Notes</label>
+        <textarea id="ev-desc" class="field-textarea" placeholder="Mood, intentions, any details…"></textarea>
+
+        <label class="field-label">Dress Code (visible to sub)</label>
+        <input id="ev-dress" class="field-input" type="text" placeholder="e.g. Lingerie, Casual, Formal collar…" />
+
+        <div class="toggle-row">
+          <span class="toggle-label">Surprise mode (hide from sub)</span>
+          <div class="toggle-switch" id="surprise-toggle" onclick="toggleSwitch('surprise-toggle','isSurprise')">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task-specific -->
+      <div id="task-fields" style="display:none;">
+        <label class="field-label">Category</label>
+        <div class="cat-btns">
+          <button class="cat-btn" id="cat-training" onclick="setCat('training')" style="background:rgba(100,181,246,0.15);border-color:rgba(100,181,246,0.3);color:#64B5F6;">🏋️ Training</button>
+          <button class="cat-btn" id="cat-ritual"   onclick="setCat('ritual')">🕯️ Ritual</button>
+          <button class="cat-btn" id="cat-protocol" onclick="setCat('protocol')">📜 Protocol</button>
+          <button class="cat-btn" id="cat-personal" onclick="setCat('personal')">✦ Personal</button>
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Recurring task</span>
+          <div class="toggle-switch" id="recur-toggle" onclick="toggleSwitch('recur-toggle','isRecurring')">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <div id="recur-fields" style="display:none;">
+          <label class="field-label">Frequency</label>
+          <div class="freq-btns">
+            <button class="freq-btn active" id="freq-daily"  onclick="setFreq('daily')">Daily</button>
+            <button class="freq-btn"        id="freq-weekly" onclick="setFreq('weekly')">Weekly</button>
+            <button class="freq-btn"        id="freq-custom" onclick="setFreq('custom')">Custom</button>
+          </div>
+          <div id="dow-row" style="display:none;">
+            <label class="field-label">Days of Week</label>
+            <div class="dow-picker">
+              <button class="dow-btn" data-dow="0" onclick="toggleDow(0)">S</button>
+              <button class="dow-btn" data-dow="1" onclick="toggleDow(1)">M</button>
+              <button class="dow-btn" data-dow="2" onclick="toggleDow(2)">T</button>
+              <button class="dow-btn" data-dow="3" onclick="toggleDow(3)">W</button>
+              <button class="dow-btn" data-dow="4" onclick="toggleDow(4)">T</button>
+              <button class="dow-btn" data-dow="5" onclick="toggleDow(5)">F</button>
+              <button class="dow-btn" data-dow="6" onclick="toggleDow(6)">S</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal('add-modal')">Cancel</button>
+        <button class="modal-save"   onclick="saveEvent()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PIN MODAL ══ -->
+  <div id="pin-modal" class="pin-modal-back">
+    <div class="pin-card">
+      <div class="pin-profile-name" id="pin-profile-label">Dom</div>
+      <div class="pin-subtitle" id="pin-subtitle">Enter PIN to switch</div>
+      <div class="pin-setup-note" id="pin-setup-note" style="display:none;"></div>
+      <div class="pin-dots" id="pin-dots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key empty"></button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+      <button class="pin-cancel-btn" onclick="closePinModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* ══════════════════════════════════════════════════════
+     DATA & STORAGE
+  ══════════════════════════════════════════════════════ */
+  const SK_EVENTS   = 'dsh_cal_events_v1';
+  const SK_TASKS    = 'dsh_cal_tasks_v1';
+  const SK_REFLECT  = 'dsh_cal_reflect_v1';
+  const SK_PROFILES = 'dsh_cal_profiles_v1';
+  const SK_ACTIVE   = 'dsh_cal_active_profile';
+
+  let events       = JSON.parse(localStorage.getItem(SK_EVENTS)   || '[]');
+  let recurTasks   = JSON.parse(localStorage.getItem(SK_TASKS)     || '[]');
+  let reflections  = JSON.parse(localStorage.getItem(SK_REFLECT)   || '[]');
+  let profiles     = JSON.parse(localStorage.getItem(SK_PROFILES)  || 'null') || { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
+  let activeProfile = localStorage.getItem(SK_ACTIVE) || 'dom';
+
+  function persist() {
+    localStorage.setItem(SK_EVENTS,   JSON.stringify(events));
+    localStorage.setItem(SK_TASKS,    JSON.stringify(recurTasks));
+    localStorage.setItem(SK_REFLECT,  JSON.stringify(reflections));
+    localStorage.setItem(SK_PROFILES, JSON.stringify(profiles));
+    localStorage.setItem(SK_ACTIVE,   activeProfile);
+  }
+
+  /* Seed demo data */
+  if (!events.length) {
+    const today = dateStr(new Date());
+    const d = new Date(); d.setDate(d.getDate()+5);
+    const future = dateStr(d);
+    const d2 = new Date(); d2.setDate(d2.getDate()+12);
+    const future2 = dateStr(d2);
+
+    events = [
+      { id: uid(), date: today, type:'scene', title:'Evening Protocol', desc:'Rope work and sensory exploration. Full aftercare planned.', dressCode:'Black lingerie, collar', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
+      { id: uid(), date: future, type:'scene', title:'Sir\'s Private Evening', desc:'Extended scene with restraint and edge play.', dressCode:'Be ready by 8pm', createdBy:'dom', visibility:'surprise', unlocked:false, completed:false },
+      { id: uid(), date: future2, type:'scene', title:'Weekend Retreat', desc:'Full day dynamic immersion.', dressCode:'Comfortable, Sir will direct', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
+    ];
+
+    recurTasks = [
+      { id:uid(), title:'Morning check-in message', category:'ritual',   frequency:'daily',  daysOfWeek:[0,1,2,3,4,5,6], owner:'dom', startDate: today },
+      { id:uid(), title:'Kegel training — 3 sets',  category:'training', frequency:'daily',  daysOfWeek:[0,1,2,3,4,5,6], owner:'dom', startDate: today },
+      { id:uid(), title:'Evening gratitude journal', category:'personal', frequency:'daily',  daysOfWeek:[0,1,2,3,4,5,6], owner:'sub', startDate: today },
+      { id:uid(), title:'Position practice — 15 min', category:'training', frequency:'weekly', daysOfWeek:[1,3,5], owner:'dom', startDate: today },
+      { id:uid(), title:'Weekly reflection note',   category:'protocol', frequency:'weekly', daysOfWeek:[0], owner:'sub', startDate: today },
+    ];
+    persist();
+  }
+
+  /* ══════════════════════════════════════════════════════
+     UTILITIES
+  ══════════════════════════════════════════════════════ */
+  function uid() { return Math.random().toString(36).slice(2,9) + Date.now().toString(36); }
+  function dateStr(d) { return d.toISOString().split('T')[0]; }
+  function todayStr() { return dateStr(new Date()); }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function isDOM() { return activeProfile === 'dom'; }
+
+  const CAT_COLORS = {
+    training: { bg:'rgba(100,181,246,0.18)', color:'#64B5F6', dot:'dot-training' },
+    ritual:   { bg:'rgba(186,104,200,0.18)', color:'#BA68C8', dot:'dot-ritual'   },
+    protocol: { bg:'rgba(76,175,80,0.18)',   color:'#4CAF50', dot:'dot-protocol' },
+    personal: { bg:'rgba(255,138,101,0.18)', color:'#FF8A65', dot:'dot-personal' },
+  };
+
+  function getTasksForDate(ds) {
+    const d = new Date(ds + 'T12:00:00');
+    const dow = d.getDay();
+    return recurTasks.filter(t => {
+      if (t.startDate && t.startDate > ds) return false;
+      if (t.endDate   && t.endDate   < ds) return false;
+      if (t.frequency === 'daily') return true;
+      if (t.frequency === 'weekly' || t.frequency === 'custom') return t.daysOfWeek.includes(dow);
+      return false;
+    });
+  }
+
+  function getEventsForDate(ds) {
+    return events.filter(e => e.date === ds);
+  }
+
+  function getCompletion(taskId, ds) {
+    return reflections.find(r => r.taskId === taskId && r.date === ds);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     PROFILE & PIN
+  ══════════════════════════════════════════════════════ */
+  let pinTarget = null;
+  let pinBuffer = '';
+  let pinMode   = 'verify'; // 'verify' | 'setup'
+  let lockUntil = 0;
+  let failCount = 0;
+
+  function updateProfilePill() {
+    const icon = isDOM() ? '👑' : '🌸';
+    const name = isDOM() ? (profiles.dom.name || 'Dom') : (profiles.sub.name || 'Sub');
+    document.getElementById('profile-icon').textContent = icon;
+    document.getElementById('profile-name').textContent  = name;
+  }
+
+  function openProfileSwitch() {
+    const target = isDOM() ? 'sub' : 'dom';
+    pinTarget = target;
+    const tName = target === 'dom' ? (profiles.dom.name||'Dom') : (profiles.sub.name||'Sub');
+    document.getElementById('pin-profile-label').textContent = tName;
+
+    if (!profiles[target].pin) {
+      pinMode = 'setup';
+      document.getElementById('pin-subtitle').textContent = 'Create a 4-digit PIN';
+      document.getElementById('pin-setup-note').style.display = 'block';
+      document.getElementById('pin-setup-note').textContent = 'Set a PIN for the ' + tName + ' profile. You\'ll need it each time you switch.';
+    } else {
+      pinMode = 'verify';
+      document.getElementById('pin-subtitle').textContent = 'Enter PIN to switch profile';
+      document.getElementById('pin-setup-note').style.display = 'none';
+    }
+
+    pinBuffer = '';
+    document.getElementById('pin-error').textContent = '';
+    updatePinDots();
+    document.getElementById('pin-modal').classList.add('open');
+  }
+
+  function closePinModal() {
+    document.getElementById('pin-modal').classList.remove('open');
+    pinBuffer = ''; pinTarget = null;
+    updatePinDots();
+  }
+
+  function pinPress(n) {
+    if (Date.now() < lockUntil) {
+      const secs = Math.ceil((lockUntil - Date.now()) / 1000);
+      document.getElementById('pin-error').textContent = `Locked for ${secs}s`;
+      return;
+    }
+    if (pinBuffer.length >= 4) return;
+    pinBuffer += n;
+    updatePinDots();
+    if (pinBuffer.length === 4) setTimeout(submitPin, 120);
+  }
+
+  function pinDel() {
+    pinBuffer = pinBuffer.slice(0,-1);
+    updatePinDots();
+    document.getElementById('pin-error').textContent = '';
+  }
+
+  function updatePinDots() {
+    for (let i=0;i<4;i++) {
+      document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
+    }
+  }
+
+  function submitPin() {
+    if (pinMode === 'setup') {
+      profiles[pinTarget].pin = pinBuffer;
+      persist();
+      doSwitch();
+    } else {
+      if (pinBuffer === profiles[pinTarget].pin) {
+        failCount = 0; doSwitch();
+      } else {
+        failCount++;
+        document.getElementById('pin-error').textContent = failCount >= 3 ? 'Too many attempts. Locked 30s.' : 'Incorrect PIN';
+        if (failCount >= 3) { lockUntil = Date.now() + 30000; failCount = 0; }
+        pinBuffer = ''; updatePinDots();
+      }
+    }
+  }
+
+  function doSwitch() {
+    activeProfile = pinTarget;
+    persist(); updateProfilePill(); closePinModal();
+    showToast('Switched to ' + (isDOM() ? '👑 Dom' : '🌸 Sub'));
+    renderCurrentView();
+  }
+
+  /* ══════════════════════════════════════════════════════
+     VIEW MANAGEMENT
+  ══════════════════════════════════════════════════════ */
+  let currentView = 'month';
+  let currentMonth = new Date().getMonth();
+  let currentYear  = new Date().getFullYear();
+  let currentWeekStart = getWeekStart(new Date());
+  let currentDayStr = todayStr();
+
+  function switchView(v) {
+    currentView = v;
+    ['month','week','day'].forEach(n => {
+      document.getElementById('view-'+n).style.display = n === v ? 'block' : 'none';
+      document.getElementById('vbtn-'+n).classList.toggle('active', n === v);
+    });
+    renderCurrentView();
+  }
+
+  function renderCurrentView() {
+    if (currentView === 'month') renderMonth();
+    if (currentView === 'week')  renderWeek();
+    if (currentView === 'day')   renderDay();
+  }
+
+  /* ══════════════════════════════════════════════════════
+     MONTH VIEW
+  ══════════════════════════════════════════════════════ */
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function changeMonth(dir) {
+    currentMonth += dir;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+    renderMonth();
+  }
+
+  function renderMonth() {
+    document.getElementById('month-label').textContent = MONTH_NAMES[currentMonth];
+    document.getElementById('month-year').textContent  = currentYear;
+
+    const grid = document.getElementById('cal-grid');
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+    const today = todayStr();
+    let html = '';
+
+    // Leading blanks
+    for (let i=0; i<firstDay; i++) html += '<div class="cal-cell empty"></div>';
+
+    for (let d=1; d<=daysInMonth; d++) {
+      const ds = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dayEvents = getEventsForDate(ds);
+      const dayTasks  = getTasksForDate(ds);
+      const isToday   = ds === today;
+
+      let dots = '';
+      const hasScene = dayEvents.some(e => e.type === 'scene');
+      const hasUnavail = dayEvents.some(e => e.type === 'unavailable');
+      if (hasScene)   dots += '<div class="cal-dot dot-scene"></div>';
+      if (hasUnavail) dots += '<div class="cal-dot dot-unavail"></div>';
+
+      const catsSeen = new Set();
+      dayTasks.forEach(t => {
+        if (!catsSeen.has(t.category)) { catsSeen.add(t.category); dots += `<div class="cal-dot ${CAT_COLORS[t.category]?.dot||''}"></div>`; }
+      });
+
+      html += `<div class="cal-cell${isToday?' today':''}" onclick="openDay('${ds}')">
+        <div class="cal-date">${d}</div>
+        <div class="cal-dots">${dots}</div>
+      </div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function openDay(ds) {
+    currentDayStr = ds;
+    switchView('day');
+  }
+
+  /* ══════════════════════════════════════════════════════
+     WEEK VIEW
+  ══════════════════════════════════════════════════════ */
+  function getWeekStart(d) {
+    const s = new Date(d);
+    s.setDate(s.getDate() - s.getDay());
+    s.setHours(0,0,0,0);
+    return s;
+  }
+
+  function changeWeek(dir) {
+    currentWeekStart.setDate(currentWeekStart.getDate() + dir*7);
+    renderWeek();
+  }
+
+  function renderWeek() {
+    const DAY_INITIALS = ['S','M','T','W','T','F','S'];
+    const end = new Date(currentWeekStart); end.setDate(end.getDate()+6);
+    const fmt = d => d.toLocaleDateString('en-GB',{month:'short',day:'numeric'});
+    document.getElementById('week-label').textContent = fmt(currentWeekStart) + ' – ' + fmt(end);
+
+    const today = todayStr();
+    let html = '';
+    for (let i=0;i<7;i++) {
+      const d = new Date(currentWeekStart); d.setDate(d.getDate()+i);
+      const ds = dateStr(d);
+      const isToday = ds === today;
+      const dayEvents = getEventsForDate(ds);
+      const dayTasks  = getTasksForDate(ds);
+      const allItems  = [
+        ...dayEvents.map(e => ({ label: e.type==='scene'?'🎭':'🚫', color: e.type==='scene'?'#D4AF37':'#666', bg: e.type==='scene'?'rgba(212,175,55,0.8)':'rgba(100,100,100,0.5)', title: e.title })),
+        ...dayTasks.slice(0,3).map(t => ({ label:'', color: CAT_COLORS[t.category]?.color||'#aaa', bg: CAT_COLORS[t.category]?.bg||'rgba(200,200,200,0.2)', title: t.title }))
+      ];
+
+      const pills = allItems.slice(0,3).map(item =>
+        `<div class="week-pill" style="background:${item.bg};color:${item.color};" title="${item.title}">${item.label} ${item.title}</div>`
+      ).join('');
+      const more = allItems.length > 3 ? `<div class="week-more">+${allItems.length-3} more</div>` : '';
+
+      html += `<div class="week-col${isToday?' today-col':''}" onclick="openDay('${ds}')">
+        <div class="week-col-day">${DAY_INITIALS[i]}</div>
+        <div class="week-col-num">${d.getDate()}</div>
+        <div class="week-pills">${pills}${more}</div>
+      </div>`;
+    }
+    document.getElementById('week-grid').innerHTML = html;
+  }
+
+  /* ══════════════════════════════════════════════════════
+     DAY VIEW
+  ══════════════════════════════════════════════════════ */
+  function changeDayView(dir) {
+    const d = new Date(currentDayStr + 'T12:00:00');
+    d.setDate(d.getDate() + dir);
+    currentDayStr = dateStr(d);
+    renderDay();
+  }
+
+  function renderDay() {
+    const d    = new Date(currentDayStr + 'T12:00:00');
+    const today = todayStr();
+    const isPast   = currentDayStr < today;
+    const isFuture = currentDayStr > today;
+
+    document.getElementById('day-date-main').textContent = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    document.getElementById('day-date-sub').textContent  = currentDayStr === today ? 'Today' : isPast ? 'Past' : 'Upcoming';
+
+    const dayEvents = getEventsForDate(currentDayStr);
+    const dayTasks  = getTasksForDate(currentDayStr);
+    let html = '';
+
+    /* ── Scene cards ── */
+    const scenes = dayEvents.filter(e => e.type === 'scene');
+    scenes.forEach(scene => {
+      const isSurprise = scene.visibility === 'surprise' && !scene.unlocked && !isDOM();
+      if (isSurprise) {
+        html += `<div class="scene-card-surprise">
+          <span class="surprise-ornament">✦</span>
+          <span class="surprise-script">Sir has something planned</span>
+          <span class="surprise-tagline">Be ready</span>
+          ${scene.dressCode ? `<div class="surprise-prep">🪞 ${escHtml(scene.dressCode)}</div>` : ''}
+        </div>`;
+      } else {
+        const domActions = isDOM() ? `
+          <div class="scene-dom-actions">
+            <button class="scene-edit-btn" onclick="editEvent('${scene.id}')">Edit</button>
+            ${scene.visibility==='surprise'&&!scene.unlocked ? `<button class="scene-unlock-btn" onclick="unlockScene('${scene.id}')">✦ Reveal to Sub</button>` : ''}
+            <button class="scene-delete-btn" onclick="deleteEvent('${scene.id}')">🗑</button>
+          </div>` : '';
+
+        html += `<div class="scene-card-full">
+          <div class="scene-card-header">
+            <div class="scene-card-title">${escHtml(scene.title)}</div>
+            <div class="scene-badge">${scene.visibility==='surprise'?'✦ Surprise':'🎭 Scene'}</div>
+          </div>
+          ${scene.dressCode ? `<div class="scene-detail-row"><span class="scene-detail-chip">🪞 ${escHtml(scene.dressCode)}</span></div>` : ''}
+          ${scene.desc ? `<div class="scene-desc">${escHtml(scene.desc)}</div>` : ''}
+          ${domActions}
+        </div>`;
+      }
+    });
+
+    /* ── Tasks ── */
+    const domTasks = dayTasks.filter(t => t.owner === 'dom');
+    const subTasks = dayTasks.filter(t => t.owner === 'sub');
+
+    if (domTasks.length) {
+      html += `<div class="task-section">
+        <div class="task-section-header">
+          <span class="task-section-icon">♛</span>
+          <span class="task-section-title">Sir's Tasks</span>
+          <span class="task-count-badge">${domTasks.length}</span>
+        </div>`;
+      domTasks.forEach(t => { html += taskItemHTML(t, currentDayStr); });
+      html += '</div>';
+    }
+
+    if (subTasks.length) {
+      html += `<div class="task-section">
+        <div class="task-section-header">
+          <span class="task-section-icon">✦</span>
+          <span class="task-section-title">Your Tasks</span>
+          <span class="task-count-badge">${subTasks.length}</span>
+        </div>`;
+      subTasks.forEach(t => { html += taskItemHTML(t, currentDayStr); });
+      html += '</div>';
+    }
+
+    if (!scenes.length && !dayTasks.length) {
+      html += `<div class="day-empty">
+        <div class="day-empty-icon">✦</div>
+        <div class="day-empty-text">${isFuture ? 'Nothing scheduled yet' : 'No entries for this day'}</div>
+      </div>`;
+    }
+
+    /* ── Reflection prompt (past days) ── */
+    if (isPast) {
+      const existingReflect = reflections.find(r => r.date === currentDayStr && !r.taskId);
+      if (!existingReflect) {
+        html += reflectionPromptHTML(currentDayStr);
+      } else {
+        html += `<div class="reflection-prompt">
+          <div class="reflection-title">Reflection saved ✦</div>
+          <div style="font-size:12px;color:#888;font-family:'Playfair Display',serif;font-style:italic;line-height:1.6;">${escHtml(existingReflect.body)}</div>
+        </div>`;
+      }
+    }
+
+    document.getElementById('day-content').innerHTML = html;
+  }
+
+  function taskItemHTML(t, ds) {
+    const comp = getCompletion(t.id, ds);
+    const cat  = CAT_COLORS[t.category] || { bg:'rgba(200,200,200,0.1)', color:'#aaa' };
+    const ownerBadge = t.owner === 'dom' ? '♛' : '✦';
+    return `<div class="task-item" id="ti-${t.id}">
+      <div class="task-check${comp?' checked':''}" onclick="toggleTask('${t.id}','${ds}')">${comp?'✓':''}</div>
+      <div class="task-info">
+        <div class="task-name${comp?' done':''}">${escHtml(t.title)}</div>
+        <div class="task-meta">
+          <span class="task-owner-badge">${ownerBadge}</span>
+          <span class="task-cat-chip" style="background:${cat.bg};color:${cat.color};">${t.category}</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function reflectionPromptHTML(ds) {
+    return `<div class="reflection-prompt" id="reflect-${ds}">
+      <div class="reflection-title">How was this day?</div>
+      <div class="reflection-sub">Add a reflection to your protocol record</div>
+      <div class="reflection-moods" id="mood-btns-${ds}">
+        <button class="mood-btn" onclick="selectMood('${ds}','fulfilled')">🌟 Fulfilled</button>
+        <button class="mood-btn" onclick="selectMood('${ds}','difficult')">🌧 Difficult</button>
+        <button class="mood-btn" onclick="selectMood('${ds}','joyful')">✨ Joyful</button>
+        <button class="mood-btn" onclick="selectMood('${ds}','processing')">🌊 Processing</button>
+      </div>
+      <textarea class="reflection-textarea" id="reflect-body-${ds}" placeholder="Write freely…"></textarea>
+      <button class="reflection-save-btn" onclick="saveReflection('${ds}')">Save Reflection</button>
+    </div>`;
+  }
+
+  function selectMood(ds, mood) {
+    document.querySelectorAll(`#mood-btns-${ds} .mood-btn`).forEach(b => b.classList.remove('selected'));
+    event.target.classList.add('selected');
+    event.target.dataset.mood = mood;
+  }
+
+  function saveReflection(ds) {
+    const body = document.getElementById(`reflect-body-${ds}`).value.trim();
+    const selected = document.querySelector(`#mood-btns-${ds} .mood-btn.selected`);
+    const mood = selected ? selected.dataset.mood : 'fulfilled';
+    if (!body) { showToast('Write something first'); return; }
+    reflections.push({ id: uid(), date: ds, mood, body, taskId: null });
+    persist(); showToast('Reflection saved ✦'); renderDay();
+  }
+
+  function toggleTask(taskId, ds) {
+    const existing = reflections.findIndex(r => r.taskId === taskId && r.date === ds);
+    if (existing > -1) {
+      reflections.splice(existing, 1);
+    } else {
+      reflections.push({ id: uid(), date: ds, taskId, completed: true });
+    }
+    persist(); renderDay();
+  }
+
+  function unlockScene(id) {
+    const ev = events.find(e => e.id === id);
+    if (ev) { ev.unlocked = true; persist(); renderDay(); showToast('Scene revealed to Sub ✦'); }
+  }
+
+  function deleteEvent(id) {
+    events = events.filter(e => e.id !== id);
+    persist(); renderDay(); showToast('Event deleted');
+  }
+
+  /* ══════════════════════════════════════════════════════
+     ADD / EDIT MODAL
+  ══════════════════════════════════════════════════════ */
+  let editingEventId = null;
+  let formState = {
+    type: 'scene', isSurprise: false, isRecurring: false,
+    freq: 'daily', cat: 'training', daysOfWeek: []
+  };
+
+  function openAddModal(evId) {
+    editingEventId = evId || null;
+    formState = { type:'scene', isSurprise:false, isRecurring:false, freq:'daily', cat:'training', daysOfWeek:[] };
+
+    if (evId) {
+      const ev = events.find(e => e.id === evId);
+      document.getElementById('add-modal-heading').textContent = 'Edit Entry';
+      document.getElementById('add-modal-sub').textContent = 'Update your record';
+      document.getElementById('ev-title').value = ev.title || '';
+      document.getElementById('ev-date').value  = ev.date  || '';
+      document.getElementById('ev-desc').value  = ev.desc  || '';
+      document.getElementById('ev-dress').value = ev.dressCode || '';
+      formState.type = ev.type === 'scene' ? 'scene' : 'unavail';
+      formState.isSurprise = ev.visibility === 'surprise';
+    } else {
+      document.getElementById('add-modal-heading').textContent = 'New Entry';
+      document.getElementById('add-modal-sub').textContent = 'Schedule your protocol';
+      document.getElementById('ev-title').value = '';
+      document.getElementById('ev-date').value  = currentDayStr || todayStr();
+      document.getElementById('ev-desc').value  = '';
+      document.getElementById('ev-dress').value = '';
+    }
+
+    setType(formState.type);
+    updateToggleUI('surprise-toggle', formState.isSurprise);
+    updateToggleUI('recur-toggle', formState.isRecurring);
+    document.getElementById('add-modal').classList.add('open');
+  }
+
+  function editEvent(id) { openAddModal(id); }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  function handleModalClick(e, id) { if (e.target.id === id) closeModal(id); }
+
+  function setType(t) {
+    formState.type = t;
+    ['scene','task','unavail'].forEach(k => {
+      const btn = document.getElementById('type-'+k);
+      btn.className = 'type-btn' + (k===t ? ` active-${k}` : '');
+    });
+    document.getElementById('scene-fields').style.display = t==='scene' ? 'block' : 'none';
+    document.getElementById('task-fields').style.display  = t==='task'  ? 'block' : 'none';
+  }
+
+  function setCat(c) {
+    formState.cat = c;
+    ['training','ritual','protocol','personal'].forEach(k => {
+      const btn = document.getElementById('cat-'+k);
+      const cc = CAT_COLORS[k];
+      if (k===c) btn.style.cssText = `background:${cc.bg};border-color:${cc.color}44;color:${cc.color};`;
+      else       btn.style.cssText = '';
+    });
+  }
+
+  function setFreq(f) {
+    formState.freq = f;
+    ['daily','weekly','custom'].forEach(k => {
+      document.getElementById('freq-'+k).classList.toggle('active', k===f);
+    });
+    document.getElementById('dow-row').style.display = (f==='weekly'||f==='custom') ? 'block' : 'none';
+  }
+
+  function toggleDow(d) {
+    const idx = formState.daysOfWeek.indexOf(d);
+    if (idx > -1) formState.daysOfWeek.splice(idx,1); else formState.daysOfWeek.push(d);
+    document.querySelectorAll('.dow-btn').forEach(b => {
+      b.classList.toggle('active', formState.daysOfWeek.includes(+b.dataset.dow));
+    });
+  }
+
+  function toggleSwitch(elId, key) {
+    formState[key] = !formState[key];
+    updateToggleUI(elId, formState[key]);
+    if (key === 'isRecurring') {
+      document.getElementById('recur-fields').style.display = formState.isRecurring ? 'block' : 'none';
+    }
+  }
+
+  function updateToggleUI(elId, val) {
+    document.getElementById(elId).classList.toggle('on', val);
+  }
+
+  function saveEvent() {
+    const title = document.getElementById('ev-title').value.trim();
+    const date  = document.getElementById('ev-date').value;
+    if (!title) { showToast('Please add a title'); return; }
+    if (!date  ) { showToast('Please pick a date');  return; }
+
+    if (formState.type === 'task' && formState.isRecurring) {
+      // Save as recurring task
+      const task = {
+        id: uid(), title, category: formState.cat,
+        frequency: formState.freq, daysOfWeek: formState.daysOfWeek,
+        owner: activeProfile, startDate: date
+      };
+      recurTasks.push(task);
+      persist(); closeModal('add-modal'); showToast('Recurring task added ✦');
+      renderCurrentView(); return;
+    }
+
+    const payload = {
+      id: editingEventId || uid(),
+      date, type: formState.type === 'unavail' ? 'unavailable' : formState.type,
+      title,
+      desc: document.getElementById('ev-desc').value.trim(),
+      dressCode: document.getElementById('ev-dress').value.trim(),
+      createdBy: activeProfile,
+      visibility: formState.isSurprise ? 'surprise' : 'both',
+      unlocked: !formState.isSurprise,
+      completed: false,
+    };
+
+    if (editingEventId) {
+      const idx = events.findIndex(e => e.id === editingEventId);
+      if (idx > -1) events[idx] = payload;
+      showToast('Event updated');
+    } else {
+      events.push(payload);
+      showToast(formState.type==='scene' ? 'Scene scheduled ✦' : 'Entry saved');
+    }
+
+    persist(); closeModal('add-modal'); renderCurrentView();
+  }
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ══════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════ */
+  updateProfilePill();
+  renderMonth();
+  </script>
+</body>
+</html>
