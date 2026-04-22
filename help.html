@@ -1,136 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="theme-color" content="#080c14"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#080c14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Dom Sub Hub — Help &amp; Info</title>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
-  <link rel="manifest" href="manifest.json"/>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <link rel="apple-touch-icon" href="icon-512.png"/>
-  <link rel="stylesheet" href="styles.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap"
+    rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="icon-512.png" />
+  <link rel="stylesheet" href="styles.css" />
   <style>
     /* ── FAQ accordion ── */
     .faq-item {
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
-    .faq-item:last-child { border-bottom: none; }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
     .faq-q {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 0; cursor: pointer; gap: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      cursor: pointer;
+      gap: 12px;
       -webkit-tap-highlight-color: transparent;
     }
+
     .faq-q-text {
-      font-size: 13px; font-weight: 600; color: #ddd; flex: 1; line-height: 1.4;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ddd;
+      flex: 1;
+      line-height: 1.4;
     }
+
     .faq-chevron {
-      font-size: 20px; color: #444; flex-shrink: 0;
+      font-size: 20px;
+      color: #444;
+      flex-shrink: 0;
       transition: transform 0.25s, color 0.25s;
     }
-    .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--gold); }
-    .faq-a {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--gold);
     }
-    .faq-item.open .faq-a { max-height: 500px; }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 500px;
+    }
+
     .faq-a-inner {
-      font-size: 12px; color: #888; line-height: 1.75;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.75;
       padding-bottom: 14px;
     }
-    .faq-a-inner strong { color: var(--gold); font-weight: 600; }
+
+    .faq-a-inner strong {
+      color: var(--gold);
+      font-weight: 600;
+    }
 
     /* ── Feature cards (Getting Started steps) ── */
     .step-card {
-      display: flex; gap: 16px; align-items: flex-start;
-      padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
-    .step-card:last-child { border-bottom: none; }
+
+    .step-card:last-child {
+      border-bottom: none;
+    }
+
     .step-num {
-      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Playfair Display', serif; font-size: 14px;
-      font-weight: 700; color: var(--gold);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
     }
-    .step-body { flex: 1; }
-    .step-title { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 4px; }
-    .step-desc  { font-size: 11px; color: #777; line-height: 1.6; }
-    .step-desc a { color: var(--gold); text-decoration: none; }
+
+    .step-body {
+      flex: 1;
+    }
+
+    .step-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ddd;
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 11px;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    .step-desc a {
+      color: var(--gold);
+      text-decoration: none;
+    }
 
     /* ── Safety alert (reusing shared class, but adding local variant) ── */
     .safety-rule {
-      display: flex; gap: 14px; align-items: flex-start;
-      padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
-    .safety-rule:last-child { border-bottom: none; }
-    .safety-rule-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-    .safety-rule-body { flex: 1; }
-    .safety-rule-title { font-size: 13px; font-weight: 600; color: #ddd; margin-bottom: 4px; }
-    .safety-rule-desc  { font-size: 11px; color: #888; line-height: 1.6; }
-    .safety-rule-desc strong { color: #F44336; }
+
+    .safety-rule:last-child {
+      border-bottom: none;
+    }
+
+    .safety-rule-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .safety-rule-body {
+      flex: 1;
+    }
+
+    .safety-rule-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ddd;
+      margin-bottom: 4px;
+    }
+
+    .safety-rule-desc {
+      font-size: 11px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    .safety-rule-desc strong {
+      color: #F44336;
+    }
 
     /* ── Module grid ── */
-    .module-grid { display: flex; flex-direction: column; gap: 10px; }
+    .module-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .module-row {
-      display: flex; align-items: center; gap: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       padding: 12px 16px;
-      background: rgba(2,8,20,0.4); border: 1px solid rgba(212,175,55,0.08);
-      border-radius: 12px; text-decoration: none; color: #bbb;
+      background: rgba(2, 8, 20, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.08);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #bbb;
       transition: border-color 0.2s;
     }
-    .module-row:active { border-color: rgba(212,175,55,0.3); }
-    .module-row-icon { font-size: 18px; flex-shrink: 0; }
-    .module-row-label { flex: 1; font-size: 12px; font-weight: 500; }
-    .module-row-arrow { font-size: 16px; color: rgba(212,175,55,0.15); }
+
+    .module-row:active {
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .module-row-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .module-row-label {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .module-row-arrow {
+      font-size: 16px;
+      color: rgba(212, 175, 55, 0.15);
+    }
 
     /* ── About version block ── */
     .about-block {
-      text-align: center; padding: 24px;
-      background: rgba(2,8,20,0.4); border: 1px solid rgba(212,175,55,0.08);
+      text-align: center;
+      padding: 24px;
+      background: rgba(2, 8, 20, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.08);
       border-radius: 20px;
     }
+
     .about-brand {
-      font-family: 'Great Vibes', cursive; font-size: 36px;
+      font-family: 'Great Vibes', cursive;
+      font-size: 36px;
       background: var(--luxury-gradient);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; margin-bottom: 6px;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
     }
+
     .about-version {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 2px;
-      color: #555; margin-bottom: 16px;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      margin-bottom: 16px;
     }
+
     .about-desc {
-      font-size: 12px; color: #777; line-height: 1.7; margin-bottom: 16px;
+      font-size: 12px;
+      color: #777;
+      line-height: 1.7;
+      margin-bottom: 16px;
     }
+
     .about-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 20px;
-      background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.12);
-      font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #555;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(212, 175, 55, 0.06);
+      border: 1px solid rgba(212, 175, 55, 0.12);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #555;
     }
-    .about-badge .material-symbols-rounded { font-size: 14px; color: var(--gold); }
+
+    .about-badge .material-symbols-rounded {
+      font-size: 14px;
+      color: var(--gold);
+    }
 
     /* ── Consent banner ── */
     .consent-banner {
-      background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2);
-      border-radius: 14px; padding: 16px 18px; margin-bottom: 20px;
-      display: flex; gap: 12px; align-items: flex-start;
+      background: rgba(76, 175, 80, 0.05);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
     }
-    .consent-banner-icon { font-size: 20px; flex-shrink: 0; color: #4CAF50; }
-    .consent-banner-text { font-size: 11px; color: #bbb; line-height: 1.65; }
-    .consent-banner-text strong { color: #4CAF50; }
+
+    .consent-banner-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      color: #4CAF50;
+    }
+
+    .consent-banner-text {
+      font-size: 11px;
+      color: #bbb;
+      line-height: 1.65;
+    }
+
+    .consent-banner-text strong {
+      color: #4CAF50;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Topbar -->
   <div class="topbar">
-    <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span class="material-symbols-rounded">menu</span></button>
+    <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span
+        class="material-symbols-rounded">menu</span></button>
     <div class="topbar-center">
       <div class="topbar-title">Help &amp; Info</div>
       <div class="topbar-sub">Dom Sub Hub</div>
@@ -148,14 +318,16 @@
 
     <div class="glass-card" style="padding: 20px 22px; margin-bottom: 20px;">
       <p class="prose" style="margin-bottom: 16px;">
-        <em>Dom Sub Hub</em> is a private protocol app designed to support the dynamic between a submissive and her Dominant. Every module is built around trust, consent, and structured growth.
+        <em>Dom Sub Hub</em> is a private protocol app designed to support the dynamic between a submissive and her
+        Dominant. Every module is built around trust, consent, and structured growth.
       </p>
 
       <div class="step-card">
         <div class="step-num">1</div>
         <div class="step-body">
           <div class="step-title">Start with the BDSM Compatibility Portal</div>
-          <div class="step-desc">Both partners review and rate limits and interests. This creates a shared baseline and ensures informed, consensual play. <a href="bdsm-checklist.html">Open Portal →</a></div>
+          <div class="step-desc">Both partners review and rate limits and interests. This creates a shared baseline and
+            ensures informed, consensual play. <a href="bdsm-checklist.html">Open Portal →</a></div>
         </div>
       </div>
 
@@ -163,7 +335,8 @@
         <div class="step-num">2</div>
         <div class="step-body">
           <div class="step-title">Explore the Assessments</div>
-          <div class="step-desc">The Submissive Protocol Checklist, Predicament Menu, and Public Play Menu are tools for Sir to review Becca's preferences, set challenges, and rate performance.</div>
+          <div class="step-desc">The Submissive Protocol Checklist, Predicament Menu, and Public Play Menu are tools for
+            Sir to review Becca's preferences, set challenges, and rate performance.</div>
         </div>
       </div>
 
@@ -171,7 +344,8 @@
         <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Begin a Training Program</div>
-          <div class="step-desc">Training modules are sequential — each phase unlocks after completing the previous. Progress is saved automatically to your device.</div>
+          <div class="step-desc">Training modules are sequential — each phase unlocks after completing the previous.
+            Progress is saved automatically to your device.</div>
         </div>
       </div>
 
@@ -179,7 +353,8 @@
         <div class="step-num">4</div>
         <div class="step-body">
           <div class="step-title">Use the Scene Menu</div>
-          <div class="step-desc">Before a session, use the Scene Menu to define parameters, limits active for that session, and desired intensity. This gives Sir a clear picture.</div>
+          <div class="step-desc">Before a session, use the Scene Menu to define parameters, limits active for that
+            session, and desired intensity. This gives Sir a clear picture.</div>
         </div>
       </div>
 
@@ -187,69 +362,10 @@
         <div class="step-num">5</div>
         <div class="step-body">
           <div class="step-title">Public Tasks (Optional)</div>
-          <div class="step-desc">Sir's Public Tasks module is used during outings — discrete directives and risk-rated public challenges designed for restaurant or public play.</div>
+          <div class="step-desc">Sir's Public Tasks module is used during outings — discrete directives and risk-rated
+            public challenges designed for restaurant or public play.</div>
         </div>
       </div>
-    </div>
-
-    <!-- All modules quick nav -->
-    <div class="section-label">All Modules</div>
-    <div class="module-grid" style="margin-bottom: 28px;">
-      <a href="scene-menu.html" class="module-row">
-        <span class="module-row-icon">🎭</span>
-        <span class="module-row-label">Scene Menu</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="deepthroat-training.html" class="module-row">
-        <span class="module-row-icon">👄</span>
-        <span class="module-row-label">Deep Throat Training</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="anal-plug-training.html" class="module-row">
-        <span class="module-row-icon">💎</span>
-        <span class="module-row-label">Anal Plug Training</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="kegel-training.html" class="module-row">
-        <span class="module-row-icon">🔐</span>
-        <span class="module-row-label">Kegel Training</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="the-5-training.html" class="module-row">
-        <span class="module-row-icon">🖐️</span>
-        <span class="module-row-label">The "5" Training</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="position-training.html" class="module-row">
-        <span class="module-row-icon">🧎</span>
-        <span class="module-row-label">Position Training</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="sub-bdsm-checklist.html" class="module-row">
-        <span class="module-row-icon">📖</span>
-        <span class="module-row-label">Submissive Protocol Checklist</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="predicament-bondage-menu.html" class="module-row">
-        <span class="module-row-icon">🪢</span>
-        <span class="module-row-label">Predicament Bondage Menu</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="public-play-menu.html" class="module-row">
-        <span class="module-row-icon">🍽️</span>
-        <span class="module-row-label">Public Play Menu</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="public-game.html" class="module-row">
-        <span class="module-row-icon">🎲</span>
-        <span class="module-row-label">Sir's Public Tasks</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
-      <a href="bdsm-checklist.html" class="module-row">
-        <span class="module-row-icon">☁️</span>
-        <span class="module-row-label">BDSM Compatibility Portal</span>
-        <span class="material-symbols-rounded module-row-arrow">chevron_right</span>
-      </a>
     </div>
 
     <!-- ══════════════════════════════════════ -->
@@ -262,7 +378,9 @@
     <div class="consent-banner">
       <span class="consent-banner-icon">✅</span>
       <div class="consent-banner-text">
-        <strong>Consent is the foundation.</strong> Everything in this app is designed around enthusiastic, ongoing, informed consent between adults. No task, scene, or training should ever be performed without clear mutual agreement.
+        <strong>Consent is the foundation.</strong> Everything in this app is designed around enthusiastic, ongoing,
+        informed consent between adults. No task, scene, or training should ever be performed without clear mutual
+        agreement.
       </div>
     </div>
 
@@ -272,7 +390,9 @@
         <div class="safety-rule-icon">🛑</div>
         <div class="safety-rule-body">
           <div class="safety-rule-title">Safewords Are Absolute</div>
-          <div class="safety-rule-desc">When a safeword is spoken, <strong>everything stops immediately</strong> — no exceptions, no negotiation. Establish your safeword system before any session. The traffic light system (Red / Yellow / Green) is recommended.</div>
+          <div class="safety-rule-desc">When a safeword is spoken, <strong>everything stops immediately</strong> — no
+            exceptions, no negotiation. Establish your safeword system before any session. The traffic light system (Red
+            / Yellow / Green) is recommended.</div>
         </div>
       </div>
 
@@ -292,7 +412,8 @@
         <div class="safety-rule-icon">🔄</div>
         <div class="safety-rule-body">
           <div class="safety-rule-title">Consent is Ongoing</div>
-          <div class="safety-rule-desc">Consent given in a previous session does not carry forward automatically. Check in before each session, especially when trying new things from the menus.</div>
+          <div class="safety-rule-desc">Consent given in a previous session does not carry forward automatically. Check
+            in before each session, especially when trying new things from the menus.</div>
         </div>
       </div>
 
@@ -300,7 +421,9 @@
         <div class="safety-rule-icon">💊</div>
         <div class="safety-rule-body">
           <div class="safety-rule-title">Physical Limits</div>
-          <div class="safety-rule-desc">Training programs include safety information specific to each activity. <strong>Sharp pain is always a stop signal.</strong> Pressure, stretch, and intensity are normal; pain is not. When in doubt, stop and rest.</div>
+          <div class="safety-rule-desc">Training programs include safety information specific to each activity.
+            <strong>Sharp pain is always a stop signal.</strong> Pressure, stretch, and intensity are normal; pain is
+            not. When in doubt, stop and rest.</div>
         </div>
       </div>
 
@@ -308,15 +431,8 @@
         <div class="safety-rule-icon">🧠</div>
         <div class="safety-rule-body">
           <div class="safety-rule-title">Aftercare</div>
-          <div class="safety-rule-desc">After any intense session, emotional and physical aftercare is important for both partners. This app does not manage aftercare — build it into your own protocol.</div>
-        </div>
-      </div>
-
-      <div class="safety-rule">
-        <div class="safety-rule-icon">🚨</div>
-        <div class="safety-rule-body">
-          <div class="safety-rule-title">Emergency</div>
-          <div class="safety-rule-desc">In any genuine emergency, <strong>call 911 or your local emergency services immediately.</strong> No scene, task, or training protocol takes priority over real safety.</div>
+          <div class="safety-rule-desc">After any intense session, emotional and physical aftercare is important for
+            both partners. This app does not manage aftercare — build it into your own protocol.</div>
         </div>
       </div>
 
@@ -335,7 +451,9 @@
           <span class="material-symbols-rounded faq-chevron">expand_more</span>
         </div>
         <div class="faq-a">
-          <div class="faq-a-inner">All training progress, checklist answers, and settings are saved to your <strong>device's local storage</strong>. No data is sent to any server unless you explicitly use the Cloud Sync feature in the BDSM Compatibility Portal. Clearing your browser data will erase local progress.</div>
+          <div class="faq-a-inner">All training progress, checklist answers, and settings are saved to your
+            <strong>device's local storage</strong>. No data is sent to any server unless you explicitly use the Cloud
+            Sync feature in the BDSM Compatibility Portal. Clearing your browser data will erase local progress.</div>
         </div>
       </div>
 
@@ -345,7 +463,9 @@
           <span class="material-symbols-rounded faq-chevron">expand_more</span>
         </div>
         <div class="faq-a">
-          <div class="faq-a-inner">The BDSM Compatibility Portal uses a unique code to store and retrieve compatibility data online. Both partners can access the same data from different devices using the same code. This is the only part of the app that communicates with an external service.</div>
+          <div class="faq-a-inner">The BDSM Compatibility Portal uses a unique code to store and retrieve compatibility
+            data online. Both partners can access the same data from different devices using the same code. This is the
+            only part of the app that communicates with an external service.</div>
         </div>
       </div>
 
@@ -355,7 +475,9 @@
           <span class="material-symbols-rounded faq-chevron">expand_more</span>
         </div>
         <div class="faq-a">
-          <div class="faq-a-inner">Yes. Each training module has a <strong>Reset All Progress</strong> button at the bottom of the protocol tab. This permanently clears your saved data for that module only and cannot be undone.</div>
+          <div class="faq-a-inner">Yes. Each training module has a <strong>Reset All Progress</strong> button at the
+            bottom of the protocol tab. This permanently clears your saved data for that module only and cannot be
+            undone.</div>
         </div>
       </div>
 
@@ -365,7 +487,9 @@
           <span class="material-symbols-rounded faq-chevron">expand_more</span>
         </div>
         <div class="faq-a">
-          <div class="faq-a-inner">Yes. The app is a <strong>Progressive Web App (PWA)</strong> with a service worker that caches pages for offline use. After the first visit, most pages will load without an internet connection. Cloud sync requires connectivity.</div>
+          <div class="faq-a-inner">Yes. The app is a <strong>Progressive Web App (PWA)</strong> with a service worker
+            that caches pages for offline use. After the first visit, most pages will load without an internet
+            connection. Cloud sync requires connectivity.</div>
         </div>
       </div>
 
@@ -389,7 +513,10 @@
           <span class="material-symbols-rounded faq-chevron">expand_more</span>
         </div>
         <div class="faq-a">
-          <div class="faq-a-inner">Each training module defines mastery differently. In Position Training, mastery requires a minimum number of practice days, a photo, and a video sent to Sir for confirmation. In other modules, completing all tasks in a phase unlocks the "Mark Phase Complete" button. Mastery is self-reported — honesty is core to the protocol.</div>
+          <div class="faq-a-inner">Each training module defines mastery differently. In Position Training, mastery
+            requires a minimum number of practice days, a photo, and a video sent to Sir for confirmation. In other
+            modules, completing all tasks in a phase unlocks the "Mark Phase Complete" button. Mastery is self-reported
+            — honesty is core to the protocol.</div>
         </div>
       </div>
 
@@ -405,10 +532,12 @@
       <div class="about-brand">Dom Sub Hub</div>
       <div class="about-version">Dom Sub Hub · Version 2.0</div>
       <p class="about-desc">
-        A private, mobile-first Progressive Web App built to support a consensual D/s dynamic. Designed with intimacy, structure, and care — not for public distribution.
+        A private, mobile-first Progressive Web App built to support a consensual D/s dynamic. Designed with intimacy,
+        structure, and care — not for public distribution.
       </p>
       <p class="about-desc" style="margin-bottom: 0;">
-        All content is custom-built for this relationship. Training protocols draw from established consensual practice resources. Safety information is non-negotiable and always current.
+        All content is custom-built for this relationship. Training protocols draw from established consensual practice
+        resources. Safety information is non-negotiable and always current.
       </p>
       <br>
       <div class="about-badge">
@@ -420,7 +549,8 @@
     <div class="safety-alert">
       <div class="safety-label">A note on privacy</div>
       <div class="safety-text">
-        This app runs entirely in your browser. No analytics, no tracking pixels, no third-party advertising. Your data stays on your device except where you explicitly choose to sync it. <strong>You are in control.</strong>
+        This app runs entirely in your browser. No analytics, no tracking pixels, no third-party advertising. Your data
+        stays on your device except where you explicitly choose to sync it. <strong>You are in control.</strong>
       </div>
     </div>
 
@@ -440,7 +570,7 @@
       const hash = window.location.hash;
       if (hash) {
         const el = document.querySelector(hash);
-        if (el) setTimeout(() => el.scrollIntoView({behavior:'smooth', block:'start'}), 150);
+        if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
       }
     });
 
@@ -449,32 +579,40 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.error(e)));
     }
   </script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
+  <!-- Global Sidebar Menu -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="global-sidebar" id="globalSidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">Dom Sub Hub</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+      <a href="scene-menu.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+      <a href="training-menu.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+      <a href="assessment-menu.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
+      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span>
+        Sir's Public Tasks</a>
+      <a href="bdsm-checklist.html" class="sidebar-link"><span
+          class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help &
+        Info</a>
+      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon"
+          style="color:var(--gold);">settings</span> Settings</a>
+    </div>
   </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
-</script>
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebarOverlay').classList.add('open');
+      document.getElementById('globalSidebar').classList.add('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebarOverlay').classList.remove('open');
+      document.getElementById('globalSidebar').classList.remove('open');
+    }
+  </script>
 </body>
+
 </html>
