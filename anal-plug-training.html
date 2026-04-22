@@ -313,7 +313,14 @@
             document.getElementById('stat-streak').textContent=state.streak;
             // Phases
             const pc=document.getElementById('phasesContainer');
-            if(!phases.length){pc.innerHTML='<div class="log-empty">Select your experience level in the Overview tab to begin.</div>';renderLog();return;}
+            if(!phases.length){
+                pc.innerHTML=`<div class="log-empty" style="padding:40px 20px">
+                    <div style="font-size:16px; margin-bottom:15px; color:var(--gold);">Training Not Started</div>
+                    <p style="margin-bottom:20px;">You must select your current experience level to generate your custom protocol.</p>
+                    <button class="reset-btn" style="border-color:var(--gold); color:var(--gold); display:inline-block; width:auto; padding:12px 24px;" onclick="showSection('overview', document.querySelectorAll('.nav-tab')[1])">Configure Training Plan</button>
+                </div>`;
+                renderLog();return;
+            }
             pc.innerHTML=phases.map((phase,i)=>{
                 const ul=isUnlocked(i),co=isCompleted(i),cu=i===getCurrent(),ad=allDone(phase.id);
                 let icon='🔒';if(co)icon='✅';else if(ul)icon=cu?'🔥':'⬜';
