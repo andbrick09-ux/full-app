@@ -16,10 +16,6 @@
   <link rel="stylesheet" href="styles.css"/>
     <style>
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{overflow-x:hidden;min-height:100vh}
-        .page-header{position:sticky;top:0;z-index:100;background:rgba(5,16,36,.92);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border-bottom:1px solid var(--border);padding:18px 20px 14px;text-align:center}
-        .back-link{display:inline-block;color:var(--gold-dim);text-decoration:none;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;transition:.3s;margin-bottom:8px}.back-link:hover{color:var(--gold)}
-        .page-title{font-family:'Great Vibes',cursive;font-size:32px;background:var(--luxury-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:0}
-        .page-subtitle{font-family:'Playfair Display',serif;color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:3px;margin-top:4px;opacity:.7}
         .progress-overview{display:flex;justify-content:center;gap:8px;padding:12px 20px;background:rgba(2,8,20,.6);border-bottom:1px solid rgba(212,175,55,.1)}
         .phase-dot{width:50px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);transition:.4s;cursor:pointer}
         .phase-dot.completed{background:var(--gold);box-shadow:0 0 8px rgba(212,175,55,.4)}.phase-dot.active{background:rgba(212,175,55,.5);animation:dp 2s ease-in-out infinite}
@@ -62,7 +58,7 @@
         .plug-visual{width:40px;height:60px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--midnight);flex-shrink:0}
         .plug-info{flex:1}.plug-size{font-size:13px;font-weight:600;color:#ddd;margin-bottom:2px}.plug-dims{font-size:10px;color:var(--gold);margin-bottom:4px}.plug-notes{font-size:11px;color:#888;line-height:1.4}
         /* Phase Cards */
-        .phase-card{background:var(--glass);border:1.5px solid var(--border);border-radius:20px;margin-bottom:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.4s}
+        .phase-card{background:var(--glass);border:1.5px solid var(--border);border-radius:20px;margin-bottom:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.4s;scroll-margin-top:100px}
         .phase-card.locked{opacity:.4;pointer-events:none;filter:grayscale(.5)}.phase-card.completed-card{border-color:rgba(76,175,80,.4)}
         .phase-header{display:flex;justify-content:space-between;align-items:center;padding:20px;cursor:pointer;transition:background .3s}.phase-header:hover{background:rgba(255,255,255,.02)}
         .phase-info{flex:1}.phase-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
@@ -340,7 +336,14 @@
 
         function toggleTask(pid,tid){
             const k=`${pid}_${tid}`;state.tasks[k]=!state.tasks[k];
-            if(state.tasks[k]){const p=getPhases().find(x=>x.id===pid),t=p.tasks.find(x=>x.id===tid);state.sessions++;updateStreak();addLog(p.badge,`Completed: ${t.name}`);}
+            if(state.tasks[k]){
+                const p=getPhases().find(x=>x.id===pid),t=p.tasks.find(x=>x.id===tid);
+                state.sessions++;
+                updateStreak();
+                addLog(p.badge,`Completed: ${t.name}`);
+            } else {
+                state.sessions = Math.max(0, state.sessions - 1);
+            }
             save();render();
         }
 
@@ -352,7 +355,11 @@
 
         function updateStreak(){const t=new Date().toDateString();if(state.lastDate){const d=Math.floor((new Date(t)-new Date(state.lastDate))/864e5);if(d===1)state.streak++;else if(d>1)state.streak=1;}else state.streak=1;state.lastDate=t;}
         function addLog(level,note){const n=new Date();state.log.unshift({level,note,date:`${n.getMonth()+1}/${n.getDate()} ${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`});save();}
-        function scrollTo(i){showSection('protocol',document.querySelector('.nav-tab'));setTimeout(()=>{const c=document.getElementById(`phase-card-${i}`);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},100);}
+        function scrollTo(i){
+            const tab = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.textContent.toLowerCase() === 'protocol');
+            showSection('protocol', tab || document.querySelector('.nav-tab'));
+            setTimeout(()=>{const c=document.getElementById(`phase-card-${i}`);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},100);
+        }
         function confirmReset(){if(confirm('Reset ALL plug training progress?')){localStorage.removeItem(SK);state=getDefault();render();}}
 
         render();
