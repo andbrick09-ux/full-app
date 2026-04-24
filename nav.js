@@ -119,9 +119,16 @@
     '<nav class="dsh-nav" id="dshNav">' + tabsHTML + '</nav>';
 
   /* ── 4. Inject into DOM ─────────────────────────────────── */
-  var container = document.createElement('div');
-  container.innerHTML = overlayHTML + sheetHTML + navHTML;
-  document.body.appendChild(container);
+  // Append each element directly to body — no wrapper div that could
+  // inherit styles or interfere with fixed positioning.
+  function appendHTML(html) {
+    var tmp = document.createElement('template');
+    tmp.innerHTML = html;
+    document.body.appendChild(tmp.content.firstElementChild);
+  }
+  appendHTML(overlayHTML);
+  appendHTML(sheetHTML);
+  appendHTML(navHTML);
 
   /* ── 5. Wire up More button & overlay ───────────────────── */
   var overlay  = document.getElementById('dshOverlay');
