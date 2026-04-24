@@ -1,787 +1,722 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#051024" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="description" content="Dom Sub Hub — A private protocol app for training, assessments, and scenes." />
-  <title>Dom Sub Hub</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap"
-    rel="stylesheet" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="apple-touch-icon" href="icon-512.png" />
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      min-height: 100dvh;
-      overflow-x: hidden;
-      position: relative;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#051024" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="Dom Sub Hub — A private protocol app for training, assessments, and scenes." />
+<title>Dom Sub Hub</title>
 
-    /* ── Ambient glow ── */
-    .glow-orb {
-      position: fixed;
-      width: 460px;
-      height: 460px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.07) 0%, transparent 70%);
-      top: -120px;
-      left: 50%;
-      transform: translateX(-50%);
-      pointer-events: none;
-      z-index: 0;
-      animation: orbFloat 8s ease-in-out infinite;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
 
-    @keyframes orbFloat {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(28px); }
-    }
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="icon-512.png" />
+<link rel="stylesheet" href="styles.css" />
 
-    /* ── Hero ── */
-    .hero {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: calc(48px + var(--safe-t)) 24px 20px;
-      animation: heroIn 0.55s ease both;
-    }
+<!-- NEW: bottom nav styles -->
+<link rel="stylesheet" href="nav.css" />
 
-    @keyframes heroIn {
-      from { opacity: 0; transform: translateY(-14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+<style>
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+}
 
-    .hero-eyebrow {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      color: var(--gold);
-      opacity: 0.55;
-      margin-bottom: 6px;
-    }
+/* ── Ambient glow ── */
+.glow-orb {
+  position: fixed;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.07) 0%, transparent 70%);
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(28px); }
+}
 
-    .hero-title {
-      font-family: 'Great Vibes', cursive;
-      font-size: clamp(44px, 13vw, 68px);
-      background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 40%, #D4AF37 70%, #c9a227 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 0;
-      line-height: 1.1;
-      animation: shimmer 4s ease-in-out infinite;
-    }
+/* ── Hero ── */
+.hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: calc(48px + var(--safe-t)) 24px 20px;
+  animation: heroIn 0.55s ease both;
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--gold);
+  opacity: 0.55;
+  margin-bottom: 6px;
+}
+.hero-title {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(44px, 13vw, 68px);
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 40%, #D4AF37 70%, #c9a227 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+  line-height: 1.1;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+.hero-tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: rgba(212, 175, 55, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 4px;
+}
 
-    @keyframes shimmer {
-      0%   { background-position: 0% center; }
-      50%  { background-position: 100% center; }
-      100% { background-position: 0% center; }
-    }
+/* ── Divider ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 24px 0;
+  animation: fadeUp 0.5s ease 0.05s both;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.2), transparent);
+}
+.divider-ornament {
+  color: var(--gold);
+  font-size: 13px;
+  opacity: 0.45;
+}
 
-    .hero-tagline {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 11px;
-      color: rgba(212, 175, 55, 0.5);
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-top: 4px;
-    }
+/* ── Greeting ── */
+.greeting-strip {
+  position: relative;
+  z-index: 1;
+  margin: 14px 20px 0;
+  background: rgba(212, 175, 55, 0.035);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: fadeUp 0.5s ease 0.1s both;
+}
+.greeting-icon { font-size: 24px; flex-shrink: 0; }
+.greeting-text { flex: 1; min-width: 0; }
+.greeting-line1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ddd;
+  margin-bottom: 2px;
+}
+.greeting-line2 {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.greeting-date {
+  font-family: 'Playfair Display', serif;
+  font-size: 11px;
+  color: var(--gold);
+  text-align: right;
+  flex-shrink: 0;
+  opacity: 0.65;
+  line-height: 1.5;
+}
 
-    /* ── Divider ── */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 14px 24px 0;
-      animation: fadeUp 0.5s ease 0.05s both;
-    }
+/* ── Stats strip ── */
+.stats-strip {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 20px 0;
+  animation: fadeUp 0.5s ease 0.15s both;
+}
+.stat-pill {
+  background: rgba(2, 8, 20, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.stat-pill-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-pill-lbl {
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #555;
+  margin-top: 4px;
+  font-weight: 600;
+}
 
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.2), transparent);
-    }
+/* ── Section heading ── */
+.section-heading {
+  position: relative;
+  z-index: 1;
+  margin: 22px 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeUp 0.5s ease 0.2s both;
+}
+.section-heading-text {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #444;
+}
+.section-heading-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+}
 
-    .divider-ornament {
-      color: var(--gold);
-      font-size: 13px;
-      opacity: 0.45;
-    }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-    /* ── Greeting ── */
-    .greeting-strip {
-      position: relative;
-      z-index: 1;
-      margin: 14px 20px 0;
-      background: rgba(212, 175, 55, 0.035);
-      border: 1px solid rgba(212, 175, 55, 0.1);
-      border-radius: 16px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      animation: fadeUp 0.5s ease 0.1s both;
-    }
+/* ── Menu groups ── */
+.menu-groups {
+  position: relative;
+  z-index: 1;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .greeting-icon  { font-size: 24px; flex-shrink: 0; }
-    .greeting-text  { flex: 1; min-width: 0; }
+/* ── Top-level row ── */
+.menu-row {
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(2, 8, 20, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s;
+  opacity: 0;
+  animation: cardIn 0.5s ease forwards;
+}
+.menu-row:nth-child(1)  { animation-delay: 0.10s; }
+.menu-row:nth-child(2)  { animation-delay: 0.17s; }
+.menu-row:nth-child(3)  { animation-delay: 0.24s; }
+.menu-row:nth-child(4)  { animation-delay: 0.31s; }
+.menu-row:nth-child(5)  { animation-delay: 0.38s; }
+.menu-row:nth-child(6)  { animation-delay: 0.45s; }
+.menu-row:nth-child(7)  { animation-delay: 0.52s; }
+.menu-row:nth-child(8)  { animation-delay: 0.59s; }
+.menu-row:nth-child(9)  { animation-delay: 0.66s; }
+.menu-row:nth-child(10) { animation-delay: 0.73s; }
+.menu-row.open { border-color: rgba(212, 175, 55, 0.28); }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-    .greeting-line1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: #ddd;
-      margin-bottom: 2px;
-    }
+/* ── Row header ── */
+.row-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #ccc;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.row-header:active { background: rgba(255, 255, 255, 0.02); }
+.row-header::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--luxury-gradient);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.menu-row.open .row-header::before { opacity: 1; }
 
-    .greeting-line2 {
-      font-size: 10px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-    }
+.row-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.row-label { flex: 1; min-width: 0; }
+.row-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ddd;
+  margin-bottom: 2px;
+}
+.row-desc {
+  font-size: 9.5px;
+  color: #555;
+  letter-spacing: 0.3px;
+  line-height: 1.35;
+}
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.row-badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.row-chevron {
+  font-size: 20px;
+  color: rgba(212, 175, 55, 0.2);
+  transition: transform 0.3s ease, color 0.3s;
+  flex-shrink: 0;
+}
+.menu-row.open .row-chevron {
+  transform: rotate(180deg);
+  color: var(--gold);
+}
+.row-arrow {
+  font-size: 18px;
+  color: rgba(212, 175, 55, 0.2);
+  transition: color 0.3s, transform 0.3s;
+  flex-shrink: 0;
+}
+a.row-header:hover .row-arrow {
+  color: var(--gold);
+  transform: translateX(3px);
+}
 
-    .greeting-date {
-      font-family: 'Playfair Display', serif;
-      font-size: 11px;
-      color: var(--gold);
-      text-align: right;
-      flex-shrink: 0;
-      opacity: 0.65;
-      line-height: 1.5;
-    }
+/* ── Sub-items ── */
+.sub-items {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  border-top: 1px solid transparent;
+}
+.menu-row.open .sub-items {
+  max-height: 600px;
+  border-top-color: rgba(212, 175, 55, 0.08);
+}
+.sub-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px 12px 24px;
+  text-decoration: none;
+  color: #aaa;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.sub-item:last-child { border-bottom: none; }
+.sub-item:active { background: rgba(212, 175, 55, 0.04); }
+.sub-item-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(212, 175, 55, 0.25);
+}
+.sub-item-emoji { font-size: 16px; flex-shrink: 0; }
+.sub-item-label {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: #bbb;
+}
+.sub-item-arrow {
+  font-size: 16px;
+  color: rgba(212, 175, 55, 0.15);
+  transition: color 0.2s, transform 0.2s;
+}
+.sub-item:active .sub-item-arrow {
+  color: var(--gold);
+  transform: translateX(2px);
+}
 
-    /* ── Stats strip ── */
-    .stats-strip {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin: 10px 20px 0;
-      animation: fadeUp 0.5s ease 0.15s both;
-    }
+/* ── Color themes ── */
+.t-gold   .row-icon-wrap { background: rgba(212, 175, 55,  0.1); }
+.t-blue   .row-icon-wrap { background: rgba(100, 181, 246, 0.1); }
+.t-purple .row-icon-wrap { background: rgba(186, 104, 200, 0.1); }
+.t-rose   .row-icon-wrap { background: rgba(244, 67,  54,  0.1); }
+.t-green  .row-icon-wrap { background: rgba(76,  175, 80,  0.1); }
+.t-gray   .row-icon-wrap { background: rgba(255, 255, 255, 0.05); }
+.t-amber  .row-icon-wrap { background: rgba(255, 193, 7,   0.1); }
+.t-teal   .row-icon-wrap { background: rgba(0,   184, 148, 0.1); }
 
-    .stat-pill {
-      background: rgba(2, 8, 20, 0.55);
-      border: 1px solid rgba(212, 175, 55, 0.1);
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-    }
+.t-gold   .row-badge { background: rgba(212, 175, 55,  0.1); color: var(--gold); }
+.t-blue   .row-badge { background: rgba(100, 181, 246, 0.1); color: #64B5F6; }
+.t-purple .row-badge { background: rgba(186, 104, 200, 0.1); color: #BA68C8; }
+.t-rose   .row-badge { background: rgba(244, 67,  54,  0.1); color: #F44336; }
+.t-green  .row-badge { background: rgba(76,  175, 80,  0.1); color: #4CAF50; }
+.t-gray   .row-badge { background: rgba(255, 255, 255, 0.07); color: #888; }
+.t-amber  .row-badge { background: rgba(255, 193, 7,   0.1); color: #FFC107; }
+.t-teal   .row-badge { background: rgba(0,   184, 148, 0.1); color: #00b894; }
 
-    .stat-pill-val {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--gold);
-      line-height: 1;
-    }
-
-    .stat-pill-lbl {
-      font-size: 7px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #555;
-      margin-top: 4px;
-      font-weight: 600;
-    }
-
-    /* ── Section heading ── */
-    .section-heading {
-      position: relative;
-      z-index: 1;
-      margin: 22px 20px 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: fadeUp 0.5s ease 0.2s both;
-    }
-
-    .section-heading-text {
-      font-size: 8px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: #444;
-    }
-
-    .section-heading-line {
-      flex: 1;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Menu groups ── */
-    .menu-groups {
-      position: relative;
-      z-index: 1;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    /* ── Top-level row ── */
-    .menu-row {
-      border-radius: 18px;
-      overflow: hidden;
-      background: rgba(2, 8, 20, 0.55);
-      border: 1px solid rgba(212, 175, 55, 0.12);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.3s;
-      opacity: 0;
-      animation: cardIn 0.5s ease forwards;
-    }
-
-    .menu-row:nth-child(1)  { animation-delay: 0.10s; }
-    .menu-row:nth-child(2)  { animation-delay: 0.17s; }
-    .menu-row:nth-child(3)  { animation-delay: 0.24s; }
-    .menu-row:nth-child(4)  { animation-delay: 0.31s; }
-    .menu-row:nth-child(5)  { animation-delay: 0.38s; }
-    .menu-row:nth-child(6)  { animation-delay: 0.45s; }
-    .menu-row:nth-child(7)  { animation-delay: 0.52s; }
-    .menu-row:nth-child(8)  { animation-delay: 0.59s; }
-    .menu-row:nth-child(9)  { animation-delay: 0.66s; }
-    .menu-row:nth-child(10) { animation-delay: 0.73s; }
-
-    .menu-row.open { border-color: rgba(212, 175, 55, 0.28); }
-
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Row header ── */
-    .row-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
-      cursor: pointer;
-      text-decoration: none;
-      color: #ccc;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .row-header:active { background: rgba(255, 255, 255, 0.02); }
-
-    .row-header::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--luxury-gradient);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .menu-row.open .row-header::before { opacity: 1; }
-
-    .row-icon-wrap {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-
-    .row-label  { flex: 1; min-width: 0; }
-
-    .row-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: #ddd;
-      margin-bottom: 2px;
-    }
-
-    .row-desc {
-      font-size: 9.5px;
-      color: #555;
-      letter-spacing: 0.3px;
-      line-height: 1.35;
-    }
-
-    .row-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .row-badge {
-      font-size: 8.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 3px 8px;
-      border-radius: 20px;
-    }
-
-    .row-chevron {
-      font-size: 20px;
-      color: rgba(212, 175, 55, 0.2);
-      transition: transform 0.3s ease, color 0.3s;
-      flex-shrink: 0;
-    }
-
-    .menu-row.open .row-chevron {
-      transform: rotate(180deg);
-      color: var(--gold);
-    }
-
-    .row-arrow {
-      font-size: 18px;
-      color: rgba(212, 175, 55, 0.2);
-      transition: color 0.3s, transform 0.3s;
-      flex-shrink: 0;
-    }
-
-    a.row-header:hover .row-arrow {
-      color: var(--gold);
-      transform: translateX(3px);
-    }
-
-    /* ── Sub-items ── */
-    .sub-items {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-      border-top: 1px solid transparent;
-    }
-
-    .menu-row.open .sub-items {
-      max-height: 600px;
-      border-top-color: rgba(212, 175, 55, 0.08);
-    }
-
-    .sub-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 18px 12px 24px;
-      text-decoration: none;
-      color: #aaa;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      transition: background 0.2s, color 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .sub-item:last-child   { border-bottom: none; }
-    .sub-item:active       { background: rgba(212, 175, 55, 0.04); }
-
-    .sub-item-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: rgba(212, 175, 55, 0.25);
-    }
-
-    .sub-item-emoji  { font-size: 16px; flex-shrink: 0; }
-
-    .sub-item-label {
-      flex: 1;
-      font-size: 12px;
-      font-weight: 500;
-      color: #bbb;
-    }
-
-    .sub-item-arrow {
-      font-size: 16px;
-      color: rgba(212, 175, 55, 0.15);
-      transition: color 0.2s, transform 0.2s;
-    }
-
-    .sub-item:active .sub-item-arrow {
-      color: var(--gold);
-      transform: translateX(2px);
-    }
-
-    /* ── Color themes ── */
-    .t-gold   .row-icon-wrap { background: rgba(212, 175, 55, 0.1); }
-    .t-blue   .row-icon-wrap { background: rgba(100, 181, 246, 0.1); }
-    .t-purple .row-icon-wrap { background: rgba(186, 104, 200, 0.1); }
-    .t-rose   .row-icon-wrap { background: rgba(244, 67, 54, 0.1); }
-    .t-green  .row-icon-wrap { background: rgba(76, 175, 80, 0.1); }
-    .t-gray   .row-icon-wrap { background: rgba(255, 255, 255, 0.05); }
-    .t-amber  .row-icon-wrap { background: rgba(255, 193, 7, 0.1); }
-    .t-teal   .row-icon-wrap { background: rgba(0, 184, 148, 0.1); }
-
-    .t-gold   .row-badge { background: rgba(212, 175, 55, 0.1);  color: var(--gold); }
-    .t-blue   .row-badge { background: rgba(100, 181, 246, 0.1); color: #64B5F6; }
-    .t-purple .row-badge { background: rgba(186, 104, 200, 0.1); color: #BA68C8; }
-    .t-rose   .row-badge { background: rgba(244, 67, 54, 0.1);   color: #F44336; }
-    .t-green  .row-badge { background: rgba(76, 175, 80, 0.1);   color: #4CAF50; }
-    .t-gray   .row-badge { background: rgba(255, 255, 255, 0.07);color: #888; }
-    .t-amber  .row-badge { background: rgba(255, 193, 7, 0.1);   color: #FFC107; }
-    .t-teal   .row-badge { background: rgba(0, 184, 148, 0.1);   color: #00b894; }
-
-    /* ── Footer ── */
-    .app-footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 28px 24px calc(32px + var(--safe-b));
-    }
-
-    .footer-ornament {
-      font-size: 16px;
-      color: var(--gold);
-      opacity: 0.2;
-      margin-bottom: 8px;
-    }
-
-    .footer-text {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 10px;
-      color: #333;
-      letter-spacing: 2px;
-    }
-  </style>
+/* ── Footer ── */
+.app-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 28px 24px calc(32px + var(--safe-b));
+}
+.footer-ornament {
+  font-size: 16px;
+  color: var(--gold);
+  opacity: 0.2;
+  margin-bottom: 8px;
+}
+.footer-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: #333;
+  letter-spacing: 2px;
+}
+</style>
 </head>
 
-<body>
+<!-- NEW: data-nav="home" tells nav.js which tab to highlight -->
+<body data-nav="home">
 
-  <div class="glow-orb"></div>
+<div class="glow-orb"></div>
 
-  <button class="back-btn floating-menu-btn" onclick="openSidebar()" aria-label="Menu">
-    <span class="material-symbols-rounded">menu</span>
-  </button>
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-eyebrow">Dom Sub Hub</div>
+  <h1 class="hero-title">Dom Sub Hub</h1>
+  <div class="hero-tagline">Devotion through discipline</div>
+</header>
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-eyebrow">Dom Sub Hub</div>
-    <h1 class="hero-title">Dom Sub Hub</h1>
-    <div class="hero-tagline">Devotion through discipline</div>
-  </header>
+<div class="divider">
+  <div class="divider-line"></div>
+  <span class="divider-ornament">❦</span>
+  <div class="divider-line"></div>
+</div>
 
-  <div class="divider">
-    <div class="divider-line"></div>
-    <span class="divider-ornament">❦</span>
-    <div class="divider-line"></div>
+<!-- Greeting -->
+<div class="greeting-strip">
+  <span class="greeting-icon" id="greetingIcon">🌙</span>
+  <div class="greeting-text">
+    <div class="greeting-line1" id="greetingLine">Welcome</div>
+    <div class="greeting-line2" id="greetingStatus">Your private sanctuary</div>
+  </div>
+  <div class="greeting-date" id="greetingDate"></div>
+</div>
+
+<!-- Stats -->
+<div class="stats-strip">
+  <div class="stat-pill">
+    <div class="stat-pill-val">5</div>
+    <div class="stat-pill-lbl">Trainings</div>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-pill-val">3</div>
+    <div class="stat-pill-lbl">Assessments</div>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-pill-val" id="statStreak">—</div>
+    <div class="stat-pill-lbl">Day Streak</div>
+  </div>
+</div>
+
+<div class="section-heading">
+  <span class="section-heading-text">Navigate</span>
+  <div class="section-heading-line"></div>
+</div>
+
+<!-- Menu -->
+<div class="menu-groups">
+
+  <!-- Scene Menu — direct link -->
+  <div class="menu-row t-gold">
+    <a href="scene-menu.html" class="row-header">
+      <div class="row-icon-wrap">🎭</div>
+      <div class="row-label">
+        <div class="row-title">Scene Menu</div>
+        <div class="row-desc">Set the guardrails for Sir to craft the perfect scene</div>
+      </div>
+      <span class="row-arrow material-symbols-rounded">chevron_right</span>
+    </a>
   </div>
 
-  
-  <!-- Stats -->
-  <div class="stats-strip">
-    <div class="stat-pill">
-      <div class="stat-pill-val">5</div>
-      <div class="stat-pill-lbl">Trainings</div>
+  <!-- Training — expandable -->
+  <div class="menu-row t-blue" id="row-training">
+    <div class="row-header" onclick="toggle('row-training')">
+      <div class="row-icon-wrap">🏋️</div>
+      <div class="row-label">
+        <div class="row-title">Training Programs</div>
+        <div class="row-desc">Structured conditioning protocols and progress tracking</div>
+      </div>
+      <span class="row-chevron material-symbols-rounded">expand_more</span>
     </div>
-    <div class="stat-pill">
-      <div class="stat-pill-val">3</div>
-      <div class="stat-pill-lbl">Assessments</div>
-    </div>
-    <div class="stat-pill">
-      <div class="stat-pill-val" id="statStreak">—</div>
-      <div class="stat-pill-lbl">Day Streak</div>
-    </div>
-  </div>
-
-  <div class="section-heading">
-    <span class="section-heading-text">Navigate</span>
-    <div class="section-heading-line"></div>
-  </div>
-
-  <!-- Menu -->
-  <div class="menu-groups">
-
-    <!-- Scene Menu — direct link -->
-    <div class="menu-row t-gold">
-      <a href="scene-menu.html" class="row-header">
-        <div class="row-icon-wrap">🎭</div>
-        <div class="row-label">
-          <div class="row-title">Scene Menu</div>
-          <div class="row-desc">Set the guardrails for Sir to craft the perfect scene</div>
-        </div>
-        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+    <div class="sub-items">
+      <a href="deepthroat-training.html" class="sub-item">
+        <span class="sub-item-emoji">👄</span>
+        <span class="sub-item-label">Deep Throat Training</span>
       </a>
-    </div>
-
-    <!-- Training — expandable -->
-    <div class="menu-row t-blue" id="row-training">
-      <div class="row-header" onclick="toggle('row-training')">
-        <div class="row-icon-wrap">🏋️</div>
-        <div class="row-label">
-          <div class="row-title">Training Programs</div>
-          <div class="row-desc">Structured conditioning protocols and progress tracking</div>
-        </div>
-        <span class="row-chevron material-symbols-rounded">expand_more</span>
-      </div>
-      <div class="sub-items">
-        <a href="deepthroat-training.html" class="sub-item">
-          <span class="sub-item-emoji">👄</span>
-          <span class="sub-item-label">Deep Throat Training</span>
-        </a>
-        <a href="anal-plug-training.html" class="sub-item">
-          <span class="sub-item-emoji">💎</span>
-          <span class="sub-item-label">Anal Plug Training</span>
-        </a>
-        <a href="kegel-training.html" class="sub-item">
-          <span class="sub-item-emoji">🔐</span>
-          <span class="sub-item-label">Kegel Training</span>
-        </a>
-        <a href="the-5-training.html" class="sub-item">
-          <span class="sub-item-emoji">🖐️</span>
-          <span class="sub-item-label">The "5" Training</span>
-        </a>
-        <a href="position-training.html" class="sub-item">
-          <span class="sub-item-emoji">🧎</span>
-          <span class="sub-item-label">Position Training</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Assessments — expandable -->
-    <div class="menu-row t-purple" id="row-assess">
-      <div class="row-header" onclick="toggle('row-assess')">
-        <div class="row-icon-wrap">📋</div>
-        <div class="row-label">
-          <div class="row-title">Assessments &amp; Ratings</div>
-          <div class="row-desc">Checklists, predicament ratings, and public play rating</div>
-        </div>
-        <span class="row-chevron material-symbols-rounded">expand_more</span>
-      </div>
-      <div class="sub-items">
-        <a href="sub-bdsm-checklist.html" class="sub-item">
-          <span class="sub-item-emoji">📖</span>
-          <span class="sub-item-label" id="bdsmChecklistLabel">Submissive's BDSM Checklist</span>
-        </a>
-        <a href="bdsm-checklist.html" class="sub-item">
-          <span class="sub-item-emoji">📖</span>
-          <span class="sub-item-label">Sir's BDSM Checklist</span>
-        </a>
-        <a href="predicament-bondage-menu.html" class="sub-item">
-          <span class="sub-item-emoji">🪢</span>
-          <span class="sub-item-label">Predicament Bondage Ideas Rating</span>
-        </a>
-        <a href="public-play-menu.html" class="sub-item">
-          <span class="sub-item-emoji">🍽️</span>
-          <span class="sub-item-label">Public Play Ideas Rating</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Public Tasks — direct link -->
-    <div class="menu-row t-rose">
-      <a href="public-game.html" class="row-header">
-        <div class="row-icon-wrap">🎲</div>
-        <div class="row-label">
-          <div class="row-title">Sir's Public Play Game</div>
-          <div class="row-desc">Interactive directives and discrete public play challenges</div>
-        </div>
-        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      <a href="anal-plug-training.html" class="sub-item">
+        <span class="sub-item-emoji">💎</span>
+        <span class="sub-item-label">Anal Plug Training</span>
       </a>
-    </div>
-
-    <!-- Toy Vault — direct link -->
-    <div class="menu-row t-teal">
-      <a href="toy-vault.html" class="row-header">
-        <div class="row-icon-wrap">🔒</div>
-        <div class="row-label">
-          <div class="row-title">Toy Vault</div>
-          <div class="row-desc">Full inventory of every toy, plug, impact tool, and bondage item — with ratings</div>
-        </div>
-        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      <a href="kegel-training.html" class="sub-item">
+        <span class="sub-item-emoji">🔐</span>
+        <span class="sub-item-label">Kegel Training</span>
       </a>
-    </div>
-
-    <!-- Notes — direct link -->
-    <div class="menu-row t-purple">
-      <a href="notes.html" class="row-header">
-        <div class="row-icon-wrap">📝</div>
-        <div class="row-label">
-          <div class="row-title">Notes</div>
-          <div class="row-desc">Fantasies, kinks, ideas, private thoughts — searchable and taggable</div>
-        </div>
-        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      <a href="the-5-training.html" class="sub-item">
+        <span class="sub-item-emoji">🖐️</span>
+        <span class="sub-item-label">The "5" Training</span>
       </a>
-    </div>
-
-    <!-- Calendar — direct link -->
-    <div class="menu-row t-blue">
-      <a href="calendar.html" class="row-header">
-        <div class="row-icon-wrap">📅</div>
-        <div class="row-label">
-          <div class="row-title">Calendar</div>
-          <div class="row-desc">Scene schedule, training deadlines, protocol check-ins &amp; upcoming tasks</div>
-        </div>
-        <span class="row-arrow material-symbols-rounded">chevron_right</span>
+      <a href="position-training.html" class="sub-item">
+        <span class="sub-item-emoji">🧎</span>
+        <span class="sub-item-label">Position Training</span>
       </a>
-    </div>
-
-    <!-- Profile & Settings — expandable -->
-    <div class="menu-row t-green" id="row-settings">
-      <div class="row-header" onclick="toggle('row-settings')">
-        <div class="row-icon-wrap">⚙️</div>
-        <div class="row-label">
-          <div class="row-title">Profile &amp; Settings</div>
-          <div class="row-desc">Cloud sync, compatibility data, and profile management</div>
-        </div>
-        <span class="row-chevron material-symbols-rounded">expand_more</span>
-      </div>
-      <div class="sub-items">
-        <a href="bdsm-checklist.html" class="sub-item">
-          <span class="sub-item-emoji">☁️</span>
-          <span class="sub-item-label">BDSM Compatibility Portal</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Help & Info — expandable -->
-    <div class="menu-row t-amber" id="row-help">
-      <div class="row-header" onclick="toggle('row-help')">
-        <div class="row-icon-wrap">❓</div>
-        <div class="row-label">
-          <div class="row-title">Help &amp; Info</div>
-          <div class="row-desc">Getting started, safety guidelines, and app information</div>
-        </div>
-        <span class="row-chevron material-symbols-rounded">expand_more</span>
-      </div>
-      <div class="sub-items">
-        <a href="help.html#getting-started" class="sub-item">
-          <span class="sub-item-emoji">🚀</span>
-          <span class="sub-item-label">Getting Started</span>
-        </a>
-        <a href="help.html#safety" class="sub-item">
-          <span class="sub-item-emoji">🛡️</span>
-          <span class="sub-item-label">Safety &amp; Safewords</span>
-        </a>
-        <a href="help.html#about" class="sub-item">
-          <span class="sub-item-emoji">ℹ️</span>
-          <span class="sub-item-label">About This App</span>
-        </a>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Footer -->
-  <footer class="app-footer">
-    <div class="footer-ornament">❦</div>
-    <div class="footer-text">Dom Sub Hub · Private &amp; Secure</div>
-  </footer>
-
-  <script>
-    // ── Accordion toggle ──
-    function toggle(id) {
-      const row = document.getElementById(id);
-      const isOpen = row.classList.contains('open');
-      document.querySelectorAll('.menu-row').forEach(r => r.classList.remove('open'));
-      if (!isOpen) row.classList.add('open');
-    }
-
-    // ── Greeting ──
-    (function () {
-      const h = new Date().getHours();
-      const icon   = document.getElementById('greetingIcon');
-      const line   = document.getElementById('greetingLine');
-      const status = document.getElementById('greetingStatus');
-      const dateEl = document.getElementById('greetingDate');
-
-      let subName = 'Becca';
-      try {
-        const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
-        if (s.subName) subName = s.subName;
-      } catch (e) {}
-
-      if      (h >= 5  && h < 12) { icon.textContent = '☀️'; line.textContent = `Good morning, ${subName}`;   status.textContent = 'Start the day with devotion'; }
-      else if (h >= 12 && h < 17) { icon.textContent = '🌤️'; line.textContent = `Good afternoon, ${subName}`; status.textContent = "Awaiting Sir's direction"; }
-      else if (h >= 17 && h < 21) { icon.textContent = '🌆'; line.textContent = `Good evening, ${subName}`;   status.textContent = 'Ready to serve Sir tonight'; }
-      else                         { icon.textContent = '🌙'; line.textContent = `Good night, ${subName}`;     status.textContent = 'Late night devotion'; }
-
-      const checklistLabel = document.getElementById('bdsmChecklistLabel');
-      if (checklistLabel) checklistLabel.textContent = `${subName}'s BDSM Checklist`;
-
-      const n = new Date();
-      const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      dateEl.innerHTML = `${days[n.getDay()]}<br>${months[n.getMonth()]} ${n.getDate()}`;
-    })();
-
-    // ── Streak ──
-    (function () {
-      const keys = ['sirender_kegel_training','sirender_5_training','sirender_plug_training','sirender_pos_training'];
-      let max = 0;
-      keys.forEach(k => {
-        try {
-          const s = localStorage.getItem(k);
-          if (s) { const d = JSON.parse(s); const v = d.streak || 0; if (v > max) max = v; }
-        } catch (e) {}
-      });
-      if (max > 0) document.getElementById('statStreak').textContent = max;
-    })();
-
-    // ── Scroll to anchor ──
-    (function () {
-      const hash = window.location.hash;
-      if (hash) { const el = document.querySelector(hash); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
-    })();
-
-    // ── Service Worker ──
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.error(e)));
-    }
-  </script>
-
-  <!-- Global Sidebar -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-  <div class="global-sidebar" id="globalSidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-brand">Dom Sub Hub</div>
-    </div>
-    <div class="sidebar-nav">
-      <a href="index.html"           class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-      <a href="scene-menu.html"      class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-      <a href="training-menu.html"   class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-      <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments &amp; Ratings</a>
-      <a href="public-game.html"     class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-      <a href="bdsm-checklist.html"  class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-      <a href="toy-vault.html"       class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">lock</span> Toy Vault</a>
-      <a href="notes.html"           class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">note</span> Notes</a>
-      <a href="calendar.html"        class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">calendar_month</span> Calendar</a>
-      <a href="help.html"            class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help &amp; Info</a>
-      <a href="settings.html"        class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
     </div>
   </div>
 
-  <script>
-    function openSidebar() {
-      document.getElementById('sidebarOverlay').classList.add('open');
-      document.getElementById('globalSidebar').classList.add('open');
-    }
-    function closeSidebar() {
-      document.getElementById('sidebarOverlay').classList.remove('open');
-      document.getElementById('globalSidebar').classList.remove('open');
-    }
-  </script>
+  <!-- Assessments — expandable -->
+  <div class="menu-row t-purple" id="row-assess">
+    <div class="row-header" onclick="toggle('row-assess')">
+      <div class="row-icon-wrap">📋</div>
+      <div class="row-label">
+        <div class="row-title">Assessments &amp; Ratings</div>
+        <div class="row-desc">Checklists, predicament ratings, and public play rating</div>
+      </div>
+      <span class="row-chevron material-symbols-rounded">expand_more</span>
+    </div>
+    <div class="sub-items">
+      <a href="sub-bdsm-checklist.html" class="sub-item">
+        <span class="sub-item-emoji">📖</span>
+        <span class="sub-item-label" id="bdsmChecklistLabel">Submissive's BDSM Checklist</span>
+      </a>
+      <a href="bdsm-checklist.html" class="sub-item">
+        <span class="sub-item-emoji">📖</span>
+        <span class="sub-item-label">Sir's BDSM Checklist</span>
+      </a>
+      <a href="predicament-bondage-menu.html" class="sub-item">
+        <span class="sub-item-emoji">🪢</span>
+        <span class="sub-item-label">Predicament Bondage Ideas Rating</span>
+      </a>
+      <a href="public-play-menu.html" class="sub-item">
+        <span class="sub-item-emoji">🍽️</span>
+        <span class="sub-item-label">Public Play Ideas Rating</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Public Tasks — direct link -->
+  <div class="menu-row t-rose">
+    <a href="public-game.html" class="row-header">
+      <div class="row-icon-wrap">🎲</div>
+      <div class="row-label">
+        <div class="row-title">Sir's Public Play Game</div>
+        <div class="row-desc">Interactive directives and discrete public play challenges</div>
+      </div>
+      <span class="row-arrow material-symbols-rounded">chevron_right</span>
+    </a>
+  </div>
+
+  <!-- Toy Vault — direct link -->
+  <div class="menu-row t-teal">
+    <a href="toy-vault.html" class="row-header">
+      <div class="row-icon-wrap">🔒</div>
+      <div class="row-label">
+        <div class="row-title">Toy Vault</div>
+        <div class="row-desc">Full inventory of every toy, plug, impact tool, and bondage item — with ratings</div>
+      </div>
+      <span class="row-arrow material-symbols-rounded">chevron_right</span>
+    </a>
+  </div>
+
+  <!-- Notes — direct link -->
+  <div class="menu-row t-purple">
+    <a href="notes.html" class="row-header">
+      <div class="row-icon-wrap">📝</div>
+      <div class="row-label">
+        <div class="row-title">Notes</div>
+        <div class="row-desc">Fantasies, kinks, ideas, private thoughts — searchable and taggable</div>
+      </div>
+      <span class="row-arrow material-symbols-rounded">chevron_right</span>
+    </a>
+  </div>
+
+  <!-- Calendar — direct link -->
+  <div class="menu-row t-blue">
+    <a href="calendar.html" class="row-header">
+      <div class="row-icon-wrap">📅</div>
+      <div class="row-label">
+        <div class="row-title">Calendar</div>
+        <div class="row-desc">Scene schedule, training deadlines, protocol check-ins &amp; upcoming tasks</div>
+      </div>
+      <span class="row-arrow material-symbols-rounded">chevron_right</span>
+    </a>
+  </div>
+
+  <!-- Profile & Settings — expandable -->
+  <div class="menu-row t-green" id="row-settings">
+    <div class="row-header" onclick="toggle('row-settings')">
+      <div class="row-icon-wrap">⚙️</div>
+      <div class="row-label">
+        <div class="row-title">Profile &amp; Settings</div>
+        <div class="row-desc">Cloud sync, compatibility data, and profile management</div>
+      </div>
+      <span class="row-chevron material-symbols-rounded">expand_more</span>
+    </div>
+    <div class="sub-items">
+      <a href="bdsm-checklist.html" class="sub-item">
+        <span class="sub-item-emoji">☁️</span>
+        <span class="sub-item-label">BDSM Compatibility Portal</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Help & Info — expandable -->
+  <div class="menu-row t-amber" id="row-help">
+    <div class="row-header" onclick="toggle('row-help')">
+      <div class="row-icon-wrap">❓</div>
+      <div class="row-label">
+        <div class="row-title">Help &amp; Info</div>
+        <div class="row-desc">Getting started, safety guidelines, and app information</div>
+      </div>
+      <span class="row-chevron material-symbols-rounded">expand_more</span>
+    </div>
+    <div class="sub-items">
+      <a href="help.html#getting-started" class="sub-item">
+        <span class="sub-item-emoji">🚀</span>
+        <span class="sub-item-label">Getting Started</span>
+      </a>
+      <a href="help.html#safety" class="sub-item">
+        <span class="sub-item-emoji">🛡️</span>
+        <span class="sub-item-label">Safety &amp; Safewords</span>
+      </a>
+      <a href="help.html#about" class="sub-item">
+        <span class="sub-item-emoji">ℹ️</span>
+        <span class="sub-item-label">About This App</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="footer-ornament">❦</div>
+  <div class="footer-text">Dom Sub Hub · Private &amp; Secure</div>
+</footer>
+
+<script>
+// ── Accordion toggle ──
+function toggle(id) {
+  const row = document.getElementById(id);
+  const isOpen = row.classList.contains('open');
+  document.querySelectorAll('.menu-row').forEach(r => r.classList.remove('open'));
+  if (!isOpen) row.classList.add('open');
+}
+
+// ── Greeting ──
+(function () {
+  const h = new Date().getHours();
+  const icon   = document.getElementById('greetingIcon');
+  const line   = document.getElementById('greetingLine');
+  const status = document.getElementById('greetingStatus');
+  const dateEl = document.getElementById('greetingDate');
+
+  let subName = 'Becca';
+  try {
+    const s = JSON.parse(localStorage.getItem('sp_settings') || '{}');
+    if (s.subName) subName = s.subName;
+  } catch (e) {}
+
+  if      (h >= 5  && h < 12) { icon.textContent = '☀️';  line.textContent = `Good morning, ${subName}`;   status.textContent = 'Start the day with devotion'; }
+  else if (h >= 12 && h < 17) { icon.textContent = '🌤️'; line.textContent = `Good afternoon, ${subName}`; status.textContent = "Awaiting Sir's direction"; }
+  else if (h >= 17 && h < 21) { icon.textContent = '🌆';  line.textContent = `Good evening, ${subName}`;   status.textContent = 'Ready to serve Sir tonight'; }
+  else                         { icon.textContent = '🌙';  line.textContent = `Good night, ${subName}`;     status.textContent = 'Late night devotion'; }
+
+  const checklistLabel = document.getElementById('bdsmChecklistLabel');
+  if (checklistLabel) checklistLabel.textContent = `${subName}'s BDSM Checklist`;
+
+  const n = new Date();
+  const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  dateEl.innerHTML = `${days[n.getDay()]}<br>${months[n.getMonth()]} ${n.getDate()}`;
+})();
+
+// ── Streak ──
+(function () {
+  const keys = ['sirender_kegel_training','sirender_5_training','sirender_plug_training','sirender_pos_training'];
+  let max = 0;
+  keys.forEach(k => {
+    try {
+      const s = localStorage.getItem(k);
+      if (s) { const d = JSON.parse(s); const v = d.streak || 0; if (v > max) max = v; }
+    } catch (e) {}
+  });
+  if (max > 0) document.getElementById('statStreak').textContent = max;
+})();
+
+// ── Scroll to anchor ──
+(function () {
+  const hash = window.location.hash;
+  if (hash) { const el = document.querySelector(hash); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
+})();
+
+// ── Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.error(e)));
+}
+</script>
+
+<!-- NEW: bottom nav — injects overlay, More sheet, and nav bar automatically -->
+<script src="nav.js"></script>
 
 </body>
 </html>
