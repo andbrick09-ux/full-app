@@ -3,744 +3,561 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>RUMPLE BEN TRACKER 🍃</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<title>RUMPLE BEN — MOST WANTED</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green:  #22ff99;
-  --red:    #ff4466;
-  --amber:  #ffcc44;
-  --blue:   #44aaff;
-  --bg:     #090909;
-  --card:   #131313;
-  --border: #1e1e1e;
-  --muted:  #333;
-  --pixel:  'Press Start 2P', monospace;
-  --mono:   'Space Mono', monospace;
+  --pink:   #ff2f8e;
+  --cyan:   #00f5ff;
+  --orange: #ff8c00;
+  --yellow: #ffe000;
+  --purple: #a020f0;
+  --bg:     #06060e;
+  --panel:  #0d0d1a;
+  --card:   #10101f;
+  --border: #1a1a33;
+  --muted:  #2a2a44;
+  --txt:    #e8e8ff;
+  --dim:    #4a4a6a;
+  --title:  'Bebas Neue', sans-serif;
+  --body:   'Barlow Condensed', sans-serif;
+  --mono:   'Share Tech Mono', monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:100vh;overflow-x:hidden;cursor:crosshair;}
+
+/* ── BACKGROUND ───────────────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 30% at 50% 100%,rgba(255,47,142,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 20% at 30% 100%,rgba(0,245,255,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 15% at 70% 100%,rgba(160,32,240,.08) 0%,transparent 60%),
+    linear-gradient(180deg,#06060e 0%,#08081a 40%,#0c0820 100%);
+}
+/* neon grid floor */
+.grid-floor{
+  position:fixed;bottom:0;left:0;right:0;height:45vh;
+  pointer-events:none;z-index:0;
+  background:
+    linear-gradient(rgba(255,47,142,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,245,255,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.4) 0%,transparent 100%);
+  mask-image:linear-gradient(to top,rgba(0,0,0,.4) 0%,transparent 100%);
+  transform:perspective(500px) rotateX(50deg);
+  transform-origin:bottom center;
+}
+/* scanlines */
+.scanlines{
+  position:fixed;inset:0;pointer-events:none;z-index:9000;
+  background:repeating-linear-gradient(to bottom,transparent 0px,transparent 2px,rgba(0,0,0,.05) 2px,rgba(0,0,0,.05) 4px);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── WANTED STARS ─────────────────────────────────────────── */
+.wanted-bar{position:fixed;top:14px;right:16px;z-index:8000;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.wanted-label{font-family:var(--mono);font-size:7px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;}
+.stars{display:flex;gap:4px;}
+.star{
+  width:18px;height:18px;
+  clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  background:var(--muted);transition:background .3s,filter .3s;
+}
+.star.active{background:var(--yellow);filter:drop-shadow(0 0 6px var(--yellow));}
 
-html { scroll-behavior: smooth; }
+/* ── PARTICLES ────────────────────────────────────────────── */
+.particle{position:fixed;pointer-events:none;animation:floatUp 3s ease-in forwards;z-index:8999;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg);}100%{opacity:0;transform:translateY(-300px) scale(.3) rotate(360deg);}}
 
-body {
-  background: var(--bg);
-  color: #fff;
-  font-family: var(--mono);
-  min-height: 100vh;
-  overflow-x: hidden;
+/* ── TOAST ────────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(140px);
+  background:var(--panel);border:1px solid var(--pink);border-left:4px solid var(--pink);
+  padding:12px 22px;font-family:var(--mono);font-size:11px;color:var(--pink);
+  z-index:9999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  text-align:center;line-height:1.6;
+  box-shadow:0 0 30px rgba(255,47,142,.25);
+  white-space:nowrap;letter-spacing:1px;text-transform:uppercase;
 }
+#toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── SCANLINES ─────────────────────────────────────────────── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9000;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px, transparent 3px,
-    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
-  );
+/* ── MODAL ────────────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(6,6,14,.92);backdrop-filter:blur(8px);
+  z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
 }
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--panel);border:1px solid var(--pink);border-top:3px solid var(--pink);
+  padding:32px 28px;max-width:500px;width:100%;
+  box-shadow:0 0 60px rgba(255,47,142,.2),inset 0 0 40px rgba(255,47,142,.03);
+  transform:scale(.9) translateY(20px);transition:transform .3s cubic-bezier(.34,1.3,.64,1);
+  max-height:90vh;overflow-y:auto;position:relative;
+}
+.modal-overlay.open .modal{transform:scale(1) translateY(0);}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;font-family:var(--mono);transition:color .2s;}
+.modal-close:hover{color:var(--pink);}
+.modal-title{font-family:var(--title);font-size:28px;color:var(--pink);letter-spacing:3px;margin-bottom:4px;text-shadow:0 0 20px rgba(255,47,142,.5);}
+.modal-sub{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.modal-pts-display{font-family:var(--mono);font-size:12px;color:var(--cyan);margin-top:8px;letter-spacing:2px;}
 
-/* ── FLOATING PARTICLES ─────────────────────────────────────── */
-.particle {
-  position: fixed;
-  pointer-events: none;
-  font-size: 20px;
-  animation: floatUp 3s ease-in forwards;
-  z-index: 8999;
-}
-@keyframes floatUp {
-  0%   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-  100% { opacity: 0; transform: translateY(-300px) scale(0.3) rotate(360deg); }
-}
+/* ── PAGE ─────────────────────────────────────────────────── */
+.page{max-width:1080px;margin:0 auto;padding:28px 18px 100px;position:relative;z-index:1;}
 
-/* ── TOAST ──────────────────────────────────────────────────── */
-#toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(120px);
-  background: var(--card);
-  border: 2px solid var(--green);
-  border-radius: 16px;
-  padding: 14px 24px;
-  font-family: var(--pixel);
-  font-size: 9px;
-  color: var(--green);
-  z-index: 9999;
-  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  text-align: center;
-  line-height: 1.8;
-  box-shadow: 0 0 30px rgba(34,255,153,0.3);
-  white-space: nowrap;
+/* ── HEADER ───────────────────────────────────────────────── */
+.site-header{
+  position:relative;text-align:center;padding:36px 24px 28px;margin-bottom:22px;
+  border:1px solid var(--border);border-top:3px solid var(--pink);
+  background:linear-gradient(180deg,rgba(255,47,142,.06) 0%,transparent 60%);
+  overflow:hidden;
 }
-#toast.show { transform: translateX(-50%) translateY(0); }
+.site-header::before,.site-header::after{
+  content:'';position:absolute;width:24px;height:24px;border-color:var(--cyan);border-style:solid;
+}
+.site-header::before{top:8px;left:8px;border-width:2px 0 0 2px;}
+.site-header::after{top:8px;right:8px;border-width:2px 2px 0 0;}
 
-/* ── MODAL ──────────────────────────────────────────────────── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.88);
-  backdrop-filter: blur(6px);
-  z-index: 9998;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s;
+.title-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:8px;color:var(--cyan);text-transform:uppercase;margin-bottom:2px;text-shadow:0 0 12px var(--cyan);}
+.header-h1{
+  font-family:var(--title);font-size:clamp(52px,10vw,96px);line-height:.9;letter-spacing:6px;
+  background:linear-gradient(135deg,var(--pink) 0%,var(--orange) 45%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(255,47,142,.4));
 }
-.modal-overlay.open {
-  opacity: 1;
-  pointer-events: all;
-}
-.modal {
-  background: var(--card);
-  border: 3px solid var(--green);
-  border-radius: 24px;
-  padding: 32px 28px;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 0 80px rgba(34,255,153,0.2);
-  transform: scale(0.85);
-  transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-overlay.open .modal { transform: scale(1); }
-.modal-close {
-  position: absolute;
-  top: 16px; right: 20px;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 22px;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.modal-close:hover { color: #fff; }
+.header-sub{font-family:var(--title);font-size:clamp(14px,3vw,22px);letter-spacing:12px;color:var(--cyan);text-shadow:0 0 14px rgba(0,245,255,.6);margin-bottom:4px;}
+.header-edition{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;}
+.header-meta{margin-top:18px;display:flex;justify-content:center;flex-wrap:wrap;gap:24px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:2px;}
+.live-badge{display:flex;align-items:center;gap:6px;}
+.live-dot{width:7px;height:7px;background:var(--pink);border-radius:50%;box-shadow:0 0 8px var(--pink);animation:livePulse 1.2s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.65);}}
+.accent-pink{color:var(--pink);}
+#lastUpdated{color:var(--cyan);}
 
-/* ── LAYOUT ─────────────────────────────────────────────────── */
-.page { max-width: 1080px; margin: 0 auto; padding: 32px 20px 80px; }
+/* header radar */
+.header-radar{
+  position:absolute;bottom:10px;right:14px;width:44px;height:44px;border-radius:50%;
+  border:1px solid rgba(0,245,255,.2);background:rgba(0,245,255,.04);
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;color:rgba(0,245,255,.3);font-family:var(--mono);overflow:hidden;
+}
+.radar-sweep{
+  position:absolute;width:50%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,245,255,.6));
+  top:50%;left:50%;transform-origin:left center;
+  animation:sweep 3s linear infinite;
+}
+@keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-/* ── HEADER ─────────────────────────────────────────────────── */
-.site-header {
-  background: #0f0f0f;
-  border: 3px solid var(--green);
-  border-radius: 22px;
-  padding: 32px 28px 24px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 28px;
-  box-shadow: 0 0 60px rgba(34,255,153,0.12), inset 0 0 80px rgba(34,255,153,0.02);
+/* ── POINTS BANNER ────────────────────────────────────────── */
+.points-banner{
+  background:var(--card);border:1px solid var(--border);border-left:3px solid var(--yellow);
+  padding:18px 22px;margin-bottom:22px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  position:relative;overflow:hidden;
 }
-.site-header::before {
-  content: '🥃';
-  position: absolute;
-  right: -15px; top: -20px;
-  font-size: 160px;
-  opacity: 0.04;
-  pointer-events: none;
-  line-height: 1;
+.points-banner::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(255,224,0,.04) 0%,transparent 50%);pointer-events:none;
 }
-.header-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-}
-.header-leaf { font-size: 36px; }
-.header-h1 {
-  font-family: var(--pixel);
-  font-size: clamp(18px, 4vw, 38px);
-  color: var(--green);
-  letter-spacing: 3px;
-  text-shadow: 0 0 20px rgba(34,255,153,0.8), 0 0 50px rgba(34,255,153,0.3);
-}
-.header-sub {
-  font-family: var(--pixel);
-  font-size: clamp(7px, 1.5vw, 12px);
-  color: var(--green);
-  letter-spacing: 8px;
-  opacity: 0.75;
-  margin-bottom: 3px;
-}
-.header-edition {
-  font-size: 8px;
-  color: #333;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-.header-meta {
-  margin-top: 16px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  font-size: 8px;
-  color: #333;
-  letter-spacing: 1.5px;
-}
-.live-badge {
-  display: flex; align-items: center; gap: 6px;
-}
-.live-dot {
-  width: 7px; height: 7px;
-  background: var(--green);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--green);
-  animation: livePulse 1.4s ease-in-out infinite;
-}
-@keyframes livePulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(0.7); }
-}
-.accent { color: var(--green); }
-#lastUpdated { color: var(--green); }
+.points-left{display:flex;align-items:center;gap:16px;}
+.points-icon{font-size:32px;}
+.points-label{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;}
+.points-value{font-family:var(--title);font-size:clamp(28px,5vw,42px);color:var(--yellow);text-shadow:0 0 20px rgba(255,224,0,.6);line-height:1;letter-spacing:2px;}
+.points-suffix{font-size:14px;opacity:.5;margin-left:4px;}
+.points-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 
-/* ── POINTS BANNER ──────────────────────────────────────────── */
-.points-banner {
-  background: linear-gradient(135deg, #0f1a12 0%, #0a1208 100%);
-  border: 2px solid var(--green);
-  border-radius: 18px;
-  padding: 20px 24px;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  box-shadow: 0 0 40px rgba(34,255,153,0.1);
+.btn-redeem{
+  font-family:var(--title);font-size:16px;letter-spacing:2px;
+  background:var(--pink);color:#fff;border:none;padding:10px 22px;cursor:pointer;
+  transition:all .15s;box-shadow:0 0 20px rgba(255,47,142,.4),3px 3px 0 rgba(0,0,0,.4);
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
 }
-.points-left { display: flex; align-items: center; gap: 16px; }
-.points-icon { font-size: 36px; }
-.points-label {
-  font-family: var(--pixel);
-  font-size: 8px;
-  color: #555;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 4px;
+.btn-redeem:hover{box-shadow:0 0 35px rgba(255,47,142,.65),3px 3px 0 rgba(0,0,0,.4);transform:translateY(-2px);}
+.btn-log{
+  font-family:var(--title);font-size:16px;letter-spacing:2px;
+  background:transparent;color:var(--cyan);border:1px solid var(--cyan);
+  padding:10px 18px;cursor:pointer;transition:all .15s;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
 }
-.points-value {
-  font-family: var(--pixel);
-  font-size: clamp(24px, 5vw, 36px);
-  color: var(--green);
-  text-shadow: 0 0 20px rgba(34,255,153,0.7);
-  line-height: 1;
-}
-.points-suffix { font-size: 12px; opacity: 0.6; margin-left: 4px; }
-.points-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn-log:hover{background:rgba(0,245,255,.1);}
 
-.btn-redeem {
-  font-family: var(--pixel);
-  font-size: 8px;
-  letter-spacing: 1px;
-  background: var(--green);
-  color: #000;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.15s;
-  box-shadow: 0 0 20px rgba(34,255,153,0.35);
+/* ── SECTION LABEL ────────────────────────────────────────── */
+.section-label{
+  font-family:var(--title);font-size:22px;letter-spacing:5px;
+  color:var(--cyan);text-shadow:0 0 12px rgba(0,245,255,.5);
+  margin-bottom:14px;display:flex;align-items:center;gap:12px;
 }
-.btn-redeem:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(34,255,153,0.55); }
-.btn-redeem:active { transform: scale(0.96); }
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,245,255,.4),transparent);}
 
-.btn-log {
-  font-family: var(--pixel);
-  font-size: 8px;
-  letter-spacing: 1px;
-  background: transparent;
-  color: #555;
-  border: 2px solid #222;
-  border-radius: 12px;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: all 0.15s;
+/* ── WHEEL SECTION ────────────────────────────────────────── */
+.wheel-section{
+  background:var(--card);border:1px solid var(--border);border-top:3px solid var(--orange);
+  padding:28px 24px 32px;margin-bottom:22px;position:relative;overflow:hidden;text-align:center;
 }
-.btn-log:hover { border-color: #444; color: #888; }
+.wheel-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,140,0,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.wheel-section-title{font-family:var(--title);font-size:clamp(20px,4vw,30px);color:var(--orange);letter-spacing:4px;margin-bottom:4px;text-shadow:0 0 20px rgba(255,140,0,.5);}
+.wheel-section-sub{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;}
+.wheel-wrap{position:relative;display:inline-block;margin-bottom:24px;}
+.wheel-pointer{
+  position:absolute;top:50%;right:-22px;transform:translateY(-50%);
+  width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;
+  border-right:34px solid var(--orange);filter:drop-shadow(0 0 10px rgba(255,140,0,.9));z-index:10;
+}
+#wheelCanvas{
+  border-radius:50%;
+  box-shadow:0 0 0 4px #0d0d1a,0 0 0 6px rgba(255,140,0,.3),0 0 60px rgba(255,140,0,.15),0 0 120px rgba(255,47,142,.08);
+  display:block;cursor:pointer;
+}
+#wheelCanvas.spinning{cursor:not-allowed;}
+.spin-btn{
+  font-family:var(--title);font-size:20px;letter-spacing:4px;
+  background:linear-gradient(135deg,#d44000,var(--orange));color:#fff;border:none;
+  padding:14px 40px;cursor:pointer;transition:all .18s;
+  box-shadow:0 0 30px rgba(255,140,0,.4),3px 3px 0 rgba(0,0,0,.5);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  display:inline-flex;align-items:center;gap:10px;
+}
+.spin-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 0 50px rgba(255,140,0,.6),3px 3px 0 rgba(0,0,0,.5);}
+.spin-btn:active:not(:disabled){transform:scale(.97);}
+.spin-btn:disabled{opacity:.35;cursor:not-allowed;}
+.spin-count{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:12px;}
+.spin-count span{color:var(--orange);}
 
-/* ── STAT CARDS ─────────────────────────────────────────────── */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-bottom: 28px;
+/* ── STAT CARDS ───────────────────────────────────────────── */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px;}
+@media(max-width:700px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  padding:22px 18px;position:relative;overflow:hidden;
+  transition:border-color .25s,box-shadow .25s;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
 }
-@media (max-width: 700px) {
-  .cards-grid { grid-template-columns: 1fr; gap: 14px; }
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ca,var(--pink));}
+.stat-card.card-noshow{--ca:var(--pink);}
+.stat-card.card-puke{--ca:var(--orange);}
+.stat-card.card-irish{--ca:var(--cyan);}
+.stat-card:hover{border-color:var(--ca,var(--pink));}
+
+@media(max-width:700px){
+  .stat-card{padding:16px 14px;}
+  .card-inner{display:flex;align-items:center;gap:12px;}
+  .card-emoji{font-size:36px!important;margin-bottom:0!important;flex-shrink:0;}
+  .card-middle{flex:1;text-align:left;}
+  .card-counter-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .card-title{font-size:16px!important;}
+  .card-sub{font-size:9px!important;margin-bottom:0!important;}
+  .counter{font-size:48px!important;margin:0!important;}
 }
 
-.stat-card {
-  background: var(--card);
-  border: 2px solid var(--green);
-  border-radius: 20px;
-  padding: 28px 20px 22px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(34,255,153,0.08);
-  transition: box-shadow 0.3s, transform 0.3s;
+.card-emoji{font-size:44px;display:block;margin-bottom:10px;filter:drop-shadow(0 0 8px rgba(255,255,255,.2));}
+.card-title{font-family:var(--title);font-size:20px;letter-spacing:2px;color:#fff;margin-bottom:2px;}
+.card-sub{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.pts-badge{
+  display:inline-block;border:1px solid var(--ca,var(--pink));color:var(--ca,var(--pink));
+  padding:2px 8px;font-family:var(--mono);font-size:8px;letter-spacing:1px;margin-bottom:14px;
 }
-.stat-card:hover {
-  box-shadow: 0 0 50px rgba(34,255,153,0.18);
-  transform: translateY(-3px);
-}
-.stat-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(34,255,153,0.03) 0%, transparent 55%);
-  pointer-events: none;
-}
+.counter{font-family:var(--title);font-size:72px;line-height:1;margin-bottom:16px;transition:transform .12s;}
+.counter.pop{transform:scale(1.2);}
+.c-pink  {color:var(--pink);  text-shadow:0 0 25px rgba(255,47,142,.8), 0 0 60px rgba(255,47,142,.3);}
+.c-orange{color:var(--orange);text-shadow:0 0 25px rgba(255,140,0,.8),  0 0 60px rgba(255,140,0,.3);}
+.c-cyan  {color:var(--cyan);  text-shadow:0 0 25px rgba(0,245,255,.8),  0 0 60px rgba(0,245,255,.3);}
 
-/* mobile: horizontal card layout */
-@media (max-width: 700px) {
-  .stat-card { padding: 18px 16px; }
-  .card-inner { display: flex; align-items: center; gap: 14px; text-align: left; }
-  .card-emoji { margin-bottom: 0 !important; font-size: 40px !important; flex-shrink: 0; }
-  .card-middle { flex: 1; }
-  .card-counter-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .card-title { font-size: 9px !important; }
-  .card-sub   { font-size: 7px !important; margin-bottom: 0 !important; }
-  .counter    { font-size: 48px !important; margin: 0 !important; }
-  .card-btns  { margin-top: 0 !important; }
+.card-btns{display:flex;justify-content:center;gap:10px;}
+.cbtn{
+  width:46px;height:46px;border:1px solid var(--border);
+  font-size:20px;font-weight:700;cursor:pointer;transition:all .12s;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);background:#0a0a18;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
 }
+.cbtn:active{transform:scale(.9);}
+.cbtn.minus{color:var(--dim);}
+.cbtn.minus:hover{border-color:var(--pink);color:var(--pink);}
+.cbtn.plus{background:var(--ca,var(--pink));border-color:var(--ca,var(--pink));color:#fff;box-shadow:0 0 16px rgba(255,47,142,.4);}
+.cbtn.plus:hover{filter:brightness(1.2);}
 
-.card-emoji {
-  font-size: 50px;
-  display: block;
-  margin-bottom: 12px;
+/* ── ACTION ROW ───────────────────────────────────────────── */
+.action-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:28px;}
+.abtn{
+  font-family:var(--title);font-size:16px;letter-spacing:2px;padding:12px 22px;cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;gap:6px;border:1px solid transparent;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
 }
-.card-title {
-  font-family: var(--pixel);
-  font-size: 10px;
-  color: #fff;
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-  line-height: 1.6;
-}
-.card-sub {
-  font-size: 7px;
-  color: var(--green);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  opacity: 0.65;
-  margin-bottom: 16px;
-}
-.pts-badge {
-  display: inline-block;
-  background: rgba(34,255,153,0.1);
-  border: 1px solid rgba(34,255,153,0.3);
-  border-radius: 20px;
-  padding: 3px 10px;
-  font-size: 7px;
-  color: var(--green);
-  letter-spacing: 1px;
-  margin-bottom: 16px;
-}
+.abtn:active{transform:scale(.97);}
+.abtn.danger {background:rgba(255,47,142,.15);color:var(--pink);  border-color:var(--pink); }
+.abtn.outline{background:rgba(0,245,255,.06); color:var(--cyan);  border-color:var(--cyan); }
+.abtn.muted  {background:#0d0d1a;             color:var(--dim);   border-color:var(--border);}
+.abtn.danger:hover {background:rgba(255,47,142,.25);}
+.abtn.outline:hover{background:rgba(0,245,255,.12);}
+.abtn.muted:hover  {border-color:var(--muted);color:var(--txt);}
 
-.counter {
-  font-family: var(--pixel);
-  font-size: 64px;
-  line-height: 1;
-  margin-bottom: 20px;
-  transition: transform 0.15s;
-}
-.counter.pop { transform: scale(1.25); }
-.c-red   { color: var(--red);   text-shadow: 0 0 25px rgba(255,68,102,0.7),  0 0 50px rgba(255,68,102,0.25); }
-.c-amber { color: var(--amber); text-shadow: 0 0 25px rgba(255,204,68,0.7), 0 0 50px rgba(255,204,68,0.25); }
-.c-green { color: var(--green); text-shadow: 0 0 25px rgba(34,255,153,0.7), 0 0 50px rgba(34,255,153,0.25); }
+/* ── FOOTER ───────────────────────────────────────────────── */
+.site-footer{text-align:center;font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;line-height:2.2;}
+.footer-line{color:var(--pink);}
 
-.card-btns {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 4px;
+/* ── REWARDS ──────────────────────────────────────────────── */
+.reward-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+@media(max-width:420px){.reward-grid{grid-template-columns:1fr;}}
+.reward-card{
+  background:#080818;border:1px solid var(--border);border-top:2px solid var(--pink);
+  padding:14px 12px;cursor:pointer;transition:all .18s;position:relative;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
 }
-.cbtn {
-  width: 48px; height: 48px;
-  border-radius: 12px;
-  border: none;
-  font-size: 20px;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.12s;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono);
-}
-.cbtn:active { transform: scale(0.9); }
-.cbtn.minus {
-  background: #111;
-  border: 2px solid #222;
-  color: #444;
-}
-.cbtn.minus:hover { border-color: var(--red); color: var(--red); }
-.cbtn.plus {
-  background: var(--green);
-  color: #000;
-  box-shadow: 0 0 18px rgba(34,255,153,0.4);
-}
-.cbtn.plus:hover {
-  box-shadow: 0 0 28px rgba(34,255,153,0.65);
-  transform: scale(1.06);
-}
+.reward-card:hover{border-color:var(--pink);box-shadow:0 0 20px rgba(255,47,142,.15);transform:translateY(-2px);}
+.reward-card.locked{opacity:.35;cursor:not-allowed;}
+.reward-card.locked:hover{transform:none;box-shadow:none;}
+.reward-card.redeemed{opacity:.4;border-top-color:var(--muted);}
+.reward-emoji{font-size:26px;margin-bottom:6px;}
+.reward-name{font-family:var(--title);font-size:14px;letter-spacing:1px;color:#fff;margin-bottom:3px;}
+.reward-desc{font-family:var(--mono);font-size:7px;color:var(--dim);line-height:1.6;}
+.reward-cost{margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--yellow);letter-spacing:1px;}
+.reward-badge{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:6px;padding:2px 6px;letter-spacing:1px;}
+.badge-ok  {background:rgba(0,245,255,.1);  color:var(--cyan);  border:1px solid rgba(0,245,255,.3);}
+.badge-rare{background:rgba(160,32,240,.15); color:#cc66ff;      border:1px solid rgba(160,32,240,.4);}
+.badge-epic{background:rgba(255,224,0,.12);  color:var(--yellow);border:1px solid rgba(255,224,0,.3);}
 
-/* ── ACTION ROW ─────────────────────────────────────────────── */
-.action-row {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 32px;
+/* ── CONFIRM ──────────────────────────────────────────────── */
+.confirm-emoji{font-size:58px;text-align:center;margin-bottom:12px;}
+.confirm-title{font-family:var(--title);font-size:22px;letter-spacing:2px;color:#fff;text-align:center;margin-bottom:8px;line-height:1.4;}
+.confirm-desc{font-family:var(--mono);font-size:8px;color:var(--dim);text-align:center;line-height:1.8;margin-bottom:16px;}
+.confirm-cost{font-family:var(--title);font-size:18px;color:var(--yellow);text-align:center;margin-bottom:20px;letter-spacing:2px;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-btns button{
+  flex:1;font-family:var(--title);font-size:16px;letter-spacing:2px;padding:13px;border:1px solid;cursor:pointer;transition:all .15s;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
 }
-.abtn {
-  font-family: var(--pixel);
-  font-size: 7px;
-  letter-spacing: 1px;
-  padding: 14px 20px;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex; align-items: center; gap: 7px;
-  border: 2px solid transparent;
-}
-.abtn:active { transform: scale(0.96); }
-.abtn.danger  { background: rgba(127,29,29,0.5); color: var(--red);   border-color: var(--red);   box-shadow: 0 0 16px rgba(255,68,102,0.15); }
-.abtn.outline { background: transparent;          color: var(--green); border-color: var(--green); box-shadow: 0 0 16px rgba(34,255,153,0.1); }
-.abtn.muted   { background: #111;                 color: #444;         border-color: #222; }
-.abtn:hover.danger  { background: rgba(127,29,29,0.8); }
-.abtn:hover.outline { background: rgba(34,255,153,0.08); }
-.abtn:hover.muted   { border-color: #333; color: #666; }
+.confirm-yes{background:var(--pink);color:#fff;border-color:var(--pink);}
+.confirm-no {background:transparent;color:var(--dim);border-color:var(--border);}
+.confirm-yes:hover{box-shadow:0 0 20px rgba(255,47,142,.4);}
+.confirm-no:hover {border-color:var(--muted);color:var(--txt);}
 
-/* ── LOG ────────────────────────────────────────────────────── */
-.log-section {
-  background: var(--card);
-  border: 2px solid #1a1a1a;
-  border-radius: 18px;
-  padding: 22px;
-  display: none;
-  margin-bottom: 28px;
+/* ── RECEIPT ──────────────────────────────────────────────── */
+.receipt{
+  background:#050510;border:1px dashed var(--border);padding:18px;margin:14px 0;
+  font-family:var(--mono);font-size:8px;color:var(--dim);line-height:2.2;text-align:center;
 }
-.log-section.visible { display: block; }
-.log-header {
-  font-family: var(--pixel);
-  font-size: 9px;
-  color: #444;
-  letter-spacing: 2px;
-  margin-bottom: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.log-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
-.log-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: #0f0f0f;
-  border-radius: 10px;
-  font-size: 8px;
-  color: #555;
-  animation: logSlide 0.3s ease;
-}
-@keyframes logSlide {
-  from { opacity: 0; transform: translateX(-12px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-.log-icon { font-size: 14px; }
-.log-pts   { margin-left: auto; color: var(--green); font-family: var(--pixel); font-size: 7px; }
-.log-empty { text-align: center; padding: 20px; font-size: 8px; color: #2a2a2a; font-family: var(--pixel); }
+.receipt-header{font-family:var(--title);font-size:16px;color:var(--pink);margin-bottom:6px;letter-spacing:3px;}
+.receipt-item{display:flex;justify-content:space-between;}
+.receipt-total{border-top:1px dashed var(--border);margin-top:8px;padding-top:8px;font-family:var(--title);font-size:14px;color:var(--yellow);letter-spacing:2px;}
+.receipt-fine{margin-top:10px;font-size:7px;color:#2a2a44;line-height:1.8;}
 
-/* ── FOOTER ─────────────────────────────────────────────────── */
-.site-footer {
-  text-align: center;
-  font-size: 7px;
-  color: #222;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  line-height: 2;
+/* ── LOG ──────────────────────────────────────────────────── */
+.log-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+.log-item{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;background:#080818;
+  border-left:2px solid var(--border);font-family:var(--mono);font-size:8px;color:var(--dim);
+  animation:logSlide .3s ease;
 }
+@keyframes logSlide{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:translateX(0);}}
+.log-icon{font-size:14px;}
+.log-pts{margin-left:auto;color:var(--cyan);font-size:9px;}
+.log-empty{text-align:center;padding:24px;font-family:var(--title);font-size:16px;color:var(--muted);letter-spacing:3px;}
 
-/* ── REWARDS MODAL ──────────────────────────────────────────── */
-.reward-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 16px;
+/* ── WHEEL RESULT ─────────────────────────────────────────── */
+#wheelResultModal .modal{border-color:var(--orange);border-top-color:var(--orange);box-shadow:0 0 80px rgba(255,140,0,.25),0 0 150px rgba(255,47,142,.1);}
+.result-crown{font-size:64px;text-align:center;margin-bottom:10px;animation:crownBounce .5s cubic-bezier(.34,1.6,.64,1);}
+@keyframes crownBounce{0%{transform:scale(0) rotate(-15deg);}100%{transform:scale(1) rotate(0deg);}}
+.result-headline{
+  font-family:var(--title);font-size:clamp(18px,4vw,26px);letter-spacing:3px;
+  background:linear-gradient(90deg,var(--orange),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-align:center;margin-bottom:10px;
 }
-@media (max-width: 420px) { .reward-grid { grid-template-columns: 1fr; } }
+.result-flavor{font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center;line-height:1.9;margin-bottom:22px;}
+.result-close-btn{
+  display:block;width:100%;font-family:var(--title);font-size:18px;letter-spacing:3px;
+  background:linear-gradient(135deg,#d44000,var(--orange));color:#fff;border:none;
+  padding:14px;cursor:pointer;transition:all .15s;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+}
+.result-close-btn:hover{filter:brightness(1.15);}
 
-.reward-card {
-  background: #0f0f0f;
-  border: 2px solid #1e1e1e;
-  border-radius: 14px;
-  padding: 14px 12px;
-  cursor: pointer;
-  transition: all 0.18s;
-  position: relative;
-}
-.reward-card:hover { border-color: var(--green); transform: translateY(-2px); }
-.reward-card.locked { opacity: 0.4; cursor: not-allowed; }
-.reward-card.locked:hover { transform: none; border-color: #1e1e1e; }
-.reward-card.redeemed { border-color: #333; opacity: 0.5; }
-
-.reward-emoji  { font-size: 28px; margin-bottom: 6px; }
-.reward-name   { font-family: var(--pixel); font-size: 7px; color: #fff; margin-bottom: 4px; line-height: 1.5; }
-.reward-desc   { font-size: 7px; color: #444; line-height: 1.5; }
-.reward-cost   { margin-top: 8px; font-family: var(--pixel); font-size: 8px; color: var(--amber); }
-.reward-badge  {
-  position: absolute;
-  top: 8px; right: 8px;
-  font-size: 6px;
-  font-family: var(--pixel);
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-.badge-rare  { background: rgba(68,170,255,0.2); color: var(--blue);  border: 1px solid var(--blue); }
-.badge-epic  { background: rgba(255,204,68,0.2); color: var(--amber); border: 1px solid var(--amber); }
-.badge-ok    { background: rgba(34,255,153,0.1); color: var(--green); border: 1px solid rgba(34,255,153,0.3); }
-
-.modal-title {
-  font-family: var(--pixel);
-  font-size: 13px;
-  color: var(--green);
-  margin-bottom: 4px;
-  letter-spacing: 1px;
-}
-.modal-sub {
-  font-size: 8px;
-  color: #444;
-  margin-bottom: 2px;
-  letter-spacing: 1px;
-}
-.modal-pts-display {
-  font-family: var(--pixel);
-  font-size: 11px;
-  color: var(--amber);
-  margin-top: 8px;
-}
-
-/* ── CONFIRM MODAL ──────────────────────────────────────────── */
-.confirm-emoji { font-size: 60px; text-align: center; margin-bottom: 12px; }
-.confirm-title {
-  font-family: var(--pixel);
-  font-size: 11px;
-  color: #fff;
-  margin-bottom: 10px;
-  line-height: 1.8;
-  text-align: center;
-}
-.confirm-desc {
-  font-size: 8px;
-  color: #555;
-  text-align: center;
-  line-height: 1.8;
-  margin-bottom: 20px;
-}
-.confirm-cost {
-  font-family: var(--pixel);
-  font-size: 10px;
-  color: var(--amber);
-  text-align: center;
-  margin-bottom: 20px;
-}
-.confirm-btns {
-  display: flex;
-  gap: 10px;
-}
-.confirm-btns button {
-  flex: 1;
-  font-family: var(--pixel);
-  font-size: 8px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.15s;
-}
-.confirm-yes  { background: var(--green); color: #000; }
-.confirm-no   { background: transparent; color: #555; border-color: #222; }
-.confirm-yes:hover { box-shadow: 0 0 20px rgba(34,255,153,0.4); }
-.confirm-no:hover  { border-color: #444; color: #888; }
-
-/* ── RECEIPT MODAL ──────────────────────────────────────────── */
-.receipt {
-  background: #0a0a0a;
-  border: 1px dashed #333;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 16px 0;
-  font-family: var(--mono);
-  font-size: 8px;
-  color: #555;
-  line-height: 2;
-  text-align: center;
-}
-.receipt-header { font-family: var(--pixel); font-size: 9px; color: var(--green); margin-bottom: 8px; }
-.receipt-item   { display: flex; justify-content: space-between; }
-.receipt-total  { border-top: 1px dashed #222; margin-top: 8px; padding-top: 8px; font-family: var(--pixel); font-size: 9px; color: var(--amber); }
-.receipt-fine   { margin-top: 12px; font-size: 7px; color: #333; font-style: italic; line-height: 1.8; }
-
-/* ── scrollbar ──────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+/* ── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--muted);}
 </style>
 </head>
 <body>
 
-<!-- ── TOAST ─────────────────────────────────────────────────── -->
+<div class="grid-floor"></div>
+<div class="scanlines"></div>
+
+<!-- WANTED LEVEL -->
+<div class="wanted-bar">
+  <div class="wanted-label">WANTED</div>
+  <div class="stars">
+    <div class="star" id="s1"></div>
+    <div class="star" id="s2"></div>
+    <div class="star" id="s3"></div>
+    <div class="star" id="s4"></div>
+    <div class="star" id="s5"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
-<!-- ── REWARDS MODAL ─────────────────────────────────────────── -->
+<!-- REWARDS MODAL -->
 <div class="modal-overlay" id="rewardsModal">
-  <div class="modal" style="position:relative;">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal('rewardsModal')">✕</button>
-    <div class="modal-title">🎰 BEN'S SHAME STORE</div>
-    <div class="modal-sub">Spend your hard-earned disgrace points</div>
-    <div class="modal-pts-display">YOUR BALANCE: <span id="rewardPtsDisplay">0</span> PTS 🍃</div>
+    <div class="modal-title">💰 BEN'S BOUNTY STORE</div>
+    <div class="modal-sub">Spend your criminal proceeds</div>
+    <div class="modal-pts-display">BALANCE: <span id="rewardPtsDisplay">0</span> PTS</div>
     <div class="reward-grid" id="rewardGrid"></div>
   </div>
 </div>
 
-<!-- ── CONFIRM MODAL ─────────────────────────────────────────── -->
+<!-- CONFIRM MODAL -->
 <div class="modal-overlay" id="confirmModal">
-  <div class="modal" style="position:relative; text-align:center;">
+  <div class="modal" style="text-align:center;">
     <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
     <div class="confirm-emoji" id="confirmEmoji">🎁</div>
-    <div class="confirm-title" id="confirmTitle">Redeem this reward?</div>
+    <div class="confirm-title" id="confirmTitle">Redeem this?</div>
     <div class="confirm-desc" id="confirmDesc"></div>
     <div class="confirm-cost" id="confirmCost"></div>
     <div class="confirm-btns">
-      <button class="confirm-no"  onclick="closeModal('confirmModal')">NOPE</button>
-      <button class="confirm-yes" onclick="executeRedeem()">REDEEM IT 🍃</button>
+      <button class="confirm-no" onclick="closeModal('confirmModal')">ABORT</button>
+      <button class="confirm-yes" onclick="executeRedeem()">COLLECT 🔫</button>
     </div>
   </div>
 </div>
 
-<!-- ── RECEIPT MODAL ─────────────────────────────────────────── -->
+<!-- RECEIPT MODAL -->
 <div class="modal-overlay" id="receiptModal">
-  <div class="modal" style="position:relative;">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal('receiptModal')">✕</button>
-    <div class="modal-title" style="text-align:center;">✅ REDEEMED!</div>
+    <div class="modal-title" style="text-align:center;">✅ LOOT SECURED</div>
     <div class="receipt" id="receiptContent"></div>
-    <div style="text-align:center; margin-top:12px;">
-      <button class="abtn outline" style="margin:auto;" onclick="closeModal('receiptModal')">CLOSE &amp; COLLECT</button>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="abtn outline" onclick="closeModal('receiptModal')">CLOSE &amp; BOUNCE</button>
     </div>
   </div>
 </div>
 
-<!-- ── LOG MODAL ─────────────────────────────────────────────── -->
+<!-- WHEEL RESULT MODAL -->
+<div class="modal-overlay" id="wheelResultModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('wheelResultModal')">✕</button>
+    <div class="result-crown" id="resultCrown">🎯</div>
+    <div class="result-headline" id="resultHeadline">INTEL ACQUIRED</div>
+    <div class="result-flavor" id="resultFlavor"></div>
+    <button class="result-close-btn" onclick="closeModal('wheelResultModal')">10-4. COPY THAT. 🚔</button>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
 <div class="modal-overlay" id="logModal">
-  <div class="modal" style="position:relative;">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal('logModal')">✕</button>
-    <div class="modal-title">📜 SHAME HISTORY</div>
-    <div class="modal-sub" style="margin-bottom:14px;">Every crime on record</div>
+    <div class="modal-title">📡 RAP SHEET</div>
+    <div class="modal-sub" style="margin-bottom:14px;">Ben's full criminal record</div>
     <div class="log-list" id="modalLogList"></div>
   </div>
 </div>
 
-<!-- ── PAGE ───────────────────────────────────────────────────── -->
+<!-- PAGE -->
 <div class="page">
 
-  <!-- HEADER -->
   <header class="site-header">
-    <div class="header-title-row">
-      <span class="header-leaf">🍃</span>
-      <h1 class="header-h1">RUMPLE BEN</h1>
-      <span class="header-leaf">🍃</span>
-    </div>
+    <div class="title-eyebrow">⚠ MOST WANTED ⚠</div>
+    <h1 class="header-h1">RUMPLE BEN</h1>
     <div class="header-sub">HALL OF SHAME</div>
-    <div class="header-edition">Peppermint Schnapps Edition &nbsp;•&nbsp; Ben's Greatest Hits</div>
+    <div class="header-edition">VICE CITY EDITION &nbsp;•&nbsp; CINCINNATI CHAPTER &nbsp;•&nbsp; PEPPERMINT CARTEL</div>
     <div class="header-meta">
-      <div>LAST UPDATED: <span id="lastUpdated">—</span></div>
-      <div class="live-badge"><div class="live-dot"></div> LIVE IN CINCINNATI</div>
+      <div>LAST SEEN: <span id="lastUpdated">—</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span class="accent-pink">ACTIVE THREAT</span></div>
     </div>
+    <div class="header-radar"><div class="radar-sweep"></div>🎯</div>
   </header>
 
-  <!-- POINTS BANNER -->
   <div class="points-banner">
     <div class="points-left">
-      <div class="points-icon">🏆</div>
+      <div class="points-icon">💰</div>
       <div>
-        <div class="points-label">Group Points</div>
+        <div class="points-label">Crime Points</div>
         <div class="points-value" id="totalPoints">0<span class="points-suffix"> PTS</span></div>
       </div>
     </div>
     <div class="points-right">
-      <button class="btn-log" onclick="openLogModal()">📜 LOG</button>
-      <button class="btn-redeem" onclick="openRewardsModal()">🎰 REDEEM SHAME</button>
+      <button class="btn-log" onclick="openLogModal()">📡 RAP SHEET</button>
+      <button class="btn-redeem" onclick="openRewardsModal()">💰 CLAIM BOUNTY</button>
     </div>
   </div>
 
-  <!-- STAT CARDS -->
+  <div class="section-label">🎰 WHEEL OF SNITCHES</div>
+  <div class="wheel-section">
+    <div class="wheel-section-title">SPIN TO WIN — SOMEONE GETS EXPOSED</div>
+    <div class="wheel-section-sub">No lawyer. No takebacks. God save whoever it lands on.</div>
+    <div class="wheel-wrap">
+      <canvas id="wheelCanvas" width="320" height="320"></canvas>
+      <div class="wheel-pointer"></div>
+    </div>
+    <br>
+    <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎰 &nbsp;SPIN THE WHEEL</button>
+    <div class="spin-count">TOTAL EXPOSURES: <span id="spinCount">0</span></div>
+  </div>
+
+  <div class="section-label">☠ BEN'S CRIME STATS</div>
   <div class="cards-grid">
 
-    <!-- NO SHOWS -->
-    <div class="stat-card">
+    <div class="stat-card card-noshow">
       <div class="card-inner">
         <span class="card-emoji">👻</span>
         <div class="card-middle">
           <div class="card-title">NO SHOWS</div>
-          <div class="card-sub">ghosted the group</div>
+          <div class="card-sub">AWOL from the mission</div>
           <div class="pts-badge">+50 PTS EACH</div>
         </div>
         <div class="card-counter-wrap">
-          <div class="counter c-red" id="noShowCount">0</div>
+          <div class="counter c-pink" id="noShowCount">0</div>
           <div class="card-btns">
-            <button class="cbtn minus" onclick="decrement('noShow')" title="Undo">–</button>
-            <button class="cbtn plus"  onclick="increment('noShow')" title="Log it">＋</button>
+            <button class="cbtn minus" onclick="decrement('noShow')">–</button>
+            <button class="cbtn plus"  onclick="increment('noShow')">＋</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PUKES -->
-    <div class="stat-card">
+    <div class="stat-card card-puke">
       <div class="card-inner">
         <span class="card-emoji">🤮</span>
         <div class="card-middle">
           <div class="card-title">PUKES</div>
-          <div class="card-sub">blamed the schnapps</div>
+          <div class="card-sub">Rumple took him out</div>
           <div class="pts-badge">+100 PTS EACH</div>
         </div>
         <div class="card-counter-wrap">
-          <div class="counter c-amber" id="pukeCount">0</div>
+          <div class="counter c-orange" id="pukeCount">0</div>
           <div class="card-btns">
-            <button class="cbtn minus" onclick="decrement('puke')" title="Undo">–</button>
-            <button class="cbtn plus"  onclick="increment('puke')" title="Log it">＋</button>
+            <button class="cbtn minus" onclick="decrement('puke')">–</button>
+            <button class="cbtn plus"  onclick="increment('puke')">＋</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- IRISH GOODBYES -->
-    <div class="stat-card">
+    <div class="stat-card card-irish">
       <div class="card-inner">
         <span class="card-emoji">🏃‍♂️</span>
         <div class="card-middle">
-          <div class="card-title">IRISH GOODBYES</div>
-          <div class="card-sub">vanished without a word</div>
+          <div class="card-title">IRISH GBYEs</div>
+          <div class="card-sub">Ghost protocol activated</div>
           <div class="pts-badge">+75 PTS EACH</div>
         </div>
         <div class="card-counter-wrap">
-          <div class="counter c-green" id="irishCount">0</div>
+          <div class="counter c-cyan" id="irishCount">0</div>
           <div class="card-btns">
-            <button class="cbtn minus" onclick="decrement('irish')" title="Undo">–</button>
-            <button class="cbtn plus"  onclick="increment('irish')" title="Log it">＋</button>
+            <button class="cbtn minus" onclick="decrement('irish')">–</button>
+            <button class="cbtn plus"  onclick="increment('irish')">＋</button>
           </div>
         </div>
       </div>
@@ -748,433 +565,409 @@ body::after {
 
   </div>
 
-  <!-- ACTIONS -->
   <div class="action-row">
-    <button class="abtn danger"  onclick="resetAll()">🗑️ RESET ALL</button>
-    <button class="abtn outline" onclick="exportData()">📤 EXPORT LOG</button>
-    <button class="abtn muted"   onclick="openLogModal()">📜 VIEW HISTORY</button>
+    <button class="abtn danger"  onclick="resetAll()">💥 WIPE RECORD</button>
+    <button class="abtn outline" onclick="exportData()">📤 EXPORT DOSSIER</button>
+    <button class="abtn muted"   onclick="openLogModal()">📡 VIEW RAP SHEET</button>
   </div>
 
-  <!-- FOOTER -->
   <footer class="site-footer">
-    RUMPLE MINZE APPROVED &nbsp;•&nbsp; DATA SAVED LOCALLY &nbsp;•&nbsp; CINCINNATI EDITION<br>
-    BEN OWES YOU EVERYTHING
+    <div class="footer-line">★ RUMPLE MINZE APPROVED — VICE CITY EDITION ★</div>
+    DATA PERSISTS IN YOUR BROWSER &nbsp;•&nbsp; CINCINNATI VICE DIVISION<br>
+    BEN IS CONSIDERED ARMED WITH SCHNAPPS AND EXTREMELY FLAKY
   </footer>
 
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════════════════
-const POINTS = { noShow: 50, puke: 100, irish: 75 };
+// ═══════════════════════════════════════════════════
+const POINTS = { noShow:50, puke:100, irish:75 };
 const EMOJIS = {
-  noShow: ['👻','🫥','💨','🕳️','📵'],
-  puke:   ['🤮','🤢','🍃💦','🚽','💀'],
-  irish:  ['🏃','👟','💨','🫢','🌬️'],
+  noShow:['👻','🚔','🚨','💨','📵'],
+  puke:  ['🤮','🥃','💀','🚽','☠️'],
+  irish: ['🏃','🔫','💨','🚗','👟'],
 };
 const TOASTS = {
-  noShow: [
-    '+50 PTS — Ghost status achieved. Ben would be proud.',
-    '+50 PTS — Wow. He really said "I\'ll be there" huh.',
-    '+50 PTS — Somewhere Ben is blaming traffic.',
-    '+50 PTS — Another one for the hall of fame.',
-    '+50 PTS — Classic Ben energy.',
+  noShow:[
+    '🚨 +50 PTS — AWOL CONFIRMED. BEN IS IN THE WIND.',
+    '🚨 +50 PTS — 10-40: SUSPECT FAILED TO APPEAR.',
+    '🚨 +50 PTS — GHOSTED AGAIN. CLASSIC PERP BEHAVIOR.',
+    '🚨 +50 PTS — APB ISSUED. BEN IS NOT IN CUSTODY.',
+    '🚨 +50 PTS — DISPATCH, WE LOST HIM AGAIN.',
   ],
-  puke:   [
-    '+100 PTS — The Rumple claims another victim.',
-    '+100 PTS — Totally worth it. No regrets.',
-    '+100 PTS — "Just one more" they said.',
-    '+100 PTS — Power move, honestly.',
-    '+100 PTS — The schnapps always wins.',
+  puke:[
+    '💀 +100 PTS — SUSPECT DOWN. RUMPLE WINS AGAIN.',
+    '💀 +100 PTS — THE SCHNAPPS DREW FIRST BLOOD.',
+    '💀 +100 PTS — OFFICER, HE SAID "JUST ONE MORE."',
+    '💀 +100 PTS — CRIME SCENE: BATHROOM, 3RD FLOOR.',
+    '💀 +100 PTS — CAUSE OF DEATH: PEPPERMINT HUBRIS.',
   ],
-  irish:  [
-    '+75 PTS — And he\'s gone. Like tears in the rain.',
-    '+75 PTS — You blinked and Ben evaporated.',
-    '+75 PTS — Speedrun any%: leaving without saying bye.',
-    '+75 PTS — Did he even pay his tab??',
-    '+75 PTS — A true Cincinnati disappearing act.',
+  irish:[
+    '🔫 +75 PTS — GHOST PROTOCOL. HE\'S GONE.',
+    '🔫 +75 PTS — SUSPECT EXECUTED A CLEAN EXFIL.',
+    '🔫 +75 PTS — DID HE EVEN SETTLE THE BILL?',
+    '🔫 +75 PTS — LAST SEEN: NOT HERE. CLASSIC BEN.',
+    '🔫 +75 PTS — POOF. LIKE HE WAS NEVER THERE.',
   ],
 };
 
-let state = { noShow: 0, puke: 0, irish: 0, points: 0, log: [], redeemed: [] };
+let state = { noShow:0, puke:0, irish:0, points:0, log:[], redeemed:[], spinCount:0 };
 let pendingReward = null;
 
-// ── REWARDS ─────────────────────────────────────────────────────
 const REWARDS = [
-  {
-    id: 'shot',
-    emoji: '🥃',
-    name: 'FREE RUMPLE SHOT',
-    desc: 'Ben buys you a Rumple Minze. He must watch you enjoy it.',
-    cost: 100,
-    badge: 'ok',
-    badgeLabel: 'STARTER',
-    funnyLine: 'Ben is contractually obligated to buy you a shot of the good stuff. He must stand there and watch.',
-  },
-  {
-    id: 'apology',
-    emoji: '📝',
-    name: 'WRITTEN APOLOGY',
-    desc: 'Ben writes you a formal, handwritten apology letter. Must use cursive.',
-    cost: 150,
-    badge: 'ok',
-    badgeLabel: 'PETTY',
-    funnyLine: 'Ben must write an apology letter by hand. In cursive. With a pen. Like a human being.',
-  },
-  {
-    id: 'dinner',
-    emoji: '🍕',
-    name: 'BEN PAYS FOR PIZZA',
-    desc: 'Ben covers the next group pizza order. No complaining about toppings.',
-    cost: 200,
-    badge: 'ok',
-    badgeLabel: 'SOLID',
-    funnyLine: 'Activate this and Ben is picking up the next pizza tab. He has forfeited his topping opinions.',
-  },
-  {
-    id: 'uber',
-    emoji: '🚕',
-    name: 'FREE UBER HOME',
-    desc: 'Ben Venmos you $25 for a ride. No questions asked.',
-    cost: 250,
-    badge: 'rare',
-    badgeLabel: 'RARE',
-    funnyLine: 'Ben Venmos you $25 for a ride. This is non-negotiable. No questions asked. No guilt trips.',
-  },
-  {
-    id: 'dd',
-    emoji: '🚗',
-    name: 'DESIGNATED DRIVER',
-    desc: 'Ben drives you home next time out. He must play your playlist.',
-    cost: 300,
-    badge: 'rare',
-    badgeLabel: 'RARE',
-    funnyLine: 'Ben is your personal chauffeur for the next night out. He drives. You control the aux. Non-negotiable.',
-  },
-  {
-    id: 'tab',
-    emoji: '🍺',
-    name: 'BEN COVERS YOUR TAB',
-    desc: 'Ben pays your full bar tab for one night. Up to $40.',
-    cost: 350,
-    badge: 'rare',
-    badgeLabel: 'RARE',
-    funnyLine: 'Ben covers your bar tab for one night. Cap is $40. Order accordingly.',
-  },
-  {
-    id: 'roast',
-    emoji: '🎤',
-    name: 'ROAST BEN NIGHT',
-    desc: 'Entire group is entitled to one 10-minute group roast of Ben. He must smile.',
-    cost: 400,
-    badge: 'epic',
-    badgeLabel: 'EPIC',
-    funnyLine: 'The whole group gets 10 minutes to roast Ben. He must sit still. He must smile. He may not defend himself.',
-  },
-  {
-    id: 'tshirt',
-    emoji: '👕',
-    name: 'CUSTOM SHAME SHIRT',
-    desc: 'Ben buys & wears a custom shirt with his worst stat printed on it. One full night out.',
-    cost: 500,
-    badge: 'epic',
-    badgeLabel: 'EPIC',
-    funnyLine: 'Ben purchases a custom shirt bearing his most embarrassing stat and wears it for an entire night out. No jacket.',
-  },
-  {
-    id: 'trophy',
-    emoji: '🏆',
-    name: 'THE GOLDEN RUMPLE AWARD',
-    desc: 'Ben buys everyone a round AND gives a speech acknowledging his crimes.',
-    cost: 750,
-    badge: 'epic',
-    badgeLabel: 'LEGENDARY',
-    funnyLine: 'Ben buys a round for everyone AND delivers a 2-minute speech acknowledging his transgressions. Must be sincere.',
-  },
+  { id:'shot',    emoji:'🥃', name:'FREE RUMPLE SHOT',      desc:'Ben buys you a shot and watches you enjoy every sip.',             cost:100, badge:'ok',   badgeLabel:'STARTER',   funnyLine:'Ben funds the shot. Eye contact required.' },
+  { id:'apology', emoji:'📝', name:'WRITTEN APOLOGY',        desc:'Formal, handwritten, cursive apology. No typing allowed.',         cost:150, badge:'ok',   badgeLabel:'PETTY',     funnyLine:'Pen. Paper. Cursive. Ben does not get to type this.' },
+  { id:'dinner',  emoji:'🍕', name:'BEN FUNDS PIZZA',        desc:'Ben covers the next group pizza. No topping opinions.',            cost:200, badge:'ok',   badgeLabel:'SOLID',     funnyLine:'Ben pays. Ben shuts up about pineapple. Those are the terms.' },
+  { id:'uber',    emoji:'🚕', name:'FREE GETAWAY CAR',       desc:'Ben Venmos $25 for a ride. No guilt. No questions.',              cost:250, badge:'rare', badgeLabel:'RARE',      funnyLine:'$25 to your Venmo. Zero attitude. Binding agreement.' },
+  { id:'dd',      emoji:'🚗', name:'CHAUFFEUR SERVICE',      desc:'Ben drives you home. You control the aux. Full authority.',        cost:300, badge:'rare', badgeLabel:'RARE',      funnyLine:'Ben drives. You DJ. He smiles. There is no negotiation.' },
+  { id:'tab',     emoji:'🍺', name:'BEN COVERS THE TAB',     desc:'Ben pays your bar tab for one night. Cap: $40.',                  cost:350, badge:'rare', badgeLabel:'RARE',      funnyLine:'One night. Full tab. $40 ceiling. Plan accordingly.' },
+  { id:'roast',   emoji:'🎤', name:'PUBLIC ROAST NIGHT',     desc:'10 minutes. Whole group roasts Ben. He smiles. No defense.',      cost:400, badge:'epic', badgeLabel:'EPIC',      funnyLine:'He sits. We speak. He may not respond. House rules.' },
+  { id:'tshirt',  emoji:'👕', name:'CUSTOM SHAME SHIRT',     desc:'Ben wears a shirt with his worst stat. Full night. No jacket.',   cost:500, badge:'epic', badgeLabel:'EPIC',      funnyLine:'Printed. Worn. In public. No hoodie. Non-negotiable.' },
+  { id:'trophy',  emoji:'🏆', name:'THE GOLDEN RUMPLE',      desc:'Ben buys a round AND delivers a 2-min confessional speech.',      cost:750, badge:'epic', badgeLabel:'LEGENDARY', funnyLine:'He buys the round. He gives the speech. Group judges sincerity.' },
 ];
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // STORAGE
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function save() {
   localStorage.setItem('rumpleBen_v2', JSON.stringify(state));
   document.getElementById('lastUpdated').textContent =
-    new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
 }
-
 function load() {
   const raw = localStorage.getItem('rumpleBen_v2');
-  if (raw) {
-    try { state = { ...state, ...JSON.parse(raw) }; } catch(e) {}
-  }
+  if (raw) { try { state = {...state,...JSON.parse(raw)}; } catch(e){} }
   render();
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // RENDER
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function render() {
   document.getElementById('noShowCount').textContent = state.noShow;
   document.getElementById('pukeCount').textContent   = state.puke;
   document.getElementById('irishCount').textContent  = state.irish;
   document.getElementById('totalPoints').innerHTML   =
-    state.points.toLocaleString() + '<span class="points-suffix"> PTS</span>';
+    state.points.toLocaleString()+'<span class="points-suffix"> PTS</span>';
   document.getElementById('rewardPtsDisplay').textContent = state.points.toLocaleString();
   document.getElementById('lastUpdated').textContent =
-    new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  // wanted stars
+  const total = state.noShow + state.puke + state.irish;
+  const stars = total===0 ? 0 : Math.min(5, Math.floor(total/2)+1);
+  for (let i=1;i<=5;i++) document.getElementById('s'+i).classList.toggle('active',i<=stars);
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // COUNTERS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function increment(type) {
   state[type]++;
-  const pts = POINTS[type];
-  state.points += pts;
-  const ts = new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
-  const labels = { noShow:'No Show', puke:'Puke', irish:'Irish Goodbye' };
-  state.log.unshift({ type, pts, ts, label: labels[type] });
-  if (state.log.length > 100) state.log.pop();
-  save();
-  render();
-  popCounter(type + 'Count');
+  state.points += POINTS[type];
+  const ts = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  state.log.unshift({type, pts:POINTS[type], ts, label:{noShow:'No Show',puke:'Puke',irish:'Irish Goodbye'}[type]});
+  if (state.log.length>100) state.log.pop();
+  save(); render();
+  popCounter(type+'Count');
   spawnParticles(type);
   showToast(pickRandom(TOASTS[type]));
 }
-
 function decrement(type) {
-  if (state[type] <= 0) return;
+  if (state[type]<=0) return;
   state[type]--;
-  const pts = POINTS[type];
-  state.points = Math.max(0, state.points - pts);
-  state.log.unshift({ type, pts: -pts, ts: new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), label: 'UNDO', undo: true });
-  save();
-  render();
-  popCounter(type + 'Count');
+  state.points = Math.max(0,state.points-POINTS[type]);
+  state.log.unshift({type, pts:-POINTS[type], ts:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), label:'UNDO', undo:true});
+  save(); render();
+  popCounter(type+'Count');
 }
-
 function popCounter(id) {
-  const el = document.getElementById(id);
-  el.classList.remove('pop');
-  void el.offsetWidth;
-  el.classList.add('pop');
-  setTimeout(() => el.classList.remove('pop'), 200);
+  const el=document.getElementById(id);
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+  setTimeout(()=>el.classList.remove('pop'),200);
 }
+function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
-function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // PARTICLES
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function spawnParticles(type) {
-  const emojis = EMOJIS[type];
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.textContent = pickRandom(emojis);
-      p.style.left = (20 + Math.random() * 60) + 'vw';
-      p.style.bottom = (10 + Math.random() * 20) + 'vh';
-      p.style.animationDuration = (2 + Math.random()) + 's';
+  const emojis=EMOJIS[type];
+  for (let i=0;i<6;i++) {
+    setTimeout(()=>{
+      const p=document.createElement('div');
+      p.className='particle';
+      p.textContent=pickRandom(emojis);
+      p.style.left=(15+Math.random()*70)+'vw';
+      p.style.bottom=(8+Math.random()*25)+'vh';
+      p.style.fontSize=(14+Math.random()*14)+'px';
+      p.style.animationDuration=(2+Math.random())+'s';
       document.body.appendChild(p);
-      setTimeout(() => p.remove(), 3500);
-    }, i * 120);
+      setTimeout(()=>p.remove(),3500);
+    },i*100);
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // TOAST
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 let toastTimer;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.innerHTML = msg;
-  t.classList.add('show');
+  const t=document.getElementById('toast');
+  t.innerHTML=msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // MODALS
-// ═══════════════════════════════════════════════════════════════
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
+// ═══════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
 });
 
-// ── REWARDS ─────────────────────────────────────────────────────
-function openRewardsModal() {
-  buildRewardGrid();
-  openModal('rewardsModal');
-}
-
+function openRewardsModal(){buildRewardGrid();openModal('rewardsModal');}
 function buildRewardGrid() {
-  document.getElementById('rewardPtsDisplay').textContent = state.points.toLocaleString();
-  const grid = document.getElementById('rewardGrid');
-  grid.innerHTML = '';
-  REWARDS.forEach(r => {
-    const canAfford  = state.points >= r.cost;
-    const redeemed   = state.redeemed.includes(r.id);
-    const locked     = !canAfford;
-    const card = document.createElement('div');
-    card.className = 'reward-card' + (locked ? ' locked' : '') + (redeemed ? ' redeemed' : '');
-    card.innerHTML = `
+  document.getElementById('rewardPtsDisplay').textContent=state.points.toLocaleString();
+  const grid=document.getElementById('rewardGrid'); grid.innerHTML='';
+  REWARDS.forEach(r=>{
+    const locked=state.points<r.cost, redeemed=state.redeemed.includes(r.id);
+    const card=document.createElement('div');
+    card.className='reward-card'+(locked?' locked':'')+(redeemed?' redeemed':'');
+    card.innerHTML=`
       <div class="reward-badge badge-${r.badge}">${r.badgeLabel}</div>
       <div class="reward-emoji">${r.emoji}</div>
       <div class="reward-name">${r.name}</div>
       <div class="reward-desc">${r.desc}</div>
-      <div class="reward-cost">${locked ? '🔒 ' : ''}${r.cost.toLocaleString()} PTS</div>
-    `;
-    if (!locked && !redeemed) {
-      card.onclick = () => openConfirm(r);
-    }
+      <div class="reward-cost">${locked?'🔒 ':''}${r.cost.toLocaleString()} PTS</div>`;
+    if (!locked&&!redeemed) card.onclick=()=>openConfirm(r);
     grid.appendChild(card);
   });
 }
-
-// ── CONFIRM ──────────────────────────────────────────────────────
 function openConfirm(reward) {
-  pendingReward = reward;
-  document.getElementById('confirmEmoji').textContent  = reward.emoji;
-  document.getElementById('confirmTitle').textContent  = reward.name;
-  document.getElementById('confirmDesc').textContent   = reward.funnyLine;
-  document.getElementById('confirmCost').textContent   = `COST: ${reward.cost.toLocaleString()} PTS`;
-  closeModal('rewardsModal');
-  openModal('confirmModal');
+  pendingReward=reward;
+  document.getElementById('confirmEmoji').textContent=reward.emoji;
+  document.getElementById('confirmTitle').textContent=reward.name;
+  document.getElementById('confirmDesc').textContent=reward.funnyLine;
+  document.getElementById('confirmCost').textContent=`COST: ${reward.cost.toLocaleString()} PTS`;
+  closeModal('rewardsModal'); openModal('confirmModal');
 }
-
 function executeRedeem() {
   if (!pendingReward) return;
-  const r = pendingReward;
-  if (state.points < r.cost) {
-    showToast('❌ Not enough shame points! Keep logging Ben\'s crimes.');
-    closeModal('confirmModal');
-    return;
-  }
-  state.points -= r.cost;
-  state.redeemed.push(r.id);
-  const ts = new Date().toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
-  state.log.unshift({ type:'redeem', pts: -r.cost, ts, label: `REDEEMED: ${r.name}`, undo:false });
-  save();
-  render();
-  closeModal('confirmModal');
-  showReceipt(r, ts);
-  pendingReward = null;
+  const r=pendingReward;
+  if (state.points<r.cost){showToast('🚨 INSUFFICIENT FUNDS — KEEP LOGGING CRIMES.');closeModal('confirmModal');return;}
+  state.points-=r.cost; state.redeemed.push(r.id);
+  const ts=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  state.log.unshift({type:'redeem',pts:-r.cost,ts,label:`REDEEMED: ${r.name}`});
+  save(); render(); closeModal('confirmModal'); showReceipt(r,ts); pendingReward=null;
 }
-
-function showReceipt(r, ts) {
-  const remaining = state.points;
-  document.getElementById('receiptContent').innerHTML = `
-    <div class="receipt-header">🍃 SHAME STORE RECEIPT 🍃</div>
-    <div style="font-size:7px;color:#333;margin-bottom:10px;">${ts} · Cincinnati, OH</div>
+function showReceipt(r,ts) {
+  document.getElementById('receiptContent').innerHTML=`
+    <div class="receipt-header">💰 VICE CITY RECEIPT 💰</div>
+    <div style="font-size:7px;color:#2a2a44;margin-bottom:10px;">${ts} · Cincinnati, OH</div>
     <div class="receipt-item"><span>ITEM</span><span>${r.emoji} ${r.name}</span></div>
-    <div class="receipt-item"><span>POINTS SPENT</span><span>-${r.cost.toLocaleString()}</span></div>
-    <div class="receipt-item"><span>REMAINING</span><span>${remaining.toLocaleString()} PTS</span></div>
-    <div class="receipt-total"><span>STATUS</span><span>✅ CONFIRMED</span></div>
-    <div class="receipt-fine">
-      By accepting this receipt, Ben acknowledges his obligation<br>
-      and waives all rights to complain, negotiate, or "forget".<br>
-      <br>
-      ${r.funnyLine}
-    </div>
-  `;
+    <div class="receipt-item"><span>PTS SPENT</span><span>-${r.cost.toLocaleString()}</span></div>
+    <div class="receipt-item"><span>REMAINING</span><span>${state.points.toLocaleString()} PTS</span></div>
+    <div class="receipt-total"><span>STATUS</span><span>✅ LOCKED IN</span></div>
+    <div class="receipt-fine">Ben has no legal recourse. This is binding.<br>Failure to comply = double shame.<br><br>${r.funnyLine}</div>`;
   openModal('receiptModal');
-  // re-spawn celebratory particles
-  for (let i = 0; i < 8; i++) {
-    setTimeout(() => {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.textContent = ['🎉','🥃','🍃','💸','🎊'][Math.floor(Math.random()*5)];
-      p.style.left = (10 + Math.random() * 80) + 'vw';
-      p.style.bottom = (5 + Math.random() * 30) + 'vh';
-      p.style.animationDuration = (2.5 + Math.random()) + 's';
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 4000);
-    }, i * 100);
+  for (let i=0;i<10;i++){
+    setTimeout(()=>{
+      const p=document.createElement('div');p.className='particle';
+      p.textContent=['💰','🔫','🚨','🏆','💸','🎉'][Math.floor(Math.random()*6)];
+      p.style.left=(5+Math.random()*90)+'vw';p.style.bottom=(5+Math.random()*40)+'vh';
+      p.style.fontSize=(14+Math.random()*18)+'px';p.style.animationDuration=(2+Math.random()*2)+'s';
+      document.body.appendChild(p);setTimeout(()=>p.remove(),4000);
+    },i*80);
   }
 }
-
-// ── LOG MODAL ────────────────────────────────────────────────────
 function openLogModal() {
-  const list = document.getElementById('modalLogList');
-  list.innerHTML = '';
-  if (!state.log.length) {
-    list.innerHTML = '<div class="log-empty">NO CRIMES RECORDED YET</div>';
-  } else {
-    const icons = { noShow:'👻', puke:'🤮', irish:'🏃‍♂️', redeem:'🎁' };
-    state.log.slice(0, 50).forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'log-item';
-      const label = item.undo ? `<span style="color:#ff4466">↩ UNDO</span>` : item.label;
-      div.innerHTML = `
-        <span class="log-icon">${icons[item.type] || '📌'}</span>
-        <span>${label}</span>
-        <span style="color:#333;margin-left:4px;font-size:7px;">${item.ts}</span>
-        <span class="log-pts">${item.pts > 0 ? '+' : ''}${item.pts} PTS</span>
-      `;
-      list.appendChild(div);
-    });
-  }
+  const list=document.getElementById('modalLogList'); list.innerHTML='';
+  if (!state.log.length){list.innerHTML='<div class="log-empty">NO CRIMES ON RECORD</div>';return;}
+  const icons={noShow:'👻',puke:'🤮',irish:'🏃‍♂️',redeem:'💰'};
+  state.log.slice(0,50).forEach(item=>{
+    const div=document.createElement('div'); div.className='log-item';
+    const label=item.undo?`<span style="color:var(--pink)">↩ UNDO</span>`:item.label;
+    div.innerHTML=`<span class="log-icon">${icons[item.type]||'📌'}</span><span>${label}</span>
+      <span style="color:var(--muted);margin-left:4px;font-size:7px;">${item.ts}</span>
+      <span class="log-pts">${item.pts>0?'+':''}${item.pts}</span>`;
+    list.appendChild(div);
+  });
   openModal('logModal');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // ACTIONS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function resetAll() {
-  if (!confirm('☢️ Wipe ALL of Ben\'s shame stats AND points? This cannot be undone.')) return;
-  state = { noShow: 0, puke: 0, irish: 0, points: 0, log: [], redeemed: [] };
-  save();
-  render();
-  showToast('🧼 Slate wiped. Ben gets a fresh start. Disgusting.');
+  if (!confirm('💥 WIPE ALL STATS AND POINTS? THIS CANNOT BE UNDONE.')) return;
+  state={noShow:0,puke:0,irish:0,points:0,log:[],redeemed:[],spinCount:0};
+  save(); render(); spinTotal=0; document.getElementById('spinCount').textContent=0;
+  showToast('🧹 RECORD EXPUNGED. BEN WALKS FREE. FOR NOW.');
 }
-
 function exportData() {
-  const total = state.noShow + state.puke + state.irish;
-  const lines = [
-    '╔══════════════════════════════╗',
-    '║   RUMPLE BEN TRACKER EXPORT  ║',
-    '╚══════════════════════════════╝',
-    '',
-    `Date: ${new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}`,
-    `Location: Cincinnati, OH`,
-    '',
-    '── SHAME STATS ─────────────────',
-    `NO SHOWS ............. ${state.noShow}  (${state.noShow * POINTS.noShow} pts)`,
-    `PUKES ................ ${state.puke}  (${state.puke * POINTS.puke} pts)`,
-    `IRISH GOODBYES ....... ${state.irish}  (${state.irish * POINTS.irish} pts)`,
-    '',
-    `TOTAL INCIDENTS ...... ${total}`,
-    `CURRENT POINTS ....... ${state.points.toLocaleString()} PTS`,
-    '',
-    '── RECENT LOG ──────────────────',
-    ...state.log.slice(0,20).map(l => `${l.ts}  ${l.label}  (${l.pts > 0 ? '+' : ''}${l.pts} pts)`),
-    '',
-    '── LEGAL DISCLAIMER ────────────',
-    'Ben is legally (morally) obligated to honor all redeemed rewards.',
-    'Failure to comply results in double the shame.',
-    '',
-    'RUMPLE MINZE APPROVED • CINCINNATI EDITION',
+  const total=state.noShow+state.puke+state.irish;
+  const lines=[
+    '╔══════════════════════════════════════╗',
+    '║    RUMPLE BEN — OFFICIAL DOSSIER     ║',
+    '║         VICE CITY EDITION            ║',
+    '╚══════════════════════════════════════╝','',
+    `DATE: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`,
+    `JURISDICTION: Cincinnati, OH`,`SUBJECT: Ben (Last Name Withheld)`,'',
+    '── CRIMINAL RECORD ────────────────────',
+    `NO SHOWS ............. ${state.noShow}  (${state.noShow*POINTS.noShow} pts)`,
+    `PUKES ................ ${state.puke}  (${state.puke*POINTS.puke} pts)`,
+    `IRISH GOODBYES ....... ${state.irish}  (${state.irish*POINTS.irish} pts)`,'',
+    `TOTAL INCIDENTS ...... ${total}`,`BOUNTY POINTS ........ ${state.points.toLocaleString()}`,'',
+    '── RAP SHEET ──────────────────────────',
+    ...state.log.slice(0,20).map(l=>`${l.ts}  ${l.label}  (${l.pts>0?'+':''}${l.pts} pts)`),'',
+    '── LEGAL NOTICE ───────────────────────',
+    'Ben is morally obligated to honor all bounties.',
+    'Non-compliance = double shame, immediately.','',
+    'RUMPLE MINZE APPROVED • CINCINNATI VICE DIVISION',
   ];
-  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `rumple-ben-export-${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`rumple-ben-dossier-${new Date().toISOString().slice(0,10)}.txt`;a.click();
   URL.revokeObjectURL(url);
-  showToast('📤 Shame exported. Evidence secured.');
+  showToast('📤 DOSSIER EXPORTED. EVIDENCE SECURED.');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// WHEEL OF SNITCHES
+// ═══════════════════════════════════════════════════
+const WHEEL_SLICES=[
+  {label:'KYLE IS GAY',         emoji:'🌈',color:'#8B2BE2',flavor:'Kyle has been OUT out and y\'all are just now catching up. The man color-coordinates his dart flights.',                                    reactions:['🌈','💅','✨','👑','🎉']},
+  {label:'MATT IS INTO PEGGING',emoji:'🪝',color:'#ff2f8e',flavor:'Matt said "I\'m open-minded" one time and the group has never forgotten. We honor that energy.',                                           reactions:['🪝','😳','👀','🤐','😂']},
+  {label:'KYLE SUCKS AT DARTS', emoji:'🎯',color:'#ff6600',flavor:'Kyle couldn\'t hit a barn door from 3 feet. His darts go rogue. The board fears him for the wrong reasons.',                              reactions:['🎯','💀','😭','🗑️','🏳️']},
+  {label:'GREG IS DRUNK',       emoji:'🍺',color:'#0088dd',flavor:'Greg arrived pre-loaded and has been on a one-man mission since 7pm. Godspeed, brother.',                                                 reactions:['🍺','🥴','🌀','💫','😵']},
+  {label:'BEN IS A LONER',      emoji:'🏝️',color:'#00aa55',flavor:'Ben RSVP\'d yes, went offline, and was last spotted eating Chipotle alone watching The Office. Again.',                                   reactions:['🏝️','😔','🛋️','📺','🫥']},
+];
+
+const WHEEL_R=155;
+let wheelAngle=0, isSpinning=false, spinTotal=0;
+
+function drawWheel(angle) {
+  const canvas=document.getElementById('wheelCanvas'); if (!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2, cy=canvas.height/2;
+  const arc=(Math.PI*2)/WHEEL_SLICES.length;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // outer glow ring
+  const grd=ctx.createRadialGradient(cx,cy,WHEEL_R-4,cx,cy,WHEEL_R+10);
+  grd.addColorStop(0,'rgba(255,140,0,.22)'); grd.addColorStop(1,'transparent');
+  ctx.beginPath(); ctx.arc(cx,cy,WHEEL_R+10,0,Math.PI*2); ctx.fillStyle=grd; ctx.fill();
+
+  WHEEL_SLICES.forEach((slice,i)=>{
+    const sa=angle+i*arc, ea=sa+arc, mid=sa+arc/2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,WHEEL_R,sa,ea); ctx.closePath();
+    ctx.fillStyle=slice.color; ctx.fill();
+
+    const gFill=ctx.createRadialGradient(cx,cy,0,cx,cy,WHEEL_R);
+    gFill.addColorStop(0,'rgba(255,255,255,.1)'); gFill.addColorStop(.7,'rgba(0,0,0,0)'); gFill.addColorStop(1,'rgba(0,0,0,.38)');
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,WHEEL_R,sa,ea); ctx.closePath();
+    ctx.fillStyle=gFill; ctx.fill();
+
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,WHEEL_R,sa,ea); ctx.closePath();
+    ctx.strokeStyle='#06060e'; ctx.lineWidth=2.5; ctx.stroke();
+
+    // emoji outer ring
+    const er=WHEEL_R*.76;
+    ctx.save(); ctx.translate(cx+er*Math.cos(mid),cy+er*Math.sin(mid));
+    ctx.rotate(mid+Math.PI/2); ctx.font='20px serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(slice.emoji,0,0); ctx.restore();
+
+    // label text
+    const words=slice.label.split(' '); const half=Math.ceil(words.length/2);
+    const l1=words.slice(0,half).join(' '), l2=words.slice(half).join(' ');
+    const tr=WHEEL_R*.42;
+    ctx.save(); ctx.translate(cx+tr*Math.cos(mid),cy+tr*Math.sin(mid));
+    ctx.rotate(mid+Math.PI/2); ctx.fillStyle='#fff';
+    ctx.font='bold 7.5px "Bebas Neue",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,.95)'; ctx.shadowBlur=5;
+    ctx.fillText(l1,0,l2?-7:0); if(l2)ctx.fillText(l2,0,7); ctx.restore();
+  });
+
+  // center hub
+  ctx.beginPath(); ctx.arc(cx,cy,24,0,Math.PI*2);
+  const hub=ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,24);
+  hub.addColorStop(0,'#1a1a2e'); hub.addColorStop(1,'#06060e');
+  ctx.fillStyle=hub; ctx.fill();
+  ctx.strokeStyle='#ff2f8e'; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.font='bold 8px "Bebas Neue",sans-serif';
+  ctx.fillStyle='#ff2f8e'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(255,47,142,.8)'; ctx.shadowBlur=8;
+  ctx.fillText('SPIN',cx,cy);
+}
+
+function spinWheel() {
+  if (isSpinning) return;
+  isSpinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('wheelCanvas').classList.add('spinning');
+
+  const targetIdx=Math.floor(Math.random()*WHEEL_SLICES.length);
+  const arc=(Math.PI*2)/WHEEL_SLICES.length;
+  const targetAng=-(targetIdx*arc+arc/2+(Math.random()*arc*.5-arc*.25));
+  const extraSpins=(7+Math.floor(Math.random()*4))*Math.PI*2;
+  const finalAng=wheelAngle+extraSpins+(targetAng-((wheelAngle%(Math.PI*2)+Math.PI*2)%(Math.PI*2)));
+
+  const duration=4200+Math.random()*1500;
+  const startAng=wheelAngle, startTime=performance.now();
+  function easeOut(t){return 1-Math.pow(1-t,3.2);}
+
+  function tick(now){
+    const t=Math.min((now-startTime)/duration,1);
+    wheelAngle=startAng+(finalAng-startAng)*easeOut(t);
+    drawWheel(wheelAngle);
+    if (t<1){requestAnimationFrame(tick);}
+    else{
+      wheelAngle=finalAng; drawWheel(wheelAngle);
+      isSpinning=false;
+      document.getElementById('spinBtn').disabled=false;
+      document.getElementById('wheelCanvas').classList.remove('spinning');
+      spinTotal++; state.spinCount=(state.spinCount||0)+1; save();
+      document.getElementById('spinCount').textContent=spinTotal;
+      showWheelResult(WHEEL_SLICES[targetIdx]);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function showWheelResult(slice) {
+  document.getElementById('resultCrown').textContent=slice.emoji;
+  document.getElementById('resultHeadline').textContent=slice.label;
+  document.getElementById('resultFlavor').textContent=slice.flavor;
+  const crown=document.getElementById('resultCrown');
+  crown.style.animation='none'; void crown.offsetWidth; crown.style.animation='';
+  openModal('wheelResultModal');
+  slice.reactions.forEach((e,i)=>{
+    for (let j=0;j<4;j++){
+      setTimeout(()=>{
+        const p=document.createElement('div');p.className='particle';p.textContent=e;
+        p.style.left=(5+Math.random()*90)+'vw';p.style.bottom=(8+Math.random()*35)+'vh';
+        p.style.fontSize=(14+Math.random()*18)+'px';p.style.animationDuration=(2+Math.random()*2)+'s';
+        document.body.appendChild(p);setTimeout(()=>p.remove(),4500);
+      },i*90+j*55);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════════════════
-window.addEventListener('load', load);
+// ═══════════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  load();
+  drawWheel(wheelAngle);
+  spinTotal=state.spinCount||0;
+  document.getElementById('spinCount').textContent=spinTotal;
+});
 </script>
 </body>
 </html>
