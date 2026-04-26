@@ -59,12 +59,14 @@
   ];
 
   var MORE_ITEMS = [
-    { href: 'assessment-menu.html',       icon: '📊', label: 'Assessments &amp; Ratings' },
-    { href: 'public-game.html',           icon: '🏛️', label: "Sir's Public Tasks" },
-    { href: 'bdsm-checklist.html',        icon: '✅', label: 'BDSM Checklists' },
-    { href: 'protocol-daily.html',        icon: '📝', label: 'Daily Protocol' },
-    { href: 'help.html',                  icon: '❓', label: 'Help &amp; Info' },
-    { href: 'settings.html',              icon: '⚙️', label: 'Settings' }
+    { href: 'assessment-menu.html', icon: '📊', label: 'Assessments &amp; Ratings' },
+    { href: 'public-game.html',     icon: '🏛️', label: "Sir&#39;s Public Tasks"    },
+    { href: 'bdsm-checklist.html',  icon: '✅', label: 'BDSM Checklists'           },
+    { href: 'notes.html',           icon: '📝', label: 'Notes'                     },
+    { href: 'calendar.html',        icon: '📅', label: 'Calendar'                  },
+    { href: 'protocol-daily.html',  icon: '📜', label: 'Daily Protocol'            },
+    { href: 'help.html',            icon: '❓', label: 'Help &amp; Info'            },
+    { href: 'settings.html',        icon: '⚙️', label: 'Settings'                  }
   ];
 
   /* ── 2. Read active page from <body data-nav="X"> ──────── */
@@ -119,8 +121,6 @@
     '<nav class="dsh-nav" id="dshNav">' + tabsHTML + '</nav>';
 
   /* ── 4. Inject into DOM ─────────────────────────────────── */
-  // Append each element directly to body — no wrapper div that could
-  // inherit styles or interfere with fixed positioning.
   function appendHTML(html) {
     var tmp = document.createElement('template');
     tmp.innerHTML = html;
@@ -131,10 +131,10 @@
   appendHTML(navHTML);
 
   /* ── 5. Wire up More button & overlay ───────────────────── */
-  var overlay  = document.getElementById('dshOverlay');
-  var sheet    = document.getElementById('dshMoreSheet');
-  var moreBtn  = document.getElementById('dshMoreBtn');
-  var allBtns  = document.querySelectorAll('.dsh-nav-btn');
+  var overlay = document.getElementById('dshOverlay');
+  var sheet   = document.getElementById('dshMoreSheet');
+  var moreBtn = document.getElementById('dshMoreBtn');
+  var allBtns = document.querySelectorAll('.dsh-nav-btn');
 
   function openMore() {
     sheet.classList.add('open');
@@ -146,7 +146,6 @@
   function closeMore() {
     sheet.classList.remove('open');
     overlay.classList.remove('open');
-    // Restore the correct active tab
     allBtns.forEach(function (b) { b.classList.remove('active'); });
     var target = document.querySelector('.dsh-nav-btn[data-page="' + activePage + '"]');
     if (target) target.classList.add('active');
