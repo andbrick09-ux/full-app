@@ -148,7 +148,7 @@ body {
 .main {
   max-width: 600px;
   margin: 0 auto;
-  padding: 25px 20px calc(100px + var(--safe-b));
+  padding: 25px 20px calc(var(--dsh-nav-h) + 2rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* ============================================================
