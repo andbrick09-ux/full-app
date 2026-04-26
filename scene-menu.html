@@ -1762,6 +1762,23 @@
       pointer-events:none; white-space:nowrap;
     }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+/* ── FIX: Scene Planner bottom CTA + scroll padding ── */
+.bottom-cta {
+  bottom: calc(var(--dsh-nav-h) + env(safe-area-inset-bottom, 12px));
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+  z-index: 50;           /* keeps it above the nav */
+  box-shadow: 0 -4px 20px rgba(0,0,0,.3); /* optional nice lift */
+}
+
+.step-page {
+  padding-bottom: calc(160px + var(--dsh-nav-h) + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Optional: make the CTA feel even more premium */
+.cta-btn {
+  border-radius: 16px;
+  box-shadow: 0 8px 25px -6px var(--gold-dim);
+}
   </style>
 <link rel="stylesheet" href="nav.css" />
 </head>
