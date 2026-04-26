@@ -122,9 +122,7 @@
 
   /* ── 4. Inject into DOM ─────────────────────────────────── */
   function appendHTML(html) {
-    var tmp = document.createElement('template');
-    tmp.innerHTML = html;
-    document.body.appendChild(tmp.content.firstElementChild);
+    document.body.insertAdjacentHTML('beforeend', html);
   }
   appendHTML(overlayHTML);
   appendHTML(sheetHTML);

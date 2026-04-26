@@ -43,7 +43,7 @@ body {
   -webkit-backdrop-filter: blur(24px);
   display: flex;
   align-items: stretch;
-  z-index: 900;
+  z-index: 930;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
