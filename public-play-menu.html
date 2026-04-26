@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -169,8 +169,9 @@
         .border-champagne { border-color: var(--gold) !important; }
         .bg-black\/98 { background-color: rgba(5, 16, 36, 0.95) !important; backdrop-filter: blur(12px); }
     </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="more">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -450,5 +451,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

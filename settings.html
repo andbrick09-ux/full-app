@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -51,8 +51,9 @@
     .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--gold); color:#051024; padding:12px 24px; border-radius:30px; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; box-shadow:0 8px 25px rgba(212,175,55,0.4); opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.22,.68,0,1.2); z-index:1000; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="more">
   <div class="glow-orb"></div>
   
   <div class="shell">
@@ -329,5 +330,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

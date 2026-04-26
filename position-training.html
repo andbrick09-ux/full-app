@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -103,8 +103,9 @@
         .tip-card{background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.15);border-radius:12px;padding:16px;margin-top:15px}
         .tip-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px}.tip-text{font-size:12px;color:#bbb;line-height:1.6}
     </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="training">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -398,5 +399,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

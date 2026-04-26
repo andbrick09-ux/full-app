@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -1372,8 +1372,9 @@
     }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="scenes">
 
 <!-- INTRO OVERLAY -->
 <div class="intro-overlay" id="introOverlay">
@@ -4011,5 +4012,7 @@ updateProgress();
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

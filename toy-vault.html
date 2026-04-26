@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -372,8 +372,9 @@
     .modal { padding:20px 14px; }
   }
 </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="vault">
 
 <header class="site-header">
   <div class="script-title">The Vault</div>
@@ -886,5 +887,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
 
 loadData(); renderVault(); renderWishlist();
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

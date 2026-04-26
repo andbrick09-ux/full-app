@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,8 +6,9 @@
   <title>Scene &amp; Growth • Dom Sub Hub</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body class="theme-midnight dark-theme">
+<body class="theme-midnight dark-theme" data-nav="more">
 
   <header class="app-header">
     <a href="sirs-protocol.html" class="back-link">← Sir’s Protocol</a>
@@ -50,5 +51,7 @@
   <nav class="bottom-nav">
     <!-- Your update_menu.py will fill this in -->
   </nav>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

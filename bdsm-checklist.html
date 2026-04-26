@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -563,9 +563,10 @@
       }
     }
   </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
 
-<body onload="init()">
+<body onload="init()" data-nav="more">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -959,6 +960,8 @@
       document.getElementById('globalSidebar').classList.remove('open');
     }
   </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 
 </html>

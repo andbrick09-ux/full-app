@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -205,8 +205,9 @@
         }
         .reset-btn:hover { border-color: #F44336; background: rgba(244, 67, 54, 0.05); }
     </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="training">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -780,5 +781,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

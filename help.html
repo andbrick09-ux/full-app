@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -293,9 +293,10 @@
       color: #4CAF50;
     }
   </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
 
-<body>
+<body data-nav="more">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -613,6 +614,8 @@
       document.getElementById('globalSidebar').classList.remove('open');
     }
   </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -280,8 +280,9 @@ body {
 
 @media(max-width:600px){ .activity-top { gap:8px; } }
 </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="more">
 
 <!-- Topbar -->
 <div class="topbar">
@@ -695,5 +696,7 @@ init();
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -639,8 +639,9 @@
     }
     .submission-copy-btn .material-symbols-rounded { font-size:15px; }
   </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="training">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -1427,5 +1428,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

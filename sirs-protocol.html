@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,8 +6,9 @@
   <title>Sir’s Protocol • Dom Sub Hub</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body class="theme-midnight dark-theme">
+<body class="theme-midnight dark-theme" data-nav="more">
 
   <!-- Header (exact match to your other pages) -->
   <header class="app-header">
@@ -73,5 +74,7 @@
       alert('✅ Sir’s Protocol accepted. You are now officially devoted.');
     }
   </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

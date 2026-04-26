@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -85,8 +85,9 @@
         .trouble-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px}
         .trouble-q{font-size:13px;font-weight:600;color:#ddd;margin-bottom:8px;font-style:italic}.trouble-a{font-size:12px;color:#aaa;line-height:1.6}.trouble-a strong{color:var(--gold);font-weight:600}
     </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="training">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -413,5 +414,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

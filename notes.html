@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -417,9 +417,10 @@
       font-family: 'Playfair Display', serif; font-style: italic;
     }
   </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
 
-<body>
+<body data-nav="more">
   <div class="glow-orb"></div>
 
   <!-- Topbar -->
@@ -783,5 +784,7 @@
     /* ── Init ── */
     renderNotes();
   </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>

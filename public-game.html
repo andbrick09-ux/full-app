@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -253,8 +253,9 @@
         }
         .slide-modal-overlay.open { transform: translateY(0); }
     </style>
+<link rel="stylesheet" href="nav.css" />
 </head>
-<body>
+<body data-nav="more">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -575,5 +576,7 @@
     document.getElementById('globalSidebar').classList.remove('open');
   }
 </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>
