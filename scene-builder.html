@@ -1,828 +1,1093 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#051024"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>Dom Sub Hub — Scene Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
 <style>
-  :root {
-    --midnight: #0a0c14; --navy: #0f1325; --navy-mid: #141829; --panel: #181d32;
-    --panel-light: #1e2440; --gold: #c9a84c; --gold-dim: #9b7d38;
-    --gold-glow: rgba(201,168,76,0.15); --gold-glass: rgba(201,168,76,0.08);
-    --rose: #c94c6a; --text: #e8e0d4; --text-dim: #9a9080; --text-faint: #5a5548;
-    --glass: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.08);
-    --radius: 14px; --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--midnight); color: var(--text); font-family: 'Montserrat', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 0%, rgba(201,168,76,0.05) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 100%, rgba(139,26,47,0.07) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+/* ── Scene Builder — page-specific only ──
+   All base variables come from styles.css:
+   --gold: #D4AF37  --midnight: #051024  --glass/--glass2
+   --border  --cream  --luxury-gradient  --cream-dim
+   All nav tokens come from nav.css.
+   We only define things NOT in those files.
+─────────────────────────────────────────── */
 
-  /* HEADER */
-  .header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,20,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(201,168,76,0.12); padding: 0 20px; display: flex; align-items: center; gap: 12px; height: 56px; }
-  .header-title { flex: 1; text-align: center; font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); letter-spacing: 0.05em; }
-  .header-sub { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--text-dim); }
-  .header-icon { width: 32px; height: 32px; background: var(--gold-glass); border: 1px solid rgba(201,168,76,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 16px; cursor: pointer; transition: background 0.2s; }
-  .header-icon:hover { background: var(--gold-glow); }
+/* KEY BUTTON in topbar (right side, not a .back-btn) */
+.key-btn {
+  flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2);
+  cursor: pointer; transition: all .2s;
+}
+.key-btn:hover  { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.4); }
+.key-btn:active { opacity:.7; transform:scale(.93); }
+.key-btn .material-symbols-rounded { font-size:20px; color:var(--gold); }
 
-  /* MAIN */
-  .main { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
+/* MODEL SELECTOR */
+.model-bar {
+  display: flex; gap: 6px; padding: 5px;
+  background: var(--glass2); border: 1px solid var(--border);
+  border-radius: 50px; margin-bottom: 24px;
+}
+.model-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 10px; border-radius: 46px; border: none; cursor: pointer;
+  font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em; transition: all 0.25s;
+  background: transparent; color: #777;
+}
+.model-btn .ms { font-size: 15px; opacity: 0.45; transition: opacity .2s; }
+.model-btn.active .ms { opacity: 1; }
+.model-btn[data-m="claude"].active { background: var(--luxury-gradient); color: var(--midnight); box-shadow: 0 4px 16px rgba(212,175,55,0.28); }
+.model-btn[data-m="grok"].active   { background: #e8e8e8; color: #051024;  box-shadow: 0 4px 12px rgba(232,232,232,0.14); }
+.model-btn[data-m="gemini"].active { background: #4285f4; color: #fff;     box-shadow: 0 4px 16px rgba(66,133,244,0.28); }
 
-  /* HERO */
-  .hero { text-align: center; padding: 32px 16px 40px; animation: fadeUp 0.6s ease both; }
-  .hero-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 12px; }
-  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(28px,6vw,40px); font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 6px; }
-  .hero-sub { font-family: 'Great Vibes', cursive; font-size: clamp(20px,4vw,26px); color: var(--gold); margin-bottom: 16px; }
-  .hero-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: var(--text-dim); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+/* STEP PROGRESS */
+.builder-steps {
+  display: flex; align-items: center; margin-bottom: 24px;
+}
+.bstep { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+.bstep-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #555;
+  transition: all 0.3s; position: relative; z-index: 1;
+}
+.bstep.active .bstep-dot {
+  background: var(--luxury-gradient); border-color: var(--gold); color: var(--midnight);
+  box-shadow: 0 0 14px rgba(212,175,55,0.35);
+}
+.bstep.done .bstep-dot {
+  background: rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.35); color: var(--gold);
+}
+.bstep-lbl {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #444; text-align: center; transition: color 0.2s;
+}
+.bstep.active .bstep-lbl { color: var(--gold); }
+.bstep.done .bstep-lbl   { color: rgba(212,175,55,0.5); }
+.bstep-line { flex: 1; height: 1px; background: rgba(212,175,55,0.1); margin-bottom: 13px; transition: background 0.3s; }
+.bstep-line.done { background: rgba(212,175,55,0.3); }
 
-  /* MODEL SELECTOR */
-  .model-selector-bar { display: flex; gap: 8px; margin-bottom: 28px; padding: 5px; background: var(--navy); border: 1px solid var(--glass-border); border-radius: 50px; animation: fadeUp 0.5s ease both 0.1s; }
-  .model-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 12px; border-radius: 46px; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; transition: all 0.25s; background: transparent; color: var(--text-dim); }
-  .model-btn .model-logo { width: 16px; height: 16px; border-radius: 3px; object-fit: contain; opacity: 0.5; transition: opacity 0.2s; font-size: 16px; }
-  .model-btn.active .model-logo { opacity: 1; }
-  .model-btn[data-model="claude"].active { background: var(--gold); color: #0a0c14; box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
-  .model-btn[data-model="grok"].active   { background: #e8e8e8; color: #0a0c14; box-shadow: 0 4px 16px rgba(232,232,232,0.15); }
-  .model-btn[data-model="gemini"].active { background: #4285f4; color: #fff;    box-shadow: 0 4px 16px rgba(66,133,244,0.3); }
+/* STEP VIEWS */
+.step-view { display: none; animation: sbFadeUp 0.4s ease both; }
+.step-view.active { display: block; }
+@keyframes sbFadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-  /* SETTINGS SHEET */
-  .settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; display: none; align-items: flex-end; }
-  .settings-overlay.open { display: flex; }
-  .settings-sheet { width: 100%; max-width: 760px; margin: 0 auto; background: var(--navy-mid); border-top: 1px solid rgba(201,168,76,0.2); border-radius: 20px 20px 0 0; padding: 28px 24px 48px; animation: slideUp 0.3s ease; }
-  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-  .settings-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 6px; }
-  .settings-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
-  .key-row { margin-bottom: 20px; }
-  .key-row-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-  .dot-claude { width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block; }
-  .dot-grok   { width:8px; height:8px; border-radius:50%; background:#e8e8e8; display:inline-block; }
-  .dot-gemini { width:8px; height:8px; border-radius:50%; background:#4285f4; display:inline-block; }
-  .key-input-wrap { position: relative; }
-  .key-input-wrap input { width:100%; background:var(--navy); border:1px solid var(--glass-border); border-radius:var(--radius-sm); color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; padding:12px 44px 12px 14px; outline:none; transition:border-color 0.2s; letter-spacing:0.04em; }
-  .key-input-wrap input:focus { border-color:rgba(201,168,76,0.4); }
-  .key-input-wrap input::placeholder { color:var(--text-faint); letter-spacing:0; }
-  .key-toggle { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-faint); cursor:pointer; display:flex; }
-  .key-toggle:hover { color:var(--gold); }
-  .key-status { font-size:10px; margin-top:5px; }
-  .key-status.ok { color:#4caf81; }
-  .key-status.empty { color:var(--text-faint); }
-  .key-get-link { font-size:10px; color:var(--gold-dim); text-decoration:none; margin-left:8px; }
-  .key-get-link:hover { color:var(--gold); }
+/* SECTION CARDS — same feel as glass-card */
+.sb-card {
+  background: var(--glass2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+}
+.sb-card-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.02);
+}
+.sb-card-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.sb-card-icon .material-symbols-rounded { font-size: 18px; color: var(--gold); }
+.sb-card-title { font-family: 'Playfair Display', serif; font-size: 15px; color: #ddd; font-weight: 600; }
+.sb-card-sub   { font-size: 11px; color: #666; margin-top: 2px; }
+.sb-card-body  { padding: 18px; }
 
-  /* CARDS */
-  .card { background:var(--panel); border:1px solid var(--glass-border); border-radius:var(--radius); margin-bottom:20px; overflow:hidden; animation:fadeUp 0.5s ease both; }
-  .card-header { display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.02); }
-  .card-header-icon { width:36px; height:36px; background:var(--gold-glass); border:1px solid rgba(201,168,76,0.25); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:18px; flex-shrink:0; }
-  .card-header-text h3 { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:var(--text); }
-  .card-header-text p { font-size:11px; color:var(--text-dim); margin-top:2px; }
-  .card-body { padding:20px; }
+/* FORM LABELS */
+.ql {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.ql .material-symbols-rounded { font-size: 14px; }
+.qs {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 13px; color: #777; margin-bottom: 10px; line-height: 1.5;
+}
 
-  /* PROGRESS */
-  .progress-dots { display:flex; justify-content:center; gap:8px; margin-bottom:32px; }
-  .progress-dot { width:8px; height:8px; border-radius:50%; background:var(--panel-light); border:1px solid var(--glass-border); transition:all 0.3s; }
-  .progress-dot.active { background:var(--gold); box-shadow:0 0 8px rgba(201,168,76,0.5); border-color:var(--gold); width:24px; border-radius:4px; }
-  .progress-dot.done { background:var(--gold-dim); border-color:var(--gold-dim); }
+/* TEXTAREA / INPUT */
+.sb-textarea {
+  width: 100%; background: rgba(2,8,20,0.7); border: 1px solid var(--border);
+  border-radius: 12px; color: #ccc; font-family: 'Montserrat', sans-serif;
+  font-size: 12px; padding: 12px; resize: vertical; min-height: 100px;
+  outline: none; transition: border-color 0.2s; line-height: 1.6;
+}
+.sb-textarea:focus { border-color: rgba(212,175,55,0.45); }
+.sb-textarea::placeholder { color: #444; }
 
-  /* STEPS */
-  .step-view { display:none; }
-  .step-view.active { display:block; }
+/* CHIPS */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  padding: 6px 13px; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(212,175,55,0.12); border-radius: 20px;
+  font-size: 11px; color: #777; cursor: pointer;
+  transition: all 0.2s; user-select: none; font-weight: 500;
+}
+.chip:hover { border-color: rgba(212,175,55,0.35); color: #ccc; }
+.chip.on {
+  background: rgba(212,175,55,0.1); border-color: rgba(212,175,55,0.45); color: var(--gold);
+}
 
-  /* FORMS */
-  .question-block { margin-bottom:20px; }
-  .question-label { font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
-  .question-label .material-icons-round { font-size:16px; }
-  .question-sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--text-dim); margin-bottom:10px; line-height:1.5; }
-  textarea.paste-input { width:100%; background:var(--navy); border:1px solid var(--glass-border); border-radius:var(--radius-sm); color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; padding:12px; resize:vertical; min-height:120px; outline:none; transition:border-color 0.2s; line-height:1.6; }
-  textarea.paste-input:focus { border-color:rgba(201,168,76,0.4); }
-  textarea.paste-input::placeholder { color:var(--text-faint); }
-  input[type="range"] { flex:1; -webkit-appearance:none; height:4px; background:var(--panel-light); border-radius:2px; outline:none; }
-  input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:var(--gold); border-radius:50%; cursor:pointer; box-shadow:0 0 8px rgba(201,168,76,0.4); }
-  .range-wrap { display:flex; align-items:center; gap:12px; }
-  .range-val { font-size:13px; color:var(--gold); font-weight:600; min-width:24px; text-align:right; }
+/* RANGE */
+.range-row { display: flex; align-items: center; gap: 10px; }
+input[type="range"] { flex:1; -webkit-appearance:none; height:3px; background:rgba(255,255,255,0.06); border-radius:2px; outline:none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:var(--gold); border-radius:50%; cursor:pointer; box-shadow:0 0 8px rgba(212,175,55,0.4); }
+.range-val { font-size:13px; color:var(--gold); font-weight:700; min-width:22px; text-align:right; }
 
-  /* CHIPS */
-  .chips { display:flex; flex-wrap:wrap; gap:8px; }
-  .chip { padding:7px 14px; background:var(--panel-light); border:1px solid var(--glass-border); border-radius:20px; font-size:12px; color:var(--text-dim); cursor:pointer; transition:all 0.2s; user-select:none; }
-  .chip:hover { border-color:rgba(201,168,76,0.3); color:var(--text); }
-  .chip.selected { background:var(--gold-glass); border-color:rgba(201,168,76,0.5); color:var(--gold); }
+/* PASTE ZONE */
+.paste-zone {
+  background: rgba(2,8,20,0.5); border: 1.5px dashed rgba(212,175,55,0.18);
+  border-radius: 14px; padding: 18px; margin-bottom: 14px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.paste-zone:focus-within { border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.04); }
+.paste-zone h4 { font-family:'Playfair Display',serif; font-size:14px; color:#ddd; margin-bottom:5px; }
+.paste-zone p  { font-size:11px; color:#666; margin-bottom:12px; line-height:1.5; }
 
-  /* PASTE ZONE */
-  .paste-zone { background:var(--navy); border:2px dashed rgba(201,168,76,0.2); border-radius:var(--radius); padding:24px; margin-bottom:16px; transition:border-color 0.2s,background 0.2s; }
-  .paste-zone:focus-within { border-color:rgba(201,168,76,0.5); background:var(--gold-glass); }
-  .paste-zone h4 { font-family:'Playfair Display',serif; font-size:16px; color:var(--text); margin-bottom:6px; }
-  .paste-zone p { font-size:12px; color:var(--text-dim); margin-bottom:16px; line-height:1.6; }
+/* BUTTONS */
+.sb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 13px 20px; border-radius: 14px;
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s;
+}
+.sb-btn .material-symbols-rounded { font-size:16px; }
+.sb-btn:active { transform: scale(0.97); opacity: 0.9; }
+.btn-gold { background: var(--luxury-gradient); color: var(--midnight); box-shadow: 0 6px 20px rgba(212,175,55,0.25); }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border);
+  color: rgba(212,175,55,0.6); letter-spacing: 0.1em;
+}
+.btn-outline:hover { border-color: rgba(212,175,55,0.4); color: var(--gold); }
+.btn-danger { background: transparent; border: 1px solid rgba(244,67,54,0.28); color: #F44336; }
+.btn-full { width: 100%; }
+.btn-row { display: flex; gap: 10px; margin-top: 18px; }
+.btn-row .sb-btn { flex: 1; }
 
-  /* BUTTONS */
-  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 24px; border-radius:var(--radius-sm); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.06em; cursor:pointer; border:none; transition:all 0.25s; }
-  .btn-gold { background:linear-gradient(135deg,var(--gold),#a87830); color:#0a0c14; box-shadow:0 4px 20px rgba(201,168,76,0.2); }
-  .btn-gold:hover { transform:translateY(-1px); box-shadow:0 6px 28px rgba(201,168,76,0.35); }
-  .btn-ghost { background:transparent; border:1px solid var(--glass-border); color:var(--text-dim); }
-  .btn-ghost:hover { border-color:rgba(201,168,76,0.3); color:var(--text); }
-  .btn-rose { background:rgba(201,76,106,0.15); border:1px solid rgba(201,76,106,0.3); color:var(--rose); }
-  .btn-rose:hover { background:rgba(201,76,106,0.25); }
-  .btn-full { width:100%; }
-  .btn-row { display:flex; gap:12px; margin-top:20px; }
-  .btn-row .btn { flex:1; }
+/* SUMMARY GRID */
+.sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+@media(max-width:380px){.sum-grid{grid-template-columns:1fr;}}
+.sum-item { background: rgba(2,8,20,0.6); border: 1px solid var(--border); border-radius: 12px; padding: 10px 13px; }
+.sum-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; color: #444; text-transform: uppercase; margin-bottom: 3px; }
+.sum-val { font-size: 12px; color: #bbb; }
 
-  /* SUMMARY */
-  .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
-  @media(max-width:480px){.summary-grid{grid-template-columns:1fr;}}
-  .summary-item { background:var(--navy); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:10px 14px; }
-  .summary-item-label { font-size:10px; font-weight:700; letter-spacing:0.12em; color:var(--text-faint); text-transform:uppercase; margin-bottom:4px; }
-  .summary-item-value { font-size:13px; color:var(--text); }
+/* MODEL BADGE */
+.mbadge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 10px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.mb-claude { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.28); color: var(--gold); }
+.mb-grok   { background: rgba(232,232,232,0.06); border: 1px solid rgba(232,232,232,0.18); color: #bbb; }
+.mb-gemini { background: rgba(66,133,244,0.08); border: 1px solid rgba(66,133,244,0.22); color: #6aabff; }
 
-  /* MODEL BADGE */
-  .model-indicator { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:12px; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
-  .mi-claude { background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); color:var(--gold); }
-  .mi-grok   { background:rgba(232,232,232,0.08); border:1px solid rgba(232,232,232,0.2); color:#ccc; }
-  .mi-gemini { background:rgba(66,133,244,0.1); border:1px solid rgba(66,133,244,0.25); color:#6aabff; }
+/* INFO NOTE */
+.info-note {
+  background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.14);
+  border-radius: 12px; padding: 11px 14px; font-size: 11px;
+  color: #888; line-height: 1.5; display: flex; gap: 9px;
+  align-items: flex-start; margin-bottom: 14px;
+}
+.info-note .material-symbols-rounded { font-size: 14px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+.warn-note { background: rgba(244,67,54,0.06); border-color: rgba(244,67,54,0.2); }
+.warn-note .material-symbols-rounded { color: #F44336; }
 
-  /* AI STATES */
-  .ai-thinking { display:none; flex-direction:column; align-items:center; gap:16px; padding:60px 20px; text-align:center; }
-  .ai-thinking.visible { display:flex; }
-  .model-orb { width:70px; height:70px; border-radius:50%; border:2px solid var(--orb-color,var(--gold)); position:relative; animation:pulseRing 1.5s ease infinite; display:flex; align-items:center; justify-content:center; font-size:32px; }
-  .model-orb::before { content:''; position:absolute; inset:-6px; border-radius:50%; border:1px solid var(--orb-color,var(--gold)); opacity:0.3; animation:pulseRing 1.5s ease infinite 0.4s; }
-  @keyframes pulseRing{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.06)}}
-  .ai-thinking p { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--text-dim); }
-  .ai-thinking-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite;}
-  @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%,100%{content:'...'}}
- 
-  /* PLAN */
-  .scene-plan { display:none; animation:fadeUp 0.5s ease both; }
-  .scene-plan.visible { display:block; }
-  .plan-section { background:var(--panel); border:1px solid var(--glass-border); border-radius:var(--radius); margin-bottom:16px; overflow:hidden; }
-  .plan-section-header { display:flex; align-items:center; gap:12px; padding:14px 18px; background:rgba(201,168,76,0.05); border-bottom:1px solid rgba(201,168,76,0.1); cursor:pointer; }
-  .plan-section-header .material-icons-round { color:var(--gold); font-size:18px; }
-  .plan-section-header h4 { flex:1; font-family:'Playfair Display',serif; font-size:14px; color:var(--text); }
-  .plan-section-badge { font-size:10px; padding:3px 8px; background:var(--gold-glass); border:1px solid rgba(201,168,76,0.3); border-radius:10px; color:var(--gold); font-weight:600; letter-spacing:0.05em; }
-  .plan-section-body { padding:18px; font-size:13px; line-height:1.8; color:var(--text); }
-  .plan-section-body.collapsed { display:none; }
-  .timeline { position:relative; padding-left:28px; }
-  .timeline::before { content:''; position:absolute; left:10px; top:6px; bottom:6px; width:1px; background:linear-gradient(to bottom,var(--gold),transparent); opacity:0.3; }
-  .timeline-item { position:relative; margin-bottom:20px; }
-  .timeline-item::before { content:''; position:absolute; left:-22px; top:6px; width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 8px rgba(201,168,76,0.5); }
-  .timeline-time { font-size:10px; font-weight:700; letter-spacing:0.12em; color:var(--gold-dim); text-transform:uppercase; margin-bottom:4px; }
-  .timeline-step-title { font-family:'Playfair Display',serif; font-size:14px; color:var(--text); margin-bottom:6px; }
-  .timeline-step-body { font-size:12px; color:var(--text-dim); line-height:1.7; }
-  .script-block { background:var(--navy); border-left:2px solid var(--gold); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:14px 40px 14px 16px; margin:10px 0; position:relative; }
-  .script-label { font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold-dim); margin-bottom:6px; }
-  .script-text { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color:var(--text); line-height:1.6; }
-  .script-copy { position:absolute; top:10px; right:10px; background:none; border:none; color:var(--text-faint); cursor:pointer; display:flex; }
-  .script-copy:hover { color:var(--gold); }
+/* THINKING */
+.thinking {
+  display: none; flex-direction: column; align-items: center;
+  gap: 14px; padding: 55px 20px; text-align: center;
+}
+.thinking.show { display: flex; }
+.think-orb {
+  width: 64px; height: 64px; border-radius: 50%;
+  border: 2px solid var(--orb-c, var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  animation: orbPulse 1.6s ease infinite; position: relative;
+}
+.think-orb::before {
+  content: ''; position: absolute; inset: -8px; border-radius: 50%;
+  border: 1px solid var(--orb-c, var(--gold)); opacity: 0.2;
+  animation: orbPulse 1.6s ease infinite 0.5s;
+}
+.think-orb .material-symbols-rounded { font-size: 26px; color: var(--orb-c, var(--gold)); }
+@keyframes orbPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.45;transform:scale(1.07)} }
+.think-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 15px; color: #888; }
+.think-dots::after { content: ''; animation: dots 1.2s steps(4,end) infinite; }
+@keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%,100%{content:'...'} }
+.think-sub { font-size: 11px; color: #444; }
 
-  /* REFINE PANEL */
-  .refine-card { margin-top:24px; }
+/* PLAN SECTIONS */
+.plan-wrap { display: none; animation: sbFadeUp 0.4s ease both; }
+.plan-wrap.show { display: block; }
+.plan-title-area { text-align: center; padding: 8px 0 22px; }
+.plan-title-area h2 {
+  font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600;
+  color: #ddd; margin-bottom: 4px;
+}
+.plan-cursive { font-family: 'Great Vibes', cursive; font-size: 22px; color: var(--gold); }
 
-  /* MISC */
-  .divider { height:1px; background:linear-gradient(to right,transparent,var(--glass-border),transparent); margin:16px 0; }
-  .info-note { background:var(--gold-glass); border:1px solid rgba(201,168,76,0.15); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:var(--text-dim); line-height:1.6; display:flex; gap:10px; align-items:flex-start; }
-  .info-note .material-icons-round { font-size:16px; color:var(--gold); flex-shrink:0; margin-top:1px; }
-  .mb-16{margin-bottom:16px;} .mt-16{margin-top:16px;} .mb-8{margin-bottom:8px;}
-  .error-card { background:rgba(201,76,106,0.08); border:1px solid rgba(201,76,106,0.25); border-radius:var(--radius); padding:24px; text-align:center; }
-  .error-card h4 { font-family:'Playfair Display',serif; color:var(--rose); margin-bottom:8px; font-size:16px; }
-  .error-card p { font-size:12px; color:var(--text-dim); margin-bottom:16px; line-height:1.6; }
+.plan-sec { background: var(--glass2); backdrop-filter: blur(14px); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+.plan-sec-hdr {
+  display: flex; align-items: center; gap: 10px; padding: 13px 16px;
+  background: rgba(212,175,55,0.03); border-bottom: 1px solid rgba(212,175,55,0.08); cursor: pointer;
+}
+.plan-sec-hdr .material-symbols-rounded { color: var(--gold); font-size: 17px; }
+.plan-sec-hdr h4 { flex: 1; font-family: 'Playfair Display', serif; font-size: 14px; color: #ddd; font-weight: 600; }
+.plan-badge {
+  font-size: 8px; padding: 2px 8px;
+  background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.22);
+  border-radius: 8px; color: var(--gold); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.plan-sec-body { padding: 16px; font-size: 13px; line-height: 1.8; color: #ccc; }
+.plan-sec-body.collapsed { display: none; }
 
-  /* NAV */
-  .nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;}
-  .nav-overlay.open{display:block;}
-  .nav-drawer{position:fixed;left:0;top:0;bottom:0;width:280px;background:var(--navy-mid);border-right:1px solid rgba(201,168,76,0.12);z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;padding:24px 0;}
-  .nav-drawer.open{transform:translateX(0);}
-  .nav-drawer a{display:flex;align-items:center;gap:14px;padding:14px 24px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;transition:all 0.2s;border-left:2px solid transparent;}
-  .nav-drawer a:hover,.nav-drawer a.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-glass);}
-  .nav-drawer a .material-icons-round{font-size:18px;}
-  .nav-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);padding:0 24px 20px;border-bottom:1px solid var(--glass-border);margin-bottom:12px;}
+/* TIMELINE */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content:''; position:absolute; left:8px; top:4px; bottom:4px; width:1px; background:linear-gradient(to bottom,var(--gold),transparent); opacity:0.2; }
+.tl-item { position: relative; margin-bottom: 18px; }
+.tl-item::before { content:''; position:absolute; left:-18px; top:5px; width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 7px rgba(212,175,55,0.5); }
+.tl-time  { font-size:9px; font-weight:700; letter-spacing:0.14em; color:rgba(212,175,55,0.55); text-transform:uppercase; margin-bottom:3px; }
+.tl-phase { font-family:'Playfair Display',serif; font-size:13px; color:#ddd; margin-bottom:5px; }
+.tl-obj   { font-size:12px; color:#888; margin-bottom:6px; line-height:1.6; font-weight:300; }
+.tl-step  { font-size:12px; color:#777; padding-left:10px; border-left:1px solid rgba(212,175,55,0.15); margin-bottom:3px; line-height:1.6; }
+.tl-trans { font-size:11px; color:#444; font-style:italic; margin-top:6px; }
 
-  /* TOAST */
-  .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#0a0c14;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s ease;pointer-events:none;}
-  .copy-toast.show{transform:translateX(-50%) translateY(0);}
+/* SCRIPT */
+.script {
+  background: rgba(2,8,20,0.6); border-left: 2px solid var(--gold);
+  border-radius: 0 10px 10px 0; padding: 11px 36px 11px 14px;
+  margin: 8px 0; position: relative;
+}
+.script-lbl { font-size: 8px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(212,175,55,0.5); margin-bottom: 5px; }
+.script-txt { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; color: #ddd; line-height: 1.6; }
+.script-copy { position: absolute; top: 9px; right: 8px; background: none; border: none; color: #444; cursor: pointer; display: flex; transition: color 0.2s; }
+.script-copy:hover { color: var(--gold); }
+.script-copy .material-symbols-rounded { font-size: 14px; }
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+/* DIVIDER */
+.divider { height: 1px; background: rgba(255,255,255,0.04); margin: 12px 0; }
+
+/* ERROR */
+.err-card { background: rgba(244,67,54,0.06); border: 1px solid rgba(244,67,54,0.22); border-radius: 16px; padding: 24px; text-align: center; }
+.err-card h4 { font-family: 'Playfair Display', serif; color: #F44336; margin-bottom: 7px; font-size: 16px; }
+.err-card p  { font-size: 12px; color: #888; margin-bottom: 16px; line-height: 1.6; font-weight: 300; }
+
+/* KEY SETTINGS SHEET */
+.key-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(8px); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
+.key-overlay.open { display: flex; }
+.key-sheet {
+  width: 100%; max-width: 600px;
+  background: var(--glass); backdrop-filter: blur(20px);
+  border: 1px solid var(--border); border-radius: 24px 24px 0 0;
+  padding: 8px 20px calc(32px + var(--safe-b, 0px));
+  animation: slideUp 0.3s cubic-bezier(.22,.68,0,1.2);
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.key-sheet-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 12px auto 20px; }
+.key-sheet-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+.key-sheet-sub   { font-size: 12px; color: #777; margin-bottom: 22px; line-height: 1.5; font-weight: 300; }
+.key-row  { margin-bottom: 16px; }
+.key-lbl  { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 7px; display: flex; align-items: center; gap: 7px; }
+.kdot-g { width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block; }
+.kdot-w { width:7px;height:7px;border-radius:50%;background:#e8e8e8;display:inline-block; }
+.kdot-b { width:7px;height:7px;border-radius:50%;background:#4285f4;display:inline-block; }
+.key-wrap { position: relative; }
+.key-wrap input {
+  width: 100%; background: rgba(2,8,20,0.8); border: 1px solid var(--border);
+  border-radius: 12px; color: #ccc; font-family: 'Montserrat', sans-serif;
+  font-size: 12px; padding: 11px 40px 11px 13px; outline: none; transition: border-color 0.2s;
+}
+.key-wrap input:focus { border-color: rgba(212,175,55,0.45); }
+.key-wrap input::placeholder { color: #444; letter-spacing: 0; }
+.key-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #555; cursor: pointer; display: flex; }
+.key-eye:hover { color: var(--gold); }
+.key-eye .material-symbols-rounded { font-size: 17px; }
+.key-status { font-size: 10px; margin-top: 4px; }
+.key-status.ok { color: #4CAF50; }
+.key-status.no { color: #444; }
+.key-link { font-size: 10px; color: rgba(212,175,55,0.55); text-decoration: none; margin-left: 8px; }
+.key-link:hover { color: var(--gold); }
+
+/* AI CHAT */
+.chat-panel { margin-top: 14px; border: 1px solid var(--border); border-radius: 18px; background: var(--glass2); backdrop-filter: blur(14px); overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+.chat-hdr {
+  display: flex; align-items: center; gap: 10px; padding: 13px 16px;
+  background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(212,175,55,0.08);
+}
+.chat-hdr .material-symbols-rounded { color: var(--gold); font-size: 17px; }
+.chat-hdr-title { font-family: 'Playfair Display', serif; font-size: 14px; color: #ddd; }
+.chat-hdr-sub   { font-size: 10px; color: #666; margin-top: 1px; }
+.chat-hist {
+  max-height: 260px; overflow-y: auto; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.chat-hist::-webkit-scrollbar { width: 3px; }
+.chat-hist::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.2); border-radius: 2px; }
+.chat-msg { max-width: 88%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6; font-weight: 300; }
+.chat-msg.user {
+  align-self: flex-end; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2);
+  color: #ccc; border-radius: 12px 12px 2px 12px;
+}
+.chat-msg.ai {
+  align-self: flex-start; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  color: #888; border-radius: 12px 12px 12px 2px;
+  font-family: 'Playfair Display', serif; font-style: italic;
+}
+.chat-input-row {
+  display: flex; gap: 8px; padding: 11px 14px;
+  border-top: 1px solid rgba(212,175,55,0.08); background: rgba(255,255,255,0.01);
+}
+.chat-input {
+  flex: 1; background: rgba(2,8,20,0.7); border: 1px solid var(--border);
+  border-radius: 22px; color: #ccc; font-family: 'Montserrat', sans-serif;
+  font-size: 12px; padding: 10px 16px; outline: none; transition: border-color 0.2s; font-weight: 300;
+}
+.chat-input:focus { border-color: rgba(212,175,55,0.4); }
+.chat-input::placeholder { color: #444; }
+.chat-send {
+  width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--luxury-gradient); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s;
+}
+.chat-send:hover { box-shadow: 0 4px 14px rgba(212,175,55,0.3); }
+.chat-send:active { transform: scale(0.94); }
+.chat-send:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+.chat-send .material-symbols-rounded { font-size: 17px; color: var(--midnight); }
+.chat-thinking { align-self: flex-start; display: flex; gap: 4px; padding: 12px 14px; }
+.chat-thinking span { width: 6px; height: 6px; border-radius: 50%; background: #555; animation: chatDot 1s ease infinite; }
+.chat-thinking span:nth-child(2){animation-delay:.15s}
+.chat-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes chatDot{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+
+/* Misc */
+.mb14{margin-bottom:14px;} .mt14{margin-top:14px;} .mb8{margin-bottom:8px;}
 </style>
 </head>
-<body>
 
-<!-- Nav -->
-<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
-<div class="nav-drawer" id="navDrawer">
-  <div class="nav-title">Dom Sub Hub</div>
-  <a href="index.html"><span class="material-icons-round">home</span>Home</a>
-  <a href="scene-menu.html"><span class="material-icons-round">theater_comedy</span>Scene Menu</a>
-  <a href="scene-builder.html" class="active"><span class="material-icons-round">architecture</span>Scene Builder</a>
-  <a href="training-menu.html"><span class="material-icons-round">fitness_center</span>Training Programs</a>
-  <a href="assessment-menu.html"><span class="material-icons-round">assignment</span>Assessments & Ratings</a>
-  <a href="bdsm-checklist.html"><span class="material-icons-round">fact_check</span>BDSM Checklists</a>
+<!-- data-nav="scenes" — nav.js highlights the Scenes tab -->
+<body data-nav="scenes">
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <!-- left: menu placeholder (back-btn is hidden by nav.css but we still need the layout slot) -->
+  <div style="width:38px;flex-shrink:0"></div>
+
+  <div class="topbar-center">
+    <div class="topbar-title">Scene Builder</div>
+    <div class="topbar-sub">Sir's Planning Chamber</div>
+  </div>
+
+  <!-- right: key button (NOT .back-btn, so nav.css doesn't hide it) -->
+  <button class="key-btn" onclick="openKeySheet()" title="Manage AI keys">
+    <span class="material-symbols-rounded">key</span>
+  </button>
 </div>
 
-<!-- Settings Sheet -->
-<div class="settings-overlay" id="settingsOverlay">
-  <div class="settings-sheet">
+<!-- ── Key Sheet Overlay ── -->
+<div class="key-overlay" id="keyOverlay">
+  <div class="key-sheet">
+    <div class="key-sheet-handle"></div>
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
       <div>
-        <div class="settings-title">AI Keys</div>
-        <div class="settings-sub">Stored in your browser only. Never shared anywhere except the AI you choose.<br>Add as many or as few as you like.</div>
+        <div class="key-sheet-title">AI Keys</div>
+        <div class="key-sheet-sub">Saved in your browser only. Never leave your device except when calling the AI you choose.</div>
       </div>
-      <button class="btn btn-ghost" style="padding:8px 16px;font-size:12px;flex-shrink:0;margin-top:4px" onclick="closeSettings()">Done</button>
+      <button class="sb-btn btn-outline" style="padding:8px 14px;font-size:10px;flex-shrink:0;border-radius:10px" onclick="closeKeySheet()">Done</button>
     </div>
 
     <div class="key-row">
-      <div class="key-row-label" style="color:var(--gold)">
-        <span class="dot-claude"></span> Claude — Anthropic
-        <a class="key-get-link" href="https://console.anthropic.com" target="_blank">Get key ↗</a>
+      <div class="key-lbl" style="color:var(--gold)"><span class="kdot-g"></span> Claude — Anthropic <a class="key-link" href="https://console.anthropic.com" target="_blank">Get key ↗</a></div>
+      <div class="key-wrap">
+        <input type="password" id="key-claude" placeholder="sk-ant-api03-..." oninput="saveKey('claude',this.value)"/>
+        <button class="key-eye" onclick="toggleEye('key-claude',this)"><span class="material-symbols-rounded">visibility_off</span></button>
       </div>
-      <div class="key-input-wrap">
-        <input type="password" id="key-claude" placeholder="sk-ant-api03-..." oninput="saveKey('claude',this.value)" />
-        <button class="key-toggle" onclick="toggleVis('key-claude',this)"><span class="material-icons-round" style="font-size:18px">visibility_off</span></button>
-      </div>
-      <div class="key-status empty" id="status-claude">Not set</div>
+      <div class="key-status no" id="ks-claude">Not set</div>
     </div>
 
     <div class="key-row">
-      <div class="key-row-label" style="color:#ccc">
-        <span class="dot-grok"></span> Grok — xAI
-        <a class="key-get-link" href="https://console.x.ai" target="_blank">Get key ↗</a>
+      <div class="key-lbl" style="color:#ccc"><span class="kdot-w"></span> Grok — xAI <a class="key-link" href="https://console.x.ai" target="_blank">Get key ↗</a></div>
+      <div class="key-wrap">
+        <input type="password" id="key-grok" placeholder="xai-..." oninput="saveKey('grok',this.value)"/>
+        <button class="key-eye" onclick="toggleEye('key-grok',this)"><span class="material-symbols-rounded">visibility_off</span></button>
       </div>
-      <div class="key-input-wrap">
-        <input type="password" id="key-grok" placeholder="xai-..." oninput="saveKey('grok',this.value)" />
-        <button class="key-toggle" onclick="toggleVis('key-grok',this)"><span class="material-icons-round" style="font-size:18px">visibility_off</span></button>
-      </div>
-      <div class="key-status empty" id="status-grok">Not set</div>
+      <div class="key-status no" id="ks-grok">Not set</div>
     </div>
 
     <div class="key-row">
-      <div class="key-row-label" style="color:#6aabff">
-        <span class="dot-gemini"></span> Gemini — Google
-        <a class="key-get-link" href="https://aistudio.google.com/app/apikey" target="_blank">Get key ↗</a>
+      <div class="key-lbl" style="color:#6aabff"><span class="kdot-b"></span> Gemini — Google <a class="key-link" href="https://aistudio.google.com/app/apikey" target="_blank">Get key ↗</a></div>
+      <div class="key-wrap">
+        <input type="password" id="key-gemini" placeholder="AIza..." oninput="saveKey('gemini',this.value)"/>
+        <button class="key-eye" onclick="toggleEye('key-gemini',this)"><span class="material-symbols-rounded">visibility_off</span></button>
       </div>
-      <div class="key-input-wrap">
-        <input type="password" id="key-gemini" placeholder="AIza..." oninput="saveKey('gemini',this.value)" />
-        <button class="key-toggle" onclick="toggleVis('key-gemini',this)"><span class="material-icons-round" style="font-size:18px">visibility_off</span></button>
-      </div>
-      <div class="key-status empty" id="status-gemini">Not set</div>
+      <div class="key-status no" id="ks-gemini">Not set</div>
     </div>
 
-    <div class="info-note" style="margin-top:20px">
-      <span class="material-icons-round">lock</span>
-      <span>Keys are saved to <b>localStorage</b> in your browser. They never leave your device except when calling the chosen AI directly.</span>
+    <div class="info-note" style="margin-top:16px">
+      <span class="material-symbols-rounded">lock</span>
+      <span>Keys are stored in <b style="color:var(--gold)">localStorage</b> in your browser and never uploaded anywhere.</span>
     </div>
   </div>
 </div>
 
-<!-- Header -->
-<div class="header">
-  <span class="material-icons-round" style="color:var(--gold);cursor:pointer;font-size:22px" onclick="openNav()">menu</span>
-  <div style="flex:1;text-align:center">
-    <div class="header-title">Scene Builder</div>
-    <div class="header-sub">Sir's planning chamber</div>
-  </div>
-  <div class="header-icon" onclick="openSettings()" title="Manage API Keys">
-    <span class="material-icons-round" style="font-size:16px">key</span>
-  </div>
-</div>
-
+<!-- ── Main ── -->
 <div class="main">
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-label">Dom Control Center</div>
-    <div class="hero-title">Build the Scene</div>
-    <div class="hero-sub">Command with Precision</div>
-    <div class="hero-desc">She has sent you her map. Choose your AI, build the architecture — the timing, the steps, the exact words to say.</div>
+  <!-- Hero -->
+  <div style="text-align:center;padding:18px 0 26px;animation:sbFadeUp 0.5s ease both">
+    <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(212,175,55,0.5);margin-bottom:10px">Dom Control Center</div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(22px,6vw,34px);font-weight:600;color:#ddd;margin-bottom:5px">Build the Scene</div>
+    <div style="font-family:'Great Vibes',cursive;font-size:clamp(18px,5vw,26px);background:var(--luxury-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">Command with Precision</div>
+    <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:#777;line-height:1.7;max-width:420px;margin:0 auto;font-weight:300">She has sent you her map. Choose your AI, build the architecture — timing, steps, the exact words to say.</div>
   </div>
 
-  <!-- MODEL SELECTOR -->
-  <div class="model-selector-bar">
-    <button class="model-btn active" data-model="claude" onclick="selectModel('claude')">
-      <span class="model-logo material-icons-round" style="color:#c9a84c">auto_awesome</span>
-      Claude
+  <!-- Model Selector -->
+  <div class="model-bar">
+    <button class="model-btn active" data-m="claude" onclick="pickModel('claude')">
+      <span class="ms material-symbols-rounded">auto_awesome</span> Claude
     </button>
-    <button class="model-btn" data-model="grok" onclick="selectModel('grok')">
-      <span class="model-logo material-icons-round">close</span>
-      Grok
+    <button class="model-btn" data-m="grok" onclick="pickModel('grok')">
+      <span class="ms material-symbols-rounded">close</span> Grok
     </button>
-    <button class="model-btn" data-model="gemini" onclick="selectModel('gemini')">
-      <span class="model-logo material-icons-round" style="color:#4285f4">diamond</span>
-      Gemini
+    <button class="model-btn" data-m="gemini" onclick="pickModel('gemini')">
+      <span class="ms material-symbols-rounded">diamond</span> Gemini
     </button>
   </div>
 
-  <!-- PROGRESS -->
-  <div class="progress-dots">
-    <div class="progress-dot active" id="dot-0"></div>
-    <div class="progress-dot" id="dot-1"></div>
-    <div class="progress-dot" id="dot-2"></div>
-    <div class="progress-dot" id="dot-3"></div>
+  <!-- Step Progress -->
+  <div class="builder-steps">
+    <div class="bstep active" id="st0" onclick="tryGoStep(0)">
+      <div class="bstep-dot">1</div>
+      <div class="bstep-lbl">Her Map</div>
+    </div>
+    <div class="bstep-line" id="ln01"></div>
+    <div class="bstep" id="st1" onclick="tryGoStep(1)">
+      <div class="bstep-dot">2</div>
+      <div class="bstep-lbl">Calibrate</div>
+    </div>
+    <div class="bstep-line" id="ln12"></div>
+    <div class="bstep" id="st2" onclick="tryGoStep(2)">
+      <div class="bstep-dot">3</div>
+      <div class="bstep-lbl">Review</div>
+    </div>
+    <div class="bstep-line" id="ln23"></div>
+    <div class="bstep" id="st3" onclick="tryGoStep(3)">
+      <div class="bstep-dot">4</div>
+      <div class="bstep-lbl">Plan</div>
+    </div>
   </div>
 
-  <!-- STEP 0 — HER MAP -->
-  <div class="step-view active" id="step-0">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-header-icon"><span class="material-icons-round">download</span></div>
-        <div class="card-header-text">
-          <h3>Import Her Map</h3>
-          <p>Paste what she submitted — or build freely</p>
+  <!-- ══ STEP 0 — HER MAP ══ -->
+  <div class="step-view active" id="sv0">
+    <div class="sb-card">
+      <div class="sb-card-header">
+        <div class="sb-card-icon"><span class="material-symbols-rounded">download</span></div>
+        <div>
+          <div class="sb-card-title">Import Her Map</div>
+          <div class="sb-card-sub">Paste what she submitted — or build freely</div>
         </div>
       </div>
-      <div class="card-body">
-        <div class="info-note mb-16">
-          <span class="material-icons-round">info</span>
-          <span>She copies her completed map from the Review screen of her Scene Planner and sends it to Sir. Paste it below — or leave empty to design from scratch.</span>
+      <div class="sb-card-body">
+        <div class="info-note">
+          <span class="material-symbols-rounded">info</span>
+          <span>She copies her completed map from the Review screen of her Scene Planner and sends it to Sir. Paste it below — or leave empty to design freely.</span>
         </div>
         <div class="paste-zone">
-          <h4>Paste Her Map Here</h4>
-          <p>The full text she copied from her Review screen.</p>
-          <textarea class="paste-input" id="herMapInput" placeholder="Role: Good Girl | Vibe: Dark & Intense | Bondage: Hogtie | Toys: Wand, Ferri | Impact: Flogger (Heavy) | Subspace Goal: Float & Drift..."></textarea>
+          <h4>Her Map</h4>
+          <p>Full text from her Review screen.</p>
+          <textarea class="sb-textarea" id="herMap" placeholder="Role: Good Girl | Vibe: Dark & Intense | Bondage: Hogtie | Toys: Wand, Ferri | Impact: Flogger (Heavy) | Subspace: Float & Drift..."></textarea>
         </div>
+
         <div class="divider"></div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">schedule</span> Scene Duration</div>
-          <div class="chips mb-16" id="durationChips">
-            <div class="chip" data-val="30 minutes" onclick="selectChip(this,'durationChips','durationInput')">30 min</div>
-            <div class="chip" data-val="45 minutes" onclick="selectChip(this,'durationChips','durationInput')">45 min</div>
-            <div class="chip" data-val="1 hour" onclick="selectChip(this,'durationChips','durationInput')">1 hour</div>
-            <div class="chip selected" data-val="90 minutes" onclick="selectChip(this,'durationChips','durationInput')">90 min</div>
-            <div class="chip" data-val="2 hours" onclick="selectChip(this,'durationChips','durationInput')">2 hours</div>
-            <div class="chip" data-val="open-ended" onclick="selectChip(this,'durationChips','durationInput')">Open</div>
-          </div>
-          <input type="hidden" id="durationInput" value="90 minutes" />
-        </div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">tune</span> Sir's Primary Intention</div>
-          <div class="chips" id="intentionChips">
-            <div class="chip selected" data-val="Psychological control and dominance" onclick="selectChip(this,'intentionChips','intentionInput')">Psychological control</div>
-            <div class="chip" data-val="Physical sensation and impact play" onclick="selectChip(this,'intentionChips','intentionInput')">Physical sensation</div>
-            <div class="chip" data-val="Service and worship" onclick="selectChip(this,'intentionChips','intentionInput')">Service & worship</div>
-            <div class="chip" data-val="Subspace and emotional depth" onclick="selectChip(this,'intentionChips','intentionInput')">Subspace & depth</div>
-            <div class="chip" data-val="Discipline and training" onclick="selectChip(this,'intentionChips','intentionInput')">Discipline</div>
-            <div class="chip" data-val="Pleasure and intimate connection" onclick="selectChip(this,'intentionChips','intentionInput')">Pleasure & connection</div>
-          </div>
-          <input type="hidden" id="intentionInput" value="Psychological control and dominance" />
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="goToStep(1)">Skip → Build Freely</button>
-          <button class="btn btn-gold" onclick="goToStep(1)"><span class="material-icons-round" style="font-size:16px">arrow_forward</span> Next</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- STEP 1 — SIR'S CALIBRATION -->
-  <div class="step-view" id="step-1">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-header-icon"><span class="material-icons-round">gavel</span></div>
-        <div class="card-header-text">
-          <h3>Sir's Calibration</h3>
-          <p>Set the tone, intensity, and arc</p>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">psychology</span> Overall Intensity</div>
-          <div class="question-sub">The emotional and physical weight of the entire scene.</div>
-          <div class="range-wrap">
-            <span style="font-size:11px;color:var(--text-faint)">Gentle</span>
-            <input type="range" min="1" max="10" value="7" id="intensityRange" oninput="document.getElementById('intensityVal').textContent=this.value" />
-            <span class="range-val" id="intensityVal">7</span>
-            <span style="font-size:11px;color:var(--text-faint)">Extreme</span>
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">schedule</span> Scene Duration</div>
+          <div class="chips mb8" id="durChips">
+            <div class="chip" data-v="30 minutes" onclick="pickChip(this,'durChips','durVal')">30 min</div>
+            <div class="chip" data-v="45 minutes" onclick="pickChip(this,'durChips','durVal')">45 min</div>
+            <div class="chip" data-v="1 hour" onclick="pickChip(this,'durChips','durVal')">1 hour</div>
+            <div class="chip on" data-v="90 minutes" onclick="pickChip(this,'durChips','durVal')">90 min</div>
+            <div class="chip" data-v="2 hours" onclick="pickChip(this,'durChips','durVal')">2 hours</div>
+            <div class="chip" data-v="open-ended" onclick="pickChip(this,'durChips','durVal')">Open</div>
           </div>
+          <input type="hidden" id="durVal" value="90 minutes"/>
         </div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">record_voice_over</span> Sir's Verbal Style</div>
-          <div class="chips" id="verbalChips">
-            <div class="chip selected" data-val="commanding and authoritative" onclick="selectChip(this,'verbalChips','verbalInput')">Commanding</div>
-            <div class="chip" data-val="cold and clinical" onclick="selectChip(this,'verbalChips','verbalInput')">Cold & clinical</div>
-            <div class="chip" data-val="dark and intense whispers" onclick="selectChip(this,'verbalChips','verbalInput')">Dark whispers</div>
-            <div class="chip" data-val="warm but strict" onclick="selectChip(this,'verbalChips','verbalInput')">Warm but strict</div>
-            <div class="chip" data-val="dominant praise mixed with degradation" onclick="selectChip(this,'verbalChips','verbalInput')">Praise & degrade</div>
-            <div class="chip" data-val="minimal words — power through silence" onclick="selectChip(this,'verbalChips','verbalInput')">Mostly silent</div>
-          </div>
-          <input type="hidden" id="verbalInput" value="commanding and authoritative" />
-        </div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">flag</span> Scene Climax Goal</div>
-          <div class="chips" id="climaxChips">
-            <div class="chip" data-val="forced orgasm after extended denial and edging" onclick="selectChip(this,'climaxChips','climaxInput')">Forced orgasm</div>
-            <div class="chip" data-val="Sir's release with devoted service from her" onclick="selectChip(this,'climaxChips','climaxInput')">Sir's release</div>
-            <div class="chip selected" data-val="subspace — she floats away, Sir holds the entire space" onclick="selectChip(this,'climaxChips','climaxInput')">Subspace</div>
-            <div class="chip" data-val="complete surrender and full restraint peak" onclick="selectChip(this,'climaxChips','climaxInput')">Full surrender</div>
-            <div class="chip" data-val="mutual intimacy and deep connection" onclick="selectChip(this,'climaxChips','climaxInput')">Intimacy</div>
-            <div class="chip" data-val="discipline peak — correction and punishment" onclick="selectChip(this,'climaxChips','climaxInput')">Discipline peak</div>
-          </div>
-          <input type="hidden" id="climaxInput" value="subspace — she floats away, Sir holds the entire space" />
-        </div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">spa</span> Aftercare Style</div>
-          <div class="chips" id="aftercareChips">
-            <div class="chip selected" data-val="hold her close, quiet affirmation, blanket and water" onclick="selectChip(this,'aftercareChips','aftercareInput')">Hold & comfort</div>
-            <div class="chip" data-val="Sir leads a quiet verbal debrief" onclick="selectChip(this,'aftercareChips','aftercareInput')">Debrief talk</div>
-            <div class="chip" data-val="shower together then rest" onclick="selectChip(this,'aftercareChips','aftercareInput')">Shower & rest</div>
-            <div class="chip" data-val="quiet separate space then reconnect" onclick="selectChip(this,'aftercareChips','aftercareInput')">Quiet separation</div>
-            <div class="chip" data-val="food, water, and physical closeness" onclick="selectChip(this,'aftercareChips','aftercareInput')">Food & closeness</div>
-          </div>
-          <input type="hidden" id="aftercareInput" value="hold her close, quiet affirmation, blanket and water" />
-        </div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">edit_note</span> Sir's Private Notes</div>
-          <div class="question-sub">Anything specific to weave into the plan.</div>
-          <textarea class="paste-input" id="sirNotes" style="min-height:70px" placeholder="e.g. Start slow — she's been stressed this week. Build to the rope tie before the wand..."></textarea>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="goToStep(0)"><span class="material-icons-round" style="font-size:16px">arrow_back</span> Back</button>
-          <button class="btn btn-gold" onclick="goToStep(2)"><span class="material-icons-round" style="font-size:16px">arrow_forward</span> Next</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- STEP 2 — REVIEW -->
-  <div class="step-view" id="step-2">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-header-icon"><span class="material-icons-round">checklist</span></div>
-        <div class="card-header-text">
-          <h3>Review & Build</h3>
-          <p>Confirm — then AI generates the full plan</p>
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">tune</span> Sir's Primary Intention</div>
+          <div class="chips" id="intChips">
+            <div class="chip on" data-v="Psychological control and dominance" onclick="pickChip(this,'intChips','intVal')">Psychological control</div>
+            <div class="chip" data-v="Physical sensation and impact play" onclick="pickChip(this,'intChips','intVal')">Physical sensation</div>
+            <div class="chip" data-v="Service and worship" onclick="pickChip(this,'intChips','intVal')">Service & worship</div>
+            <div class="chip" data-v="Subspace and emotional depth" onclick="pickChip(this,'intChips','intVal')">Subspace & depth</div>
+            <div class="chip" data-v="Discipline and training" onclick="pickChip(this,'intChips','intVal')">Discipline</div>
+            <div class="chip" data-v="Pleasure and intimate connection" onclick="pickChip(this,'intChips','intVal')">Pleasure & connection</div>
+          </div>
+          <input type="hidden" id="intVal" value="Psychological control and dominance"/>
         </div>
-      </div>
-      <div class="card-body">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <span style="font-size:12px;color:var(--text-dim)">Building with</span>
-          <div class="model-indicator mi-claude" id="activeModelBadge">Claude</div>
-        </div>
-        <div id="summaryGrid" class="summary-grid mb-16"></div>
-        <div id="noKeyWarning" class="info-note mb-16" style="display:none;background:rgba(201,76,106,0.08);border-color:rgba(201,76,106,0.2)">
-          <span class="material-icons-round" style="color:var(--rose)">warning</span>
-          <span>No API key for this model. <b style="color:var(--rose);cursor:pointer;text-decoration:underline" onclick="openSettings()">Add key →</b></span>
-        </div>
-        <div class="question-block">
-          <div class="question-label"><span class="material-icons-round">add_circle_outline</span> Final Thoughts (Optional)</div>
-          <textarea class="paste-input" id="finalNotes" style="min-height:60px" placeholder="Anything to add before the AI builds..."></textarea>
-        </div>
+
         <div class="btn-row">
-          <button class="btn btn-ghost" onclick="goToStep(1)"><span class="material-icons-round" style="font-size:16px">arrow_back</span> Back</button>
-          <button class="btn btn-gold btn-full" onclick="buildScene()">
-            <span class="material-icons-round" style="font-size:16px">auto_awesome</span> Build the Scene
+          <button class="sb-btn btn-outline" onclick="goStep(1)">Skip → Build Freely</button>
+          <button class="sb-btn btn-gold" onclick="goStep(1)">
+            <span class="material-symbols-rounded">arrow_forward</span> Next
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- STEP 3 — THE PLAN -->
-  <div class="step-view" id="step-3">
-    <div class="ai-thinking" id="aiThinking">
-      <div class="model-orb" id="modelOrb" style="--orb-color:var(--gold)">
-        <span class="material-icons-round" id="orbIcon" style="font-size:28px;color:var(--gold)">auto_awesome</span>
-      </div>
-      <p>Building Sir's scene plan<span class="ai-thinking-dots"></span></p>
-      <p style="font-size:12px;opacity:0.5" id="thinkingLabel">via Claude</p>
-    </div>
-    <div class="scene-plan" id="scenePlan">
-      <div class="hero" style="padding:0 0 24px">
-        <div class="hero-label">Scene Plan</div>
-        <div class="hero-title" id="planTitle">Sir's Blueprint</div>
-        <div class="hero-sub" id="planSubtitle">The Architecture of Control</div>
-        <div style="display:flex;justify-content:center;margin-top:8px">
-          <div class="model-indicator mi-claude" id="planModelBadge">Claude</div>
+  <!-- ══ STEP 1 — CALIBRATE ══ -->
+  <div class="step-view" id="sv1">
+    <div class="sb-card">
+      <div class="sb-card-header">
+        <div class="sb-card-icon"><span class="material-symbols-rounded">gavel</span></div>
+        <div>
+          <div class="sb-card-title">Sir's Calibration</div>
+          <div class="sb-card-sub">Set the tone, intensity, and arc</div>
         </div>
       </div>
-      <div id="planContent"></div>
+      <div class="sb-card-body">
 
-      <!-- REFINE WITH AI PANEL -->
-      <div class="card refine-card mt-16">
-        <div class="card-header">
-          <div class="card-header-icon"><span class="material-icons-round">auto_awesome</span></div>
-          <div class="card-header-text">
-            <h3>Refine with AI</h3>
-            <p>Tell the AI exactly what to change — it will rebuild the entire plan</p>
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">psychology</span> Overall Intensity</div>
+          <div class="qs">The emotional and physical weight of the scene.</div>
+          <div class="range-row">
+            <span style="font-size:10px;color:#444">Gentle</span>
+            <input type="range" min="1" max="10" value="7" id="intenRange" oninput="document.getElementById('intenVal').textContent=this.value"/>
+            <span class="range-val" id="intenVal">7</span>
+            <span style="font-size:10px;color:#444">Extreme</span>
           </div>
         </div>
-        <div class="card-body">
-          <textarea id="refineInput" class="paste-input" rows="3" placeholder="Make the humiliation heavier… Extend the rope section by 15 minutes… Change the dialogue to be more degrading…"></textarea>
-          <div class="btn-row" style="margin-top:16px">
-            <button onclick="refineScene()" class="btn btn-gold btn-full">
-              <span class="material-icons-round" style="font-size:18px">auto_awesome</span>
-              Refine Scene with AI
-            </button>
-          </div>
-          <div id="refineStatus" style="margin-top:12px;font-size:12px;color:var(--text-dim);text-align:center;display:none;">
-            Refining with AI<span class="ai-thinking-dots"></span>
-          </div>
-        </div>
-      </div>
 
-      <div class="card mt-16">
-        <div class="card-body">
-          <div class="question-label mb-8"><span class="material-icons-round">share</span> Export</div>
-          <div class="btn-row" style="margin-top:0">
-            <button class="btn btn-ghost" onclick="copyPlan()"><span class="material-icons-round" style="font-size:16px">content_copy</span> Copy Plan</button>
-            <button class="btn btn-rose" onclick="resetBuilder()"><span class="material-icons-round" style="font-size:16px">restart_alt</span> New Scene</button>
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">record_voice_over</span> Sir's Verbal Style</div>
+          <div class="chips" id="verbChips">
+            <div class="chip on" data-v="commanding and authoritative" onclick="pickChip(this,'verbChips','verbVal')">Commanding</div>
+            <div class="chip" data-v="cold and clinical" onclick="pickChip(this,'verbChips','verbVal')">Cold & clinical</div>
+            <div class="chip" data-v="dark and intense whispers" onclick="pickChip(this,'verbChips','verbVal')">Dark whispers</div>
+            <div class="chip" data-v="warm but strict" onclick="pickChip(this,'verbChips','verbVal')">Warm but strict</div>
+            <div class="chip" data-v="dominant praise mixed with degradation" onclick="pickChip(this,'verbChips','verbVal')">Praise & degrade</div>
+            <div class="chip" data-v="minimal words — power through silence" onclick="pickChip(this,'verbChips','verbVal')">Mostly silent</div>
           </div>
+          <input type="hidden" id="verbVal" value="commanding and authoritative"/>
+        </div>
+
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">flag</span> Scene Climax Goal</div>
+          <div class="chips" id="climaxChips">
+            <div class="chip" data-v="forced orgasm after extended denial and edging" onclick="pickChip(this,'climaxChips','climaxVal')">Forced orgasm</div>
+            <div class="chip" data-v="Sir's release with devoted service from her" onclick="pickChip(this,'climaxChips','climaxVal')">Sir's release</div>
+            <div class="chip on" data-v="subspace — she floats away, Sir holds everything" onclick="pickChip(this,'climaxChips','climaxVal')">Subspace</div>
+            <div class="chip" data-v="complete surrender and full restraint peak" onclick="pickChip(this,'climaxChips','climaxVal')">Full surrender</div>
+            <div class="chip" data-v="mutual intimacy and deep connection" onclick="pickChip(this,'climaxChips','climaxVal')">Intimacy</div>
+            <div class="chip" data-v="discipline peak — correction and punishment" onclick="pickChip(this,'climaxChips','climaxVal')">Discipline peak</div>
+          </div>
+          <input type="hidden" id="climaxVal" value="subspace — she floats away, Sir holds everything"/>
+        </div>
+
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">spa</span> Aftercare Style</div>
+          <div class="chips" id="acChips">
+            <div class="chip on" data-v="hold her close, quiet affirmation, blanket and water" onclick="pickChip(this,'acChips','acVal')">Hold & comfort</div>
+            <div class="chip" data-v="Sir leads a quiet verbal debrief" onclick="pickChip(this,'acChips','acVal')">Debrief talk</div>
+            <div class="chip" data-v="shower together then rest" onclick="pickChip(this,'acChips','acVal')">Shower & rest</div>
+            <div class="chip" data-v="quiet separate space then reconnect" onclick="pickChip(this,'acChips','acVal')">Quiet separation</div>
+            <div class="chip" data-v="food, water, and physical closeness" onclick="pickChip(this,'acChips','acVal')">Food & closeness</div>
+          </div>
+          <input type="hidden" id="acVal" value="hold her close, quiet affirmation, blanket and water"/>
+        </div>
+
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">edit_note</span> Sir's Private Notes</div>
+          <div class="qs">Anything specific to weave into the plan.</div>
+          <textarea class="sb-textarea" id="sirNotes" style="min-height:70px" placeholder="e.g. Start slow — she's been stressed. Build to rope before the wand. End with verbal affirmation..."></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button class="sb-btn btn-outline" onclick="goStep(0)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+          <button class="sb-btn btn-gold" onclick="goStep(2)"><span class="material-symbols-rounded">arrow_forward</span> Next</button>
         </div>
       </div>
     </div>
   </div>
 
-</div>
+  <!-- ══ STEP 2 — REVIEW ══ -->
+  <div class="step-view" id="sv2">
+    <div class="sb-card">
+      <div class="sb-card-header">
+        <div class="sb-card-icon"><span class="material-symbols-rounded">checklist</span></div>
+        <div>
+          <div class="sb-card-title">Review & Build</div>
+          <div class="sb-card-sub">Confirm — AI generates the full scene plan</div>
+        </div>
+      </div>
+      <div class="sb-card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <span style="font-size:11px;color:#666">Building with</span>
+          <div class="mbadge mb-claude" id="revModelBadge">Claude</div>
+        </div>
+        <div class="sum-grid" id="sumGrid"></div>
+        <div class="info-note warn-note mb14" id="noKeyWarn" style="display:none">
+          <span class="material-symbols-rounded">warning</span>
+          <span>No API key for this model. <b style="color:#F44336;cursor:pointer;text-decoration:underline" onclick="openKeySheet()">Add key →</b></span>
+        </div>
+        <div class="mb14">
+          <div class="ql"><span class="material-symbols-rounded">add_circle</span> Final Thoughts (Optional)</div>
+          <textarea class="sb-textarea" id="finalNotes" style="min-height:60px" placeholder="Anything to add before the AI builds..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="sb-btn btn-outline" onclick="goStep(1)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+          <button class="sb-btn btn-gold btn-full" onclick="buildScene()">
+            <span class="material-symbols-rounded">auto_awesome</span> Build the Scene
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="copy-toast" id="copyToast">Copied to clipboard</div>
+  <!-- ══ STEP 3 — THE PLAN ══ -->
+  <div class="step-view" id="sv3">
+
+    <div class="thinking" id="thinkEl">
+      <div class="think-orb" id="thinkOrb">
+        <span class="material-symbols-rounded" id="thinkIcon">auto_awesome</span>
+      </div>
+      <div class="think-text">Building Sir's scene plan<span class="think-dots"></span></div>
+      <div class="think-sub" id="thinkSub">via Claude</div>
+    </div>
+
+    <div class="plan-wrap" id="planWrap">
+      <div class="plan-title-area">
+        <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(212,175,55,0.5);margin-bottom:8px">Scene Plan</div>
+        <h2 id="planTitle">Sir's Blueprint</h2>
+        <div class="plan-cursive" id="planSub">The Architecture of Control</div>
+        <div style="display:flex;justify-content:center;margin-top:10px">
+          <div class="mbadge mb-claude" id="planModelBadge">Claude</div>
+        </div>
+      </div>
+
+      <div id="planSections"></div>
+
+      <div class="sb-card">
+        <div class="sb-card-body">
+          <div class="ql mb8"><span class="material-symbols-rounded">ios_share</span> Export</div>
+          <div class="btn-row" style="margin-top:0">
+            <button class="sb-btn btn-outline" onclick="copyPlan()"><span class="material-symbols-rounded">content_copy</span> Copy Plan</button>
+            <button class="sb-btn btn-danger" onclick="resetAll()"><span class="material-symbols-rounded">restart_alt</span> New Scene</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Refinement Chat -->
+      <div class="chat-panel" id="chatPanel">
+        <div class="chat-hdr">
+          <span class="material-symbols-rounded">chat</span>
+          <div>
+            <div class="chat-hdr-title">Refine with AI</div>
+            <div class="chat-hdr-sub">Ask Sir's AI to tweak any part of the plan</div>
+          </div>
+        </div>
+        <div class="chat-hist" id="chatHist">
+          <div class="chat-msg ai">The scene plan is ready. Tell me what to adjust — a phase, a script, the pacing, the tone. I'll rebuild the full plan with your changes.</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" type="text" id="chatInput"
+            placeholder="e.g. Make the opening longer, add more scripts for phase 3..."
+            onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="chat-send" id="chatSendBtn" onclick="sendChat()">
+            <span class="material-symbols-rounded">send</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- nav.js injects the bottom tab bar automatically -->
+<script src="nav.js"></script>
 
 <script>
-let currentStep = 0;
-let activeModel = 'claude';
-let currentPlanData = null;
-let originalParameters = null;
+// ── STATE ────────────────────────────────────────────────────────────────────
+var activeModel = 'claude';
+var currentStep = 0;
+var currentPlan = null;
+var chatHistory = [];
 
-const MODELS = {
-  claude: { label:'Claude', cls:'mi-claude', orbColor:'#c9a84c', icon:'auto_awesome', iconColor:'#c9a84c' },
-  grok:   { label:'Grok',   cls:'mi-grok',   orbColor:'#e8e8e8', icon:'close',        iconColor:'#e8e8e8' },
-  gemini: { label:'Gemini', cls:'mi-gemini', orbColor:'#4285f4', icon:'diamond',      iconColor:'#4285f4' }
+var MODEL_CFG = {
+  claude: { label:'Claude', cls:'mb-claude', orbColor:'#D4AF37',  icon:'auto_awesome' },
+  grok:   { label:'Grok',   cls:'mb-grok',   orbColor:'#e8e8e8',  icon:'close'        },
+  gemini: { label:'Gemini', cls:'mb-gemini', orbColor:'#4285f4',  icon:'diamond'      }
 };
 
-// Init
+// ── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', loadKeys);
 
-// Nav
-function openNav(){document.getElementById('navDrawer').classList.add('open');document.getElementById('navOverlay').classList.add('open');}
-function closeNav(){document.getElementById('navDrawer').classList.remove('open');document.getElementById('navOverlay').classList.remove('open');}
+// ── KEY SHEET ────────────────────────────────────────────────────────────────
+function openKeySheet()  { document.getElementById('keyOverlay').classList.add('open'); }
+function closeKeySheet() { document.getElementById('keyOverlay').classList.remove('open'); }
+document.getElementById('keyOverlay').addEventListener('click', function(e) {
+  if (e.target === e.currentTarget) closeKeySheet();
+});
 
-// Settings
-function openSettings(){document.getElementById('settingsOverlay').classList.add('open');}
-function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
-document.getElementById('settingsOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSettings();});
-
-function saveKey(model,val){
-  if(val.trim()){localStorage.setItem('dsb_key_'+model,val.trim());setKeyStatus(model,true);}
-  else{localStorage.removeItem('dsb_key_'+model);setKeyStatus(model,false);}
+function saveKey(m, v) {
+  if (v.trim()) { localStorage.setItem('dsb_k_'+m, v.trim()); setKS(m, true); }
+  else          { localStorage.removeItem('dsb_k_'+m);        setKS(m, false); }
 }
-function loadKeys(){
-  ['claude','grok','gemini'].forEach(m=>{
-    const v=localStorage.getItem('dsb_key_'+m);
-    if(v){document.getElementById('key-'+m).value=v;setKeyStatus(m,true);}
+function loadKeys() {
+  ['claude','grok','gemini'].forEach(function(m) {
+    var v = localStorage.getItem('dsb_k_'+m);
+    if (v) { document.getElementById('key-'+m).value = v; setKS(m, true); }
   });
 }
-function setKeyStatus(m,ok){
-  const el=document.getElementById('status-'+m);
-  el.textContent=ok?'✓ Key saved':'Not set';
-  el.className='key-status '+(ok?'ok':'empty');
+function setKS(m, ok) {
+  var el = document.getElementById('ks-'+m);
+  el.textContent = ok ? '✓ Key saved' : 'Not set';
+  el.className = 'key-status ' + (ok ? 'ok' : 'no');
 }
-function getKey(m){return localStorage.getItem('dsb_key_'+m)||'';}
-function toggleVis(id,btn){
-  const inp=document.getElementById(id);
-  const ic=btn.querySelector('span');
-  if(inp.type==='password'){inp.type='text';ic.textContent='visibility';}
-  else{inp.type='password';ic.textContent='visibility_off';}
-}
-
-// Model selector
-function selectModel(m){
-  activeModel=m;
-  document.querySelectorAll('.model-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector('[data-model="'+m+'"]').classList.add('active');
+function getKey(m) { return localStorage.getItem('dsb_k_'+m) || ''; }
+function toggleEye(id, btn) {
+  var inp = document.getElementById(id);
+  var ic  = btn.querySelector('span');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  ic.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
 }
 
-// Steps
-function goToStep(n){
-  document.getElementById('step-'+currentStep).classList.remove('active');
-  document.getElementById('dot-'+currentStep).classList.remove('active');
-  document.getElementById('dot-'+currentStep).classList.add('done');
-  currentStep=n;
-  document.getElementById('step-'+n).classList.add('active');
-  document.getElementById('dot-'+n).classList.add('active');
-  document.getElementById('dot-'+n).classList.remove('done');
-  window.scrollTo({top:0,behavior:'smooth'});
-  if(n===2)populateSummary();
+// ── MODEL ─────────────────────────────────────────────────────────────────────
+function pickModel(m) {
+  activeModel = m;
+  document.querySelectorAll('.model-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('[data-m="'+m+'"]').classList.add('active');
 }
 
-function selectChip(el,groupId,inputId){
-  document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  if(inputId)document.getElementById(inputId).value=el.dataset.val;
+// ── STEPS ─────────────────────────────────────────────────────────────────────
+function tryGoStep(n) { if (n <= currentStep) goStep(n); }
+function goStep(n) {
+  document.getElementById('sv'+currentStep).classList.remove('active');
+  document.getElementById('st'+currentStep).classList.remove('active');
+  if (n > currentStep) document.getElementById('st'+currentStep).classList.add('done');
+  if (n < currentStep) document.getElementById('st'+currentStep).classList.remove('done');
+
+  for (var i = 0; i < 3; i++) {
+    var ln = document.getElementById('ln'+i+(i+1));
+    if (ln) ln.classList.toggle('done', n > i);
+  }
+
+  currentStep = n;
+  document.getElementById('sv'+n).classList.add('active');
+  document.getElementById('st'+n).classList.add('active');
+  document.getElementById('st'+n).classList.remove('done');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 2) buildSummary();
 }
 
-function populateSummary(){
-  const cfg=MODELS[activeModel];
-  const b=document.getElementById('activeModelBadge');
-  b.textContent=cfg.label; b.className='model-indicator '+cfg.cls;
-  document.getElementById('noKeyWarning').style.display=getKey(activeModel)?'none':'flex';
-  const items=[
-    {label:'Model',val:cfg.label},
-    {label:'Duration',val:document.getElementById('durationInput').value},
-    {label:'Intention',val:document.getElementById('intentionInput').value},
-    {label:'Intensity',val:document.getElementById('intensityRange').value+' / 10'},
-    {label:'Verbal Style',val:document.getElementById('verbalInput').value},
-    {label:'Climax',val:document.getElementById('climaxInput').value},
+function pickChip(el, grp, hid) {
+  document.querySelectorAll('#'+grp+' .chip').forEach(function(c) { c.classList.remove('on'); });
+  el.classList.add('on');
+  if (hid) document.getElementById(hid).value = el.dataset.v;
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────────────────────
+function buildSummary() {
+  var cfg = MODEL_CFG[activeModel];
+  var b = document.getElementById('revModelBadge');
+  b.textContent = cfg.label; b.className = 'mbadge ' + cfg.cls;
+  document.getElementById('noKeyWarn').style.display = getKey(activeModel) ? 'none' : 'flex';
+  var rows = [
+    { l:'Model',     v: cfg.label },
+    { l:'Duration',  v: document.getElementById('durVal').value },
+    { l:'Intention', v: document.getElementById('intVal').value },
+    { l:'Intensity', v: document.getElementById('intenRange').value + ' / 10' },
+    { l:'Verbal',    v: document.getElementById('verbVal').value },
+    { l:'Climax',    v: document.getElementById('climaxVal').value }
   ];
-  document.getElementById('summaryGrid').innerHTML=items.map(i=>`<div class="summary-item"><div class="summary-item-label">\( {i.label}</div><div class="summary-item-value"> \){i.val}</div></div>`).join('');
+  document.getElementById('sumGrid').innerHTML = rows.map(function(r) {
+    return '<div class="sum-item"><div class="sum-lbl">'+r.l+'</div><div class="sum-val">'+r.v+'</div></div>';
+  }).join('');
 }
 
-// Build
-async function buildScene(){
-  const cfg=MODELS[activeModel];
-  const orb=document.getElementById('modelOrb');
-  orb.style.setProperty('--orb-color',cfg.orbColor);
-  const ic=document.getElementById('orbIcon');
-  ic.textContent=cfg.icon; ic.style.color=cfg.orbColor;
-  document.getElementById('thinkingLabel').textContent='via '+cfg.label;
+// ── BUILD ──────────────────────────────────────────────────────────────────────
+function buildScene() {
+  var cfg = MODEL_CFG[activeModel];
+  var orb = document.getElementById('thinkOrb');
+  orb.style.setProperty('--orb-c', cfg.orbColor);
+  document.getElementById('thinkIcon').textContent = cfg.icon;
+  document.getElementById('thinkSub').textContent  = 'via ' + cfg.label;
+  var pb = document.getElementById('planModelBadge');
+  pb.textContent = cfg.label; pb.className = 'mbadge ' + cfg.cls;
 
-  goToStep(3);
-  document.getElementById('aiThinking').classList.add('visible');
-  document.getElementById('scenePlan').classList.remove('visible');
+  goStep(3);
+  document.getElementById('thinkEl').classList.add('show');
+  document.getElementById('planWrap').classList.remove('show');
 
-  const p={
-    herMap:document.getElementById('herMapInput').value.trim(),
-    duration:document.getElementById('durationInput').value,
-    intention:document.getElementById('intentionInput').value,
-    intensity:document.getElementById('intensityRange').value,
-    verbal:document.getElementById('verbalInput').value,
-    climax:document.getElementById('climaxInput').value,
-    aftercare:document.getElementById('aftercareInput').value,
-    sirNotes:document.getElementById('sirNotes').value.trim(),
-    finalNotes:document.getElementById('finalNotes').value.trim()
+  var p = {
+    herMap:     document.getElementById('herMap').value.trim(),
+    duration:   document.getElementById('durVal').value,
+    intention:  document.getElementById('intVal').value,
+    intensity:  document.getElementById('intenRange').value,
+    verbal:     document.getElementById('verbVal').value,
+    climax:     document.getElementById('climaxVal').value,
+    aftercare:  document.getElementById('acVal').value,
+    sirNotes:   document.getElementById('sirNotes').value.trim(),
+    finalNotes: document.getElementById('finalNotes').value.trim()
   };
 
-  const prompt=`You are a sophisticated BDSM scene planning assistant helping a Dom/Sir build a complete scene plan for a consensual adult dynamic.
+  var system = 'You are a sophisticated BDSM scene planning assistant helping a Dom/Sir build a complete, detailed scene plan for a consensual adult dynamic. Always respond with valid JSON only — no markdown, no backticks, no preamble.';
+  var user   = buildUserPrompt(p);
+  chatHistory = [{ role:'user', content: user }];
 
-HER SUBMITTED MAP:
-${p.herMap||'[No map — Sir is designing freely]'}
-
-SIR'S PARAMETERS:
-- Duration: ${p.duration}
-- Intention: ${p.intention}
-- Intensity: ${p.intensity}/10
-- Verbal Style: ${p.verbal}
-- Climax Goal: ${p.climax}
-- Aftercare: ${p.aftercare}
-- Notes: ${p.sirNotes||'None'}
-- Final: ${p.finalNotes||'None'}
-
-Respond ONLY in valid JSON, no markdown, no backticks, no preamble:
-{"title":"2-5 word poetic title","subtitle":"one refined line","overview":"2-3 sentence arc","setup":{"environment":"space prep","sir_mindset":"how Sir arrives","her_preparation":"what she does first"},"timeline":[{"phase":"name","time":"e.g. 0-12 min","objective":"what this achieves","steps":["step1","step2","step3"],"scripts":["Sir says this","or this"],"transition":"how to move on"}],"key_moments":[{"label":"name","description":"what and why"}],"aftercare_plan":"detailed aftercare","sir_reminders":["reminder1","reminder2","reminder3"]}
-
-Build 4-7 phases fitting the duration. Scripts: natural, authoritative, intimate. Be specific and detailed for consenting adults.`;
-
-  try {
-    let plan;
-    if(activeModel==='claude') plan=await callClaude(prompt);
-    else if(activeModel==='grok') plan=await callGrok(prompt);
-    else plan=await callGemini(prompt);
-    
-    currentPlanData = plan;
-    originalParameters = p;
+  callAI(chatHistory, system).then(function(plan) {
+    chatHistory.push({ role:'assistant', content: JSON.stringify(plan) });
+    currentPlan = plan;
     renderPlan(plan);
-  } catch(err){
+    resetChat();
+  }).catch(function(err) {
     showError(err.message);
-  }
-}
-
-async function callClaude(prompt){
-  const key=getKey('claude');
-  if(!key) throw new Error('No Claude API key saved. Tap the 🔑 key icon in the header to add one.');
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-3-5-sonnet-20241022',max_tokens:1200,messages:[{role:'user',content:prompt}]})
   });
-  const d=await res.json();
-  if(d.error) throw new Error('Claude error: '+d.error.message);
-  return parseAI(d.content.map(b=>b.text||'').join(''));
 }
 
-async function callGrok(prompt){
-  const key=getKey('grok');
-  if(!key) throw new Error('No Grok API key saved. Tap the 🔑 key icon to add one.');
-  const res=await fetch('https://api.x.ai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'grok-3-latest',max_tokens:1200,messages:[{role:'system',content:'Respond only with valid JSON, no markdown.'},{role:'user',content:prompt}]})
+function buildUserPrompt(p) {
+  return 'Build a complete scene plan.\n\nHER MAP:\n'+(p.herMap||'[None — designing freely]')+'\n\nPARAMETERS:\n- Duration: '+p.duration+'\n- Intention: '+p.intention+'\n- Intensity: '+p.intensity+'/10\n- Verbal Style: '+p.verbal+'\n- Climax: '+p.climax+'\n- Aftercare: '+p.aftercare+'\n- Notes: '+(p.sirNotes||'None')+'\n- Final: '+(p.finalNotes||'None')+'\n\nReturn ONLY valid JSON:\n{"title":"2-5 word poetic title","subtitle":"one refined line","overview":"2-3 sentence arc","setup":{"environment":"space prep","sir_mindset":"how Sir arrives","her_preparation":"what she does first"},"timeline":[{"phase":"name","time":"e.g. 0–12 min","objective":"what this achieves","steps":["step1","step2","step3"],"scripts":["Sir says this","or this"],"transition":"how to move on"}],"key_moments":[{"label":"name","description":"what and why"}],"aftercare_plan":"detailed aftercare","sir_reminders":["reminder1","reminder2","reminder3"]}\n\nBuild 4-7 phases. Scripts must be natural, intimate, authoritative. Be specific — consenting adults.';
+}
+
+function buildRefinePrompt(msg) {
+  return 'The scene plan is already built. Sir wants to refine it.\n\nSir\'s request: "'+msg+'"\n\nApply the changes and return the COMPLETE updated scene plan in the same JSON schema. Do not summarise — rebuild the full plan.';
+}
+
+// ── API CALLS ─────────────────────────────────────────────────────────────────
+function callAI(messages, system) {
+  if (activeModel === 'claude')  return callClaude(messages, system);
+  if (activeModel === 'grok')    return callGrok(messages, system);
+  return callGemini(messages, system);
+}
+
+function callClaude(messages, system) {
+  var key = getKey('claude');
+  if (!key) return Promise.reject(new Error('No Claude API key. Tap the key icon to add one.'));
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:system, messages:messages })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d.error) throw new Error('Claude: '+d.error.message);
+    return parseAI(d.content.map(function(b){return b.text||'';}).join(''));
   });
-  const d=await res.json();
-  if(d.error) throw new Error('Grok error: '+(d.error.message||JSON.stringify(d.error)));
-  return parseAI(d.choices?.[0]?.message?.content||'');
 }
 
-async function callGemini(prompt){
-  const key=getKey('gemini');
-  if(!key) throw new Error('No Gemini API key saved. Tap the 🔑 key icon to add one.');
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:1200}})
+function callGrok(messages, system) {
+  var key = getKey('grok');
+  if (!key) return Promise.reject(new Error('No Grok API key. Tap the key icon to add one.'));
+  var msgs = [{ role:'system', content:system }].concat(messages);
+  return fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+    body: JSON.stringify({ model:'grok-3-latest', max_tokens:1000, messages:msgs })
+  }).then(function(r){return r.json();}).then(function(d) {
+    if (d.error) throw new Error('Grok: '+(d.error.message||JSON.stringify(d.error)));
+    return parseAI((d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'');
   });
-  const d=await res.json();
-  if(d.error) throw new Error('Gemini error: '+d.error.message);
-  return parseAI(d.candidates?.[0]?.content?.parts?.[0]?.text||'');
 }
 
-function parseAI(raw){
-  const clean=raw.replace(/```json|```/g,'').trim();
-  try{return JSON.parse(clean);}
-  catch(e){
-    const m=clean.match(/\{[\s\S]*\}/);
-    if(m) return JSON.parse(m[0]);
-    throw new Error('Could not parse the AI response. Please try again.');
+function callGemini(messages, system) {
+  var key = getKey('gemini');
+  if (!key) return Promise.reject(new Error('No Gemini API key. Tap the key icon to add one.'));
+  var combined = system+'\n\n'+messages.map(function(m){return m.content;}).join('\n\n');
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ contents:[{parts:[{text:combined}]}], generationConfig:{maxOutputTokens:1000} })
+  }).then(function(r){return r.json();}).then(function(d) {
+    if (d.error) throw new Error('Gemini: '+d.error.message);
+    return parseAI((d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text)||'');
+  });
+}
+
+function parseAI(raw) {
+  var clean = raw.replace(/```json|```/g,'').trim();
+  try { return JSON.parse(clean); }
+  catch(e) {
+    var m = clean.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error('Could not parse AI response. Please try again.');
   }
 }
 
-function renderPlan(plan){
-  document.getElementById('planTitle').textContent=plan.title||"Sir's Blueprint";
-  document.getElementById('planSubtitle').textContent=plan.subtitle||'';
-  let html='';
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function renderPlan(plan) {
+  document.getElementById('planTitle').textContent = plan.title || "Sir's Blueprint";
+  document.getElementById('planSub').textContent   = plan.subtitle || '';
+  var html = '';
 
-  html+=ps('auto_stories','Scene Overview','Read First',`<p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;line-height:1.8;color:var(--text-dim)">${plan.overview||''}</p>`);
+  html += ps('auto_stories','Scene Overview','Read First',
+    '<p style="font-family:\'Playfair Display\',serif;font-style:italic;font-size:14px;line-height:1.8;color:#888;font-weight:300">'+(plan.overview||'')+'</p>');
 
-  if(plan.setup) html+=ps('settings','Scene Setup','Before She Arrives',
-    `<div class="question-label" style="font-size:10px;margin-bottom:6px"><span class="material-icons-round">home</span> Environment</div><p style="margin-bottom:14px">\( {plan.setup.environment||''}</p><div class="divider"></div><div class="question-label" style="font-size:10px;margin:14px 0 6px"><span class="material-icons-round">psychology</span> Sir's Mindset</div><p style="margin-bottom:14px"> \){plan.setup.sir_mindset||''}</p><div class="divider"></div><div class="question-label" style="font-size:10px;margin:14px 0 6px"><span class="material-icons-round">person</span> Her Preparation</div><p>${plan.setup.her_preparation||''}</p>`);
-
-  if(plan.timeline?.length){
-    const tl=plan.timeline.map(ph=>`<div class="timeline-item">
-      <div class="timeline-time">${ph.time||''}</div>
-      <div class="timeline-step-title">${ph.phase||''}</div>
-      <div class="timeline-step-body" style="margin-bottom:8px">${ph.objective||''}</div>
-      ${(ph.steps||[]).map(s=>`<div class="timeline-step-body" style="padding-left:12px;border-left:1px solid rgba(201,168,76,0.2);margin-bottom:4px">• ${s}</div>`).join('')}
-      \( {(ph.scripts||[]).map(s=>{const safe=s.replace(/"/g,'&quot;').replace(/'/g,'&#39;');return`<div class="script-block"><div class="script-label">Sir Says</div><div class="script-text">" \){s}"</div><button class="script-copy" onclick="copyText('${safe}')"><span class="material-icons-round" style="font-size:15px">content_copy</span></button></div>`;}).join('')}
-      ${ph.transition?`<div style="font-size:12px;color:var(--text-faint);font-style:italic;margin-top:8px">→ ${ph.transition}</div>`:''}
-    </div>`).join('');
-    html+=ps('schedule','Scene Timeline',plan.timeline.length+' Phases',`<div class="timeline">${tl}</div>`);
+  if (plan.setup) {
+    html += ps('settings','Scene Setup','Before She Arrives',
+      secBlock('home','Environment',plan.setup.environment)+
+      '<div class="divider"></div>'+
+      secBlock('psychology',"Sir's Mindset",plan.setup.sir_mindset)+
+      '<div class="divider"></div>'+
+      secBlock('person','Her Preparation',plan.setup.her_preparation));
   }
 
-  if(plan.key_moments?.length) html+=ps('star','Key Moments',"Don't Miss",plan.key_moments.map(m=>`<div style="margin-bottom:14px"><div class="question-label" style="font-size:10px;margin-bottom:4px">\( {m.label||''}</div><p> \){m.description||''}</p></div>`).join(''));
-
-  if(plan.aftercare_plan) html+=ps('favorite','Aftercare Plan','Essential',`<p>${plan.aftercare_plan}</p>`);
-
-  if(plan.sir_reminders?.length) html+=ps('tips_and_updates',"Sir's Reminders",'Keep in Mind',plan.sir_reminders.map(r=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start"><span class="material-icons-round" style="color:var(--gold);font-size:15px;margin-top:1px">chevron_right</span><p>${r}</p></div>`).join(''));
-
-  document.getElementById('planContent').innerHTML=html;
-  document.getElementById('aiThinking').classList.remove('visible');
-  document.getElementById('scenePlan').classList.add('visible');
-}
-
-function ps(icon,title,badge,body){
-  return`<div class="plan-section"><div class="plan-section-header" onclick="toggleSection(this)"><span class="material-icons-round">\( {icon}</span><h4> \){title}</h4><span class="plan-section-badge">\( {badge}</span></div><div class="plan-section-body"> \){body}</div></div>`;
-}
-
-// Refine with AI
-async function refineScene() {
-  if (!currentPlanData) return;
-  const tweak = document.getElementById('refineInput').value.trim();
-  if (!tweak) return;
-
-  const statusEl = document.getElementById('refineStatus');
-  statusEl.style.display = 'block';
-
-  const refinePrompt = `You are refining an existing BDSM scene plan.
-
-ORIGINAL PARAMETERS:
-${JSON.stringify(originalParameters, null, 2)}
-
-CURRENT PLAN (JSON):
-${JSON.stringify(currentPlanData, null, 2)}
-
-USER REFINEMENT REQUEST:
-${tweak}
-
-Update the entire plan accordingly. Keep the same JSON structure exactly. Respond ONLY with valid JSON, no markdown, no extra text.`;
-
-  try {
-    let updatedPlan;
-    if(activeModel==='claude') updatedPlan = await callClaude(refinePrompt);
-    else if(activeModel==='grok') updatedPlan = await callGrok(refinePrompt);
-    else updatedPlan = await callGemini(refinePrompt);
-
-    currentPlanData = updatedPlan;
-    renderPlan(updatedPlan);
-    document.getElementById('refineInput').value = '';
-  } catch (err) {
-    alert('Refine failed: ' + err.message);
-  } finally {
-    statusEl.style.display = 'none';
+  if (plan.timeline && plan.timeline.length) {
+    var tl = plan.timeline.map(function(ph) {
+      var steps  = (ph.steps||[]).map(function(s){return '<div class="tl-step">• '+s+'</div>';}).join('');
+      var scripts = (ph.scripts||[]).map(function(s){
+        var safe = s.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        return '<div class="script"><div class="script-lbl">Sir Says</div><div class="script-txt">"'+s+'"</div><button class="script-copy" onclick="copyTxt(\''+safe+'\')"><span class="material-symbols-rounded">content_copy</span></button></div>';
+      }).join('');
+      return '<div class="tl-item"><div class="tl-time">'+(ph.time||'')+'</div><div class="tl-phase">'+(ph.phase||'')+'</div><div class="tl-obj">'+(ph.objective||'')+'</div>'+steps+scripts+(ph.transition?'<div class="tl-trans">→ '+ph.transition+'</div>':'')+'</div>';
+    }).join('');
+    html += ps('schedule','Scene Timeline',plan.timeline.length+' Phases','<div class="timeline">'+tl+'</div>');
   }
+
+  if (plan.key_moments && plan.key_moments.length) {
+    html += ps('star','Key Moments',"Don't Miss",
+      plan.key_moments.map(function(m){
+        return '<div style="margin-bottom:13px"><div class="ql" style="font-size:9px;margin-bottom:3px">'+(m.label||'')+'</div><p style="font-size:12px;color:#888;line-height:1.7;font-weight:300">'+(m.description||'')+'</p></div>';
+      }).join(''));
+  }
+
+  if (plan.aftercare_plan) {
+    html += ps('favorite','Aftercare Plan','Essential',
+      '<p style="font-size:13px;color:#888;line-height:1.8;font-weight:300">'+plan.aftercare_plan+'</p>');
+  }
+
+  if (plan.sir_reminders && plan.sir_reminders.length) {
+    html += ps('tips_and_updates',"Sir's Reminders",'Keep in Mind',
+      plan.sir_reminders.map(function(r){
+        return '<div style="display:flex;gap:8px;margin-bottom:9px;align-items:flex-start"><span class="material-symbols-rounded" style="color:var(--gold);font-size:14px;margin-top:2px">chevron_right</span><p style="font-size:13px;color:#888;line-height:1.7;font-weight:300">'+r+'</p></div>';
+      }).join(''));
+  }
+
+  document.getElementById('planSections').innerHTML = html;
+  document.getElementById('thinkEl').classList.remove('show');
+  document.getElementById('planWrap').classList.add('show');
 }
 
-function showError(msg){
-  document.getElementById('aiThinking').classList.remove('visible');
-  document.getElementById('planContent').innerHTML=`<div class="error-card"><h4>Something went wrong</h4><p>${msg}</p><div style="display:flex;gap:12px;margin-top:16px;justify-content:center"><button class="btn btn-ghost" onclick="openSettings()"><span class="material-icons-round" style="font-size:16px">key</span> Add Key</button><button class="btn btn-ghost" onclick="goToStep(2)"><span class="material-icons-round" style="font-size:16px">arrow_back</span> Go back</button></div></div>`;
-  document.getElementById('scenePlan').classList.add('visible');
+function ps(icon, title, badge, body) {
+  return '<div class="plan-sec"><div class="plan-sec-hdr" onclick="toggleSec(this)"><span class="material-symbols-rounded">'+icon+'</span><h4>'+title+'</h4><span class="plan-badge">'+badge+'</span></div><div class="plan-sec-body">'+body+'</div></div>';
+}
+function secBlock(icon, label, text) {
+  return '<div class="ql" style="font-size:9px;margin-bottom:4px"><span class="material-symbols-rounded">'+icon+'</span>'+label+'</div><p style="font-size:13px;color:#888;line-height:1.7;font-weight:300;margin-bottom:0">'+(text||'')+'</p>';
+}
+function toggleSec(h) { h.nextElementSibling.classList.toggle('collapsed'); }
+
+function showError(msg) {
+  document.getElementById('thinkEl').classList.remove('show');
+  document.getElementById('planSections').innerHTML =
+    '<div class="err-card"><h4>Something went wrong</h4><p>'+msg+'</p>'+
+    '<div style="display:flex;gap:10px;justify-content:center">'+
+    '<button class="sb-btn btn-outline" onclick="openKeySheet()"><span class="material-symbols-rounded">key</span> Add Key</button>'+
+    '<button class="sb-btn btn-outline" onclick="goStep(2)"><span class="material-symbols-rounded">arrow_back</span> Go Back</button>'+
+    '</div></div>';
+  document.getElementById('planWrap').classList.add('show');
 }
 
-function toggleSection(h){h.nextElementSibling.classList.toggle('collapsed');}
-function copyText(t){navigator.clipboard.writeText(t).then(showToast);}
-function copyPlan(){navigator.clipboard.writeText(document.getElementById('planContent').innerText).then(showToast);}
-function showToast(){const t=document.getElementById('copyToast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+// ── COPY ──────────────────────────────────────────────────────────────────────
+function copyTxt(t) { navigator.clipboard.writeText(t).then(function(){toast('Copied');}); }
+function copyPlan()  { navigator.clipboard.writeText(document.getElementById('planSections').innerText).then(function(){toast('Plan copied');}); }
+function toast(msg) {
+  // Use global showToast if available (from styles.css pattern)
+  var el = document.getElementById('toast');
+  if (el) { el.textContent = msg; el.classList.add('show'); setTimeout(function(){el.classList.remove('show');},2200); return; }
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:var(--midnight);padding:12px 24px;border-radius:30px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;box-shadow:0 8px 25px rgba(212,175,55,0.4);z-index:9999;transition:all .3s;';
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.transform='translateX(-50%) translateY(0)';t.style.opacity='1';},10);
+  setTimeout(function(){t.remove();},2200);
+}
 
-function resetBuilder(){
-  ['herMapInput','sirNotes','finalNotes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('scenePlan').classList.remove('visible');
-  document.getElementById('aiThinking').classList.remove('visible');
-  document.getElementById('refineInput').value = '';
-  for(let i=0;i<4;i++)document.getElementById('dot-'+i).classList.remove('active','done');
-  document.getElementById('dot-0').classList.add('active');
-  document.querySelectorAll('.step-view').forEach(s=>s.classList.remove('active'));
-  document.getElementById('step-0').classList.add('active');
-  currentStep=0;
+// ── RESET ─────────────────────────────────────────────────────────────────────
+function resetAll() {
+  ['herMap','sirNotes','finalNotes'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('planWrap').classList.remove('show');
+  document.getElementById('thinkEl').classList.remove('show');
+  currentPlan = null; chatHistory = [];
+  for (var i=0;i<4;i++) {
+    document.getElementById('st'+i).classList.remove('active','done');
+    document.getElementById('sv'+i).classList.remove('active');
+  }
+  for (var j=0;j<3;j++){var l=document.getElementById('ln'+j+(j+1));if(l)l.classList.remove('done');}
+  document.getElementById('st0').classList.add('active');
+  document.getElementById('sv0').classList.add('active');
+  currentStep = 0;
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function resetChat() {
+  document.getElementById('chatHist').innerHTML =
+    '<div class="chat-msg ai">The scene plan is ready. Tell me what to adjust — a phase, a script, the pacing, the tone. I\'ll rebuild the full plan with your changes.</div>';
+}
+
+function sendChat() {
+  var input = document.getElementById('chatInput');
+  var msg   = input.value.trim();
+  if (!msg || !currentPlan) return;
+
+  var hist = document.getElementById('chatHist');
+  var send = document.getElementById('chatSendBtn');
+
+  hist.innerHTML += '<div class="chat-msg user">'+msg+'</div>';
+  input.value = '';
+  send.disabled = true;
+
+  var dots = document.createElement('div');
+  dots.className = 'chat-thinking';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  hist.appendChild(dots);
+  hist.scrollTop = hist.scrollHeight;
+
+  chatHistory.push({ role:'user', content: buildRefinePrompt(msg) });
+
+  var system = 'You are a BDSM scene planning assistant. Return ONLY valid JSON with no markdown.';
+
+  callAI(chatHistory, system).then(function(plan) {
+    chatHistory.push({ role:'assistant', content: JSON.stringify(plan) });
+    currentPlan = plan;
+    dots.remove();
+    renderPlan(plan);
+    hist.innerHTML += '<div class="chat-msg ai">Done — the plan has been updated. Anything else to adjust?</div>';
+    hist.scrollTop = hist.scrollHeight;
+    document.getElementById('planSections').scrollIntoView({behavior:'smooth',block:'start'});
+  }).catch(function(err) {
+    dots.remove();
+    hist.innerHTML += '<div class="chat-msg ai" style="color:#F44336">Error: '+err.message+'</div>';
+    hist.scrollTop = hist.scrollHeight;
+  }).finally(function() {
+    send.disabled = false;
+    input.focus();
+  });
+}
 </script>
+
+<!-- Reuse the app's toast element pattern -->
+<div id="toast" class="toast"></div>
+
 </body>
 </html>
