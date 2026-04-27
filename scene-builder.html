@@ -3,76 +3,309 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Scene Builder • Dom Sub Hub</title>
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="nav.css">
+<title>Dom Sub Hub — Scene Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
 <style>
-  /* Tiny targeted overrides only — everything else uses your real styles.css */
-  .model-selector-bar {
-    display: flex; gap: 8px; margin: 20px; padding: 6px;
-    background: var(--glass2); border: 1px solid var(--border);
-    border-radius: 50px;
+  :root {
+    --midnight: #0a0c14; --navy: #0f1325; --navy-mid: #141829; --panel: #181d32;
+    --panel-light: #1e2440; --gold: #c9a84c; --gold-dim: #9b7d38;
+    --gold-glow: rgba(201,168,76,0.15); --gold-glass: rgba(201,168,76,0.08);
+    --rose: #c94c6a; --text: #e8e0d4; --text-dim: #9a9080; --text-faint: #5a5548;
+    --glass: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.08);
+    --radius: 14px; --radius-sm: 8px;
   }
-  .model-btn {
-    flex: 1; padding: 12px 14px; border-radius: 50px; border: none;
-    background: transparent; color: var(--cream-mute); font-weight: 600;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-size: 13px;
-  }
-  .model-btn.active {
-    background: var(--luxury-gradient); color: #051024;
-    box-shadow: 0 4px 20px rgba(212,175,55,0.4);
-  }
-  .progress-dots { display: flex; justify-content: center; gap: 12px; margin: 20px 0 32px; }
-  .progress-dot {
-    width: 10px; height: 10px; border-radius: 50%; background: var(--glass);
-    border: 2px solid var(--border); transition: all 0.3s;
-  }
-  .progress-dot.active {
-    background: var(--gold); border-color: var(--gold); width: 28px; border-radius: 6px;
-    box-shadow: 0 0 12px rgba(212,175,55,0.6);
-  }
-  .step-view { display: none; }
-  .step-view.active { display: block; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--midnight); color: var(--text); font-family: 'Montserrat', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 0%, rgba(201,168,76,0.05) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 100%, rgba(139,26,47,0.07) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+
+  /* HEADER */
+  .header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,20,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(201,168,76,0.12); padding: 0 20px; display: flex; align-items: center; gap: 12px; height: 56px; }
+  .header-title { flex: 1; text-align: center; font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); letter-spacing: 0.05em; }
+  .header-sub { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--text-dim); }
+  .header-icon { width: 32px; height: 32px; background: var(--gold-glass); border: 1px solid rgba(201,168,76,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 16px; cursor: pointer; transition: background 0.2s; }
+  .header-icon:hover { background: var(--gold-glow); }
+
+  /* MAIN */
+  .main { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  /* HERO */
+  .hero { text-align: center; padding: 32px 16px 40px; animation: fadeUp 0.6s ease both; }
+  .hero-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 12px; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(28px,6vw,40px); font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 6px; }
+  .hero-sub { font-family: 'Great Vibes', cursive; font-size: clamp(20px,4vw,26px); color: var(--gold); margin-bottom: 16px; }
+  .hero-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: var(--text-dim); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+  /* MODEL SELECTOR */
+  .model-selector-bar { display: flex; gap: 8px; margin-bottom: 28px; padding: 5px; background: var(--navy); border: 1px solid var(--glass-border); border-radius: 50px; animation: fadeUp 0.5s ease both 0.1s; }
+  .model-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 12px; border-radius: 46px; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; transition: all 0.25s; background: transparent; color: var(--text-dim); }
+  .model-btn .model-logo { width: 16px; height: 16px; border-radius: 3px; object-fit: contain; opacity: 0.5; transition: opacity 0.2s; font-size: 16px; }
+  .model-btn.active .model-logo { opacity: 1; }
+  .model-btn[data-model="claude"].active { background: var(--gold); color: #0a0c14; box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
+  .model-btn[data-model="grok"].active   { background: #e8e8e8; color: #0a0c14; box-shadow: 0 4px 16px rgba(232,232,232,0.15); }
+  .model-btn[data-model="gemini"].active { background: #4285f4; color: #fff;    box-shadow: 0 4px 16px rgba(66,133,244,0.3); }
+
+  /* SETTINGS SHEET */
+  .settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; display: none; align-items: flex-end; }
+  .settings-overlay.open { display: flex; }
+  .settings-sheet { width: 100%; max-width: 760px; margin: 0 auto; background: var(--navy-mid); border-top: 1px solid rgba(201,168,76,0.2); border-radius: 20px 20px 0 0; padding: 28px 24px 48px; animation: slideUp 0.3s ease; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .settings-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 6px; }
+  .settings-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
+  .key-row { margin-bottom: 20px; }
+  .key-row-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .dot-claude { width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block; }
+  .dot-grok   { width:8px; height:8px; border-radius:50%; background:#e8e8e8; display:inline-block; }
+  .dot-gemini { width:8px; height:8px; border-radius:50%; background:#4285f4; display:inline-block; }
+  .key-input-wrap { position: relative; }
+  .key-input-wrap input { width:100%; background:var(--navy); border:1px solid var(--glass-border); border-radius:var(--radius-sm); color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; padding:12px 44px 12px 14px; outline:none; transition:border-color 0.2s; letter-spacing:0.04em; }
+  .key-input-wrap input:focus { border-color:rgba(201,168,76,0.4); }
+  .key-input-wrap input::placeholder { color:var(--text-faint); letter-spacing:0; }
+  .key-toggle { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-faint); cursor:pointer; display:flex; }
+  .key-toggle:hover { color:var(--gold); }
+  .key-status { font-size:10px; margin-top:5px; }
+  .key-status.ok { color:#4caf81; }
+  .key-status.empty { color:var(--text-faint); }
+  .key-get-link { font-size:10px; color:var(--gold-dim); text-decoration:none; margin-left:8px; }
+  .key-get-link:hover { color:var(--gold); }
+
+  /* CARDS */
+  .card { background:var(--panel); border:1px solid var(--glass-border); border-radius:var(--radius); margin-bottom:20px; overflow:hidden; animation:fadeUp 0.5s ease both; }
+  .card-header { display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.02); }
+  .card-header-icon { width:36px; height:36px; background:var(--gold-glass); border:1px solid rgba(201,168,76,0.25); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:18px; flex-shrink:0; }
+  .card-header-text h3 { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:var(--text); }
+  .card-header-text p { font-size:11px; color:var(--text-dim); margin-top:2px; }
+  .card-body { padding:20px; }
+
+  /* PROGRESS */
+  .progress-dots { display:flex; justify-content:center; gap:8px; margin-bottom:32px; }
+  .progress-dot { width:8px; height:8px; border-radius:50%; background:var(--panel-light); border:1px solid var(--glass-border); transition:all 0.3s; }
+  .progress-dot.active { background:var(--gold); box-shadow:0 0 8px rgba(201,168,76,0.5); border-color:var(--gold); width:24px; border-radius:4px; }
+  .progress-dot.done { background:var(--gold-dim); border-color:var(--gold-dim); }
+
+  /* STEPS */
+  .step-view { display:none; }
+  .step-view.active { display:block; }
+
+  /* FORMS */
+  .question-block { margin-bottom:20px; }
+  .question-label { font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .question-label .material-icons-round { font-size:16px; }
+  .question-sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--text-dim); margin-bottom:10px; line-height:1.5; }
+  textarea.paste-input { width:100%; background:var(--navy); border:1px solid var(--glass-border); border-radius:var(--radius-sm); color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; padding:12px; resize:vertical; min-height:120px; outline:none; transition:border-color 0.2s; line-height:1.6; }
+  textarea.paste-input:focus { border-color:rgba(201,168,76,0.4); }
+  textarea.paste-input::placeholder { color:var(--text-faint); }
+  input[type="range"] { flex:1; -webkit-appearance:none; height:4px; background:var(--panel-light); border-radius:2px; outline:none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:var(--gold); border-radius:50%; cursor:pointer; box-shadow:0 0 8px rgba(201,168,76,0.4); }
+  .range-wrap { display:flex; align-items:center; gap:12px; }
+  .range-val { font-size:13px; color:var(--gold); font-weight:600; min-width:24px; text-align:right; }
+
+  /* CHIPS */
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { padding:7px 14px; background:var(--panel-light); border:1px solid var(--glass-border); border-radius:20px; font-size:12px; color:var(--text-dim); cursor:pointer; transition:all 0.2s; user-select:none; }
+  .chip:hover { border-color:rgba(201,168,76,0.3); color:var(--text); }
+  .chip.selected { background:var(--gold-glass); border-color:rgba(201,168,76,0.5); color:var(--gold); }
+
+  /* PASTE ZONE */
+  .paste-zone { background:var(--navy); border:2px dashed rgba(201,168,76,0.2); border-radius:var(--radius); padding:24px; margin-bottom:16px; transition:border-color 0.2s,background 0.2s; }
+  .paste-zone:focus-within { border-color:rgba(201,168,76,0.5); background:var(--gold-glass); }
+  .paste-zone h4 { font-family:'Playfair Display',serif; font-size:16px; color:var(--text); margin-bottom:6px; }
+  .paste-zone p { font-size:12px; color:var(--text-dim); margin-bottom:16px; line-height:1.6; }
+
+  /* BUTTONS */
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 24px; border-radius:var(--radius-sm); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.06em; cursor:pointer; border:none; transition:all 0.25s; }
+  .btn-gold { background:linear-gradient(135deg,var(--gold),#a87830); color:#0a0c14; box-shadow:0 4px 20px rgba(201,168,76,0.2); }
+  .btn-gold:hover { transform:translateY(-1px); box-shadow:0 6px 28px rgba(201,168,76,0.35); }
+  .btn-ghost { background:transparent; border:1px solid var(--glass-border); color:var(--text-dim); }
+  .btn-ghost:hover { border-color:rgba(201,168,76,0.3); color:var(--text); }
+  .btn-rose { background:rgba(201,76,106,0.15); border:1px solid rgba(201,76,106,0.3); color:var(--rose); }
+  .btn-rose:hover { background:rgba(201,76,106,0.25); }
+  .btn-full { width:100%; }
+  .btn-row { display:flex; gap:12px; margin-top:20px; }
+  .btn-row .btn { flex:1; }
+
+  /* SUMMARY */
+  .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+  @media(max-width:480px){.summary-grid{grid-template-columns:1fr;}}
+  .summary-item { background:var(--navy); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:10px 14px; }
+  .summary-item-label { font-size:10px; font-weight:700; letter-spacing:0.12em; color:var(--text-faint); text-transform:uppercase; margin-bottom:4px; }
+  .summary-item-value { font-size:13px; color:var(--text); }
+
+  /* MODEL BADGE */
+  .model-indicator { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:12px; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
+  .mi-claude { background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); color:var(--gold); }
+  .mi-grok   { background:rgba(232,232,232,0.08); border:1px solid rgba(232,232,232,0.2); color:#ccc; }
+  .mi-gemini { background:rgba(66,133,244,0.1); border:1px solid rgba(66,133,244,0.25); color:#6aabff; }
+
+  /* AI STATES */
+  .ai-thinking { display:none; flex-direction:column; align-items:center; gap:16px; padding:60px 20px; text-align:center; }
+  .ai-thinking.visible { display:flex; }
+  .model-orb { width:70px; height:70px; border-radius:50%; border:2px solid var(--orb-color,var(--gold)); position:relative; animation:pulseRing 1.5s ease infinite; display:flex; align-items:center; justify-content:center; font-size:32px; }
+  .model-orb::before { content:''; position:absolute; inset:-6px; border-radius:50%; border:1px solid var(--orb-color,var(--gold)); opacity:0.3; animation:pulseRing 1.5s ease infinite 0.4s; }
+  @keyframes pulseRing{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.06)}}
+  .ai-thinking p { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--text-dim); }
+  .ai-thinking-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite;}
+  @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%,100%{content:'...'}}
+
+  /* PLAN */
+  .scene-plan { display:none; animation:fadeUp 0.5s ease both; }
+  .scene-plan.visible { display:block; }
+  .plan-section { background:var(--panel); border:1px solid var(--glass-border); border-radius:var(--radius); margin-bottom:16px; overflow:hidden; }
+  .plan-section-header { display:flex; align-items:center; gap:12px; padding:14px 18px; background:rgba(201,168,76,0.05); border-bottom:1px solid rgba(201,168,76,0.1); cursor:pointer; }
+  .plan-section-header .material-icons-round { color:var(--gold); font-size:18px; }
+  .plan-section-header h4 { flex:1; font-family:'Playfair Display',serif; font-size:14px; color:var(--text); }
+  .plan-section-badge { font-size:10px; padding:3px 8px; background:var(--gold-glass); border:1px solid rgba(201,168,76,0.3); border-radius:10px; color:var(--gold); font-weight:600; letter-spacing:0.05em; }
+  .plan-section-body { padding:18px; font-size:13px; line-height:1.8; color:var(--text); }
+  .plan-section-body.collapsed { display:none; }
+  .timeline { position:relative; padding-left:28px; }
+  .timeline::before { content:''; position:absolute; left:10px; top:6px; bottom:6px; width:1px; background:linear-gradient(to bottom,var(--gold),transparent); opacity:0.3; }
+  .timeline-item { position:relative; margin-bottom:20px; }
+  .timeline-item::before { content:''; position:absolute; left:-22px; top:6px; width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 8px rgba(201,168,76,0.5); }
+  .timeline-time { font-size:10px; font-weight:700; letter-spacing:0.12em; color:var(--gold-dim); text-transform:uppercase; margin-bottom:4px; }
+  .timeline-step-title { font-family:'Playfair Display',serif; font-size:14px; color:var(--text); margin-bottom:6px; }
+  .timeline-step-body { font-size:12px; color:var(--text-dim); line-height:1.7; }
+  .script-block { background:var(--navy); border-left:2px solid var(--gold); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:14px 40px 14px 16px; margin:10px 0; position:relative; }
+  .script-label { font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold-dim); margin-bottom:6px; }
+  .script-text { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color:var(--text); line-height:1.6; }
+  .script-copy { position:absolute; top:10px; right:10px; background:none; border:none; color:var(--text-faint); cursor:pointer; display:flex; }
+  .script-copy:hover { color:var(--gold); }
+
+  /* REFINE PANEL */
+  .refine-card { margin-top:24px; }
+
+  /* MISC */
+  .divider { height:1px; background:linear-gradient(to right,transparent,var(--glass-border),transparent); margin:16px 0; }
+  .info-note { background:var(--gold-glass); border:1px solid rgba(201,168,76,0.15); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:var(--text-dim); line-height:1.6; display:flex; gap:10px; align-items:flex-start; }
+  .info-note .material-icons-round { font-size:16px; color:var(--gold); flex-shrink:0; margin-top:1px; }
+  .mb-16{margin-bottom:16px;} .mt-16{margin-top:16px;} .mb-8{margin-bottom:8px;}
+  .error-card { background:rgba(201,76,106,0.08); border:1px solid rgba(201,76,106,0.25); border-radius:var(--radius); padding:24px; text-align:center; }
+  .error-card h4 { font-family:'Playfair Display',serif; color:var(--rose); margin-bottom:8px; font-size:16px; }
+  .error-card p { font-size:12px; color:var(--text-dim); margin-bottom:16px; line-height:1.6; }
+
+  /* NAV */
+  .nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;}
+  .nav-overlay.open{display:block;}
+  .nav-drawer{position:fixed;left:0;top:0;bottom:0;width:280px;background:var(--navy-mid);border-right:1px solid rgba(201,168,76,0.12);z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;padding:24px 0;}
+  .nav-drawer.open{transform:translateX(0);}
+  .nav-drawer a{display:flex;align-items:center;gap:14px;padding:14px 24px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;transition:all 0.2s;border-left:2px solid transparent;}
+  .nav-drawer a:hover,.nav-drawer a.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-glass);}
+  .nav-drawer a .material-icons-round{font-size:18px;}
+  .nav-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);padding:0 24px 20px;border-bottom:1px solid var(--glass-border);margin-bottom:12px;}
+
+  /* TOAST */
+  .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#0a0c14;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s ease;pointer-events:none;}
+  .copy-toast.show{transform:translateX(-50%) translateY(0);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
-<body data-nav="scenes">
+<body>
+
+<!-- Nav -->
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+<div class="nav-drawer" id="navDrawer">
+  <div class="nav-title">Dom Sub Hub</div>
+  <a href="index.html"><span class="material-icons-round">home</span>Home</a>
+  <a href="scene-menu.html"><span class="material-icons-round">theater_comedy</span>Scene Menu</a>
+  <a href="scene-builder.html" class="active"><span class="material-icons-round">architecture</span>Scene Builder</a>
+  <a href="training-menu.html"><span class="material-icons-round">fitness_center</span>Training Programs</a>
+  <a href="assessment-menu.html"><span class="material-icons-round">assignment</span>Assessments & Ratings</a>
+  <a href="bdsm-checklist.html"><span class="material-icons-round">fact_check</span>BDSM Checklists</a>
+</div>
+
+<!-- Settings Sheet -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-sheet">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
+      <div>
+        <div class="settings-title">AI Keys</div>
+        <div class="settings-sub">Stored in your browser only. Never shared anywhere except the AI you choose.<br>Add as many or as few as you like.</div>
+      </div>
+      <button class="btn btn-ghost" style="padding:8px 16px;font-size:12px;flex-shrink:0;margin-top:4px" onclick="closeSettings()">Done</button>
+    </div>
+
+    <div class="key-row">
+      <div class="key-row-label" style="color:var(--gold)">
+        <span class="dot-claude"></span> Claude — Anthropic
+        <a class="key-get-link" href="https://console.anthropic.com" target="_blank">Get key ↗</a>
+      </div>
+      <div class="key-input-wrap">
+        <input type="password" id="key-claude" placeholder="sk-ant-api03-..." oninput="saveKey('claude',this.value)" />
+        <button class="key-toggle" onclick="toggleVis('key-claude',this)"><span class="material-icons-round" style="font-size:18px">visibility_off</span></button>
+      </div>
+      <div class="key-status empty" id="status-claude">Not set</div>
+    </div>
+
+    <div class="key-row">
+      <div class="key-row-label" style="color:#ccc">
+        <span class="dot-grok"></span> Grok — xAI
+        <a class="key-get-link" href="https://console.x.ai" target="_blank">Get key ↗</a>
+      </div>
+      <div class="key-input-wrap">
+        <input type="password" id="key-grok" placeholder="xai-..." oninput="saveKey('grok',this.value)" />
+        <button class="key-toggle" onclick="toggleVis('key-grok',this)"><span class="material-icons-round" style="font-size:18px">visibility_off</span></button>
+      </div>
+      <div class="key-status empty" id="status-grok">Not set</div>
+    </div>
+
+    <div class="key-row">
+      <div class="key-row-label" style="color:#6aabff">
+        <span class="dot-gemini"></span> Gemini — Google
+        <a class="key-get-link" href="https://aistudio.google.com/app/apikey" target="_blank">Get key ↗</a>
+      </div>
+      <div class="key-input-wrap">
+        <input type="password" id="key-gemini" placeholder="AIza..." oninput="saveKey('gemini',this.value)" />
+        <button class="key-toggle" onclick="toggleVis('key-gemini',this)"><span class="material-icons-round" style="font-size:18px">visibility_off</span></button>
+      </div>
+      <div class="key-status empty" id="status-gemini">Not set</div>
+    </div>
+
+    <div class="info-note" style="margin-top:20px">
+      <span class="material-icons-round">lock</span>
+      <span>Keys are saved to <b>localStorage</b> in your browser. They never leave your device except when calling the chosen AI directly.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <span class="material-icons-round" style="color:var(--gold);cursor:pointer;font-size:22px" onclick="openNav()">menu</span>
+  <div style="flex:1;text-align:center">
+    <div class="header-title">Scene Builder</div>
+    <div class="header-sub">Sir's planning chamber</div>
+  </div>
+  <div class="header-icon" onclick="openSettings()" title="Manage API Keys">
+    <span class="material-icons-round" style="font-size:16px">key</span>
+  </div>
+</div>
 
 <div class="main">
 
-  <!-- Topbar — exactly like your other pages -->
-  <div class="topbar-centered">
-    <div class="topbar-title">Scene Builder</div>
-    <div class="topbar-sub">Sir's Planning Chamber</div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Dom Control Center</div>
+    <div class="hero-title">Build the Scene</div>
+    <div class="hero-sub">Command with Precision</div>
+    <div class="hero-desc">She has sent you her map. Choose your AI, build the architecture — the timing, the steps, the exact words to say.</div>
   </div>
 
-  <!-- Hero -->
-  <div style="text-align:center; padding:32px 20px 40px;">
-    <div class="section-label">Dom Control Center</div>
-    <h1 style="font-family:'Playfair Display',serif; font-size:32px; color:var(--gold); margin:12px 0 8px;">Build the Scene</h1>
-    <p style="font-family:'Great Vibes',cursive; font-size:24px; color:var(--gold);">Command with Precision</p>
-    <p style="color:var(--cream-mute); line-height:1.6; max-width:460px; margin:0 auto;">She sent her map. Turn it into a complete timed plan with steps, scripts, and safety.</p>
-  </div>
-
-  <!-- Model Selector -->
+  <!-- MODEL SELECTOR -->
   <div class="model-selector-bar">
     <button class="model-btn active" data-model="claude" onclick="selectModel('claude')">
-      <span class="material-icons-round" style="color:#D4AF37">auto_awesome</span>
+      <span class="model-logo material-icons-round" style="color:#c9a84c">auto_awesome</span>
       Claude
     </button>
     <button class="model-btn" data-model="grok" onclick="selectModel('grok')">
-      <span class="material-icons-round">close</span>
+      <span class="model-logo material-icons-round">close</span>
       Grok
     </button>
     <button class="model-btn" data-model="gemini" onclick="selectModel('gemini')">
-      <span class="material-icons-round" style="color:#4285f4">diamond</span>
+      <span class="model-logo material-icons-round" style="color:#4285f4">diamond</span>
       Gemini
     </button>
   </div>
 
-  <!-- Progress Dots -->
+  <!-- PROGRESS -->
   <div class="progress-dots">
     <div class="progress-dot active" id="dot-0"></div>
     <div class="progress-dot" id="dot-1"></div>
@@ -82,37 +315,52 @@
 
   <!-- STEP 0 — HER MAP -->
   <div class="step-view active" id="step-0">
-    <div class="menu-card">
-      <div style="padding:28px 24px">
-        <div class="section-label">Import Her Map</div>
-        <textarea class="paste-input" id="herMapInput" placeholder="Paste the full map she copied from Scene Menu Review..."></textarea>
-
-        <div class="question-block mt-16">
-          <div class="section-label">Scene Duration</div>
-          <div class="chips" id="durationChips">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><span class="material-icons-round">download</span></div>
+        <div class="card-header-text">
+          <h3>Import Her Map</h3>
+          <p>Paste what she submitted — or build freely</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="info-note mb-16">
+          <span class="material-icons-round">info</span>
+          <span>She copies her completed map from the Review screen of her Scene Planner and sends it to Sir. Paste it below — or leave empty to design from scratch.</span>
+        </div>
+        <div class="paste-zone">
+          <h4>Paste Her Map Here</h4>
+          <p>The full text she copied from her Review screen.</p>
+          <textarea class="paste-input" id="herMapInput" placeholder="Role: Good Girl | Vibe: Dark & Intense | Bondage: Hogtie | Toys: Wand, Ferri | Impact: Flogger (Heavy) | Subspace Goal: Float & Drift..."></textarea>
+        </div>
+        <div class="divider"></div>
+        <div class="question-block">
+          <div class="question-label"><span class="material-icons-round">schedule</span> Scene Duration</div>
+          <div class="chips mb-16" id="durationChips">
             <div class="chip" data-val="30 minutes" onclick="selectChip(this,'durationChips','durationInput')">30 min</div>
             <div class="chip" data-val="45 minutes" onclick="selectChip(this,'durationChips','durationInput')">45 min</div>
             <div class="chip" data-val="1 hour" onclick="selectChip(this,'durationChips','durationInput')">1 hour</div>
             <div class="chip selected" data-val="90 minutes" onclick="selectChip(this,'durationChips','durationInput')">90 min</div>
             <div class="chip" data-val="2 hours" onclick="selectChip(this,'durationChips','durationInput')">2 hours</div>
+            <div class="chip" data-val="open-ended" onclick="selectChip(this,'durationChips','durationInput')">Open</div>
           </div>
           <input type="hidden" id="durationInput" value="90 minutes" />
         </div>
-
         <div class="question-block">
-          <div class="section-label">Sir's Primary Intention</div>
+          <div class="question-label"><span class="material-icons-round">tune</span> Sir's Primary Intention</div>
           <div class="chips" id="intentionChips">
             <div class="chip selected" data-val="Psychological control and dominance" onclick="selectChip(this,'intentionChips','intentionInput')">Psychological control</div>
             <div class="chip" data-val="Physical sensation and impact play" onclick="selectChip(this,'intentionChips','intentionInput')">Physical sensation</div>
             <div class="chip" data-val="Service and worship" onclick="selectChip(this,'intentionChips','intentionInput')">Service & worship</div>
             <div class="chip" data-val="Subspace and emotional depth" onclick="selectChip(this,'intentionChips','intentionInput')">Subspace & depth</div>
+            <div class="chip" data-val="Discipline and training" onclick="selectChip(this,'intentionChips','intentionInput')">Discipline</div>
+            <div class="chip" data-val="Pleasure and intimate connection" onclick="selectChip(this,'intentionChips','intentionInput')">Pleasure & connection</div>
           </div>
           <input type="hidden" id="intentionInput" value="Psychological control and dominance" />
         </div>
-
-        <div class="flex gap-3 mt-8">
-          <button class="outline-btn" onclick="goToStep(1)">Skip → Build Freely</button>
-          <button class="gold-btn" onclick="goToStep(1)">Next</button>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goToStep(1)">Skip → Build Freely</button>
+          <button class="btn btn-gold" onclick="goToStep(1)"><span class="material-icons-round" style="font-size:16px">arrow_forward</span> Next</button>
         </div>
       </div>
     </div>
@@ -120,58 +368,68 @@
 
   <!-- STEP 1 — SIR'S CALIBRATION -->
   <div class="step-view" id="step-1">
-    <div class="menu-card">
-      <div style="padding:28px 24px">
-        <div class="section-label">Sir's Calibration</div>
-
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><span class="material-icons-round">gavel</span></div>
+        <div class="card-header-text">
+          <h3>Sir's Calibration</h3>
+          <p>Set the tone, intensity, and arc</p>
+        </div>
+      </div>
+      <div class="card-body">
         <div class="question-block">
-          <div class="section-label">Overall Intensity</div>
+          <div class="question-label"><span class="material-icons-round">psychology</span> Overall Intensity</div>
+          <div class="question-sub">The emotional and physical weight of the entire scene.</div>
           <div class="range-wrap">
-            <span style="color:var(--cream-mute)">Gentle</span>
-            <input type="range" min="1" max="10" value="7" id="intensityRange" oninput="document.getElementById('intensityVal').textContent=this.value">
-            <span class="range-val" id="intensityVal" style="color:var(--gold)">7</span>
-            <span style="color:var(--cream-mute)">Extreme</span>
+            <span style="font-size:11px;color:var(--text-faint)">Gentle</span>
+            <input type="range" min="1" max="10" value="7" id="intensityRange" oninput="document.getElementById('intensityVal').textContent=this.value" />
+            <span class="range-val" id="intensityVal">7</span>
+            <span style="font-size:11px;color:var(--text-faint)">Extreme</span>
           </div>
         </div>
-
         <div class="question-block">
-          <div class="section-label">Sir's Verbal Style</div>
+          <div class="question-label"><span class="material-icons-round">record_voice_over</span> Sir's Verbal Style</div>
           <div class="chips" id="verbalChips">
             <div class="chip selected" data-val="commanding and authoritative" onclick="selectChip(this,'verbalChips','verbalInput')">Commanding</div>
+            <div class="chip" data-val="cold and clinical" onclick="selectChip(this,'verbalChips','verbalInput')">Cold & clinical</div>
             <div class="chip" data-val="dark and intense whispers" onclick="selectChip(this,'verbalChips','verbalInput')">Dark whispers</div>
             <div class="chip" data-val="warm but strict" onclick="selectChip(this,'verbalChips','verbalInput')">Warm but strict</div>
             <div class="chip" data-val="dominant praise mixed with degradation" onclick="selectChip(this,'verbalChips','verbalInput')">Praise & degrade</div>
+            <div class="chip" data-val="minimal words — power through silence" onclick="selectChip(this,'verbalChips','verbalInput')">Mostly silent</div>
           </div>
           <input type="hidden" id="verbalInput" value="commanding and authoritative" />
         </div>
-
         <div class="question-block">
-          <div class="section-label">Scene Climax Goal</div>
+          <div class="question-label"><span class="material-icons-round">flag</span> Scene Climax Goal</div>
           <div class="chips" id="climaxChips">
+            <div class="chip" data-val="forced orgasm after extended denial and edging" onclick="selectChip(this,'climaxChips','climaxInput')">Forced orgasm</div>
+            <div class="chip" data-val="Sir's release with devoted service from her" onclick="selectChip(this,'climaxChips','climaxInput')">Sir's release</div>
             <div class="chip selected" data-val="subspace — she floats away, Sir holds the entire space" onclick="selectChip(this,'climaxChips','climaxInput')">Subspace</div>
-            <div class="chip" data-val="forced orgasm after extended denial" onclick="selectChip(this,'climaxChips','climaxInput')">Forced orgasm</div>
-            <div class="chip" data-val="complete surrender" onclick="selectChip(this,'climaxChips','climaxInput')">Full surrender</div>
+            <div class="chip" data-val="complete surrender and full restraint peak" onclick="selectChip(this,'climaxChips','climaxInput')">Full surrender</div>
+            <div class="chip" data-val="mutual intimacy and deep connection" onclick="selectChip(this,'climaxChips','climaxInput')">Intimacy</div>
+            <div class="chip" data-val="discipline peak — correction and punishment" onclick="selectChip(this,'climaxChips','climaxInput')">Discipline peak</div>
           </div>
           <input type="hidden" id="climaxInput" value="subspace — she floats away, Sir holds the entire space" />
         </div>
-
         <div class="question-block">
-          <div class="section-label">Aftercare Style</div>
+          <div class="question-label"><span class="material-icons-round">spa</span> Aftercare Style</div>
           <div class="chips" id="aftercareChips">
             <div class="chip selected" data-val="hold her close, quiet affirmation, blanket and water" onclick="selectChip(this,'aftercareChips','aftercareInput')">Hold & comfort</div>
             <div class="chip" data-val="Sir leads a quiet verbal debrief" onclick="selectChip(this,'aftercareChips','aftercareInput')">Debrief talk</div>
+            <div class="chip" data-val="shower together then rest" onclick="selectChip(this,'aftercareChips','aftercareInput')">Shower & rest</div>
+            <div class="chip" data-val="quiet separate space then reconnect" onclick="selectChip(this,'aftercareChips','aftercareInput')">Quiet separation</div>
+            <div class="chip" data-val="food, water, and physical closeness" onclick="selectChip(this,'aftercareChips','aftercareInput')">Food & closeness</div>
           </div>
           <input type="hidden" id="aftercareInput" value="hold her close, quiet affirmation, blanket and water" />
         </div>
-
         <div class="question-block">
-          <div class="section-label">Sir's Private Notes</div>
-          <textarea class="paste-input" id="sirNotes" style="min-height:80px" placeholder="Anything specific to weave into the plan..."></textarea>
+          <div class="question-label"><span class="material-icons-round">edit_note</span> Sir's Private Notes</div>
+          <div class="question-sub">Anything specific to weave into the plan.</div>
+          <textarea class="paste-input" id="sirNotes" style="min-height:70px" placeholder="e.g. Start slow — she's been stressed this week. Build to the rope tie before the wand..."></textarea>
         </div>
-
-        <div class="flex gap-3 mt-8">
-          <button class="outline-btn" onclick="goToStep(0)">Back</button>
-          <button class="gold-btn" onclick="goToStep(2)">Next</button>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goToStep(0)"><span class="material-icons-round" style="font-size:16px">arrow_back</span> Back</button>
+          <button class="btn btn-gold" onclick="goToStep(2)"><span class="material-icons-round" style="font-size:16px">arrow_forward</span> Next</button>
         </div>
       </div>
     </div>
@@ -179,50 +437,97 @@
 
   <!-- STEP 2 — REVIEW -->
   <div class="step-view" id="step-2">
-    <div class="menu-card">
-      <div style="padding:28px 24px">
-        <div class="section-label">Review & Build</div>
-        <div id="summaryGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;"></div>
-        <div class="question-block">
-          <div class="section-label">Final Thoughts (Optional)</div>
-          <textarea class="paste-input" id="finalNotes" placeholder="Anything else to tell the AI..."></textarea>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><span class="material-icons-round">checklist</span></div>
+        <div class="card-header-text">
+          <h3>Review & Build</h3>
+          <p>Confirm — then AI generates the full plan</p>
         </div>
-        <button class="gold-btn w-full" onclick="buildScene()">
-          <span class="material-icons-round">auto_awesome</span> Build the Scene
-        </button>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <span style="font-size:12px;color:var(--text-dim)">Building with</span>
+          <div class="model-indicator mi-claude" id="activeModelBadge">Claude</div>
+        </div>
+        <div id="summaryGrid" class="summary-grid mb-16"></div>
+        <div id="noKeyWarning" class="info-note mb-16" style="display:none;background:rgba(201,76,106,0.08);border-color:rgba(201,76,106,0.2)">
+          <span class="material-icons-round" style="color:var(--rose)">warning</span>
+          <span>No API key for this model. <b style="color:var(--rose);cursor:pointer;text-decoration:underline" onclick="openSettings()">Add key →</b></span>
+        </div>
+        <div class="question-block">
+          <div class="question-label"><span class="material-icons-round">add_circle_outline</span> Final Thoughts (Optional)</div>
+          <textarea class="paste-input" id="finalNotes" style="min-height:60px" placeholder="Anything to add before the AI builds..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goToStep(1)"><span class="material-icons-round" style="font-size:16px">arrow_back</span> Back</button>
+          <button class="btn btn-gold btn-full" onclick="buildScene()">
+            <span class="material-icons-round" style="font-size:16px">auto_awesome</span> Build the Scene
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- STEP 3 — THE PLAN -->
   <div class="step-view" id="step-3">
-    <div id="aiThinking" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; text-align:center;">
-      <div id="modelOrb" style="width:80px;height:80px;border-radius:50%;border:4px solid var(--gold);animation:pulse 1.5s infinite;"></div>
-      <p style="margin-top:24px;font-size:18px;">Building Sir's scene plan<span class="dots"></span></p>
+    <div class="ai-thinking" id="aiThinking">
+      <div class="model-orb" id="modelOrb" style="--orb-color:var(--gold)">
+        <span class="material-icons-round" id="orbIcon" style="font-size:28px;color:var(--gold)">auto_awesome</span>
+      </div>
+      <p>Building Sir's scene plan<span class="ai-thinking-dots"></span></p>
+      <p style="font-size:12px;opacity:0.5" id="thinkingLabel">via Claude</p>
     </div>
+    <div class="scene-plan" id="scenePlan">
+      <div class="hero" style="padding:0 0 24px">
+        <div class="hero-label">Scene Plan</div>
+        <div class="hero-title" id="planTitle">Sir's Blueprint</div>
+        <div class="hero-sub" id="planSubtitle">The Architecture of Control</div>
+        <div style="display:flex;justify-content:center;margin-top:8px">
+          <div class="model-indicator mi-claude" id="planModelBadge">Claude</div>
+        </div>
+      </div>
+      <div id="planContent"></div>
 
-    <div id="scenePlan" style="display:none;">
-      <div id="planContent" class="menu-card" style="margin:20px;"></div>
-
-      <!-- Refine with AI Panel -->
-      <div class="menu-card refine-panel" style="margin:20px;">
-        <div class="section-label">Refine with AI</div>
-        <textarea id="refineInput" class="paste-input" placeholder="Make the humiliation heavier… Extend the rope section… Add more degrading dialogue…"></textarea>
-        <button class="gold-btn w-full mt-4" onclick="refineScene()">
-          <span class="material-icons-round">auto_awesome</span> Refine Scene with AI
-        </button>
+      <!-- REFINE WITH AI PANEL -->
+      <div class="card refine-card mt-16">
+        <div class="card-header">
+          <div class="card-header-icon"><span class="material-icons-round">auto_awesome</span></div>
+          <div class="card-header-text">
+            <h3>Refine with AI</h3>
+            <p>Tell the AI exactly what to change — it will rebuild the entire plan</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <textarea id="refineInput" class="paste-input" rows="3" placeholder="Make the humiliation heavier… Extend the rope section by 15 minutes… Change the dialogue to be more degrading…"></textarea>
+          <div class="btn-row" style="margin-top:16px">
+            <button onclick="refineScene()" class="btn btn-gold btn-full">
+              <span class="material-icons-round" style="font-size:18px">auto_awesome</span>
+              Refine Scene with AI
+            </button>
+          </div>
+          <div id="refineStatus" style="margin-top:12px;font-size:12px;color:var(--text-dim);text-align:center;display:none;">
+            Refining<span class="ai-thinking-dots"></span>
+          </div>
+        </div>
       </div>
 
-      <div class="flex gap-3" style="margin:20px;">
-        <button class="outline-btn" onclick="copyPlan()">Copy Plan</button>
-        <button class="danger-btn" onclick="resetBuilder()">New Scene</button>
+      <div class="card mt-16">
+        <div class="card-body">
+          <div class="question-label mb-8"><span class="material-icons-round">share</span> Export</div>
+          <div class="btn-row" style="margin-top:0">
+            <button class="btn btn-ghost" onclick="copyPlan()"><span class="material-icons-round" style="font-size:16px">content_copy</span> Copy Plan</button>
+            <button class="btn btn-rose" onclick="resetBuilder()"><span class="material-icons-round" style="font-size:16px">restart_alt</span> New Scene</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
 </div>
 
-<script src="nav.js"></script>
+<div class="copy-toast" id="copyToast">Copied to clipboard</div>
+
 <script>
 let currentStep = 0;
 let activeModel = 'claude';
@@ -230,59 +535,117 @@ let currentPlanData = null;
 let originalParameters = null;
 
 const MODELS = {
-  claude: { label:'Claude', orbColor:'#D4AF37' },
-  grok:   { label:'Grok',   orbColor:'#e8e8e8' },
-  gemini: { label:'Gemini', orbColor:'#4285f4' }
+  claude: { label:'Claude', cls:'mi-claude', orbColor:'#c9a84c', icon:'auto_awesome', iconColor:'#c9a84c' },
+  grok:   { label:'Grok',   cls:'mi-grok',   orbColor:'#e8e8e8', icon:'close',        iconColor:'#e8e8e8' },
+  gemini: { label:'Gemini', cls:'mi-gemini', orbColor:'#4285f4', icon:'diamond',      iconColor:'#4285f4' }
 };
 
-function selectModel(m) {
-  activeModel = m;
-  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`[data-model="${m}"]`).classList.add('active');
+// Init
+window.addEventListener('DOMContentLoaded', loadKeys);
+
+// Nav
+function openNav(){document.getElementById('navDrawer').classList.add('open');document.getElementById('navOverlay').classList.add('open');}
+function closeNav(){document.getElementById('navDrawer').classList.remove('open');document.getElementById('navOverlay').classList.remove('open');}
+
+// Settings
+function openSettings(){document.getElementById('settingsOverlay').classList.add('open');}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+document.getElementById('settingsOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSettings();});
+
+function saveKey(model,val){
+  if(val.trim()){localStorage.setItem('dsb_key_'+model,val.trim());setKeyStatus(model,true);}
+  else{localStorage.removeItem('dsb_key_'+model);setKeyStatus(model,false);}
+}
+function loadKeys(){
+  ['claude','grok','gemini'].forEach(m=>{
+    const v=localStorage.getItem('dsb_key_'+m);
+    if(v){document.getElementById('key-'+m).value=v;setKeyStatus(m,true);}
+  });
+}
+function setKeyStatus(m,ok){
+  const el=document.getElementById('status-'+m);
+  el.textContent=ok?'✓ Key saved':'Not set';
+  el.className='key-status '+(ok?'ok':'empty');
+}
+function getKey(m){return localStorage.getItem('dsb_key_'+m)||'';}
+function toggleVis(id,btn){
+  const inp=document.getElementById(id);
+  const ic=btn.querySelector('span');
+  if(inp.type==='password'){inp.type='text';ic.textContent='visibility';}
+  else{inp.type='password';ic.textContent='visibility_off';}
 }
 
-function goToStep(n) {
-  document.querySelectorAll('.step-view').forEach(s => s.classList.remove('active'));
-  document.getElementById(`step-${n}`).classList.add('active');
-  currentStep = n;
-  if (n === 2) populateSummary();
+// Model selector
+function selectModel(m){
+  activeModel=m;
+  document.querySelectorAll('.model-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-model="'+m+'"]').classList.add('active');
 }
 
-function selectChip(el, groupId, inputId) {
-  document.querySelectorAll(`#${groupId} .chip`).forEach(c => c.classList.remove('selected'));
+// Steps
+function goToStep(n){
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  document.getElementById('dot-'+currentStep).classList.remove('active');
+  document.getElementById('dot-'+currentStep).classList.add('done');
+  currentStep=n;
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('dot-'+n).classList.add('active');
+  document.getElementById('dot-'+n).classList.remove('done');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===2)populateSummary();
+}
+
+function selectChip(el,groupId,inputId){
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
-  if (inputId) document.getElementById(inputId).value = el.dataset.val;
+  if(inputId)document.getElementById(inputId).value=el.dataset.val;
 }
 
-function populateSummary() {
-  const items = [
-    {label:'Duration', val: document.getElementById('durationInput').value},
-    {label:'Intention', val: document.getElementById('intentionInput').value},
-    {label:'Intensity', val: document.getElementById('intensityRange').value + '/10'},
-    {label:'Verbal Style', val: document.getElementById('verbalInput').value}
+function populateSummary(){
+  const cfg=MODELS[activeModel];
+  const b=document.getElementById('activeModelBadge');
+  b.textContent=cfg.label; b.className='model-indicator '+cfg.cls;
+  document.getElementById('noKeyWarning').style.display=getKey(activeModel)?'none':'flex';
+  const items=[
+    {label:'Model',val:cfg.label},
+    {label:'Duration',val:document.getElementById('durationInput').value},
+    {label:'Intention',val:document.getElementById('intentionInput').value},
+    {label:'Intensity',val:document.getElementById('intensityRange').value+' / 10'},
+    {label:'Verbal Style',val:document.getElementById('verbalInput').value},
+    {label:'Climax',val:document.getElementById('climaxInput').value},
   ];
-  document.getElementById('summaryGrid').innerHTML = items.map(i => 
-    `<div style="background:var(--glass2);padding:12px;border-radius:12px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--gold);text-transform:uppercase;">\( {i.label}</div><div style="font-weight:600;"> \){i.val}</div></div>`
-  ).join('');
+  document.getElementById('summaryGrid').innerHTML=items.map(i=>`<div class="summary-item"><div class="summary-item-label">\( {i.label}</div><div class="summary-item-value"> \){i.val}</div></div>`).join('');
 }
 
-async function buildScene() {
-  const p = {
-    herMap: document.getElementById('herMapInput').value.trim(),
-    duration: document.getElementById('durationInput').value,
-    intention: document.getElementById('intentionInput').value,
-    intensity: document.getElementById('intensityRange').value,
-    verbal: document.getElementById('verbalInput').value,
-    climax: document.getElementById('climaxInput').value,
-    aftercare: document.getElementById('aftercareInput').value,
-    sirNotes: document.getElementById('sirNotes').value.trim(),
-    finalNotes: document.getElementById('finalNotes').value.trim()
+// Build
+async function buildScene(){
+  const cfg=MODELS[activeModel];
+  const orb=document.getElementById('modelOrb');
+  orb.style.setProperty('--orb-color',cfg.orbColor);
+  const ic=document.getElementById('orbIcon');
+  ic.textContent=cfg.icon; ic.style.color=cfg.orbColor;
+  document.getElementById('thinkingLabel').textContent='via '+cfg.label;
+
+  goToStep(3);
+  document.getElementById('aiThinking').classList.add('visible');
+  document.getElementById('scenePlan').classList.remove('visible');
+
+  const p={
+    herMap:document.getElementById('herMapInput').value.trim(),
+    duration:document.getElementById('durationInput').value,
+    intention:document.getElementById('intentionInput').value,
+    intensity:document.getElementById('intensityRange').value,
+    verbal:document.getElementById('verbalInput').value,
+    climax:document.getElementById('climaxInput').value,
+    aftercare:document.getElementById('aftercareInput').value,
+    sirNotes:document.getElementById('sirNotes').value.trim(),
+    finalNotes:document.getElementById('finalNotes').value.trim()
   };
 
-  const prompt = `You are a sophisticated BDSM scene planning assistant helping a Dom/Sir build a complete scene plan for a consensual adult dynamic.
+  const prompt=`You are a sophisticated BDSM scene planning assistant helping a Dom/Sir build a complete scene plan for a consensual adult dynamic.
 
 HER SUBMITTED MAP:
-${p.herMap || '[No map — Sir is designing freely]'}
+${p.herMap||'[No map — Sir is designing freely]'}
 
 SIR'S PARAMETERS:
 - Duration: ${p.duration}
@@ -291,102 +654,141 @@ SIR'S PARAMETERS:
 - Verbal Style: ${p.verbal}
 - Climax Goal: ${p.climax}
 - Aftercare: ${p.aftercare}
-- Notes: ${p.sirNotes || 'None'}
-- Final: ${p.finalNotes || 'None'}
+- Notes: ${p.sirNotes||'None'}
+- Final: ${p.finalNotes||'None'}
 
 Respond ONLY in valid JSON, no markdown, no backticks, no preamble:
 {"title":"2-5 word poetic title","subtitle":"one refined line","overview":"2-3 sentence arc","setup":{"environment":"space prep","sir_mindset":"how Sir arrives","her_preparation":"what she does first"},"timeline":[{"phase":"name","time":"e.g. 0-12 min","objective":"what this achieves","steps":["step1","step2","step3"],"scripts":["Sir says this","or this"],"transition":"how to move on"}],"key_moments":[{"label":"name","description":"what and why"}],"aftercare_plan":"detailed aftercare","sir_reminders":["reminder1","reminder2","reminder3"]}
 
 Build 4-7 phases fitting the duration. Scripts: natural, authoritative, intimate. Be specific and detailed for consenting adults.`;
 
-  document.getElementById('aiThinking').style.display = 'flex';
-  document.getElementById('scenePlan').style.display = 'none';
-
   try {
     let plan;
-    if (activeModel === 'claude') plan = await callClaude(prompt);
-    else if (activeModel === 'grok') plan = await callGrok(prompt);
-    else plan = await callGemini(prompt);
-
-    storePlanContext(plan, p);
+    if(activeModel==='claude') plan=await callClaude(prompt);
+    else if(activeModel==='grok') plan=await callGrok(prompt);
+    else plan=await callGemini(prompt);
+    
+    // Store for refinement
+    currentPlanData = plan;
+    originalParameters = p;
     renderPlan(plan);
-  } catch (err) {
-    alert('Error: ' + err.message);
-    document.getElementById('aiThinking').style.display = 'none';
+  } catch(err){
+    showError(err.message);
   }
 }
 
-async function callClaude(prompt) {
-  const key = localStorage.getItem('dsb_key_claude') || '';
-  if (!key) throw new Error('Add Claude API key in settings');
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
-    body: JSON.stringify({model:'claude-3-5-sonnet-20241022',max_tokens:1200,messages:[{role:'user',content:prompt}]})
+async function callClaude(prompt){
+  const key=getKey('claude');
+  if(!key) throw new Error('No Claude API key saved. Tap the 🔑 key icon in the header to add one.');
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-3-5-sonnet-20241022',max_tokens:1200,messages:[{role:'user',content:prompt}]})
   });
-  const d = await res.json();
-  return parseAI(d.content?.[0]?.text || '');
+  const d=await res.json();
+  if(d.error) throw new Error('Claude error: '+d.error.message);
+  return parseAI(d.content.map(b=>b.text||'').join(''));
 }
 
-async function callGrok(prompt) {
-  const key = localStorage.getItem('dsb_key_grok') || '';
-  if (!key) throw new Error('Add Grok API key in settings');
-  const res = await fetch('https://api.x.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body: JSON.stringify({model:'grok-3-latest',max_tokens:1200,messages:[{role:'user',content:prompt}]})
+async function callGrok(prompt){
+  const key=getKey('grok');
+  if(!key) throw new Error('No Grok API key saved. Tap the 🔑 key icon to add one.');
+  const res=await fetch('https://api.x.ai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'grok-3-latest',max_tokens:1200,messages:[{role:'system',content:'Respond only with valid JSON, no markdown.'},{role:'user',content:prompt}]})
   });
-  const d = await res.json();
-  return parseAI(d.choices?.[0]?.message?.content || '');
+  const d=await res.json();
+  if(d.error) throw new Error('Grok error: '+(d.error.message||JSON.stringify(d.error)));
+  return parseAI(d.choices?.[0]?.message?.content||'');
 }
 
-async function callGemini(prompt) {
-  const key = localStorage.getItem('dsb_key_gemini') || '';
-  if (!key) throw new Error('Add Gemini API key in settings');
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+async function callGemini(prompt){
+  const key=getKey('gemini');
+  if(!key) throw new Error('No Gemini API key saved. Tap the 🔑 key icon to add one.');
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:1200}})
   });
-  const d = await res.json();
-  return parseAI(d.candidates?.[0]?.content?.parts?.[0]?.text || '');
+  const d=await res.json();
+  if(d.error) throw new Error('Gemini error: '+d.error.message);
+  return parseAI(d.candidates?.[0]?.content?.parts?.[0]?.text||'');
 }
 
-function parseAI(raw) {
-  const clean = raw.replace(/```json|```/g,'').trim();
-  try { return JSON.parse(clean); }
-  catch(e) {
-    const m = clean.match(/\{[\s\S]*\}/);
-    return m ? JSON.parse(m[0]) : {title:"Error", overview:raw};
+function parseAI(raw){
+  const clean=raw.replace(/```json|```/g,'').trim();
+  try{return JSON.parse(clean);}
+  catch(e){
+    const m=clean.match(/\{[\s\S]*\}/);
+    if(m) return JSON.parse(m[0]);
+    throw new Error('Could not parse the AI response. Please try again.');
   }
 }
 
-function storePlanContext(plan, params) {
-  currentPlanData = plan;
-  originalParameters = params;
+function renderPlan(plan){
+  document.getElementById('planTitle').textContent=plan.title||"Sir's Blueprint";
+  document.getElementById('planSubtitle').textContent=plan.subtitle||'';
+  let html='';
+
+  html+=ps('auto_stories','Scene Overview','Read First',`<p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;line-height:1.8;color:var(--text-dim)">${plan.overview||''}</p>`);
+
+  if(plan.setup) html+=ps('settings','Scene Setup','Before She Arrives',
+    `<div class="question-label" style="font-size:10px;margin-bottom:6px"><span class="material-icons-round">home</span> Environment</div><p style="margin-bottom:14px">\( {plan.setup.environment||''}</p><div class="divider"></div><div class="question-label" style="font-size:10px;margin:14px 0 6px"><span class="material-icons-round">psychology</span> Sir's Mindset</div><p style="margin-bottom:14px"> \){plan.setup.sir_mindset||''}</p><div class="divider"></div><div class="question-label" style="font-size:10px;margin:14px 0 6px"><span class="material-icons-round">person</span> Her Preparation</div><p>${plan.setup.her_preparation||''}</p>`);
+
+  if(plan.timeline?.length){
+    const tl=plan.timeline.map(ph=>`<div class="timeline-item">
+      <div class="timeline-time">${ph.time||''}</div>
+      <div class="timeline-step-title">${ph.phase||''}</div>
+      <div class="timeline-step-body" style="margin-bottom:8px">${ph.objective||''}</div>
+      ${(ph.steps||[]).map(s=>`<div class="timeline-step-body" style="padding-left:12px;border-left:1px solid rgba(201,168,76,0.2);margin-bottom:4px">• ${s}</div>`).join('')}
+      \( {(ph.scripts||[]).map(s=>{const safe=s.replace(/"/g,'&quot;').replace(/'/g,'&#39;');return`<div class="script-block"><div class="script-label">Sir Says</div><div class="script-text">" \){s}"</div><button class="script-copy" onclick="copyText('${safe}')"><span class="material-icons-round" style="font-size:15px">content_copy</span></button></div>`;}).join('')}
+      ${ph.transition?`<div style="font-size:12px;color:var(--text-faint);font-style:italic;margin-top:8px">→ ${ph.transition}</div>`:''}
+    </div>`).join('');
+    html+=ps('schedule','Scene Timeline',plan.timeline.length+' Phases',`<div class="timeline">${tl}</div>`);
+  }
+
+  if(plan.key_moments?.length) html+=ps('star','Key Moments',"Don't Miss",plan.key_moments.map(m=>`<div style="margin-bottom:14px"><div class="question-label" style="font-size:10px;margin-bottom:4px">\( {m.label||''}</div><p> \){m.description||''}</p></div>`).join(''));
+
+  if(plan.aftercare_plan) html+=ps('favorite','Aftercare Plan','Essential',`<p>${plan.aftercare_plan}</p>`);
+
+  if(plan.sir_reminders?.length) html+=ps('tips_and_updates',"Sir's Reminders",'Keep in Mind',plan.sir_reminders.map(r=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start"><span class="material-icons-round" style="color:var(--gold);font-size:15px;margin-top:1px">chevron_right</span><p>${r}</p></div>`).join(''));
+
+  document.getElementById('planContent').innerHTML=html;
+  document.getElementById('aiThinking').classList.remove('visible');
+  document.getElementById('scenePlan').classList.add('visible');
 }
 
+function ps(icon,title,badge,body){
+  return`<div class="plan-section"><div class="plan-section-header" onclick="toggleSection(this)"><span class="material-icons-round">\( {icon}</span><h4> \){title}</h4><span class="plan-section-badge">\( {badge}</span></div><div class="plan-section-body"> \){body}</div></div>`;
+}
+
+// NEW: Refine with AI
 async function refineScene() {
   if (!currentPlanData) return;
   const tweak = document.getElementById('refineInput').value.trim();
   if (!tweak) return;
+
+  const statusEl = document.getElementById('refineStatus');
+  statusEl.style.display = 'block';
 
   const refinePrompt = `You are refining an existing BDSM scene plan.
 
 ORIGINAL PARAMETERS:
 ${JSON.stringify(originalParameters, null, 2)}
 
-CURRENT PLAN:
+CURRENT PLAN (JSON):
 ${JSON.stringify(currentPlanData, null, 2)}
 
-USER REQUEST: ${tweak}
+USER REFINEMENT REQUEST:
+${tweak}
 
-Update the entire plan. Keep the same JSON structure. Respond ONLY with valid JSON.`;
+Update the entire plan accordingly. Keep the same JSON structure exactly. Respond ONLY with valid JSON, no markdown, no extra text.`;
 
   try {
     let updatedPlan;
-    if (activeModel === 'claude') updatedPlan = await callClaude(refinePrompt);
-    else if (activeModel === 'grok') updatedPlan = await callGrok(refinePrompt);
+    if(activeModel==='claude') updatedPlan = await callClaude(refinePrompt);
+    else if(activeModel==='grok') updatedPlan = await callGrok(refinePrompt);
     else updatedPlan = await callGemini(refinePrompt);
 
     currentPlanData = updatedPlan;
@@ -394,35 +796,34 @@ Update the entire plan. Keep the same JSON structure. Respond ONLY with valid JS
     document.getElementById('refineInput').value = '';
   } catch (err) {
     alert('Refine failed: ' + err.message);
+  } finally {
+    statusEl.style.display = 'none';
   }
 }
 
-function renderPlan(plan) {
-  currentPlanData = plan;
-  let html = `<div class="menu-card" style="padding:24px;margin:20px;">
-    <h2 style="font-family:'Playfair Display',serif;color:var(--gold);">${plan.title || "Sir's Blueprint"}</h2>
-    <p style="font-style:italic;color:var(--cream-mute);">${plan.subtitle || ""}</p>
-    <p style="margin:16px 0;">${plan.overview || ""}</p>
-    <!-- Timeline and other sections would render here — full logic from previous version is preserved -->
-    <div style="margin-top:24px;font-size:13px;line-height:1.7;">${JSON.stringify(plan, null, 2)}</div>
-  </div>`;
-  document.getElementById('planContent').innerHTML = html;
-  document.getElementById('aiThinking').style.display = 'none';
-  document.getElementById('scenePlan').style.display = 'block';
+function showError(msg){
+  document.getElementById('aiThinking').classList.remove('visible');
+  document.getElementById('planContent').innerHTML=`<div class="error-card"><h4>Something went wrong</h4><p>${msg}</p><div style="display:flex;gap:12px;margin-top:16px;justify-content:center"><button class="btn btn-ghost" onclick="openSettings()"><span class="material-icons-round" style="font-size:16px">key</span> Add Key</button><button class="btn btn-ghost" onclick="goToStep(2)"><span class="material-icons-round" style="font-size:16px">arrow_back</span> Go back</button></div></div>`;
+  document.getElementById('scenePlan').classList.add('visible');
 }
 
-function copyPlan() {
-  const text = document.getElementById('planContent').innerText;
-  navigator.clipboard.writeText(text).then(() => alert('Plan copied to clipboard'));
-}
+function toggleSection(h){h.nextElementSibling.classList.toggle('collapsed');}
+function copyText(t){navigator.clipboard.writeText(t).then(showToast);}
+function copyPlan(){navigator.clipboard.writeText(document.getElementById('planContent').innerText).then(showToast);}
+function showToast(){const t=document.getElementById('copyToast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
-function resetBuilder() {
-  location.reload();
+function resetBuilder(){
+  ['herMapInput','sirNotes','finalNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('scenePlan').classList.remove('visible');
+  document.getElementById('aiThinking').classList.remove('visible');
+  document.getElementById('refineInput').value = '';
+  for(let i=0;i<4;i++)document.getElementById('dot-'+i).classList.remove('active','done');
+  document.getElementById('dot-0').classList.add('active');
+  document.querySelectorAll('.step-view').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-0').classList.add('active');
+  currentStep=0;
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  console.log('%c✅ Scene Builder loaded with full app styling', 'color:#D4AF37;font-weight:bold');
-});
 </script>
 </body>
 </html>
