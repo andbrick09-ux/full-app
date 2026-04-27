@@ -62,7 +62,8 @@
   { href: 'assessment-menu.html',     icon: '📊', label: 'Assessments &amp; Ratings' },
   { href: 'public-game.html',         icon: '🏛️', label: "Sir&#39;s Public Tasks"    },
   { href: 'bdsm-checklist.html',      icon: '✅', label: 'BDSM Checklists'           },
-  { href: 'sirs-protocol.html',       icon: '📜', label: 'Sir’s Protocol'            },   // ← NEW
+  { href: 'sirs-protocol.html',       icon: '📜', label: 'Sir’s Protocol'            },   
+  { href: 'song-vault.html',          icon: '🎵', label: 'Song Vault'                },
   { href: 'notes.html',               icon: '📝', label: 'Notes'                     },
   { href: 'calendar.html',            icon: '📅', label: 'Calendar'                  },
   { href: 'protocol-daily.html',      icon: '📅', label: 'Daily Protocol'            },
