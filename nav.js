@@ -63,8 +63,6 @@
   { href: 'public-game.html',         icon: '🏛️', label: "Sir&#39;s Public Tasks"    },
   { href: 'bdsm-checklist.html',      icon: '✅', label: 'BDSM Checklists'           },
   { href: 'sirs-protocol.html',       icon: '📜', label: 'Sir’s Protocol'            },   // ← NEW
-  { href: 'public-play-menu.html',    icon: '🎟️', label: 'Public Play'               },   // ← NEW
-  { href: 'predicament-bondage-menu.html', icon: '⛓️', label: 'Predicament Bondage' },   // ← NEW
   { href: 'notes.html',               icon: '📝', label: 'Notes'                     },
   { href: 'calendar.html',            icon: '📅', label: 'Calendar'                  },
   { href: 'protocol-daily.html',      icon: '📅', label: 'Daily Protocol'            },
