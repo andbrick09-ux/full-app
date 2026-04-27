@@ -59,15 +59,18 @@
   ];
 
   var MORE_ITEMS = [
-    { href: 'assessment-menu.html', icon: '📊', label: 'Assessments &amp; Ratings' },
-    { href: 'public-game.html',     icon: '🏛️', label: "Sir&#39;s Public Tasks"    },
-    { href: 'bdsm-checklist.html',  icon: '✅', label: 'BDSM Checklists'           },
-    { href: 'notes.html',           icon: '📝', label: 'Notes'                     },
-    { href: 'calendar.html',        icon: '📅', label: 'Calendar'                  },
-    { href: 'protocol-daily.html',  icon: '📜', label: 'Daily Protocol'            },
-    { href: 'help.html',            icon: '❓', label: 'Help &amp; Info'            },
-    { href: 'settings.html',        icon: '⚙️', label: 'Settings'                  }
-  ];
+  { href: 'assessment-menu.html',     icon: '📊', label: 'Assessments &amp; Ratings' },
+  { href: 'public-game.html',         icon: '🏛️', label: "Sir&#39;s Public Tasks"    },
+  { href: 'bdsm-checklist.html',      icon: '✅', label: 'BDSM Checklists'           },
+  { href: 'sirs-protocol.html',       icon: '📜', label: 'Sir’s Protocol'            },   // ← NEW
+  { href: 'public-play-menu.html',    icon: '🎟️', label: 'Public Play'               },   // ← NEW
+  { href: 'predicament-bondage-menu.html', icon: '⛓️', label: 'Predicament Bondage' },   // ← NEW
+  { href: 'notes.html',               icon: '📝', label: 'Notes'                     },
+  { href: 'calendar.html',            icon: '📅', label: 'Calendar'                  },
+  { href: 'protocol-daily.html',      icon: '📅', label: 'Daily Protocol'            },
+  { href: 'help.html',                icon: '❓', label: 'Help &amp; Info'            },
+  { href: 'settings.html',            icon: '⚙️', label: 'Settings'                  }
+];
 
   /* ── 2. Read active page from <body data-nav="X"> ──────── */
   var activePage = document.body.dataset.nav || 'more';
