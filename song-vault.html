@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#051024"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Song Vault · Dom Sub Hub</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #051024;
+  --surface:     rgba(5,16,36,0.85);
+  --surface2:    rgba(2,8,20,0.92);
+  --gold:        #D4AF37;
+  --gold-light:  #F5E6A3;
+  --gold-dim:    rgba(212,175,55,.28);
+  --border:      rgba(212,175,55,.15);
+  --luxury-gradient: linear-gradient(135deg,#D4AF37,#F5E6A3);
+  --cream:       #f0e6d3;
+  --cream-dim:   rgba(240,230,211,.6);
+  --cream-mute:  rgba(240,230,211,.3);
+  --red:         #F44336;
+  --green:       #4CAF50;
+  --safe-b:      env(safe-area-inset-bottom,0px);
+  --safe-t:      env(safe-area-inset-top,0px);
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--cream);
+  font-family: 'Montserrat', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; overflow-x: hidden;
+}
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(212,175,55,.07) 0%, transparent 60%);
+}
+
+.shell {
+  position:relative; z-index:1;
+  max-width:480px; margin:0 auto;
+  display:flex; flex-direction:column; min-height:100dvh;
+}
+
+/* ── Topbar ── */
+.topbar {
+  display:flex; align-items:center; gap:12px;
+  padding: calc(12px + var(--safe-t)) 16px 12px;
+  background:rgba(5,16,36,.92); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:40;
+}
+.tb-back {
+  width:38px; height:38px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:1px solid var(--border);
+  text-decoration:none; cursor:pointer; flex-shrink:0; transition:all .2s;
+}
+.tb-back:active { transform:scale(.93); }
+.tb-back .material-symbols-rounded { font-size:20px; color:var(--gold); }
+.tb-center { flex:1; min-width:0; }
+.tb-title {
+  font-family:'Playfair Display',serif; font-size:12px; letter-spacing:2px;
+  color:var(--cream); text-transform:uppercase; font-weight:600;
+}
+.tb-sub {
+  font-family:'Playfair Display',serif; font-size:11px; font-style:italic;
+  color:var(--gold); margin-top:1px; opacity:.7;
+}
+.tb-badge {
+  background:rgba(212,175,55,.1); border:1px solid var(--border);
+  border-radius:20px; padding:4px 12px;
+  font-size:9px; font-weight:700; letter-spacing:1px; color:var(--gold); flex-shrink:0;
+}
+
+/* ── Tab strip ── */
+.tab-strip {
+  display:flex; background:rgba(5,16,36,.92);
+  border-bottom:1px solid var(--border);
+  padding:0 16px; position:sticky;
+  top:62px; z-index:39;
+}
+.tab-btn {
+  flex:1; padding:11px 8px; background:transparent; border:none;
+  border-bottom:2px solid transparent;
+  font-family:'Playfair Display',serif; font-size:9.5px;
+  letter-spacing:2px; text-transform:uppercase;
+  color:var(--cream-mute); cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+.tab-btn .material-symbols-rounded { font-size:14px; }
+.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+/* ── Page content ── */
+.page-content {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  padding:20px 16px 24px; scrollbar-width:none;
+}
+.page-content::-webkit-scrollbar { display:none; }
+
+.panel { display:none; }
+.panel.active { display:block; }
+
+/* ── Section label ── */
+.sec-label {
+  font-family:'Playfair Display',serif; font-weight:600;
+  font-size:9px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--gold-light); padding-bottom:6px; margin-bottom:10px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:6px;
+}
+.sec-label .material-symbols-rounded { font-size:13px; color:var(--gold); opacity:.7; }
+
+/* ── API key banner ── */
+.api-banner {
+  background:rgba(212,175,55,.06); border:1px solid rgba(212,175,55,.22);
+  border-radius:14px; padding:14px 16px;
+  display:flex; align-items:center; gap:12px;
+  cursor:pointer; margin-bottom:16px; transition:border-color .2s;
+}
+.api-banner:active { border-color:var(--gold); }
+.api-banner.hidden { display:none; }
+.api-banner-body { flex:1; }
+.api-banner-title { font-size:11px; font-weight:700; color:var(--gold); margin-bottom:2px; }
+.api-banner-sub { font-size:9px; color:var(--cream-mute); }
+
+/* ── Inputs ── */
+.search-row, .paste-row, .playlist-row { display:flex; gap:8px; margin-bottom:8px; }
+.playlist-row { margin-bottom:20px; }
+
+.text-input {
+  flex:1; background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; padding:12px 14px;
+  font-size:13px; color:var(--cream);
+  font-family:'Montserrat',sans-serif; outline:none; transition:border-color .2s;
+}
+.text-input.sm { font-size:12px; }
+.text-input:focus { border-color:var(--gold-dim); }
+.text-input::placeholder { color:var(--cream-mute); font-style:italic; }
+
+.icon-btn {
+  width:46px; height:46px; flex-shrink:0;
+  background:rgba(212,175,55,.1); border:1px solid var(--border);
+  border-radius:12px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .2s;
+}
+.icon-btn:active { background:rgba(212,175,55,.2); transform:scale(.93); }
+.icon-btn .material-symbols-rounded { font-size:20px; color:var(--gold); }
+
+.text-btn {
+  padding:12px 16px; flex-shrink:0;
+  background:rgba(212,175,55,.1); border:1px solid var(--border);
+  border-radius:12px;
+  font-family:'Playfair Display',serif; font-size:9.5px;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--gold);
+  cursor:pointer; white-space:nowrap; transition:all .2s;
+}
+.text-btn:active { background:rgba(212,175,55,.2); }
+
+/* ── States ── */
+.state-box {
+  background:var(--surface); border:1px solid rgba(255,255,255,.05);
+  border-radius:16px; padding:36px 20px; text-align:center; margin-top:4px;
+}
+.state-box.hidden { display:none; }
+.state-icon { font-size:38px; margin-bottom:12px; }
+.state-title {
+  font-family:'Playfair Display',serif; font-size:16px; font-weight:300;
+  font-style:italic; color:var(--cream); margin-bottom:6px;
+}
+.state-desc { font-size:11px; color:var(--cream-mute); line-height:1.6; }
+.spinner {
+  width:28px; height:28px; border-radius:50%;
+  border:2px solid rgba(212,175,55,.15); border-top-color:var(--gold);
+  animation:spin .7s linear infinite; margin:0 auto 14px;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Search results ── */
+.results-area.hidden { display:none; }
+.results-hd {
+  font-size:8px; font-weight:700; text-transform:uppercase;
+  letter-spacing:3px; color:rgba(212,175,55,.35);
+  margin-bottom:10px; display:flex; align-items:center; gap:8px;
+}
+.results-hd::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.04); }
+
+.result-card {
+  background:var(--surface); border:1px solid rgba(255,255,255,.06);
+  border-radius:14px; padding:12px 14px;
+  display:flex; gap:12px; align-items:center;
+  margin-bottom:8px; transition:border-color .2s;
+}
+.result-thumb { width:62px; height:46px; border-radius:8px; object-fit:cover; flex-shrink:0; background:rgba(212,175,55,.05); }
+.result-thumb-ph { width:62px; height:46px; border-radius:8px; flex-shrink:0; background:rgba(212,175,55,.05); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.result-info { flex:1; min-width:0; }
+.result-title { font-size:12px; font-weight:600; color:var(--cream); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
+.result-artist { font-size:10px; color:var(--cream-mute); margin-bottom:3px; }
+.result-dur { font-size:9px; color:rgba(240,230,211,.2); }
+.add-btn {
+  padding:8px 13px; flex-shrink:0;
+  background:rgba(212,175,55,.1); border:1px solid var(--border);
+  border-radius:10px; font-family:'Playfair Display',serif;
+  font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--gold); cursor:pointer; white-space:nowrap; transition:all .2s;
+}
+.add-btn:active { background:rgba(212,175,55,.2); }
+.add-btn.added { background:rgba(76,175,80,.1); border-color:rgba(76,175,80,.25); color:var(--green); }
+
+.load-more-btn {
+  width:100%; padding:12px; margin-top:4px;
+  background:transparent; border:1px solid rgba(255,255,255,.06);
+  border-radius:12px; font-family:'Playfair Display',serif;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--cream-mute); cursor:pointer; transition:all .2s;
+}
+.load-more-btn:active { color:var(--cream-dim); border-color:var(--border); }
+
+/* ── Filter chips ── */
+.filter-chips {
+  display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;
+  scrollbar-width:none; margin-bottom:14px;
+}
+.filter-chips::-webkit-scrollbar { display:none; }
+.fchip {
+  padding:7px 14px; white-space:nowrap; flex-shrink:0;
+  background:var(--surface); border:1px solid rgba(255,255,255,.06);
+  border-radius:20px; font-family:'Playfair Display',serif;
+  font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--cream-mute); cursor:pointer; transition:all .2s;
+}
+.fchip.active { background:rgba(212,175,55,.1); border-color:var(--border); color:var(--gold); }
+
+/* ── Vault cards ── */
+.vault-card {
+  background:var(--surface); border:1px solid rgba(212,175,55,.1);
+  border-radius:16px; overflow:hidden; margin-bottom:8px;
+  animation:cardIn .3s ease both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+.vault-card-main { display:flex; gap:12px; align-items:center; padding:12px 14px; }
+.vault-thumb { width:54px; height:40px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+.vault-thumb-ph { width:54px; height:40px; border-radius:8px; flex-shrink:0; background:rgba(212,175,55,.05); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.vault-info { flex:1; min-width:0; }
+.vault-song-title { font-size:12px; font-weight:600; color:var(--cream); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
+.vault-artist { font-size:10px; color:var(--cream-mute); margin-bottom:4px; }
+.vault-meta { display:flex; gap:6px; align-items:center; }
+.by-badge { font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:2px 7px; border-radius:10px; }
+.by-badge.dom { background:rgba(212,175,55,.1); color:var(--gold); }
+.by-badge.sub { background:rgba(186,104,200,.1); color:#BA68C8; }
+.vault-dur { font-size:9px; color:rgba(240,230,211,.2); }
+.card-tags { padding:0 14px 6px; display:flex; flex-wrap:wrap; gap:5px; }
+.ctag { font-size:8.5px; font-weight:700; letter-spacing:.5px; padding:3px 9px; border-radius:12px; background:rgba(212,175,55,.08); border:1px solid var(--border); color:var(--gold); }
+
+.vault-actions { display:flex; gap:6px; padding:0 14px 12px; align-items:center; }
+.va-btn {
+  padding:7px 12px; border-radius:10px; cursor:pointer;
+  font-family:'Playfair Display',serif; font-size:8.5px;
+  letter-spacing:1.2px; text-transform:uppercase; transition:all .2s;
+  border:1px solid transparent;
+}
+.va-btn.tags  { background:rgba(100,181,246,.08); border-color:rgba(100,181,246,.2); color:#64B5F6; }
+.va-btn.open  { background:rgba(76,175,80,.08); border-color:rgba(76,175,80,.2); color:var(--green); text-decoration:none; }
+.va-btn.del   { background:rgba(244,67,54,.07); border-color:rgba(244,67,54,.15); color:var(--red); margin-left:auto; }
+.va-btn:active { opacity:.7; }
+
+/* ── Tag/note panel ── */
+.tag-panel { max-height:0; overflow:hidden; transition:max-height .3s cubic-bezier(.4,0,.2,1); border-top:1px solid transparent; }
+.tag-panel.open { max-height:300px; border-top-color:rgba(212,175,55,.07); }
+.tag-panel-inner { padding:12px 14px 14px; }
+.tp-label { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:rgba(212,175,55,.35); margin-bottom:8px; }
+.preset-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.ptag {
+  padding:5px 11px; border-radius:16px; cursor:pointer;
+  font-family:'Playfair Display',serif; font-size:8.5px; letter-spacing:1px; text-transform:uppercase;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07);
+  color:var(--cream-mute); transition:all .15s;
+}
+.ptag.on { background:rgba(212,175,55,.1); border-color:var(--border); color:var(--gold); }
+.active-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
+.atag { font-size:8.5px; font-weight:700; padding:3px 9px; border-radius:12px; background:rgba(212,175,55,.1); border:1px solid var(--border); color:var(--gold); display:flex; align-items:center; gap:5px; }
+.atag-x { cursor:pointer; opacity:.5; font-size:11px; }
+.custom-row { display:flex; gap:6px; }
+.custom-input {
+  flex:1; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.07);
+  border-radius:10px; padding:8px 12px;
+  font-size:11px; color:var(--cream); font-family:'Montserrat',sans-serif; outline:none;
+}
+.custom-input:focus { border-color:rgba(212,175,55,.3); }
+.custom-input::placeholder { color:rgba(240,230,211,.2); }
+.custom-add { padding:8px 14px; border-radius:10px; cursor:pointer; background:rgba(212,175,55,.1); border:1px solid var(--border); font-family:'Playfair Display',serif; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--gold); }
+.note-area { width:100%; margin-top:8px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:10px 12px; font-size:11px; color:var(--cream); font-family:'Montserrat',sans-serif; resize:none; outline:none; line-height:1.5; }
+.note-area:focus { border-color:rgba(212,175,55,.25); }
+.note-area::placeholder { color:rgba(240,230,211,.15); font-style:italic; }
+
+/* ── Bottom sheets (shared styles) ── */
+.sheet-back {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(0,0,0,.8); backdrop-filter:blur(8px);
+  display:flex; align-items:flex-end;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.sheet-back.open { opacity:1; pointer-events:all; }
+.sheet-box {
+  width:100%; background:#0d1120;
+  border:1px solid var(--border); border-bottom:none;
+  border-radius:24px 24px 0 0;
+  padding:8px 20px calc(24px + var(--safe-b));
+  transform:translateY(100%);
+  transition:transform .32s cubic-bezier(.22,1,.36,1);
+}
+.sheet-back.open .sheet-box { transform:translateY(0); }
+.sheet-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 18px; }
+.sheet-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:300; font-style:italic; color:var(--cream); margin-bottom:4px; }
+.sheet-sub { font-size:10px; color:var(--cream-mute); margin-bottom:16px; line-height:1.7; }
+
+/* playlist sheet extras */
+.pl-scroll { max-height:42dvh; overflow-y:auto; scrollbar-width:none; margin-bottom:14px; }
+.pl-scroll::-webkit-scrollbar { display:none; }
+.pl-item {
+  display:flex; gap:10px; align-items:center;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  border-radius:12px; padding:10px 12px; cursor:pointer;
+  transition:border-color .15s; margin-bottom:6px;
+}
+.pl-item.selected { border-color:var(--border); background:rgba(212,175,55,.05); }
+.pl-thumb { width:48px; height:36px; border-radius:6px; object-fit:cover; flex-shrink:0; background:rgba(212,175,55,.05); }
+.pl-thumb-ph { width:48px; height:36px; border-radius:6px; flex-shrink:0; background:rgba(212,175,55,.05); display:flex; align-items:center; justify-content:center; font-size:14px; }
+.pl-info { flex:1; min-width:0; }
+.pl-item-title { font-size:11px; font-weight:600; color:var(--cream); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+.pl-item-artist { font-size:9px; color:var(--cream-mute); }
+.pl-check { width:20px; height:20px; border-radius:6px; border:1.5px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+.pl-item.selected .pl-check { background:var(--gold); border-color:var(--gold); }
+.pl-check .material-symbols-rounded { font-size:13px; color:transparent; transition:color .15s; }
+.pl-item.selected .pl-check .material-symbols-rounded { color:#051024; }
+.pl-select-all { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); background:transparent; border:none; cursor:pointer; font-family:'Playfair Display',serif; padding:0 0 10px; display:block; text-align:right; width:100%; }
+
+.primary-btn {
+  width:100%; padding:14px; border-radius:14px; border:none; cursor:pointer;
+  font-family:'Playfair Display',serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  background:var(--luxury-gradient); color:#051024;
+  display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s;
+}
+.primary-btn:active { transform:scale(.97); }
+.primary-btn .material-symbols-rounded { font-size:17px; }
+.ghost-btn {
+  width:100%; padding:12px; margin-top:8px; border-radius:12px;
+  background:transparent; border:1px solid var(--border);
+  font-family:'Playfair Display',serif; font-size:10px; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--cream-mute); cursor:pointer;
+}
+
+/* modal input */
+.modal-input {
+  width:100%; background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:12px; padding:13px 16px; margin-bottom:12px;
+  font-size:12px; color:var(--cream); font-family:'Montserrat',sans-serif; outline:none;
+}
+.modal-input:focus { border-color:rgba(212,175,55,.4); }
+
+/* delete sheet */
+.del-sheet-box { border-color:rgba(244,67,54,.2); }
+.del-title { font-family:'Playfair Display',serif; font-size:16px; color:var(--red); margin-bottom:6px; text-align:center; }
+.del-desc { font-size:11px; color:var(--cream-mute); margin-bottom:20px; text-align:center; }
+.del-btns { display:flex; gap:8px; }
+.del-cancel, .del-confirm { flex:1; padding:13px; border-radius:12px; cursor:pointer; font-family:'Playfair Display',serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; border:1px solid transparent; }
+.del-cancel { background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.08); color:var(--cream-mute); }
+.del-confirm { background:rgba(244,67,54,.1); border-color:rgba(244,67,54,.25); color:var(--red); }
+
+/* ── Toast ── */
+.dsh-toast {
+  position:fixed; bottom:calc(80px + var(--safe-b)); left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:#0d1120; border:1px solid var(--border);
+  border-radius:24px; padding:10px 20px;
+  font-size:11px; font-weight:600; color:var(--gold);
+  letter-spacing:.5px; white-space:nowrap; z-index:999;
+  opacity:0; pointer-events:none; transition:all .3s ease;
+}
+.dsh-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+
+<body data-nav="more">
+<div class="shell">
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <a href="index.html" class="tb-back" aria-label="Back">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </a>
+    <div class="tb-center">
+      <div class="tb-title">Song Vault</div>
+      <div class="tb-sub">Shared music library</div>
+    </div>
+    <div class="tb-badge" id="vaultBadge">0 Songs</div>
+  </header>
+
+  <!-- ══ TAB STRIP ══ -->
+  <div class="tab-strip">
+    <button class="tab-btn active" id="tabSearch" onclick="switchTab('search')">
+      <span class="material-symbols-rounded">search</span> Search
+    </button>
+    <button class="tab-btn" id="tabVault" onclick="switchTab('vault')">
+      <span class="material-symbols-rounded">library_music</span> Vault
+    </button>
+  </div>
+
+  <!-- ══ CONTENT ══ -->
+  <div class="page-content">
+
+    <!-- ─── SEARCH PANEL ─── -->
+    <div class="panel active" id="panelSearch">
+
+      <div class="api-banner" id="apiBanner" onclick="openApiModal()">
+        <span class="material-symbols-rounded" style="font-size:20px;color:var(--gold);flex-shrink:0;">key</span>
+        <div class="api-banner-body">
+          <div class="api-banner-title">YouTube API Key Needed</div>
+          <div class="api-banner-sub">Tap to add your free Google API key</div>
+        </div>
+        <span class="material-symbols-rounded" style="font-size:16px;color:var(--cream-mute);flex-shrink:0;">chevron_right</span>
+      </div>
+
+      <div class="sec-label">
+        <span class="material-symbols-rounded">search</span>
+        Search YouTube
+      </div>
+      <div class="search-row">
+        <input class="text-input" id="searchInput" type="text" placeholder="Song title, artist, or mood…" onkeydown="if(event.key==='Enter')doSearch()"/>
+        <button class="icon-btn" onclick="doSearch()">
+          <span class="material-symbols-rounded">search</span>
+        </button>
+      </div>
+
+      <div class="sec-label" style="margin-top:16px;">
+        <span class="material-symbols-rounded">link</span>
+        Add a single song
+      </div>
+      <div class="paste-row">
+        <input class="text-input sm" id="pasteInput" type="text" placeholder="Paste a YouTube or YouTube Music link…"/>
+        <button class="text-btn" onclick="addFromPaste()">Add</button>
+      </div>
+
+      <div class="sec-label" style="margin-top:16px;">
+        <span class="material-symbols-rounded">queue_music</span>
+        Import a playlist
+      </div>
+      <div class="playlist-row">
+        <input class="text-input sm" id="playlistInput" type="text" placeholder="Paste a YouTube playlist URL…"/>
+        <button class="text-btn" onclick="importPlaylist()">Import</button>
+      </div>
+
+      <!-- States -->
+      <div class="state-box" id="stateIdle">
+        <div class="state-icon">🎵</div>
+        <div class="state-title">Search for a song</div>
+        <div class="state-desc">Type a title, artist, or vibe above — or paste a link to add directly.</div>
+      </div>
+      <div class="state-box hidden" id="stateLoading">
+        <div class="spinner"></div>
+        <div class="state-title">Searching…</div>
+      </div>
+      <div class="state-box hidden" id="stateError">
+        <div class="state-icon">⚠️</div>
+        <div class="state-title" id="errTitle">Something went wrong</div>
+        <div class="state-desc" id="errDesc">Check your API key or connection.</div>
+      </div>
+      <div class="results-area hidden" id="resultsArea">
+        <div class="results-hd" id="resultsHd">Results</div>
+        <div id="resultsList"></div>
+        <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()" style="display:none">Load more results</button>
+      </div>
+
+    </div><!-- /panelSearch -->
+
+    <!-- ─── VAULT PANEL ─── -->
+    <div class="panel" id="panelVault">
+
+      <div class="filter-chips">
+        <button class="fchip active" onclick="setFilter('all',this)">All</button>
+        <button class="fchip" onclick="setFilter('warm-up',this)">Warm-Up</button>
+        <button class="fchip" onclick="setFilter('peak energy',this)">Peak Energy</button>
+        <button class="fchip" onclick="setFilter('rhythmic',this)">Rhythmic</button>
+        <button class="fchip" onclick="setFilter('intense impact',this)">Intense Impact</button>
+        <button class="fchip" onclick="setFilter('sensual',this)">Sensual</button>
+        <button class="fchip" onclick="setFilter('emotional',this)">Emotional</button>
+        <button class="fchip" onclick="setFilter('rope scene',this)">Rope Scene</button>
+        <button class="fchip" onclick="setFilter('aftercare',this)">Aftercare</button>
+      </div>
+
+      <div id="vaultList"></div>
+
+      <div class="state-box hidden" id="vaultEmpty">
+        <div class="state-icon">🎶</div>
+        <div class="state-title" id="emptyTitle">The vault is empty</div>
+        <div class="state-desc" id="emptyDesc">Search for songs and add them here.<br>Both partners can build this together.</div>
+      </div>
+
+    </div><!-- /panelVault -->
+
+  </div><!-- /page-content -->
+</div><!-- /shell -->
+
+<!-- ══ PLAYLIST PREVIEW SHEET ══ -->
+<div class="sheet-back" id="plBack">
+  <div class="sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Import Playlist</div>
+    <div class="sheet-sub" id="plSub">Loading…</div>
+    <button class="pl-select-all" id="selectAllBtn" onclick="toggleSelectAll()">Select All</button>
+    <div class="pl-scroll" id="plList"></div>
+    <button class="primary-btn" onclick="confirmImport()">
+      <span class="material-symbols-rounded">library_add</span>
+      <span id="plAddLabel">Add Songs to Vault</span>
+    </button>
+    <button class="ghost-btn" onclick="closePlSheet()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ API KEY MODAL ══ -->
+<div class="sheet-back" id="apiBack">
+  <div class="sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">YouTube API Key</div>
+    <div class="sheet-sub">
+      Get a free key at <strong style="color:var(--gold)">console.cloud.google.com</strong><br>
+      → Enable "YouTube Data API v3" → Create a browser key.<br>
+      Stored locally on this device only.
+    </div>
+    <input class="modal-input" id="apiKeyInput" type="text" placeholder="AIzaSy…" autocomplete="off" spellcheck="false"/>
+    <button class="primary-btn" onclick="saveApiKey()">Save Key</button>
+    <button class="ghost-btn" onclick="closeApiModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ DELETE CONFIRM SHEET ══ -->
+<div class="sheet-back" id="delBack">
+  <div class="sheet-box del-sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="del-title">Remove from Vault?</div>
+    <div class="del-desc">This song will be removed for both partners.</div>
+    <div class="del-btns">
+      <button class="del-cancel" onclick="closeDelConfirm()">Cancel</button>
+      <button class="del-confirm" onclick="confirmDelete()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="dsh-toast" id="toast"></div>
+
+<script src="nav.js"></script>
+<script>
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+var VAULT_KEY   = 'sirender_song_vault';
+var API_KEY_KEY = 'sirender_yt_api_key';
+var PRESETS     = ['warm-up','peak energy','rhythmic','intense impact','sensual','emotional','rope scene','teasing','aftercare','aftercare calm'];
+
+var vault = [], searchResults = [], nextPageToken = '', lastQuery = '', currentFilter = 'all', deleteTargetId = null, plItems = [];
+
+var adderRole = 'dom';
+try { var _s=JSON.parse(localStorage.getItem('sp_settings')||'{}'); if(_s.role) adderRole=_s.role.toLowerCase().includes('sub')?'sub':'dom'; } catch(e){}
+
+// ══════════════════════════════════════
+//  PERSISTENCE
+// ══════════════════════════════════════
+function loadVault(){ try{ vault=JSON.parse(localStorage.getItem(VAULT_KEY)||'[]'); }catch(e){ vault=[]; } }
+function saveVault(){ localStorage.setItem(VAULT_KEY,JSON.stringify(vault)); updateBadge(); }
+function getKey(){ return localStorage.getItem(API_KEY_KEY)||''; }
+function updateBadge(){ var n=vault.length; document.getElementById('vaultBadge').textContent=n+(n===1?' Song':' Songs'); }
+
+// ══════════════════════════════════════
+//  API KEY
+// ══════════════════════════════════════
+function checkBanner(){ document.getElementById('apiBanner').classList.toggle('hidden',!!getKey()); }
+function openApiModal(){ document.getElementById('apiKeyInput').value=getKey(); document.getElementById('apiBack').classList.add('open'); }
+function closeApiModal(){ document.getElementById('apiBack').classList.remove('open'); }
+function saveApiKey(){
+  var v=document.getElementById('apiKeyInput').value.trim();
+  if(!v){ showToast('Please enter a key'); return; }
+  localStorage.setItem(API_KEY_KEY,v); closeApiModal(); checkBanner(); showToast('API key saved ✓');
+}
+
+// ══════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════
+function switchTab(tab){
+  var s=tab==='search';
+  document.getElementById('panelSearch').classList.toggle('active',s);
+  document.getElementById('panelVault').classList.toggle('active',!s);
+  document.getElementById('tabSearch').classList.toggle('active',s);
+  document.getElementById('tabVault').classList.toggle('active',!s);
+  if(!s) renderVault();
+}
+
+// ══════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════
+async function doSearch(pageToken){
+  var q=document.getElementById('searchInput').value.trim();
+  if(!q){ showToast('Enter a search term'); return; }
+  var key=getKey(); if(!key){ openApiModal(); return; }
+  if(!pageToken){ lastQuery=q; nextPageToken=''; searchResults=[]; showState('loading'); }
+  try{
+    var p=new URLSearchParams({part:'snippet',q:q,type:'video',videoCategoryId:'10',maxResults:10,key:key});
+    if(pageToken) p.set('pageToken',pageToken);
+    var res=await fetch('https://www.googleapis.com/youtube/v3/search?'+p);
+    var data=await res.json();
+    if(data.error){ showState('error'); document.getElementById('errTitle').textContent='API Error '+data.error.code; document.getElementById('errDesc').textContent=data.error.message; return; }
+    nextPageToken=data.nextPageToken||'';
+    var ids=(data.items||[]).map(function(i){ return i.id.videoId; }).join(',');
+    var durMap={};
+    if(ids){
+      var vr=await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id='+ids+'&key='+key);
+      var vd=await vr.json();
+      (vd.items||[]).forEach(function(v){ durMap[v.id]=parseDur(v.contentDetails.duration); });
+    }
+    var mapped=(data.items||[]).map(function(i){ return {videoId:i.id.videoId,title:i.snippet.title,artist:i.snippet.channelTitle,thumb:((i.snippet.thumbnails.medium||i.snippet.thumbnails.default)||{}).url||'',duration:durMap[i.id.videoId]||''}; });
+    searchResults=pageToken?searchResults.concat(mapped):mapped;
+    showState('results'); renderResults();
+  }catch(e){ showState('error'); document.getElementById('errTitle').textContent='Network Error'; document.getElementById('errDesc').textContent='Check your connection and try again.'; }
+}
+function loadMore(){ if(nextPageToken) doSearch(nextPageToken); }
+function showState(s){
+  document.getElementById('stateIdle').classList.toggle('hidden',s!=='idle');
+  document.getElementById('stateLoading').classList.toggle('hidden',s!=='loading');
+  document.getElementById('stateError').classList.toggle('hidden',s!=='error');
+  document.getElementById('resultsArea').classList.toggle('hidden',s!=='results');
+}
+function renderResults(){
+  var list=document.getElementById('resultsList'); list.innerHTML='';
+  document.getElementById('resultsHd').textContent=searchResults.length+' results for "'+lastQuery+'"';
+  searchResults.forEach(function(item){
+    var inV=vault.some(function(v){ return v.videoId===item.videoId; });
+    var card=document.createElement('div'); card.className='result-card';
+    card.innerHTML=(item.thumb?'<img class="result-thumb" src="'+esc(item.thumb)+'" alt="" loading="lazy"/>':'<div class="result-thumb-ph">🎵</div>')+'<div class="result-info"><div class="result-title">'+esc(item.title)+'</div><div class="result-artist">'+esc(item.artist)+'</div>'+(item.duration?'<div class="result-dur">'+item.duration+'</div>':'')+'</div><button class="add-btn'+(inV?' added':'')+'">'+( inV?'✓ Added':'+ Add')+'</button>';
+    card.querySelector('.add-btn').addEventListener('click',function(){ addToVault(item,this); });
+    list.appendChild(card);
+  });
+  document.getElementById('loadMoreBtn').style.display=nextPageToken?'':'none';
+}
+
+// ══════════════════════════════════════
+//  ADD FROM SEARCH
+// ══════════════════════════════════════
+function addToVault(item,btn){
+  if(vault.some(function(v){ return v.videoId===item.videoId; })){ showToast('Already in Vault'); return; }
+  vault.unshift({id:Date.now(),videoId:item.videoId,title:decode(item.title),artist:decode(item.artist),thumb:item.thumb,duration:item.duration,tags:[],note:'',addedBy:adderRole,addedAt:Date.now()});
+  saveVault(); btn.textContent='✓ Added'; btn.classList.add('added'); showToast('Added to Vault ✓');
+}
+
+// ══════════════════════════════════════
+//  PASTE SINGLE LINK
+// ══════════════════════════════════════
+async function addFromPaste(){
+  var raw=document.getElementById('pasteInput').value.trim();
+  if(!raw){ showToast('Paste a YouTube link first'); return; }
+  var vid=extractVideoId(raw); if(!vid){ showToast('Could not find a video ID'); return; }
+  if(vault.some(function(v){ return v.videoId===vid; })){ showToast('Already in Vault'); return; }
+  var key=getKey(); if(!key){ openApiModal(); return; }
+  showToast('Fetching details…');
+  try{
+    var res=await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id='+vid+'&key='+key);
+    var data=await res.json();
+    var item=(data.items||[])[0]; if(!item){ showToast('Video not found'); return; }
+    vault.unshift({id:Date.now(),videoId:vid,title:item.snippet.title,artist:item.snippet.channelTitle,thumb:((item.snippet.thumbnails.medium||item.snippet.thumbnails.default)||{}).url||'',duration:parseDur(item.contentDetails.duration||''),tags:[],note:'',addedBy:adderRole,addedAt:Date.now()});
+    saveVault(); document.getElementById('pasteInput').value=''; showToast('Added to Vault ✓');
+  }catch(e){ showToast('Error fetching video'); }
+}
+
+// ══════════════════════════════════════
+//  PLAYLIST IMPORT
+// ══════════════════════════════════════
+async function importPlaylist(){
+  var raw=document.getElementById('playlistInput').value.trim();
+  if(!raw){ showToast('Paste a playlist URL first'); return; }
+  var plId=extractPlaylistId(raw); if(!plId){ showToast('Could not find a playlist ID'); return; }
+  var key=getKey(); if(!key){ openApiModal(); return; }
+  showToast('Loading playlist…'); plItems=[];
+  try{
+    var pageToken='';
+    do{
+      var p=new URLSearchParams({part:'snippet',playlistId:plId,maxResults:50,key:key});
+      if(pageToken) p.set('pageToken',pageToken);
+      var res=await fetch('https://www.googleapis.com/youtube/v3/playlistItems?'+p);
+      var data=await res.json();
+      if(data.error){ showToast('Playlist error: '+data.error.message); return; }
+      var ids=(data.items||[]).filter(function(i){ return i.snippet.resourceId.kind==='youtube#video'; }).map(function(i){ return i.snippet.resourceId.videoId; }).join(',');
+      var durMap={};
+      if(ids){
+        var vr=await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id='+ids+'&key='+key);
+        var vd=await vr.json();
+        (vd.items||[]).forEach(function(v){ durMap[v.id]=parseDur(v.contentDetails.duration); });
+      }
+      (data.items||[]).forEach(function(i){
+        if(i.snippet.resourceId.kind!=='youtube#video') return;
+        var vid=i.snippet.resourceId.videoId;
+        plItems.push({videoId:vid,title:i.snippet.title,artist:i.snippet.videoOwnerChannelTitle||'',thumb:((i.snippet.thumbnails.medium||i.snippet.thumbnails.default)||{}).url||'',duration:durMap[vid]||'',selected:true});
+      });
+      pageToken=data.nextPageToken||'';
+    }while(pageToken);
+    if(!plItems.length){ showToast('No videos found in playlist'); return; }
+    // filter already-in-vault
+    var inV=vault.map(function(v){ return v.videoId; });
+    var skip=plItems.filter(function(i){ return inV.indexOf(i.videoId)>-1; }).length;
+    plItems=plItems.filter(function(i){ return inV.indexOf(i.videoId)<0; });
+    document.getElementById('plSub').textContent=plItems.length+' new tracks'+(skip?' · '+skip+' already in Vault':'');
+    updatePlLabel(); renderPlList();
+    document.getElementById('playlistInput').value='';
+    document.getElementById('plBack').classList.add('open');
+  }catch(e){ showToast('Error loading playlist'); }
+}
+function closePlSheet(){ document.getElementById('plBack').classList.remove('open'); }
+function renderPlList(){
+  var list=document.getElementById('plList'); list.innerHTML='';
+  plItems.forEach(function(item,idx){
+    var el=document.createElement('div'); el.className='pl-item'+(item.selected?' selected':'');
+    el.innerHTML=(item.thumb?'<img class="pl-thumb" src="'+esc(item.thumb)+'" alt="" loading="lazy"/>'  :'<div class="pl-thumb-ph">🎵</div>')+'<div class="pl-info"><div class="pl-item-title">'+esc(item.title)+'</div><div class="pl-item-artist">'+esc(item.artist)+(item.duration?' · '+item.duration:'')+'</div></div><div class="pl-check"><span class="material-symbols-rounded">check</span></div>';
+    el.addEventListener('click',function(){ plItems[idx].selected=!plItems[idx].selected; el.classList.toggle('selected',plItems[idx].selected); updatePlLabel(); });
+    list.appendChild(el);
+  });
+}
+function updatePlLabel(){ var n=plItems.filter(function(i){ return i.selected; }).length; document.getElementById('plAddLabel').textContent='Add '+n+' Song'+(n!==1?'s':'')+' to Vault'; }
+function toggleSelectAll(){
+  var allOn=plItems.every(function(i){ return i.selected; });
+  plItems.forEach(function(i){ i.selected=!allOn; });
+  renderPlList(); updatePlLabel();
+  document.getElementById('selectAllBtn').textContent=allOn?'Select All':'Deselect All';
+}
+function confirmImport(){
+  var toAdd=plItems.filter(function(i){ return i.selected; });
+  if(!toAdd.length){ showToast('No songs selected'); return; }
+  var now=Date.now();
+  toAdd.slice().reverse().forEach(function(item){
+    vault.unshift({id:now++,videoId:item.videoId,title:decode(item.title),artist:decode(item.artist),thumb:item.thumb,duration:item.duration,tags:[],note:'',addedBy:adderRole,addedAt:now});
+  });
+  saveVault(); closePlSheet(); showToast(toAdd.length+' songs added ✓'); switchTab('vault');
+}
+
+// ══════════════════════════════════════
+//  RENDER VAULT
+// ══════════════════════════════════════
+function renderVault(){
+  var list=document.getElementById('vaultList'), empty=document.getElementById('vaultEmpty');
+  list.innerHTML='';
+  var filtered=currentFilter==='all'?vault:vault.filter(function(s){ return s.tags.map(function(t){ return t.toLowerCase(); }).indexOf(currentFilter)>-1; });
+  if(!filtered.length){
+    empty.classList.remove('hidden');
+    if(currentFilter!=='all'){ document.getElementById('emptyTitle').textContent='No songs with this tag'; document.getElementById('emptyDesc').textContent='Tag songs from the Vault list.'; }
+    else { document.getElementById('emptyTitle').textContent='The vault is empty'; document.getElementById('emptyDesc').textContent='Search for songs and add them here.\nBoth partners can build this together.'; }
+    return;
+  }
+  empty.classList.add('hidden');
+  filtered.forEach(function(song){
+    var card=document.createElement('div'); card.className='vault-card'; card.id='vc-'+song.id;
+    var tagsHtml=song.tags.map(function(t){ return '<span class="ctag">'+esc(t)+'</span>'; }).join('');
+    var presetHtml=PRESETS.map(function(p){ var on=song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(p)>-1; return '<button class="ptag'+(on?' on':'')+'" onclick="togglePreset('+song.id+',\''+escAttr(p)+'\',this)">'+p+'</button>'; }).join('');
+    card.innerHTML=
+      '<div class="vault-card-main">'+(song.thumb?'<img class="vault-thumb" src="'+esc(song.thumb)+'" alt="" loading="lazy"/>'  :'<div class="vault-thumb-ph">🎵</div>')+'<div class="vault-info"><div class="vault-song-title">'+esc(song.title)+'</div><div class="vault-artist">'+esc(song.artist)+'</div><div class="vault-meta"><span class="by-badge '+song.addedBy+'">'+(song.addedBy==='dom'?'Sir':'Sub')+'</span>'+(song.duration?'<span class="vault-dur">'+song.duration+'</span>':'')+'</div></div></div>'+
+      (song.tags.length?'<div class="card-tags">'+tagsHtml+'</div>':'')+
+      '<div class="vault-actions"><button class="va-btn tags" onclick="toggleTagPanel('+song.id+')">✦ Tags &amp; Note</button><a href="https://www.youtube.com/watch?v='+song.videoId+'" target="_blank" rel="noopener" class="va-btn open">▶ Open</a><button class="va-btn del" onclick="openDelConfirm('+song.id+')">✕</button></div>'+
+      '<div class="tag-panel" id="tp-'+song.id+'"><div class="tag-panel-inner"><div class="tp-label">Quick Tags</div><div class="preset-tags">'+presetHtml+'</div><div class="active-tags" id="at-'+song.id+'">'+activeTagsHtml(song)+'</div><div class="custom-row"><input class="custom-input" id="cti-'+song.id+'" placeholder="Custom tag…" onkeydown="if(event.key===\'Enter\')addCustomTag('+song.id+')"/><button class="custom-add" onclick="addCustomTag('+song.id+')">Add</button></div><textarea class="note-area" id="note-'+song.id+'" rows="2" placeholder="Note — great for teasing, use during rope scene…" onchange="saveNote('+song.id+',this.value)">'+esc(song.note||'')+'</textarea></div></div>';
+    list.appendChild(card);
+  });
+}
+function activeTagsHtml(song){ return song.tags.map(function(t){ return '<span class="atag">'+esc(t)+'<span class="atag-x" onclick="removeTag('+song.id+',\''+escAttr(t)+'\')">×</span></span>'; }).join(''); }
+
+// ══════════════════════════════════════
+//  TAGS
+// ══════════════════════════════════════
+function toggleTagPanel(id){ document.getElementById('tp-'+id).classList.toggle('open'); }
+function togglePreset(id,tag,btn){
+  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
+  var idx=song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(tag);
+  if(idx>-1){ song.tags.splice(idx,1); btn.classList.remove('on'); }
+  else{ song.tags.push(tag); btn.classList.add('on'); }
+  saveVault(); refreshCardTags(id);
+}
+function addCustomTag(id){
+  var inp=document.getElementById('cti-'+id), tag=inp.value.trim(); if(!tag) return;
+  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
+  if(song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(tag.toLowerCase())<0){ song.tags.push(tag); saveVault(); refreshCardTags(id); }
+  inp.value='';
+}
+function removeTag(id,tag){
+  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
+  song.tags=song.tags.filter(function(t){ return t.toLowerCase()!==tag.toLowerCase(); });
+  saveVault(); refreshCardTags(id);
+}
+function refreshCardTags(id){
+  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
+  var at=document.getElementById('at-'+id); if(at) at.innerHTML=activeTagsHtml(song);
+  var card=document.getElementById('vc-'+id);
+  if(card){
+    var old=card.querySelector('.card-tags'); if(old) old.remove();
+    if(song.tags.length){ var row=document.createElement('div'); row.className='card-tags'; row.innerHTML=song.tags.map(function(t){ return '<span class="ctag">'+esc(t)+'</span>'; }).join(''); card.querySelector('.vault-actions').insertAdjacentElement('beforebegin',row); }
+  }
+  PRESETS.forEach(function(p){ var btn=document.querySelector('#tp-'+id+' .ptag[onclick*="\''+p+'\'"]'); if(btn) btn.classList.toggle('on',song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(p)>-1); });
+}
+function saveNote(id,val){ var song=vault.find(function(s){ return s.id===id; }); if(song){ song.note=val; saveVault(); } }
+
+// ══════════════════════════════════════
+//  FILTER
+// ══════════════════════════════════════
+function setFilter(tag,btn){
+  currentFilter=tag;
+  document.querySelectorAll('.fchip').forEach(function(c){ c.classList.remove('active'); });
+  btn.classList.add('active'); renderVault();
+}
+
+// ══════════════════════════════════════
+//  DELETE
+// ══════════════════════════════════════
+function openDelConfirm(id){ deleteTargetId=id; document.getElementById('delBack').classList.add('open'); }
+function closeDelConfirm(){ deleteTargetId=null; document.getElementById('delBack').classList.remove('open'); }
+function confirmDelete(){ vault=vault.filter(function(s){ return s.id!==deleteTargetId; }); saveVault(); closeDelConfirm(); renderVault(); renderResults(); showToast('Removed from Vault'); }
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+var _tt;
+function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){ t.classList.remove('show'); },2200); }
+
+// ══════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════
+function extractVideoId(url){ var pats=[/(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/,/music\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})/]; for(var i=0;i<pats.length;i++){ var m=url.match(pats[i]); if(m) return m[1]; } if(/^[A-Za-z0-9_-]{11}$/.test(url)) return url; return null; }
+function extractPlaylistId(url){ var m=url.match(/[?&]list=([A-Za-z0-9_-]+)/); return m?m[1]:null; }
+function parseDur(iso){ if(!iso) return ''; var m=iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m) return ''; var h=parseInt(m[1]||0),mn=parseInt(m[2]||0),s=parseInt(m[3]||0); return h>0?h+':'+pad(mn)+':'+pad(s):mn+':'+pad(s); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return String(s||'').replace(/'/g,"\\'"); }
+function decode(s){ var t=document.createElement('textarea'); t.innerHTML=s; return t.value; }
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+loadVault(); updateBadge(); checkBanner();
+if('serviceWorker' in navigator) window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+</script>
+</body>
+</html>
