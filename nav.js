@@ -1,25 +1,25 @@
 /**
  * ============================================================
- *  DOM SUB HUB — nav.js
- *  Injects the bottom nav, overlay, and More sheet into every
- *  page automatically. Include once before </body>:
- *    <script src="nav.js"></script>
+ * DOM SUB HUB — nav.js
+ * Injects the bottom nav, overlay, and More sheet into every
+ * page automatically. Include once before </body>:
+ * <script src="nav.js"></script>
  *
- *  To set the active tab, add data-nav="X" to <body>:
- *    home     → index.html
- *    scenes   → scene-menu.html
- *    training → training-menu.html + all training sub-pages
- *    vault    → toy-vault.html
- *    more     → everything else
+ * To set the active tab, add data-nav="X" to <body>:
+ * home     → index.html
+ * tasks    → tasks.html
+ * scenes   → scene-menu.html
+ * training → training-menu.html + all training sub-pages
+ * more     → everything else
  * ============================================================
  */
-
 (function () {
 
   /* ── 1. Nav link definitions ─────────────────────────────
      To add/remove/reorder tabs: edit NAV_TABS.
      To add/remove More sheet links: edit MORE_ITEMS.
-  ──────────────────────────────────────────────────────── */
+     ──────────────────────────────────────────────────────── */
+
   var NAV_TABS = [
     {
       page: 'home',
@@ -27,6 +27,13 @@
       label: 'Home',
       isButton: false,
       svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V10.5z"/><path d="M9 21V13h6v8"/></svg>'
+    },
+    {
+      page: 'tasks',
+      href: 'tasks.html',
+      label: 'Tasks',
+      isButton: false,
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>'
     },
     {
       page: 'scenes',
@@ -43,13 +50,6 @@
       svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'
     },
     {
-      page: 'vault',
-      href: 'toy-vault.html',
-      label: 'Vault',
-      isButton: false,
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 7l9-4 9 4"/><circle cx="12" cy="14" r="2.5"/><line x1="12" y1="16.5" x2="12" y2="19"/></svg>'
-    },
-    {
       page: 'more',
       href: null,
       label: 'More',
@@ -59,17 +59,18 @@
   ];
 
   var MORE_ITEMS = [
-  { href: 'assessment-menu.html',     icon: '📊', label: 'Assessments &amp; Ratings' },
-  { href: 'public-game.html',         icon: '🏛️', label: "Sir&#39;s Public Tasks"    },
-  { href: 'bdsm-checklist.html',      icon: '✅', label: 'BDSM Checklists'           },
-  { href: 'sirs-protocol.html',       icon: '📜', label: 'Sir’s Protocol'            },   
-  { href: 'song-vault.html',          icon: '🎵', label: 'Song Vault'                },
-  { href: 'notes.html',               icon: '📝', label: 'Notes'                     },
-  { href: 'calendar.html',            icon: '📅', label: 'Calendar'                  },
-  { href: 'protocol-daily.html',      icon: '📅', label: 'Daily Protocol'            },
-  { href: 'help.html',                icon: '❓', label: 'Help &amp; Info'            },
-  { href: 'settings.html',            icon: '⚙️', label: 'Settings'                  }
-];
+    { href: 'toy-vault.html',       icon: '🔒', label: 'Toy Vault' },
+    { href: 'assessment-menu.html', icon: '📊', label: 'Assessments &amp; Ratings' },
+    { href: 'public-game.html',     icon: '🏛️', label: "Sir&#39;s Public Tasks" },
+    { href: 'bdsm-checklist.html',  icon: '✅', label: 'BDSM Checklists' },
+    { href: 'sirs-protocol.html',   icon: '📜', label: 'Sir\u2019s Protocol' },
+    { href: 'song-vault.html',      icon: '🎵', label: 'Song Vault' },
+    { href: 'notes.html',           icon: '📝', label: 'Notes' },
+    { href: 'calendar.html',        icon: '📅', label: 'Calendar' },
+    { href: 'protocol-daily.html',  icon: '📅', label: 'Daily Protocol' },
+    { href: 'help.html',            icon: '❓', label: 'Help &amp; Info' },
+    { href: 'settings.html',        icon: '⚙️', label: 'Settings' }
+  ];
 
   /* ── 2. Read active page from <body data-nav="X"> ──────── */
   var activePage = document.body.dataset.nav || 'more';
@@ -83,17 +84,17 @@
   var moreItemsHTML = MORE_ITEMS.map(function (item) {
     return (
       '<a href="' + item.href + '" class="dsh-more-item">' +
-        '<span class="dsh-more-icon">' + item.icon + '</span>' +
-        '<span class="dsh-more-lbl">' + item.label + '</span>' +
+      '<span class="dsh-more-icon">' + item.icon + '</span>' +
+      '<span class="dsh-more-lbl">' + item.label + '</span>' +
       '</a>'
     );
   }).join('');
 
   var sheetHTML =
     '<div class="dsh-more-sheet" id="dshMoreSheet">' +
-      '<div class="dsh-sheet-handle"></div>' +
-      '<div class="dsh-sheet-title">More</div>' +
-      '<div class="dsh-more-grid">' + moreItemsHTML + '</div>' +
+    '<div class="dsh-sheet-handle"></div>' +
+    '<div class="dsh-sheet-title">More</div>' +
+    '<div class="dsh-more-grid">' + moreItemsHTML + '</div>' +
     '</div>';
 
   // Nav bar tabs
@@ -107,13 +108,13 @@
     if (tab.isButton) {
       return (
         '<button class="dsh-nav-btn' + isActive + '" data-page="' + tab.page + '" id="dshMoreBtn">' +
-          inner +
+        inner +
         '</button>'
       );
     } else {
       return (
         '<a href="' + tab.href + '" class="dsh-nav-btn' + isActive + '" data-page="' + tab.page + '">' +
-          inner +
+        inner +
         '</a>'
       );
     }
@@ -126,6 +127,7 @@
   function appendHTML(html) {
     document.body.insertAdjacentHTML('beforeend', html);
   }
+
   appendHTML(overlayHTML);
   appendHTML(sheetHTML);
   appendHTML(navHTML);
