@@ -194,17 +194,8 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
 .alert-text{flex:1;font-size:10px;color:var(--text-mid);line-height:1.4;}
 .alert-text strong{color:var(--text);display:block;font-size:11px;margin-bottom:1px;}
 
-/* ── Sidebar ── */
-.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;opacity:0;pointer-events:none;transition:opacity .25s;}
-.sidebar-overlay.open{opacity:1;pointer-events:all;}
-.global-sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:#07111f;border-right:1px solid var(--gold-border);z-index:301;transform:translateX(-100%);transition:transform .3s cubic-bezier(.32,0,.67,0);padding-top:var(--safe-t);}
-.global-sidebar.open{transform:translateX(0);}
-.sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.05);}
-.sidebar-brand{font-family:'Great Vibes',cursive;font-size:28px;background:var(--luxury-gradient);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-.sidebar-nav{padding:12px 0;}
-.sidebar-link{display:flex;align-items:center;gap:12px;padding:12px 20px;font-size:12px;font-weight:500;color:var(--text-mid);text-decoration:none;transition:all .2s;}
-.sidebar-link:active{background:rgba(212,175,55,0.05);color:var(--gold);}
-.sidebar-icon{font-size:18px;color:var(--text-dim);}
+/* ── Bottom nav padding ── */
+#appShell{padding-bottom:calc(64px + var(--safe-b));}
 
 /* ── Util ── */
 .mt-8{margin-top:8px;}
@@ -225,7 +216,7 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
-<body>
+<body data-nav="more">
 
 <div class="glow-orb"></div>
 <div id="toast" class="toast"></div>
@@ -287,9 +278,9 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
 
   <!-- Header -->
   <div class="app-header">
-    <button class="header-back" onclick="openSidebar()">
-      <span class="material-symbols-rounded">menu</span>
-    </button>
+    <a href="index.html" class="header-back">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </a>
     <div class="header-title">
       <div class="header-title-main">Tasks</div>
       <div class="header-title-sub" id="headerSub">Dom Sub Hub</div>
@@ -529,23 +520,11 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Sidebar -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header"><div class="sidebar-brand">Dom Sub Hub</div></div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training</a>
-    <a href="tasks.html" class="sidebar-link" style="color:var(--gold);"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">task_alt</span> Tasks</a>
-    <a href="protocol-daily.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">checklist</span> Daily Protocol</a>
-    <a href="notes.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">note</span> Notes</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">settings</span> Settings</a>
-  </div>
-  <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,0.05);margin-top:auto;">
-    <button onclick="logout()" style="width:100%;padding:10px;background:rgba(224,91,106,0.1);border:1px solid rgba(224,91,106,0.2);border-radius:10px;font-size:11px;font-weight:600;color:var(--rose);cursor:pointer;">Sign Out</button>
-  </div>
-</div>
+<!-- Bottom Nav (injected by nav.js) -->
+<nav class="bottom-nav"></nav>
+
+<link rel="stylesheet" href="nav.css" />
+<script src="nav.js"></script>
 
 <!-- ══════════════════════════════════════════
      FIREBASE + APP JS
@@ -601,8 +580,6 @@ window.saveTask = saveTask;
 window.saveReward = saveReward;
 window.savePunishment = savePunishment;
 window.confirmFail = confirmFail;
-window.openSidebar = openSidebar;
-window.closeSidebar = closeSidebar;
 window.logout = logout;
 window.toggleFilter = toggleFilter;
 window.completeTask = completeTask;
@@ -1270,15 +1247,7 @@ function toggleFilter() {
   renderTasks(filterState);
 }
 
-// ── Sidebar ──
-function openSidebar() {
-  document.getElementById('sidebarOverlay').classList.add('open');
-  document.getElementById('globalSidebar').classList.add('open');
-}
-function closeSidebar() {
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  document.getElementById('globalSidebar').classList.remove('open');
-}
+
 
 // ── Helpers ──
 function selectChip(groupId, el) {
