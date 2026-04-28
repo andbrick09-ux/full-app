@@ -251,6 +251,58 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 .alert-text{font-size:10px;color:var(--mid);line-height:1.5;}
 .alert-text strong{color:var(--text);display:block;font-size:11px;margin-bottom:1px;}
 
+/* ── Demerit Tier Banner ── */
+.demerit-banner{margin:10px 16px 0;border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px;}
+.demerit-banner.tier-1{background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.22);}
+.demerit-banner.tier-2{background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.22);}
+.demerit-banner.tier-3{background:rgba(186,104,200,.1);border:1px solid rgba(186,104,200,.3);}
+.demerit-icon{font-size:20px;flex-shrink:0;}
+.demerit-body{flex:1;}
+.demerit-title{font-size:11px;font-weight:700;margin-bottom:2px;}
+.tier-1 .demerit-title{color:var(--amber);}
+.tier-2 .demerit-title{color:var(--rose);}
+.tier-3 .demerit-title{color:var(--purple);}
+.demerit-desc{font-size:9px;color:var(--mid);line-height:1.4;}
+.demerit-count{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;flex-shrink:0;}
+.tier-1 .demerit-count{color:var(--amber);}
+.tier-2 .demerit-count{color:var(--rose);}
+.tier-3 .demerit-count{color:var(--purple);}
+
+/* ── Consequence Picker Sheet ── */
+.consequence-card{background:var(--surface);border:1px solid var(--gold-b);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;}
+.consequence-card:active{border-color:var(--gold);background:rgba(212,175,55,.06);}
+.consequence-card.selected{border-color:var(--rose);background:rgba(224,91,106,.06);}
+.consequence-emoji{font-size:22px;flex-shrink:0;}
+.consequence-info{flex:1;}
+.consequence-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.consequence-desc{font-size:9.5px;color:var(--dim);line-height:1.4;}
+.consequence-tier{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:8px;flex-shrink:0;}
+.consequence-tier.t1{background:rgba(255,193,7,.12);color:var(--amber);}
+.consequence-tier.t2{background:rgba(224,91,106,.1);color:var(--rose);}
+.consequence-tier.t3{background:rgba(186,104,200,.1);color:var(--purple);}
+.reroll-btn{width:100%;padding:11px;border-radius:11px;border:1px solid var(--gold-b);background:transparent;font-family:'Playfair Display',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;margin-bottom:8px;transition:all .2s;}
+.reroll-btn:active{background:rgba(212,175,55,.08);}
+
+/* ── Achievement Badges ── */
+.achievements-wrap{margin:10px 16px 0;}
+.achievements-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.achievements-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--dim);}
+.achievements-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.achievements-scroll::-webkit-scrollbar{display:none;}
+.achievement-pill{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:20px;border:1px solid var(--gold-b);background:var(--surface);white-space:nowrap;flex-shrink:0;transition:all .2s;}
+.achievement-pill.earned{border-color:var(--gold);background:rgba(212,175,55,.08);}
+.achievement-pill.locked{opacity:.35;}
+.achievement-emoji{font-size:14px;}
+.achievement-name{font-size:9px;font-weight:700;color:var(--text);}
+.achievement-pill.earned .achievement-name{color:var(--gold);}
+
+/* ── Difficulty Multiplier Visual ── */
+.mult-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:7px;margin-left:2px;}
+.mult-x1{background:rgba(76,175,80,.1);color:var(--green);}
+.mult-x15{background:rgba(100,181,246,.1);color:var(--blue);}
+.mult-x2{background:rgba(255,193,7,.1);color:var(--amber);}
+.mult-x3{background:rgba(224,91,106,.1);color:var(--rose);}
+
 /* Misc */
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:11px;gap:10px;}
 .spinner{width:18px;height:18px;border:2px solid var(--gold-b);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
@@ -346,6 +398,13 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
         </div>
       </div>
       <div id="punishBanner"></div>
+      <div id="demeritsBanner"></div>
+      <div id="achievementsStrip" class="achievements-wrap hidden">
+        <div class="achievements-head">
+          <div class="achievements-lbl">Achievements</div>
+        </div>
+        <div class="achievements-scroll" id="achievementsList"></div>
+      </div>
       <div class="section">
         <div class="section-head">
           <div class="section-lbl">Active Tasks</div>
@@ -530,6 +589,25 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 </div>
 
 <!-- Bottom Nav -->
+<!-- Consequence Picker Sheet (Sir picks escalated punishment) -->
+<div class="sheet" id="consequenceSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Consequence Picker</div>
+    <div class="sheet-sub" id="consequenceSheetSub">Choose a fitting consequence</div>
+  </div>
+  <div class="sheet-body">
+    <div class="alert warn" style="margin-bottom:12px;">
+      <div class="alert-icon">⚡</div>
+      <div class="alert-text" id="consequenceAlertText"><strong>Demerit escalation active</strong>Repeated failures trigger escalated consequences.</div>
+    </div>
+    <button class="reroll-btn" onclick="rollConsequence()">🎲 Roll Again</button>
+    <div id="consequenceCards"></div>
+    <button class="submit-btn" onclick="applyConsequence()">Apply This Consequence</button>
+    <button class="cancel-btn" onclick="closeAllSheets()">Skip for Now</button>
+  </div>
+</div>
+
 <nav class="bottom-nav"></nav>
 <link rel="stylesheet" href="nav.css"/>
 <script src="nav.js"></script>
@@ -662,6 +740,7 @@ function showApp() {
   document.getElementById('fabBtn').style.display = isDom ? 'flex' : 'none';
   listenPoints(); listenTasks(); listenRewards(); listenPunishments(); listenQueue(); listenHistory();
   setTimeout(checkDailyReset, 1500);
+  setTimeout(renderAchievements, 2000);
 }
 
 // ─────────────────────────────────────────────
@@ -716,6 +795,9 @@ function renderTasks() {
     const overdue     = t.due && !done && now > t.due;
     const diffClass   = 'diff-' + (t.difficulty||'simple');
     const diffLabel   = cap(t.difficulty||'simple');
+    const multMap     = {simple:'×1',standard:'×1.5',demanding:'×2',extreme:'×3'};
+    const multClass   = {simple:'mult-x1',standard:'mult-x15',demanding:'mult-x2',extreme:'mult-x3'};
+    const multBadge   = `<span class="mult-badge ${multClass[t.difficulty||'simple']}">${multMap[t.difficulty||'simple']}</span>`;
 
     const dueLine = t.due
       ? `<div class="task-due${overdue?' overdue':''}">${overdue?'⚠ Overdue — ':''}Due ${fmtDate(t.due)}</div>` : '';
@@ -772,7 +854,7 @@ function renderTasks() {
           </div>
           ${dueLine}
         </div>
-        <div class="task-pts">+${earnedPts}</div>
+        <div class="task-pts">+${earnedPts}${multBadge}</div>
       </div>
       ${t.description ? `<div class="task-desc">${esc(t.description)}</div>` : ''}
       ${streakHtml}
@@ -957,6 +1039,8 @@ function listenQueue() {
     }
     if (curTab === 'queue') renderQueue();
     renderPunishBanner();
+    renderDemeritsBanner();
+    renderAchievements();
   });
 }
 
@@ -978,12 +1062,16 @@ function renderQueue() {
         </div>
       </div>`;
     } else if (item.type === 'failure_report') {
+      const count = getDemeritCount();
+      const tierNum = TIER.indexOf(getTier(count));
+      const showConsequence = tierNum >= 1;
       html += `<div class="q-card fade-up">
         <div class="q-head"><span class="q-type">⚠️ Failure</span><div class="q-title">${esc(item.taskTitle)}</div><span class="q-time">${time}</span></div>
         <div class="q-body">
           <div class="q-detail">${item.reason ? 'Reason: "' + esc(item.reason) + '"' : 'No reason given.'}</div>
           <div class="q-actions">
-            <button class="q-btn redeem" onclick="openRedemptionSheet('${id}')">🌿 Assign Redemption</button>
+            ${showConsequence ? `<button class="q-btn deny" style="background:rgba(186,104,200,.1);color:var(--purple);border-color:rgba(186,104,200,.2);" onclick="openConsequencePicker('${id}')">⚡ Consequence</button>` : ''}
+            <button class="q-btn redeem" onclick="openRedemptionSheet('${id}')">🌿 Redemption</button>
             <button class="q-btn deny" onclick="denyQueueItem('${id}')">Dismiss</button>
           </div>
         </div>
@@ -1242,7 +1330,7 @@ function fillPunishDrop() {
 // ─────────────────────────────────────────────
 let histData = {};
 function listenHistory() {
-  onValue(ref(db,'history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); });
+  onValue(ref(db,'history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); renderAchievements(); });
 }
 
 function renderHistory() {
@@ -1259,7 +1347,8 @@ function renderHistory() {
     punishment_assigned:  { icon:'⚡', color:'var(--amber)',  label:'Punishment Assigned' },
     proof_approved:       { icon:'📷', color:'var(--green)',  label:'Proof Approved' },
     proof_denied:         { icon:'🚫', color:'var(--rose)',   label:'Proof Rejected' },
-    redemption_assigned:  { icon:'🌿', color:'var(--purple)', label:'Redemption Assigned' }
+    redemption_assigned:  { icon:'🌿', color:'var(--purple)', label:'Redemption Assigned' },
+    consequence_assigned: { icon:'⚡', color:'var(--rose)',   label:'Consequence Assigned' }
   };
   let html = '';
   entries.forEach(([, e]) => {
@@ -1357,6 +1446,177 @@ function showToast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────
+// PHASE 3 — DEMERITS, ACHIEVEMENTS, CONSEQUENCE PICKER
+// ─────────────────────────────────────────────
+
+// Demerit tier thresholds
+const TIER = [ {min:0,max:0,label:null}, {min:1,max:2,label:'Minor',cls:'tier-1',icon:'⚠️',desc:'1–2 unresolved failures. Minor correction expected.'},
+  {min:3,max:4,label:'Moderate',cls:'tier-2',icon:'🔴',desc:'3–4 failures. Moderate escalation. Sir\'s attention required.'},
+  {min:5,max:99,label:'Significant',cls:'tier-3',icon:'💀',desc:'5+ failures. Significant consequences in effect.'} ];
+
+// Consequence pool — filtered by tier
+const CONSEQUENCES = [
+  {emoji:'📝',title:'Devotion Letter',desc:'Write a 300-word letter of apology and devotion.',tier:1,pts:5},
+  {emoji:'🙇',title:'Kneeling Meditation',desc:'Hold the Ready position for 20 minutes with photo proof.',tier:1,pts:10},
+  {emoji:'🚫',title:'Privilege Loss',desc:'Forfeit the Get Dreamy ritual or a favourite scent for 48 hours.',tier:1,pts:10},
+  {emoji:'📵',title:'Device Silence',desc:'3 hours of total silence — no social media except messages to Sir.',tier:1,pts:5},
+  {emoji:'🛁',title:'Ritual Reset',desc:'Full grooming ritual completed and documented with photos.',tier:2,pts:15},
+  {emoji:'🔒',title:'24hr Abstinence',desc:'24 hours of total sexual abstinence — no touching, no content.',tier:2,pts:20},
+  {emoji:'🏠',title:'Double Domestic',desc:'Two extra domestic service tasks assigned by Sir on the spot.',tier:2,pts:15},
+  {emoji:'⏳',title:'Extended Edge',desc:'30 minutes of edging — bring to the brink, stop, repeat every 5 min.',tier:2,pts:20},
+  {emoji:'🌑',title:'Total Reset Protocol',desc:'48 hours of withdrawal — no privileges, no play, service only.',tier:3,pts:30},
+  {emoji:'📋',title:'Full Rule Recital',desc:'Write out every rule and expectation from scratch. Submit for review.',tier:3,pts:25},
+  {emoji:'🎭',title:'Public Submission',desc:'A structured humility task defined entirely by Sir\'s discretion.',tier:3,pts:35},
+];
+
+let currentConsequenceTaskId = null;
+let currentConsequencePicked = null;
+
+// Expose new functions
+W.rollConsequence = rollConsequence;
+W.applyConsequence = applyConsequence;
+W.openConsequencePicker = openConsequencePicker;
+
+// ── Demerit count = unresolved failure_report queue items ──
+function getDemeritCount() {
+  return Object.values(queue).filter(i => !i.resolved && i.type === 'failure_report').length;
+}
+
+function getTier(count) {
+  return TIER.find(t => count >= t.min && count <= t.max) || TIER[0];
+}
+
+function renderDemeritsBanner() {
+  const banner = document.getElementById('demeritsBanner');
+  const count = getDemeritCount();
+  const tier = getTier(count);
+  if (!tier.label) { banner.innerHTML = ''; return; }
+  banner.innerHTML = `<div class="demerit-banner ${tier.cls}">
+    <div class="demerit-icon">${tier.icon}</div>
+    <div class="demerit-body">
+      <div class="demerit-title">${tier.label} Infraction — Tier ${TIER.indexOf(tier)}</div>
+      <div class="demerit-desc">${tier.desc}</div>
+    </div>
+    <div class="demerit-count">${count}</div>
+  </div>`;
+}
+
+// ── Consequence Picker ──
+function openConsequencePicker(taskId) {
+  currentConsequenceTaskId = taskId;
+  const count = getDemeritCount();
+  const tier = getTier(count);
+  document.getElementById('consequenceSheetSub').textContent =
+    tier.label ? tier.label + ' tier — ' + count + ' unresolved failure' + (count!==1?'s':'') : 'Choose a fitting consequence';
+  document.getElementById('consequenceAlertText').innerHTML =
+    `<strong>${tier.label || 'Demerit'} escalation active</strong>${tier.desc || 'Assign a consequence for this failure.'}`;
+  rollConsequence();
+  openSheet('consequenceSheet');
+}
+
+function rollConsequence() {
+  const count = getDemeritCount();
+  const tierNum = TIER.indexOf(getTier(count));
+  // Include consequences at or below current tier
+  const eligible = CONSEQUENCES.filter(c => c.tier <= Math.max(tierNum, 1));
+  // Pick 3 random without replacement
+  const shuffled = eligible.sort(() => Math.random() - 0.5).slice(0, 3);
+  currentConsequencePicked = shuffled[0]; // default select first
+  renderConsequenceCards(shuffled);
+}
+
+function renderConsequenceCards(pool) {
+  const tierClass = ['','t1','t2','t3'];
+  const tierLabel = ['','Minor','Moderate','Significant'];
+  let html = '';
+  pool.forEach((c, i) => {
+    html += `<div class="consequence-card${i===0?' selected':''}" onclick="selectConsequence(this, ${CONSEQUENCES.indexOf(c)})">
+      <div class="consequence-emoji">${c.emoji}</div>
+      <div class="consequence-info">
+        <div class="consequence-title">${c.title}</div>
+        <div class="consequence-desc">${c.desc}</div>
+      </div>
+      <span class="consequence-tier ${tierClass[c.tier]}">${tierLabel[c.tier]}</span>
+    </div>`;
+  });
+  document.getElementById('consequenceCards').innerHTML = html;
+  // Store pool on window for selectConsequence
+  window._consequencePool = pool;
+}
+
+W.selectConsequence = function(el, globalIdx) {
+  document.querySelectorAll('.consequence-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  currentConsequencePicked = CONSEQUENCES[globalIdx];
+};
+
+async function applyConsequence() {
+  if (!currentConsequencePicked) return;
+  const c = currentConsequencePicked;
+  // Add as a redemption-style task with photo proof
+  await push(ref(db,'tasks'), {
+    title: c.emoji + ' ' + c.title,
+    description: c.desc,
+    difficulty: 'demanding', basePoints: c.pts,
+    schedule: 'once', due: null, punishLink: null, punishPoints: 0,
+    requireProof: true, isRedemption: true,
+    redemptionFor: currentConsequenceTaskId || null,
+    createdAt: Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
+  });
+  await push(ref(db,'history'), {
+    type: 'consequence_assigned', title: c.title, tier: c.tier, pts: c.pts, ts: Date.now()
+  });
+  // Resolve the queue item if linked
+  if (currentConsequenceTaskId && queue[currentConsequenceTaskId]) {
+    await update(ref(db,'queue/'+currentConsequenceTaskId), {resolved:true, hadConsequence:true});
+  }
+  closeAllSheets();
+  currentConsequenceTaskId = null; currentConsequencePicked = null;
+  showToast('⚡ Consequence assigned: ' + c.title);
+}
+
+// ── Achievement Badges ──
+const ACHIEVEMENTS = [
+  {id:'first_complete', emoji:'🌟', name:'First Step',    desc:'Complete your first task',           check: (t,h) => Object.values(h).some(e=>e.type==='task_completed')},
+  {id:'streak_3',       emoji:'⚡', name:'On a Roll',     desc:'3-day streak on any task',           check: (t,h) => Object.values(t).some(x=>x.streak>=3)},
+  {id:'streak_7',       emoji:'🔥', name:'Fire Streak',   desc:'7-day streak on any task',           check: (t,h) => Object.values(t).some(x=>x.streak>=7)},
+  {id:'streak_30',      emoji:'💎', name:'Diamond',       desc:'30-day streak on any task',          check: (t,h) => Object.values(t).some(x=>x.streak>=30)},
+  {id:'pts_100',        emoji:'⭐', name:'Century',       desc:'Earn 100 points total',              check: (t,h,p) => (p.earned||0) >= 100},
+  {id:'pts_500',        emoji:'🏆', name:'Gold Standard', desc:'Earn 500 points total',              check: (t,h,p) => (p.earned||0) >= 500},
+  {id:'no_fails_7',     emoji:'🕊️', name:'Perfect Week',  desc:'7 days with no failures reported',  check: (t,h) => {
+    const now = Date.now(), week = 7*86400000;
+    return !Object.values(h).some(e=>e.type==='task_failed' && now-e.ts < week);
+  }},
+  {id:'redeemed',       emoji:'🌿', name:'Redeemed',      desc:'Complete a redemption task',         check: (t,h) => Object.values(h).some(e=>e.type==='task_completed' && Object.values(t).some(x=>x.isRedemption&&x.completedToday))},
+  {id:'tasks_10',       emoji:'📋', name:'Dedicated',     desc:'Complete 10 tasks total',            check: (t,h) => Object.values(h).filter(e=>e.type==='task_completed').length >= 10},
+  {id:'tasks_50',       emoji:'👑', name:'Devoted',       desc:'Complete 50 tasks total',            check: (t,h) => Object.values(h).filter(e=>e.type==='task_completed').length >= 50},
+];
+
+function computeAchievements() {
+  return ACHIEVEMENTS.map(a => ({
+    ...a,
+    earned: a.check(tasks, histData || {}, pts)
+  }));
+}
+
+function renderAchievements() {
+  const strip = document.getElementById('achievementsStrip');
+  const list  = document.getElementById('achievementsList');
+  if (role !== 'sub') { strip.classList.add('hidden'); return; }
+  const all = computeAchievements();
+  const earnedAny = all.some(a => a.earned);
+  strip.classList.toggle('hidden', !earnedAny);
+  let html = '';
+  all.filter(a => a.earned).forEach(a => {
+    html += `<div class="achievement-pill earned" title="${a.desc}">
+      <span class="achievement-emoji">${a.emoji}</span>
+      <span class="achievement-name">${a.name}</span>
+    </div>`;
+  });
+  list.innerHTML = html;
 }
 
 // ─────────────────────────────────────────────
