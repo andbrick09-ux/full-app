@@ -1,335 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#051024" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#051024"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
 <title>Tasks — Dom Sub Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --gold: #D4AF37;
-  --gold-dim: rgba(212,175,55,0.15);
-  --gold-border: rgba(212,175,55,0.2);
-  --bg: #020814;
-  --surface: rgba(2,8,20,0.7);
-  --surface2: rgba(5,15,35,0.85);
-  --text: #ddd;
-  --text-dim: #666;
-  --text-mid: #aaa;
-  --luxury-gradient: linear-gradient(135deg,#D4AF37,#F5E6A3,#D4AF37);
-  --safe-t: env(safe-area-inset-top,0px);
-  --safe-b: env(safe-area-inset-bottom,0px);
-  --rose: #e05b6a;
-  --green: #4CAF50;
-  --blue: #64B5F6;
-  --purple: #BA68C8;
-  --amber: #FFC107;
+:root{
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,.15);--gold-b:rgba(212,175,55,.2);
+  --bg:#020814;--surface:rgba(2,8,20,.7);--surface2:rgba(5,15,35,.85);
+  --text:#ddd;--dim:#666;--mid:#aaa;
+  --luxury:linear-gradient(135deg,#D4AF37,#F5E6A3,#D4AF37);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+  --rose:#e05b6a;--green:#4CAF50;--blue:#64B5F6;--purple:#BA68C8;--amber:#FFC107;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;min-height:100dvh;overflow-x:hidden;}
-
-/* ── Ambient ── */
-.glow-orb{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.06) 0%,transparent 70%);top:-150px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite;}
-@keyframes orbFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(24px)}}
-
-/* ── Login Screen ── */
-#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0;}
-.login-logo{font-family:'Great Vibes',cursive;font-size:52px;background:var(--luxury-gradient);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s ease-in-out infinite;margin-bottom:4px;}
+@keyframes orbFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(20px)}}
 @keyframes shimmer{0%{background-position:0% center}50%{background-position:100% center}100%{background-position:0% center}}
-.login-sub{font-size:9px;text-transform:uppercase;letter-spacing:4px;color:rgba(212,175,55,0.4);margin-bottom:40px;}
-.role-title{font-family:'Playfair Display',serif;font-size:13px;color:var(--text-mid);margin-bottom:16px;letter-spacing:1px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.glow-orb{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.06) 0%,transparent 70%);top:-150px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite;}
+
+/* ── Login ── */
+#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.login-logo{font-family:'Great Vibes',cursive;font-size:52px;background:var(--luxury);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s ease-in-out infinite;margin-bottom:4px;}
+.login-sub{font-size:9px;text-transform:uppercase;letter-spacing:4px;color:rgba(212,175,55,.4);margin-bottom:40px;}
+.role-title{font-family:'Playfair Display',serif;font-size:13px;color:var(--mid);margin-bottom:16px;}
 .role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:320px;margin-bottom:28px;}
-.role-card{border:1px solid var(--gold-border);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface);}
+.role-card{border:1px solid var(--gold-b);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface);}
 .role-card:active{transform:scale(.97);}
-.role-card.selected{border-color:var(--gold);background:rgba(212,175,55,0.08);}
+.role-card.selected{border-color:var(--gold);background:rgba(212,175,55,.08);}
 .role-card-icon{font-size:28px;margin-bottom:8px;}
-.role-card-label{font-family:'Playfair Display',serif;font-size:13px;color:var(--text);}
-.role-card-desc{font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:.5px;}
+.role-card-name{font-family:'Playfair Display',serif;font-size:13px;color:var(--text);}
+.role-card-sub{font-size:9px;color:var(--dim);margin-top:3px;}
 .pin-section{width:100%;max-width:320px;margin-bottom:20px;}
-.pin-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:10px;text-align:center;}
+.pin-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px;text-align:center;}
 .pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:16px;}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--gold-border);transition:all .2s;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--gold-b);transition:all .2s;}
 .pin-dot.filled{background:var(--gold);border-color:var(--gold);}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.pin-btn{background:var(--surface);border:1px solid var(--gold-border);border-radius:12px;padding:14px;font-family:'Montserrat',sans-serif;font-size:18px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;}
+.pin-btn{background:var(--surface);border:1px solid var(--gold-b);border-radius:12px;padding:14px;font-family:'Montserrat',sans-serif;font-size:18px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;}
 .pin-btn:active{background:var(--gold-dim);border-color:var(--gold);transform:scale(.95);}
-.pin-btn.del{font-size:14px;color:var(--text-dim);}
-.login-btn{width:100%;max-width:320px;padding:16px;background:var(--luxury-gradient);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:opacity .2s;}
+.pin-btn.del{font-size:14px;color:var(--dim);}
+.login-btn{width:100%;max-width:320px;padding:16px;background:var(--luxury);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:opacity .2s;}
 .login-btn:disabled{opacity:.3;cursor:default;}
 .login-error{font-size:11px;color:var(--rose);text-align:center;margin-top:10px;min-height:16px;}
-.login-setup-note{font-size:10px;color:var(--text-dim);text-align:center;margin-top:12px;line-height:1.5;}
+.login-note{font-size:10px;color:var(--dim);text-align:center;margin-top:12px;line-height:1.5;}
 
 /* ── App Shell ── */
-#appShell{display:none;flex-direction:column;min-height:100dvh;}
+#appShell{display:none;flex-direction:column;min-height:100dvh;padding-bottom:calc(72px + var(--safe-b));}
 #appShell.visible{display:flex;}
 
 /* ── Header ── */
-.app-header{position:sticky;top:0;z-index:100;background:rgba(2,8,20,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-border);padding:calc(12px + var(--safe-t)) 20px 12px;display:flex;align-items:center;gap:12px;}
-.header-back{width:36px;height:36px;border-radius:10px;border:1px solid var(--gold-border);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);font-size:20px;flex-shrink:0;}
+.app-header{position:sticky;top:0;z-index:100;background:rgba(2,8,20,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-b);padding:calc(12px + var(--safe-t)) 20px 12px;display:flex;align-items:center;gap:12px;}
+.header-back{width:36px;height:36px;border-radius:10px;border:1px solid var(--gold-b);background:none;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:20px;flex-shrink:0;text-decoration:none;}
 .header-title{flex:1;}
 .header-title-main{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);}
-.header-title-sub{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-top:1px;}
-.header-role-badge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:20px;flex-shrink:0;}
-.role-dom .header-role-badge{background:rgba(212,175,55,0.15);color:var(--gold);}
-.role-sub .header-role-badge{background:rgba(186,104,200,0.15);color:var(--purple);}
+.header-title-sub{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-top:1px;}
+.header-badge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:20px;flex-shrink:0;}
+.role-dom .header-badge{background:rgba(212,175,55,.15);color:var(--gold);}
+.role-sub .header-badge{background:rgba(186,104,200,.15);color:var(--purple);}
 
 /* ── Tab Bar ── */
-.tab-bar{display:flex;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(2,8,20,0.85);position:sticky;top:64px;z-index:99;overflow-x:auto;scrollbar-width:none;}
+.tab-bar{display:flex;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(2,8,20,.85);position:sticky;top:64px;z-index:99;overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:1;min-width:60px;padding:12px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab-btn{flex:1;min-width:58px;padding:11px 5px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-count{background:var(--rose);color:#fff;font-size:7px;padding:1px 5px;border-radius:8px;margin-left:3px;display:inline-block;vertical-align:middle;}
 
 /* ── Points Bar ── */
-.points-bar{margin:14px 16px 0;background:var(--surface);border:1px solid var(--gold-border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;position:relative;z-index:1;}
-.points-icon{font-size:22px;}
-.points-info{flex:1;}
-.points-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);line-height:1;}
-.points-lbl{font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-top:2px;}
-.points-stats{display:flex;gap:16px;flex-shrink:0;}
-.point-stat{text-align:center;}
-.point-stat-val{font-size:13px;font-weight:700;font-family:'Playfair Display',serif;}
-.point-stat-lbl{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-top:1px;}
-.earned-val{color:var(--green);}
-.lost-val{color:var(--rose);}
+.points-bar{margin:14px 16px 0;background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.pts-icon{font-size:22px;}
+.pts-info{flex:1;}
+.pts-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);line-height:1;}
+.pts-lbl{font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-top:2px;}
+.pts-stats{display:flex;gap:16px;flex-shrink:0;}
+.pts-stat{text-align:center;}
+.pts-stat-val{font-size:13px;font-weight:700;font-family:'Playfair Display',serif;}
+.pts-stat-lbl{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-top:1px;}
+.c-green{color:var(--green);}.c-rose{color:var(--rose);}
 
 /* ── Section ── */
-.section{padding:14px 16px 0;position:relative;z-index:1;}
+.section{padding:14px 16px 0;}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.section-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--text-dim);}
+.section-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--dim);}
 .section-action{font-size:11px;color:var(--gold);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;}
 
 /* ── Task Cards ── */
-.task-list{display:flex;flex-direction:column;gap:8px;padding-bottom:100px;}
-.task-card{background:var(--surface);border:1px solid var(--gold-border);border-radius:14px;overflow:hidden;transition:border-color .2s;}
-.task-card.completed{opacity:.55;border-color:rgba(76,175,80,0.2);}
-.task-card-header{display:flex;align-items:center;gap:12px;padding:14px 14px 12px;}
-.task-check{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--gold-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:14px;}
-.task-card.completed .task-check{background:var(--green);border-color:var(--green);}
+.task-list{display:flex;flex-direction:column;gap:8px;padding-bottom:12px;}
+.task-card{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;overflow:hidden;}
+.task-card.done{opacity:.55;border-color:rgba(76,175,80,.2);}
+.task-card.proof-required{border-color:rgba(100,181,246,.3);}
+.task-card.is-redemption{border-color:rgba(186,104,200,.3);}
+.task-card-header{display:flex;align-items:center;gap:12px;padding:13px 14px 11px;}
+.task-check{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--gold-b);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.task-card.done .task-check{background:var(--green);border-color:var(--green);}
 .task-info{flex:1;min-width:0;}
-.task-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.task-card.completed .task-title{text-decoration:line-through;color:var(--text-dim);}
-.task-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.task-badge{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:10px;}
-.diff-simple{background:rgba(76,175,80,0.12);color:var(--green);}
-.diff-standard{background:rgba(100,181,246,0.12);color:var(--blue);}
-.diff-demanding{background:rgba(255,193,7,0.12);color:var(--amber);}
-.diff-extreme{background:rgba(224,91,106,0.12);color:var(--rose);}
-.sched-badge{background:rgba(255,255,255,0.05);color:var(--text-dim);}
+.task-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.task-card.done .task-name{text-decoration:line-through;color:var(--dim);}
+.task-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px;}
+.badge{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:10px;}
+.diff-simple{background:rgba(76,175,80,.12);color:var(--green);}
+.diff-standard{background:rgba(100,181,246,.12);color:var(--blue);}
+.diff-demanding{background:rgba(255,193,7,.12);color:var(--amber);}
+.diff-extreme{background:rgba(224,91,106,.12);color:var(--rose);}
+.badge-sched{background:rgba(255,255,255,.05);color:var(--dim);}
+.badge-proof{background:rgba(100,181,246,.1);color:var(--blue);}
+.badge-redemption{background:rgba(186,104,200,.1);color:var(--purple);}
 .task-pts{font-size:10px;font-weight:700;color:var(--gold);flex-shrink:0;}
-.task-desc{font-size:10px;color:var(--text-dim);padding:0 14px 12px;line-height:1.5;border-top:1px solid rgba(255,255,255,0.03);margin-top:-2px;padding-top:8px;}
-.task-actions{display:flex;border-top:1px solid rgba(255,255,255,0.04);}
-.task-action-btn{flex:1;padding:10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .15s;}
-.task-action-btn:active{background:rgba(255,255,255,0.03);}
-.task-action-btn.fail{color:var(--rose);}
-.task-action-btn.edit{color:var(--text-dim);}
-.task-action-btn + .task-action-btn{border-left:1px solid rgba(255,255,255,0.04);}
-.task-due{font-size:8px;color:var(--text-dim);margin-top:2px;}
+.task-due{font-size:8px;color:var(--dim);margin-top:2px;}
 .task-due.overdue{color:var(--rose);}
+.task-desc{font-size:10px;color:var(--dim);padding:8px 14px 10px;line-height:1.5;border-top:1px solid rgba(255,255,255,.03);}
+
+/* Streak */
+.task-streak{padding:5px 14px 9px;border-top:1px solid rgba(255,255,255,.03);display:flex;align-items:center;gap:6px;}
+.streak-pill{display:inline-flex;align-items:center;gap:3px;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,193,7,.12);color:var(--amber);}
+.streak-pill.fire{background:rgba(224,91,106,.1);color:var(--rose);}
+.streak-best{font-size:8px;color:var(--dim);}
+
+/* Task Actions */
+.task-actions{display:flex;border-top:1px solid rgba(255,255,255,.04);}
+.t-btn{flex:1;padding:10px 5px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s;color:var(--mid);}
+.t-btn:active{background:rgba(255,255,255,.03);}
+.t-btn.complete{color:var(--green);}
+.t-btn.proof{color:var(--blue);}
+.t-btn.fail{color:var(--rose);}
+.t-btn.remove{color:var(--dim);}
+.t-btn+.t-btn{border-left:1px solid rgba(255,255,255,.04);}
 
 /* ── Empty State ── */
-.empty-state{text-align:center;padding:48px 24px;color:var(--text-dim);}
+.empty{text-align:center;padding:48px 24px;color:var(--dim);}
 .empty-icon{font-size:36px;margin-bottom:12px;opacity:.4;}
-.empty-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--text-mid);margin-bottom:6px;}
+.empty-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--mid);margin-bottom:6px;}
 .empty-desc{font-size:10px;line-height:1.6;max-width:240px;margin:0 auto;}
 
-/* ── Reward / Punishment Cards ── */
-.rp-card{background:var(--surface);border:1px solid var(--gold-border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;}
-.rp-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.rp-icon.reward{background:rgba(212,175,55,0.1);}
-.rp-icon.punish{background:rgba(224,91,106,0.1);}
+/* ── RP Cards ── */
+.rp-card{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:13px;display:flex;align-items:flex-start;gap:11px;}
+.rp-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.rp-icon.reward{background:rgba(212,175,55,.1);}
+.rp-icon.punish{background:rgba(224,91,106,.1);}
 .rp-info{flex:1;min-width:0;}
-.rp-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.rp-desc{font-size:9.5px;color:var(--text-dim);line-height:1.4;}
-.rp-cost{font-size:12px;font-weight:700;font-family:'Playfair Display',serif;flex-shrink:0;}
-.rp-cost.reward{color:var(--gold);}
-.rp-cost.punish{color:var(--rose);}
-.rp-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-.rp-btn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:6px 10px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;}
-.rp-btn.primary{background:var(--gold);color:var(--bg);}
-.rp-btn.ghost{background:rgba(255,255,255,0.05);color:var(--text-dim);}
+.rp-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.rp-desc{font-size:9.5px;color:var(--dim);line-height:1.4;}
+.rp-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.rp-cost{font-size:12px;font-weight:700;font-family:'Playfair Display',serif;}
+.rp-cost.reward{color:var(--gold);}.rp-cost.punish{color:var(--rose);}
+.rp-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
+.rp-btn{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:5px 9px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;}
 .rp-btn:active{opacity:.8;transform:scale(.96);}
-.rp-pending{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 8px;border-radius:8px;background:rgba(255,193,7,0.12);color:var(--amber);}
+.rp-btn:disabled{opacity:.3;cursor:default;}
+.rp-btn.primary{background:var(--gold);color:var(--bg);}
+.rp-btn.green{background:rgba(76,175,80,.14);color:var(--green);border:1px solid rgba(76,175,80,.22);}
+.rp-btn.red{background:rgba(224,91,106,.1);color:var(--rose);border:1px solid rgba(224,91,106,.18);}
+.rp-btn.ghost{background:rgba(255,255,255,.05);color:var(--mid);border:1px solid rgba(255,255,255,.07);}
+.rp-pending{font-size:8px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:8px;background:rgba(255,193,7,.12);color:var(--amber);}
+
+/* ── Queue Cards ── */
+.q-card{background:var(--surface);border:1px solid rgba(255,193,7,.2);border-radius:14px;overflow:hidden;}
+.q-head{display:flex;align-items:center;gap:8px;padding:11px 13px;background:rgba(255,193,7,.04);}
+.q-type{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:7px;background:rgba(255,193,7,.15);color:var(--amber);flex-shrink:0;}
+.q-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.q-time{font-size:8px;color:var(--dim);flex-shrink:0;}
+.q-body{padding:9px 13px 12px;}
+.q-detail{font-size:9.5px;color:var(--mid);line-height:1.5;margin-bottom:9px;}
+.q-actions{display:flex;gap:7px;}
+.q-btn{flex:1;padding:9px 5px;border-radius:10px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border:1px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.q-btn:active{transform:scale(.96);}
+.q-btn.approve{background:rgba(76,175,80,.12);color:var(--green);border-color:rgba(76,175,80,.2);}
+.q-btn.deny{background:rgba(224,91,106,.08);color:var(--rose);border-color:rgba(224,91,106,.18);}
+.q-btn.redeem{background:rgba(186,104,200,.1);color:var(--purple);border-color:rgba(186,104,200,.2);}
+
+/* ── Punishment Banner ── */
+.punish-banner{margin:10px 16px 0;border-radius:12px;padding:12px 13px;background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.2);display:flex;align-items:flex-start;gap:10px;}
+.punish-banner-icon{font-size:20px;flex-shrink:0;}
+.punish-banner-body{flex:1;}
+.punish-banner-title{font-size:11px;font-weight:700;color:var(--rose);margin-bottom:2px;}
+.punish-banner-desc{font-size:9.5px;color:var(--mid);line-height:1.4;}
+.punish-banner-actions{display:flex;gap:6px;margin-top:8px;}
+.punish-banner-btn{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:5px 10px;border-radius:8px;border:none;cursor:pointer;}
+.punish-banner-btn.redeem{background:rgba(186,104,200,.14);color:var(--purple);}
+.punish-banner-btn.dismiss{background:rgba(255,255,255,.05);color:var(--dim);}
+
+/* ── History ── */
+.hist-card{background:var(--surface);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:11px 13px;display:flex;align-items:flex-start;gap:10px;}
+.hist-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.hist-info{flex:1;}
+.hist-lbl{font-size:11px;font-weight:600;margin-bottom:2px;}
+.hist-detail{font-size:9px;color:var(--dim);line-height:1.4;}
+.hist-time{font-size:8px;color:var(--dim);margin-top:3px;}
+.hist-pts{font-size:11px;font-weight:700;font-family:'Playfair Display',serif;flex-shrink:0;}
 
 /* ── FAB ── */
-.fab{position:fixed;bottom:calc(24px + var(--safe-b));right:20px;width:54px;height:54px;border-radius:16px;background:var(--luxury-gradient);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--bg);box-shadow:0 8px 24px rgba(212,175,55,0.3);z-index:200;transition:transform .15s;}
-.fab:active{transform:scale(.93);}
-.fab span{font-size:26px;}
+.fab{position:fixed;bottom:calc(80px + var(--safe-b));right:20px;width:52px;height:52px;border-radius:15px;background:var(--luxury);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(212,175,55,.28);z-index:200;transition:transform .15s;}
+.fab:active{transform:scale(.92);}
 
-/* ── Modal / Sheet ── */
-.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s;}
+/* ── Sheets ── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s;}
 .sheet-overlay.open{opacity:1;pointer-events:all;}
-.sheet{position:fixed;bottom:0;left:0;right:0;background:#07111f;border-radius:24px 24px 0 0;border-top:1px solid var(--gold-border);z-index:501;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);max-height:92dvh;overflow-y:auto;padding-bottom:calc(24px + var(--safe-b));}
+.sheet{position:fixed;bottom:0;left:0;right:0;background:#07111f;border-radius:24px 24px 0 0;border-top:1px solid var(--gold-b);z-index:501;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);max-height:92dvh;overflow-y:auto;padding-bottom:calc(24px + var(--safe-b));}
 .sheet.open{transform:translateY(0);}
-.sheet-handle{width:40px;height:4px;background:rgba(255,255,255,0.12);border-radius:2px;margin:12px auto 0;}
-.sheet-header{padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.sheet-handle{width:40px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:12px auto 0;}
+.sheet-header{padding:15px 20px 11px;border-bottom:1px solid rgba(255,255,255,.05);}
 .sheet-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--text);}
-.sheet-subtitle{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-top:2px;}
-.sheet-body{padding:16px 20px;}
+.sheet-sub{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-top:2px;}
+.sheet-body{padding:15px 20px;}
 
-/* ── Form Elements ── */
-.form-group{margin-bottom:16px;}
-.form-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px;display:block;}
-.form-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:11px;padding:12px 14px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;}
-.form-input:focus{border-color:var(--gold-border);}
-.form-input::placeholder{color:var(--text-dim);}
-textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
-.form-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23D4AF37'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
-.chip-group{display:flex;flex-wrap:wrap;gap:8px;}
-.chip{padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-size:11px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:all .15s;}
-.chip.selected{border-color:var(--gold);background:rgba(212,175,55,0.1);color:var(--gold);}
+/* ── Form ── */
+.fg{margin-bottom:15px;}
+.fl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:7px;display:block;}
+.fi{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:11px 13px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;}
+.fi:focus{border-color:var(--gold-b);}
+.fi::placeholder{color:var(--dim);}
+textarea.fi{resize:none;min-height:76px;line-height:1.5;}
+.fselect{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23D4AF37'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.chip-group{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{padding:7px 13px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);font-size:11px;font-weight:600;color:var(--mid);cursor:pointer;transition:all .15s;}
+.chip.selected{border-color:var(--gold);background:rgba(212,175,55,.1);color:var(--gold);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.submit-btn{width:100%;padding:15px;background:var(--luxury-gradient);border:none;border-radius:13px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;margin-top:8px;transition:opacity .2s;}
+.submit-btn{width:100%;padding:14px;background:var(--luxury);border:none;border-radius:13px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;margin-top:7px;transition:opacity .2s;}
 .submit-btn:active{opacity:.85;}
-.cancel-btn{width:100%;padding:13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:13px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;margin-top:8px;}
+.cancel-btn{width:100%;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:13px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;margin-top:7px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:rgba(100,181,246,.05);border:1px solid rgba(100,181,246,.14);border-radius:11px;cursor:pointer;}
+.toggle-main{font-size:11px;font-weight:600;color:var(--blue);}
+.toggle-sub{font-size:9px;color:var(--dim);margin-top:2px;}
+.toggle-wrap{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:24px;transition:.2s;}
+.toggle-track.on{background:var(--blue);}
+.toggle-thumb{position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none;}
+.toggle-thumb.on{transform:translateX(20px);}
 
-/* ── Alert Banner ── */
-.alert-banner{margin:10px 16px 0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
-.alert-banner.warn{background:rgba(224,91,106,0.1);border:1px solid rgba(224,91,106,0.25);}
-.alert-banner.info{background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);}
-.alert-icon{font-size:18px;flex-shrink:0;}
-.alert-text{flex:1;font-size:10px;color:var(--text-mid);line-height:1.4;}
+/* Proof upload */
+.proof-area{border:2px dashed rgba(100,181,246,.28);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.proof-area:active{border-color:var(--blue);background:rgba(100,181,246,.05);}
+.proof-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.proof-upload-icon{font-size:30px;margin-bottom:6px;opacity:.45;}
+.proof-upload-text{font-size:10px;color:var(--dim);line-height:1.5;}
+.proof-preview{width:100%;border-radius:10px;margin-top:9px;max-height:200px;object-fit:cover;}
+
+/* Alert banners */
+.alert{border-radius:11px;padding:11px 13px;display:flex;align-items:flex-start;gap:9px;}
+.alert.warn{background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.2);}
+.alert.info{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.16);}
+.alert.blue{background:rgba(100,181,246,.06);border:1px solid rgba(100,181,246,.16);}
+.alert-icon{font-size:17px;flex-shrink:0;}
+.alert-text{font-size:10px;color:var(--mid);line-height:1.5;}
 .alert-text strong{color:var(--text);display:block;font-size:11px;margin-bottom:1px;}
 
-/* ── Bottom nav padding ── */
-#appShell{padding-bottom:calc(64px + var(--safe-b));}
-
-/* ── Streak Badge ── */
-.streak-badge{display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,193,7,0.12);color:var(--amber);letter-spacing:.5px;}
-.streak-badge.hot{background:rgba(224,91,106,0.12);color:var(--rose);}
-
-/* ── Proof Required Badge ── */
-.proof-badge{display:inline-flex;align-items:center;gap:3px;font-size:7.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(100,181,246,0.12);color:var(--blue);letter-spacing:.5px;}
-
-/* ── Queue / Approval cards ── */
-.queue-card{background:var(--surface);border:1px solid rgba(255,193,7,0.25);border-radius:14px;overflow:hidden;margin-bottom:8px;}
-.queue-card-header{display:flex;align-items:center;gap:12px;padding:14px;}
-.queue-type-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.queue-type-proof{background:rgba(100,181,246,0.1);}
-.queue-type-reward{background:rgba(212,175,55,0.1);}
-.queue-type-failure{background:rgba(224,91,106,0.1);}
-.queue-type-redemption{background:rgba(76,175,80,0.1);}
-.queue-info{flex:1;min-width:0;}
-.queue-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
-.queue-sub{font-size:9.5px;color:var(--text-dim);line-height:1.4;}
-.queue-time{font-size:8px;color:var(--text-dim);margin-top:2px;}
-.queue-actions{display:flex;border-top:1px solid rgba(255,255,255,0.04);}
-.queue-btn{flex:1;padding:11px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .15s;}
-.queue-btn:active{background:rgba(255,255,255,0.03);}
-.queue-btn.approve{color:var(--green);}
-.queue-btn.deny{color:var(--rose);}
-.queue-btn.view{color:var(--text-dim);}
-.queue-btn + .queue-btn{border-left:1px solid rgba(255,255,255,0.04);}
-.queue-badge{font-size:8px;font-weight:700;padding:3px 8px;border-radius:20px;background:rgba(255,193,7,0.15);color:var(--amber);}
-.queue-empty{text-align:center;padding:40px 24px;color:var(--text-dim);}
-.queue-proof-img{width:100%;max-height:200px;object-fit:cover;border-top:1px solid rgba(255,255,255,0.05);}
-
-/* ── Redemption Task on punishment card ── */
-.redemption-row{padding:10px 14px;border-top:1px solid rgba(76,175,80,0.15);background:rgba(76,175,80,0.04);display:flex;align-items:center;gap:10px;}
-.redemption-label{font-size:9px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.8px;flex:1;}
-.redemption-btn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:5px 10px;border-radius:8px;border:1px solid rgba(76,175,80,0.3);background:rgba(76,175,80,0.1);color:var(--green);cursor:pointer;}
-
-/* ── Photo proof preview in sheet ── */
-.proof-preview{width:100%;border-radius:11px;overflow:hidden;margin-top:8px;border:1px solid var(--gold-border);display:none;}
-.proof-preview img{width:100%;display:block;max-height:220px;object-fit:cover;}
-.proof-upload-btn{width:100%;padding:12px;background:rgba(100,181,246,0.07);border:1px dashed rgba(100,181,246,0.3);border-radius:11px;font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
-.proof-upload-btn:active{background:rgba(100,181,246,0.12);}
-
-/* ── Streak Badge ── */
-.streak-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,193,7,0.12);color:var(--amber);border:1px solid rgba(255,193,7,0.2);}
-.streak-badge.hot{background:rgba(224,91,106,0.12);color:var(--rose);border-color:rgba(224,91,106,0.2);}
-.task-streak{display:flex;align-items:center;gap:6px;padding:6px 14px 10px;border-top:1px solid rgba(255,255,255,0.03);}
-
-/* ── Approval Queue ── */
-.queue-card{background:var(--surface);border:1px solid rgba(255,193,7,0.25);border-radius:14px;overflow:hidden;margin-bottom:8px;}
-.queue-card-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,193,7,0.05);}
-.queue-type-badge{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:8px;background:rgba(255,193,7,0.15);color:var(--amber);flex-shrink:0;}
-.queue-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);flex:1;}
-.queue-time{font-size:8px;color:var(--text-dim);flex-shrink:0;}
-.queue-body{padding:10px 14px 12px;}
-.queue-detail{font-size:10px;color:var(--text-mid);line-height:1.5;margin-bottom:10px;}
-.queue-actions{display:flex;gap:8px;}
-.queue-btn{flex:1;padding:9px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
-.queue-btn:active{transform:scale(.96);}
-.queue-btn.approve{background:rgba(76,175,80,0.15);color:var(--green);border:1px solid rgba(76,175,80,0.25);}
-.queue-btn.deny{background:rgba(224,91,106,0.1);color:var(--rose);border:1px solid rgba(224,91,106,0.2);}
-.queue-btn.view-proof{background:rgba(100,181,246,0.1);color:var(--blue);border:1px solid rgba(100,181,246,0.2);}
-
-/* ── Photo Proof ── */
-.proof-required-badge{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:10px;background:rgba(100,181,246,0.12);color:var(--blue);border:1px solid rgba(100,181,246,0.2);}
-.proof-upload-area{border:2px dashed rgba(100,181,246,0.3);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;margin-top:8px;}
-.proof-upload-area:active{border-color:var(--blue);background:rgba(100,181,246,0.05);}
-.proof-upload-icon{font-size:28px;margin-bottom:6px;opacity:.5;}
-.proof-upload-label{font-size:10px;color:var(--text-dim);line-height:1.4;}
-.proof-preview{width:100%;border-radius:10px;margin-top:8px;max-height:200px;object-fit:cover;display:none;}
-.proof-preview.loaded{display:block;}
-#proofFileInput{display:none;}
-
-/* ── Redemption Task ── */
-.redemption-card{background:rgba(186,104,200,0.06);border:1px solid rgba(186,104,200,0.25);border-radius:14px;overflow:hidden;}
-.redemption-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(186,104,200,0.05);}
-.redemption-icon{font-size:20px;}
-.redemption-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--purple);flex:1;}
-.redemption-body{padding:8px 14px 12px;}
-.redemption-desc{font-size:10px;color:var(--text-mid);line-height:1.5;margin-bottom:10px;}
-.redemption-action{width:100%;padding:10px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;cursor:pointer;background:rgba(186,104,200,0.15);color:var(--purple);border:1px solid rgba(186,104,200,0.25);transition:all .15s;}
-.redemption-action:active{transform:scale(.97);}
-
-/* ── Util ── */
-.mt-8{margin-top:8px;}
-.mt-4{margin-top:4px;}
-.text-rose{color:var(--rose);}
-.text-green{color:var(--green);}
-.hidden{display:none!important;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .3s ease both;}
-
-/* ── Loading ── */
-.loading-spinner{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text-dim);font-size:11px;gap:10px;}
-.spinner{width:18px;height:18px;border:2px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* Toast */
-.toast{position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(20px);background:#1a2840;border:1px solid var(--gold-border);border-radius:12px;padding:10px 18px;font-size:11px;font-weight:600;color:var(--text);z-index:600;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
+/* Misc */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:11px;gap:10px;}
+.spinner{width:18px;height:18px;border:2px solid var(--gold-b);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+.toast{position:fixed;bottom:calc(82px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(20px);background:#1a2840;border:1px solid var(--gold-b);border-radius:12px;padding:10px 18px;font-size:11px;font-weight:600;color:var(--text);z-index:600;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.hidden{display:none!important;}
+.mt-8{margin-top:8px;}
+.fade-up{animation:fadeUp .3s ease both;}
 </style>
 </head>
 <body data-nav="more">
-
 <div class="glow-orb"></div>
 <div id="toast" class="toast"></div>
 
-<!-- ══════════════════════════════════════════
-     LOGIN SCREEN
-══════════════════════════════════════════ -->
+<!-- ═══════════════ LOGIN ═══════════════ -->
 <div id="loginScreen">
   <div class="login-logo">Tasks</div>
   <div class="login-sub">Dom Sub Hub</div>
-
   <div class="role-title">I am the…</div>
   <div class="role-cards">
     <div class="role-card" id="roleCardDom" onclick="selectRole('dom')">
       <div class="role-card-icon">👑</div>
-      <div class="role-card-label">Dominant</div>
-      <div class="role-card-desc">Sir</div>
+      <div class="role-card-name">Dominant</div>
+      <div class="role-card-sub">Sir</div>
     </div>
     <div class="role-card" id="roleCardSub" onclick="selectRole('sub')">
       <div class="role-card-icon">🌸</div>
-      <div class="role-card-label">Submissive</div>
-      <div class="role-card-desc">Becca</div>
+      <div class="role-card-name">Submissive</div>
+      <div class="role-card-sub">Becca</div>
     </div>
   </div>
-
   <div class="pin-section" id="pinSection" style="display:none;">
     <div class="pin-label" id="pinLabel">Enter PIN</div>
     <div class="pin-dots" id="pinDots">
-      <div class="pin-dot" id="d0"></div>
-      <div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div>
-      <div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
     </div>
     <div class="pin-pad">
       <button class="pin-btn" onclick="pinPress('1')">1</button>
@@ -346,18 +303,14 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
       <button class="pin-btn del" onclick="pinDel()">⌫</button>
     </div>
     <div class="login-error" id="pinError"></div>
-    <div class="login-setup-note" id="pinSetupNote"></div>
+    <div class="login-note" id="pinNote"></div>
   </div>
-
   <button class="login-btn" id="loginBtn" disabled onclick="doLogin()">Enter</button>
 </div>
 
-<!-- ══════════════════════════════════════════
-     APP SHELL
-══════════════════════════════════════════ -->
+<!-- ═══════════════ APP SHELL ═══════════════ -->
 <div id="appShell">
 
-  <!-- Header -->
   <div class="app-header">
     <a href="index.html" class="header-back">
       <span class="material-symbols-rounded">arrow_back</span>
@@ -366,332 +319,222 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
       <div class="header-title-main">Tasks</div>
       <div class="header-title-sub" id="headerSub">Dom Sub Hub</div>
     </div>
-    <div class="header-role-badge" id="headerRoleBadge">—</div>
+    <div class="header-badge" id="headerBadge">—</div>
   </div>
 
-  <!-- Tab Bar -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tasks</button>
-    <button class="tab-btn" onclick="switchTab('queue')" id="tab-queue">Queue <span id="queueCount" style="display:none;background:var(--rose);color:#fff;font-size:7px;padding:1px 5px;border-radius:8px;margin-left:3px;"></span></button>
+    <button class="tab-btn" onclick="switchTab('queue')" id="tab-queue">Queue</button>
     <button class="tab-btn" onclick="switchTab('rewards')" id="tab-rewards">Rewards</button>
     <button class="tab-btn" onclick="switchTab('punishments')" id="tab-punishments">Punishments</button>
     <button class="tab-btn" onclick="switchTab('history')" id="tab-history">History</button>
   </div>
 
-  <!-- Content -->
-  <div id="tabContent" style="flex:1;overflow-y:auto;padding-bottom:24px;">
+  <div id="tabContent">
 
     <!-- TASKS TAB -->
     <div id="view-tasks">
       <div class="points-bar">
-        <div class="points-icon">⭐</div>
-        <div class="points-info">
-          <div class="points-val" id="ptBalance">—</div>
-          <div class="points-lbl">Points Balance</div>
+        <div class="pts-icon">⭐</div>
+        <div class="pts-info">
+          <div class="pts-val" id="ptBal">—</div>
+          <div class="pts-lbl">Points Balance</div>
         </div>
-        <div class="points-stats">
-          <div class="point-stat">
-            <div class="point-stat-val earned-val" id="ptEarned">—</div>
-            <div class="point-stat-lbl">Earned</div>
-          </div>
-          <div class="point-stat">
-            <div class="point-stat-val lost-val" id="ptLost">—</div>
-            <div class="point-stat-lbl">Lost</div>
-          </div>
+        <div class="pts-stats">
+          <div class="pts-stat"><div class="pts-stat-val c-green" id="ptEarned">—</div><div class="pts-stat-lbl">Earned</div></div>
+          <div class="pts-stat"><div class="pts-stat-val c-rose" id="ptLost">—</div><div class="pts-stat-lbl">Lost</div></div>
         </div>
       </div>
-
-      <div id="activePunishBanner" class="hidden"></div>
-
+      <div id="punishBanner"></div>
       <div class="section">
         <div class="section-head">
-          <div class="section-label">Active Tasks</div>
-          <div class="section-action" id="filterToggle" onclick="toggleFilter()">
+          <div class="section-lbl">Active Tasks</div>
+          <div class="section-action" id="filterToggle" onclick="cycleFilter()">
             <span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> All
           </div>
         </div>
-        <div class="task-list" id="taskList">
-          <div class="loading-spinner"><div class="spinner"></div> Loading tasks…</div>
-        </div>
+        <div class="task-list" id="taskList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
 
-    <!-- QUEUE TAB (Sir's Approval Queue) -->
+    <!-- QUEUE TAB -->
     <div id="view-queue" class="hidden">
       <div class="section">
-        <div class="section-head">
-          <div class="section-label">Awaiting Sir's Attention</div>
-        </div>
-        <div id="queueList">
-          <div class="loading-spinner"><div class="spinner"></div> Loading…</div>
-        </div>
+        <div class="section-head"><div class="section-lbl">Awaiting Sir's Attention</div></div>
+        <div class="task-list" id="queueList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
 
-
+    <!-- REWARDS TAB -->
     <div id="view-rewards" class="hidden">
       <div class="section">
-        <div class="section-head">
-          <div class="section-label">Reward Store</div>
-        </div>
-        <div class="task-list" id="rewardList">
-          <div class="loading-spinner"><div class="spinner"></div> Loading…</div>
-        </div>
+        <div class="section-head"><div class="section-lbl">Reward Store</div></div>
+        <div class="task-list" id="rewardList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
 
     <!-- PUNISHMENTS TAB -->
     <div id="view-punishments" class="hidden">
       <div class="section">
-        <div class="section-head">
-          <div class="section-label">Punishment List</div>
-        </div>
-        <div class="task-list" id="punishList">
-          <div class="loading-spinner"><div class="spinner"></div> Loading…</div>
-        </div>
+        <div class="section-head"><div class="section-lbl">Punishment List</div></div>
+        <div class="task-list" id="punishList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
 
     <!-- HISTORY TAB -->
     <div id="view-history" class="hidden">
       <div class="section">
-        <div class="section-head">
-          <div class="section-label">Activity Log</div>
-        </div>
-        <div class="task-list" id="historyList">
-          <div class="loading-spinner"><div class="spinner"></div> Loading…</div>
-        </div>
+        <div class="section-head"><div class="section-lbl">Activity Log</div></div>
+        <div class="task-list" id="historyList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /tabContent -->
 
-  <!-- FAB -->
   <button class="fab" id="fabBtn" onclick="openCreateSheet()" style="display:none;">
     <span class="material-symbols-rounded">add</span>
   </button>
 
-</div>
+</div><!-- /appShell -->
 
-<!-- ══════════════════════════════════════════
-     SHEETS
-══════════════════════════════════════════ -->
+<!-- ═══════════════ SHEETS ═══════════════ -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeAllSheets()"></div>
 
-<!-- Create Task Sheet -->
+<!-- Task Sheet -->
 <div class="sheet" id="taskSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
-    <div class="sheet-title" id="taskSheetTitle">New Task</div>
-    <div class="sheet-subtitle">Assign a task for Becca</div>
+    <div class="sheet-title">New Task</div>
+    <div class="sheet-sub">Assign a task for Becca</div>
   </div>
   <div class="sheet-body">
-    <div class="form-group">
-      <label class="form-label">Task Title</label>
-      <input class="form-input" id="taskTitle" placeholder="e.g. Morning affirmations" maxlength="80"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Description (optional)</label>
-      <textarea class="form-input" id="taskDesc" placeholder="Instructions or details…" rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Difficulty</label>
+    <div class="fg"><label class="fl">Task Title</label><input class="fi" id="taskTitle" placeholder="e.g. Morning affirmations" maxlength="80"/></div>
+    <div class="fg"><label class="fl">Description (optional)</label><textarea class="fi" id="taskDesc" placeholder="Instructions or details…" rows="3"></textarea></div>
+    <div class="fg"><label class="fl">Difficulty</label>
       <div class="chip-group" id="diffChips">
-        <div class="chip selected" data-val="simple" onclick="selectChip('diffChips',this)">Simple</div>
-        <div class="chip" data-val="standard" onclick="selectChip('diffChips',this)">Standard</div>
-        <div class="chip" data-val="demanding" onclick="selectChip('diffChips',this)">Demanding</div>
-        <div class="chip" data-val="extreme" onclick="selectChip('diffChips',this)">Extreme</div>
+        <div class="chip selected" data-val="simple" onclick="pickChip('diffChips',this)">Simple</div>
+        <div class="chip" data-val="standard" onclick="pickChip('diffChips',this)">Standard</div>
+        <div class="chip" data-val="demanding" onclick="pickChip('diffChips',this)">Demanding</div>
+        <div class="chip" data-val="extreme" onclick="pickChip('diffChips',this)">Extreme</div>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">Base Points</label>
-        <input class="form-input" id="taskPoints" type="number" min="1" max="500" value="10" placeholder="10"/>
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">Schedule</label>
-        <select class="form-input form-select" id="taskSchedule">
-          <option value="once">One-off</option>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="weekdays">Weekdays</option>
-          <option value="weekends">Weekends</option>
+      <div class="fg" style="margin-bottom:0;"><label class="fl">Base Points</label><input class="fi" id="taskPoints" type="number" min="1" max="500" value="10"/></div>
+      <div class="fg" style="margin-bottom:0;"><label class="fl">Schedule</label>
+        <select class="fi fselect" id="taskSchedule">
+          <option value="once">One-off</option><option value="daily">Daily</option>
+          <option value="weekly">Weekly</option><option value="monthly">Monthly</option>
+          <option value="weekdays">Weekdays</option><option value="weekends">Weekends</option>
         </select>
       </div>
     </div>
-    <div class="form-group mt-8" id="dueDateGroup">
-      <label class="form-label">Due Date &amp; Time</label>
-      <input class="form-input" id="taskDue" type="datetime-local"/>
+    <div class="fg mt-8"><label class="fl">Due Date &amp; Time (optional)</label><input class="fi" id="taskDue" type="datetime-local"/></div>
+    <div class="fg mt-8"><label class="fl">Attach Punishment if Failed</label>
+      <select class="fi fselect" id="taskPunishLink"><option value="">None</option></select>
     </div>
-    <div class="form-group mt-8">
-      <label class="form-label">Attach Punishment (if failed)</label>
-      <select class="form-input form-select" id="taskPunishLink">
-        <option value="">None</option>
-      </select>
-    </div>
-    <div class="form-group mt-8" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(100,181,246,0.05);border:1px solid rgba(100,181,246,0.15);border-radius:11px;">
-      <div>
-        <div style="font-size:11px;font-weight:600;color:var(--blue);">📷 Require Photo Proof</div>
-        <div style="font-size:9px;color:var(--text-dim);margin-top:2px;">Sub texts you the photo to complete</div>
-      </div>
-      <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;">
-        <input type="checkbox" id="taskRequireProof" style="opacity:0;width:0;height:0;">
-        <span onclick="this.previousElementSibling.checked=!this.previousElementSibling.checked;this.style.background=this.previousElementSibling.checked?'var(--blue)':'rgba(255,255,255,0.1)'" style="position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,0.1);border-radius:24px;transition:.2s;"></span>
-        <span onclick="this.parentElement.querySelector('input').click()" style="position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;pointer-events:none;" id="proofToggleThumb"></span>
-      </label>
+    <div class="toggle-row mt-8" onclick="toggleProof()">
+      <div><div class="toggle-main">📷 Require Photo Proof</div><div class="toggle-sub">Sub must submit a photo to complete</div></div>
+      <div class="toggle-wrap"><div class="toggle-track" id="proofTrack"></div><div class="toggle-thumb" id="proofThumb"></div></div>
     </div>
     <button class="submit-btn" onclick="saveTask()">Assign Task</button>
     <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
 </div>
 
-<!-- Create Reward Sheet -->
+<!-- Reward Sheet -->
 <div class="sheet" id="rewardSheet">
   <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">New Reward</div>
-    <div class="sheet-subtitle">Add to the reward store</div>
-  </div>
+  <div class="sheet-header"><div class="sheet-title">New Reward</div><div class="sheet-sub">Add to the reward store</div></div>
   <div class="sheet-body">
-    <div class="form-group">
-      <label class="form-label">Reward Title</label>
-      <input class="form-input" id="rewardTitle" placeholder="e.g. Choose the next scene type" maxlength="80"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Description</label>
-      <textarea class="form-input" id="rewardDesc" placeholder="What does this reward entail?" rows="2"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Point Cost</label>
-      <input class="form-input" id="rewardCost" type="number" min="1" value="50" placeholder="50"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Emoji / Icon</label>
-      <input class="form-input" id="rewardEmoji" placeholder="🎁" maxlength="4"/>
-    </div>
+    <div class="fg"><label class="fl">Reward Title</label><input class="fi" id="rewardTitle" placeholder="e.g. Choose the next scene" maxlength="80"/></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fi" id="rewardDesc" placeholder="What does this reward entail?" rows="2"></textarea></div>
+    <div class="fg"><label class="fl">Point Cost</label><input class="fi" id="rewardCost" type="number" min="1" value="50"/></div>
+    <div class="fg"><label class="fl">Emoji</label><input class="fi" id="rewardEmoji" placeholder="🎁" maxlength="4"/></div>
     <button class="submit-btn" onclick="saveReward()">Add Reward</button>
     <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
 </div>
 
-<!-- Create Punishment Sheet -->
+<!-- Punishment Sheet -->
 <div class="sheet" id="punishSheet">
   <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">New Punishment</div>
-    <div class="sheet-subtitle">Add to the punishment list</div>
-  </div>
+  <div class="sheet-header"><div class="sheet-title">New Punishment</div><div class="sheet-sub">Add to the punishment list</div></div>
   <div class="sheet-body">
-    <div class="form-group">
-      <label class="form-label">Punishment Title</label>
-      <input class="form-input" id="punishTitle" placeholder="e.g. 20 strikes with the paddle" maxlength="80"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Description</label>
-      <textarea class="form-input" id="punishDesc" placeholder="Full details of the punishment…" rows="2"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Point Deduction</label>
-      <input class="form-input" id="punishPoints" type="number" min="0" value="15" placeholder="15"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Emoji / Icon</label>
-      <input class="form-input" id="punishEmoji" placeholder="⚡" maxlength="4"/>
-    </div>
+    <div class="fg"><label class="fl">Title</label><input class="fi" id="punishTitle" placeholder="e.g. 20 strikes with the paddle" maxlength="80"/></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fi" id="punishDesc" placeholder="Full details…" rows="2"></textarea></div>
+    <div class="fg"><label class="fl">Point Deduction</label><input class="fi" id="punishPoints" type="number" min="0" value="15"/></div>
+    <div class="fg"><label class="fl">Emoji</label><input class="fi" id="punishEmoji" placeholder="⚡" maxlength="4"/></div>
     <button class="submit-btn" onclick="savePunishment()">Add Punishment</button>
     <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
 </div>
 
-<!-- Photo Proof Submission Sheet (sub) -->
-<div class="sheet" id="proofSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">Submit Proof</div>
-    <div class="sheet-subtitle" id="proofSheetSub">Sir requires photo proof for this task</div>
-  </div>
-  <div class="sheet-body">
-    <div class="alert-banner info">
-      <div class="alert-icon">📷</div>
-      <div class="alert-text"><strong>Photo Required</strong>Sir must approve your proof before points are awarded.</div>
-    </div>
-    <div class="mt-8">
-      <label class="proof-upload-btn" for="proofFileInput">
-        <span class="material-symbols-rounded">add_photo_alternate</span> Choose Photo
-      </label>
-      <input type="file" id="proofFileInput" accept="image/*" style="display:none;" onchange="previewProof(this)"/>
-      <div class="proof-preview" id="proofPreview"><img id="proofImg" src="" alt="proof"/></div>
-    </div>
-    <div class="form-group mt-8">
-      <label class="form-label">Note (optional)</label>
-      <textarea class="form-input" id="proofNote" placeholder="Any context for Sir…" rows="2"></textarea>
-    </div>
-    <button class="submit-btn" onclick="submitProof()">Submit for Approval</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-<!-- Assign Redemption Task Sheet (Sir) -->
-<div class="sheet" id="redemptionSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">Assign Redemption Task</div>
-    <div class="sheet-subtitle" id="redemptionSheetSub">Allow Becca to earn forgiveness</div>
-  </div>
-  <div class="sheet-body">
-    <div class="alert-banner info">
-      <div class="alert-icon">🌿</div>
-      <div class="alert-text"><strong>Redemption Task</strong>Becca completes this to clear the active punishment.</div>
-    </div>
-    <div class="form-group mt-8">
-      <label class="form-label">Redemption Task</label>
-      <input class="form-input" id="redemptionTitle" placeholder="e.g. Write a 200-word apology letter" maxlength="80"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Details</label>
-      <textarea class="form-input" id="redemptionDesc" placeholder="Exact instructions…" rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Points Restored on Completion</label>
-      <input class="form-input" id="redemptionPoints" type="number" min="0" value="10" placeholder="10"/>
-    </div>
-    <button class="submit-btn" onclick="saveRedemptionTask()">Assign Redemption</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-
 <!-- Fail Sheet -->
 <div class="sheet" id="failSheet">
   <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">Report Failure</div>
-    <div class="sheet-subtitle" id="failSheetSub">Confess to Sir</div>
-  </div>
+  <div class="sheet-header"><div class="sheet-title">Report Failure</div><div class="sheet-sub" id="failSheetSub">Confess to Sir</div></div>
   <div class="sheet-body">
-    <div class="alert-banner warn">
-      <div class="alert-icon">⚠️</div>
-      <div class="alert-text"><strong>This will notify Sir</strong>Any attached punishment will be applied and points will be deducted.</div>
-    </div>
-    <div class="form-group mt-8">
-      <label class="form-label">Reason (optional)</label>
-      <textarea class="form-input" id="failReason" placeholder="What happened? Be honest with Sir…" rows="3"></textarea>
-    </div>
+    <div class="alert warn"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>This will notify Sir</strong>Any attached punishment will be applied and points deducted.</div></div>
+    <div class="fg mt-8"><label class="fl">Reason (optional)</label><textarea class="fi" id="failReason" placeholder="What happened? Be honest with Sir…" rows="3"></textarea></div>
     <button class="submit-btn" style="background:linear-gradient(135deg,#e05b6a,#c0394a);color:#fff;" onclick="confirmFail()">Confess Failure</button>
     <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
 </div>
 
-<!-- Bottom Nav (injected by nav.js) -->
-<nav class="bottom-nav"></nav>
+<!-- Photo Proof Sheet (sub submits) -->
+<div class="sheet" id="proofSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><div class="sheet-title">Submit Proof</div><div class="sheet-sub" id="proofSheetSub">Sir requires photo proof</div></div>
+  <div class="sheet-body">
+    <div class="alert blue"><div class="alert-icon">📷</div><div class="alert-text"><strong>Photo Required</strong>Sir must approve before points are awarded.</div></div>
+    <div class="proof-area mt-8">
+      <input type="file" accept="image/*" onchange="handleProofFile(event)"/>
+      <div class="proof-upload-icon">📷</div>
+      <div class="proof-upload-text">Tap to choose a photo</div>
+    </div>
+    <img class="proof-preview hidden" id="proofPreview" alt="preview"/>
+    <div class="fg mt-8"><label class="fl">Note for Sir (optional)</label><textarea class="fi" id="proofNote" placeholder="Any context…" rows="2"></textarea></div>
+    <button class="submit-btn" onclick="submitProof()">Submit for Approval</button>
+    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
+  </div>
+</div>
 
-<link rel="stylesheet" href="nav.css" />
+<!-- Proof Review Sheet (Sir reviews) -->
+<div class="sheet" id="proofReviewSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><div class="sheet-title">Review Proof</div><div class="sheet-sub" id="proofReviewSub">Becca submitted photo proof</div></div>
+  <div class="sheet-body">
+    <img id="proofReviewImg" alt="submitted proof" style="width:100%;border-radius:12px;margin-bottom:11px;max-height:240px;object-fit:cover;"/>
+    <div class="alert info hidden" id="proofReviewNote">
+      <div class="alert-icon">💬</div><div class="alert-text" id="proofReviewNoteText"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="q-btn approve" style="flex:1;padding:13px;" onclick="approveProof()">✓ Approve &amp; Award Points</button>
+      <button class="q-btn deny" style="flex:1;padding:13px;" onclick="denyProof()">✕ Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Redemption Task Sheet (Sir assigns) -->
+<div class="sheet" id="redemptionSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><div class="sheet-title">Assign Redemption Task</div><div class="sheet-sub" id="redemptionSheetSub">Allow Becca to earn forgiveness</div></div>
+  <div class="sheet-body">
+    <div class="alert info"><div class="alert-icon">🌿</div><div class="alert-text"><strong>Redemption Task</strong>Completing this clears the active punishment.</div></div>
+    <div class="fg mt-8"><label class="fl">Task Title</label><input class="fi" id="redemptionTitle" placeholder="e.g. Write a 200-word apology letter" maxlength="80"/></div>
+    <div class="fg"><label class="fl">Full Instructions</label><textarea class="fi" id="redemptionDesc" placeholder="Exact details…" rows="3"></textarea></div>
+    <div class="fg"><label class="fl">Points Restored on Completion</label><input class="fi" id="redemptionPoints" type="number" min="0" value="10"/></div>
+    <button class="submit-btn" onclick="saveRedemptionTask()">Assign Redemption</button>
+    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav"></nav>
+<link rel="stylesheet" href="nav.css"/>
 <script src="nav.js"></script>
 
-<!-- ══════════════════════════════════════════
-     FIREBASE + APP JS — PHASE 2
-══════════════════════════════════════════ -->
+<!-- ═══════════════ FIREBASE JS ═══════════════ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, get, push, onValue, update, remove }
@@ -699,913 +542,516 @@ import { getDatabase, ref, set, get, push, onValue, update, remove }
 import { getStorage, ref as sRef, uploadString, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
-// ── Config ──
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBvSU5SpjuDBNn1BoH7p_njyaMOHxJwxgs",
-  authDomain: "dom-sub-hub.firebaseapp.com",
-  projectId: "dom-sub-hub",
-  storageBucket: "dom-sub-hub.firebasestorage.app",
-  messagingSenderId: "409837369295",
-  appId: "1:409837369295:web:e7efef07a0b267936084ba",
-  measurementId: "G-13NYW9WHHB",
-  databaseURL: "https://dom-sub-hub-default-rtdb.firebaseio.com"
+  apiKey:"AIzaSyBvSU5SpjuDBNn1BoH7p_njyaMOHxJwxgs",
+  authDomain:"dom-sub-hub.firebaseapp.com",
+  projectId:"dom-sub-hub",
+  storageBucket:"dom-sub-hub.firebasestorage.app",
+  messagingSenderId:"409837369295",
+  appId:"1:409837369295:web:e7efef07a0b267936084ba",
+  databaseURL:"https://dom-sub-hub-default-rtdb.firebaseio.com"
 };
-const PHASE2_JS_START = true;
-
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db  = getDatabase(app);
+const storage = getStorage(app);
 
 // ── State ──
-let currentRole = null;
-let currentPin = '';
-let settingUpPin = false;
-let pendingFirstPin = '';
-let currentTab = 'tasks';
-let allTasks = {};
-let allRewards = {};
-let allPunishments = {};
-let allQueue = {};
-let allActivePunishments = {};
-let pointsData = { balance: 0, earned: 0, lost: 0 };
-let failingTaskId = null;
-let editingTaskId = null;
-let proofTaskId = null;
-let redemptionPunishId = null;
+let role=null, pin='', settingUp=false, pendingPin='';
+let curTab='tasks', filterState='all';
+let tasks={}, rewards={}, punishments={}, queue={};
+let pts={balance:0,earned:0,lost:0};
+let failId=null, proofTaskId=null, reviewQId=null, redemptionQId=null;
+let proofDataUrl=null, requireProof=false;
+const DPIN='dsh_dom_pin', SPIN='dsh_sub_pin', SESS='dsh_session_role';
 
-// Dom/Sub PINs stored in localStorage per device
-const DOM_PIN_KEY = 'dsh_dom_pin';
-const SUB_PIN_KEY = 'dsh_sub_pin';
-const SESSION_KEY = 'dsh_session_role';
-
-// ── Expose globals needed by inline handlers ──
-window.selectRole = selectRole;
-window.pinPress = pinPress;
-window.pinDel = pinDel;
-window.doLogin = doLogin;
-window.switchTab = switchTab;
-window.openCreateSheet = openCreateSheet;
-window.closeAllSheets = closeAllSheets;
-window.selectChip = selectChip;
-window.saveTask = saveTask;
-window.saveReward = saveReward;
-window.savePunishment = savePunishment;
-window.confirmFail = confirmFail;
-window.logout = logout;
-window.toggleFilter = toggleFilter;
-window.completeTask = completeTask;
-window.openFailSheet = openFailSheet;
-window.requestReward = requestReward;
-window.approveReward = approveReward;
-window.denyReward = denyReward;
-window.assignPunishment = assignPunishment;
-window.deleteTask = deleteTask;
-window.deleteReward = deleteReward;
-window.deletePunishment = deletePunishment;
-window.openProofSheet = openProofSheet;
-window.previewProof = previewProof;
-window.submitProof = submitProof;
-window.textProofToSir = textProofToSir;
-window.approveProof = approveProof;
-window.denyProof = denyProof;
-window.openRedemptionSheet = openRedemptionSheet;
-window.saveRedemptionTask = saveRedemptionTask;
-window.completeRedemption = completeRedemption;
-window.dismissPunishment = dismissPunishment;
+// ── Expose to inline handlers ──
+const W = window;
+W.selectRole=selectRole; W.pinPress=pinPress; W.pinDel=pinDel; W.doLogin=doLogin; W.logout=logout;
+W.switchTab=switchTab; W.openCreateSheet=openCreateSheet; W.closeAllSheets=closeAllSheets;
+W.pickChip=pickChip; W.toggleProof=toggleProof; W.cycleFilter=cycleFilter;
+W.saveTask=saveTask; W.completeTask=completeTask; W.openFailSheet=openFailSheet;
+W.confirmFail=confirmFail; W.deleteTask=deleteTask;
+W.handleProofFile=handleProofFile; W.openProofSheet=openProofSheet; W.submitProof=submitProof;
+W.openProofReview=openProofReview; W.approveProof=approveProof; W.denyProof=denyProof;
+W.saveReward=saveReward; W.requestReward=requestReward; W.approveReward=approveReward;
+W.denyReward=denyReward; W.deleteReward=deleteReward;
+W.savePunishment=savePunishment; W.assignPunishment=assignPunishment; W.deletePunishment=deletePunishment;
+W.approveQueueItem=approveQueueItem; W.denyQueueItem=denyQueueItem;
+W.openRedemptionSheet=openRedemptionSheet; W.saveRedemptionTask=saveRedemptionTask;
+W.dismissPunishment=dismissPunishment;
 
 // ── Session restore ──
-const savedSession = sessionStorage.getItem(SESSION_KEY);
-if (savedSession) {
-  currentRole = savedSession;
-  showApp();
-}
+const saved = sessionStorage.getItem(SESS);
+if (saved) { role = saved; showApp(); }
 
-// ── Role selection ──
-function selectRole(role) {
-  currentRole = role;
-  document.getElementById('roleCardDom').classList.toggle('selected', role === 'dom');
-  document.getElementById('roleCardSub').classList.toggle('selected', role === 'sub');
+// ─────────────────────────────────────────────
+// LOGIN
+// ─────────────────────────────────────────────
+function selectRole(r) {
+  role = r;
+  document.getElementById('roleCardDom').classList.toggle('selected', r==='dom');
+  document.getElementById('roleCardSub').classList.toggle('selected', r==='sub');
   document.getElementById('pinSection').style.display = 'block';
-  currentPin = '';
-  updatePinDots();
-  const pinKey = role === 'dom' ? DOM_PIN_KEY : SUB_PIN_KEY;
-  const existingPin = localStorage.getItem(pinKey);
-  if (existingPin) {
-    document.getElementById('pinLabel').textContent = role === 'dom' ? 'Sir\'s PIN' : 'Your PIN';
-    document.getElementById('pinSetupNote').textContent = '';
-    settingUpPin = false;
-  } else {
-    document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
-    document.getElementById('pinSetupNote').textContent = 'First time? Set a PIN to protect this role.';
-    settingUpPin = true;
-  }
+  pin = ''; updateDots();
+  const stored = localStorage.getItem(r==='dom' ? DPIN : SPIN);
+  settingUp = !stored;
+  document.getElementById('pinLabel').textContent = stored ? (r==='dom' ? "Sir's PIN" : 'Your PIN') : 'Create a 4-digit PIN';
+  document.getElementById('pinNote').textContent = stored ? '' : 'First time? Create a PIN to protect this role.';
   document.getElementById('loginBtn').disabled = true;
   document.getElementById('pinError').textContent = '';
 }
 
-function pinPress(digit) {
-  if (!currentRole) return;
-  if (currentPin.length >= 4) return;
-  currentPin += digit;
-  updatePinDots();
-  if (currentPin.length === 4) {
-    document.getElementById('loginBtn').disabled = false;
-    // Auto-submit after brief delay
-    setTimeout(() => doLogin(), 200);
-  }
+function pinPress(d) {
+  if (!role || pin.length >= 4) return;
+  pin += d; updateDots();
+  if (pin.length === 4) { document.getElementById('loginBtn').disabled = false; setTimeout(doLogin, 200); }
 }
-
-function pinDel() {
-  currentPin = currentPin.slice(0, -1);
-  updatePinDots();
-  document.getElementById('loginBtn').disabled = currentPin.length < 4;
-}
-
-function updatePinDots() {
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('d' + i).classList.toggle('filled', i < currentPin.length);
-  }
-}
+function pinDel() { pin = pin.slice(0,-1); updateDots(); document.getElementById('loginBtn').disabled = pin.length < 4; }
+function updateDots() { for (let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled', i < pin.length); }
 
 function doLogin() {
-  if (!currentRole || currentPin.length < 4) return;
-  const pinKey = currentRole === 'dom' ? DOM_PIN_KEY : SUB_PIN_KEY;
-  const existingPin = localStorage.getItem(pinKey);
-
-  if (settingUpPin) {
-    if (!pendingFirstPin) {
-      pendingFirstPin = currentPin;
-      currentPin = '';
-      updatePinDots();
+  if (!role || pin.length < 4) return;
+  const key = role==='dom' ? DPIN : SPIN;
+  const stored = localStorage.getItem(key);
+  if (settingUp) {
+    if (!pendingPin) {
+      pendingPin = pin; pin = ''; updateDots();
       document.getElementById('loginBtn').disabled = true;
       document.getElementById('pinLabel').textContent = 'Confirm PIN';
-      document.getElementById('pinSetupNote').textContent = 'Enter the same PIN again to confirm.';
+      document.getElementById('pinNote').textContent = 'Enter the same PIN again.';
       return;
-    } else {
-      if (currentPin !== pendingFirstPin) {
-        document.getElementById('pinError').textContent = 'PINs don\'t match. Try again.';
-        currentPin = '';
-        pendingFirstPin = '';
-        updatePinDots();
-        document.getElementById('loginBtn').disabled = true;
-        document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
-        return;
-      }
-      localStorage.setItem(pinKey, currentPin);
-      pendingFirstPin = '';
-      settingUpPin = false;
     }
-  } else {
-    if (currentPin !== existingPin) {
-      document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
-      currentPin = '';
-      updatePinDots();
+    if (pin !== pendingPin) {
+      document.getElementById('pinError').textContent = "PINs don't match. Try again.";
+      pin = ''; pendingPin = ''; updateDots();
       document.getElementById('loginBtn').disabled = true;
+      document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
       return;
+    }
+    localStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
+  } else {
+    if (pin !== stored) {
+      document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+      pin = ''; updateDots(); document.getElementById('loginBtn').disabled = true; return;
     }
   }
-  sessionStorage.setItem(SESSION_KEY, currentRole);
-  showApp();
+  sessionStorage.setItem(SESS, role); showApp();
 }
 
 function logout() {
-  sessionStorage.removeItem(SESSION_KEY);
-  currentRole = null;
-  currentPin = '';
-  pendingFirstPin = '';
+  sessionStorage.removeItem(SESS); role = null; pin = ''; pendingPin = '';
   document.getElementById('appShell').classList.remove('visible');
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('roleCardDom').classList.remove('selected');
   document.getElementById('roleCardSub').classList.remove('selected');
   document.getElementById('pinSection').style.display = 'none';
-  updatePinDots();
-  closeSidebar();
+  updateDots();
 }
 
-// ── Show App ──
+// ─────────────────────────────────────────────
+// APP INIT
+// ─────────────────────────────────────────────
 function showApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').classList.add('visible');
-
-  // Header
-  const isDom = currentRole === 'dom';
-  document.getElementById('headerRoleBadge').textContent = isDom ? '👑 Sir' : '🌸 Becca';
+  const isDom = role === 'dom';
+  document.getElementById('headerBadge').textContent = isDom ? '👑 Sir' : '🌸 Becca';
   document.getElementById('appShell').className = 'visible ' + (isDom ? 'role-dom' : 'role-sub');
   document.getElementById('headerSub').textContent = isDom ? 'Dominant View' : 'Submissive View';
-
-  // FAB only for Dom
   document.getElementById('fabBtn').style.display = isDom ? 'flex' : 'none';
-
-  // Start listeners
-  listenPoints();
-  listenTasks();
-  listenRewards();
-  listenPunishments();
-  listenHistory();
-  listenQueue();
-  listenActivePunishments();
+  listenPoints(); listenTasks(); listenRewards(); listenPunishments(); listenQueue(); listenHistory();
+  setTimeout(checkDailyReset, 1500);
 }
 
-// ── Points ──
+// ─────────────────────────────────────────────
+// POINTS
+// ─────────────────────────────────────────────
 function listenPoints() {
-  onValue(ref(db, 'points'), snap => {
-    const d = snap.val() || { balance: 0, earned: 0, lost: 0 };
-    pointsData = d;
-    document.getElementById('ptBalance').textContent = d.balance ?? 0;
-    document.getElementById('ptEarned').textContent = d.earned ?? 0;
-    document.getElementById('ptLost').textContent = d.lost ?? 0;
+  onValue(ref(db,'points'), s => {
+    pts = s.val() || {balance:0,earned:0,lost:0};
+    document.getElementById('ptBal').textContent    = pts.balance ?? 0;
+    document.getElementById('ptEarned').textContent = pts.earned  ?? 0;
+    document.getElementById('ptLost').textContent   = pts.lost    ?? 0;
   });
 }
 
-async function addPoints(amount, reason) {
-  const snap = await get(ref(db, 'points'));
-  const d = snap.val() || { balance: 0, earned: 0, lost: 0 };
-  await set(ref(db, 'points'), {
-    balance: (d.balance || 0) + amount,
-    earned: amount > 0 ? (d.earned || 0) + amount : (d.earned || 0),
-    lost: amount < 0 ? (d.lost || 0) + Math.abs(amount) : (d.lost || 0)
+async function addPts(amount, reason) {
+  const s = await get(ref(db,'points'));
+  const d = s.val() || {balance:0,earned:0,lost:0};
+  await set(ref(db,'points'), {
+    balance: (d.balance||0) + amount,
+    earned:  amount > 0 ? (d.earned||0) + amount  : (d.earned||0),
+    lost:    amount < 0 ? (d.lost||0) + Math.abs(amount) : (d.lost||0)
   });
-  // Log to history
-  await push(ref(db, 'history'), {
-    type: amount > 0 ? 'points_earned' : 'points_lost',
-    amount,
-    reason,
-    ts: Date.now()
-  });
+  await push(ref(db,'history'), { type: amount>0?'points_earned':'points_lost', amount, reason, ts: Date.now() });
 }
 
-// ── Tasks ──
+// ─────────────────────────────────────────────
+// TASKS
+// ─────────────────────────────────────────────
 function listenTasks() {
-  onValue(ref(db, 'tasks'), snap => {
-    allTasks = snap.val() || {};
-    renderTasks();
-    populatePunishDropdown();
-  });
+  onValue(ref(db,'tasks'), s => { tasks = s.val() || {}; renderTasks(); fillPunishDrop(); });
 }
 
-function renderTasks(filter = 'all') {
+function renderTasks() {
   const list = document.getElementById('taskList');
-  const tasks = Object.entries(allTasks);
-
-  if (tasks.length === 0) {
-    list.innerHTML = `<div class="empty-state fade-up">
-      <div class="empty-icon">📋</div>
-      <div class="empty-title">${currentRole === 'dom' ? 'No tasks assigned yet' : 'No tasks yet'}</div>
-      <div class="empty-desc">${currentRole === 'dom' ? 'Tap + to assign Becca\'s first task.' : 'Sir hasn\'t assigned any tasks yet.'}</div>
-    </div>`;
+  const entries = Object.entries(tasks).filter(([,t]) => !t.archived);
+  if (!entries.length) {
+    list.innerHTML = emptyState('📋',
+      role==='dom' ? 'No tasks yet' : 'No tasks assigned',
+      role==='dom' ? 'Tap + to assign a task.' : "Sir hasn't assigned any tasks yet.");
     return;
   }
-
   const now = Date.now();
   let html = '';
-  tasks.forEach(([id, t]) => {
-    if (filter === 'pending' && t.completedToday) return;
-    if (filter === 'done' && !t.completedToday) return;
+  entries.forEach(([id, t]) => {
+    if (filterState==='pending' && t.completedToday) return;
+    if (filterState==='done'    && !t.completedToday) return;
+    const done        = !!t.completedToday;
+    const proofPend   = !!t.proofPending;
+    const earnedPts   = calcPts(t.basePoints||10, t.difficulty);
+    const streak      = t.streak || 0;
+    const best        = t.bestStreak || 0;
+    const overdue     = t.due && !done && now > t.due;
+    const diffClass   = 'diff-' + (t.difficulty||'simple');
+    const diffLabel   = cap(t.difficulty||'simple');
 
-    const diffClass = 'diff-' + (t.difficulty || 'simple');
-    const diffLabel = (t.difficulty || 'simple').charAt(0).toUpperCase() + (t.difficulty || 'simple').slice(1);
-    const schedLabel = scheduleLabel(t.schedule);
-    const pts = calcPoints(t.basePoints || 10, t.difficulty);
-    const isDone = !!t.completedToday;
-    const isOverdue = t.due && !isDone && now > t.due;
-    const streak = t.streak || 0;
-    const requiresProof = !!t.requireProof;
-    const proofPending = !!t.proofPending;
+    const dueLine = t.due
+      ? `<div class="task-due${overdue?' overdue':''}">${overdue?'⚠ Overdue — ':''}Due ${fmtDate(t.due)}</div>` : '';
 
-    let dueStr = '';
-    if (t.due) {
-      const d = new Date(t.due);
-      dueStr = `<div class="task-due${isOverdue ? ' overdue' : ''}">Due: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}${isOverdue ? ' — Overdue' : ''}</div>`;
-    }
+    const proofBadge      = t.requireProof ? `<span class="badge badge-proof">📷${proofPend?' Pending':' Req.'}</span>` : '';
+    const redemptionBadge = t.isRedemption ? `<span class="badge badge-redemption">🌿 Redemption</span>` : '';
 
-    const streakBadge = streak > 0 ? `<span class="streak-badge${streak >= 7 ? ' hot' : ''}">🔥 ${streak}</span>` : '';
-    const proofBadge = requiresProof ? `<span class="proof-badge">📷 Proof</span>` : '';
+    const streakHtml = streak > 0
+      ? `<div class="task-streak">
+           <span class="streak-pill${streak>=7?' fire':''}">${streak>=7?'🔥':'⚡'} ${streak}-day streak</span>
+           ${best > streak ? `<span class="streak-best">Best: ${best}</span>` : ''}
+         </div>` : '';
 
-    let subActions = '';
-    if (currentRole === 'sub' && !isDone) {
-      if (requiresProof && !proofPending) {
-        subActions = `
-          <button class="task-action-btn" onclick="openProofSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">add_a_photo</span> Submit Proof
+    // Action buttons
+    let actions = '';
+    if (role==='sub' && !done) {
+      if (t.requireProof && !proofPend) {
+        actions = `<div class="task-actions">
+          <button class="t-btn proof" onclick="openProofSheet('${id}')">
+            <span class="material-symbols-rounded" style="font-size:13px;">photo_camera</span> Submit Proof
           </button>
-          <button class="task-action-btn fail" onclick="openFailSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">report</span> Report Failure
-          </button>`;
-      } else if (requiresProof && proofPending) {
-        subActions = `<div style="padding:10px 14px;font-size:10px;color:var(--amber);text-align:center;">⏳ Proof submitted — awaiting Sir's approval</div>`;
-      } else {
-        subActions = `
-          <button class="task-action-btn" onclick="completeTask('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Complete
+          <button class="t-btn fail" onclick="openFailSheet('${id}')">
+            <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
           </button>
-          <button class="task-action-btn fail" onclick="openFailSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">report</span> Report Failure
-          </button>`;
+        </div>`;
+      } else if (!t.requireProof) {
+        actions = `<div class="task-actions">
+          <button class="t-btn complete" onclick="completeTask('${id}')">
+            <span class="material-symbols-rounded" style="font-size:13px;">check_circle</span> Complete
+          </button>
+          <button class="t-btn fail" onclick="openFailSheet('${id}')">
+            <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
+          </button>
+        </div>`;
       }
     }
+    if (role==='dom') {
+      actions = `<div class="task-actions">
+        <button class="t-btn remove" onclick="deleteTask('${id}')">
+          <span class="material-symbols-rounded" style="font-size:13px;">delete</span> Remove
+        </button>
+      </div>`;
+    }
 
-    const domActions = currentRole === 'dom' ? `
-      <button class="task-action-btn edit" onclick="deleteTask('${id}')">
-        <span class="material-symbols-rounded" style="font-size:14px;">delete</span> Remove
-      </button>` : '';
-
-    const actions = (subActions || domActions) ? `<div class="task-actions">${subActions}${domActions}</div>` : '';
-
-    html += `<div class="task-card${isDone ? ' completed' : ''} fade-up">
+    html += `<div class="task-card${done?' done':''}${t.requireProof?' proof-required':''}${t.isRedemption?' is-redemption':''} fade-up">
       <div class="task-card-header">
-        <div class="task-check">${isDone ? '✓' : ''}</div>
+        <div class="task-check">${done ? '✓' : ''}</div>
         <div class="task-info">
-          <div class="task-title">${esc(t.title)}</div>
+          <div class="task-name">${esc(t.title)}</div>
           <div class="task-meta">
-            <span class="task-badge ${diffClass}">${diffLabel}</span>
-            <span class="task-badge sched-badge">${schedLabel}</span>
-            ${streakBadge}
-            ${proofBadge}
+            <span class="badge ${diffClass}">${diffLabel}</span>
+            <span class="badge badge-sched">${schedLbl(t.schedule)}</span>
+            ${proofBadge}${redemptionBadge}
           </div>
-          ${dueStr}
+          ${dueLine}
         </div>
-        <div class="task-pts">+${pts} pts</div>
+        <div class="task-pts">+${earnedPts}</div>
       </div>
       ${t.description ? `<div class="task-desc">${esc(t.description)}</div>` : ''}
+      ${streakHtml}
       ${actions}
     </div>`;
   });
-
-  list.innerHTML = html || `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">All done!</div></div>`;
+  list.innerHTML = html || `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">All done!</div></div>`;
 }
 
 async function completeTask(id) {
-  const t = allTasks[id];
-  if (!t || t.completedToday) return;
-  const pts = calcPoints(t.basePoints || 10, t.difficulty);
-  const newStreak = (t.streak || 0) + 1;
-  await update(ref(db, 'tasks/' + id), { completedToday: true, completedAt: Date.now(), streak: newStreak, proofPending: false });
-  await addPoints(pts, 'Completed: ' + t.title);
-  await push(ref(db, 'history'), {
-    type: 'task_completed',
-    taskId: id,
-    taskTitle: t.title,
-    points: pts,
-    streak: newStreak,
-    ts: Date.now()
-  });
-  showToast('✅ Task complete! +' + pts + ' pts' + (newStreak > 1 ? ' 🔥 ' + newStreak + ' streak' : ''));
-  if (t.schedule === 'once') {
-    await update(ref(db, 'tasks/' + id), { archived: true });
-  }
+  const t = tasks[id]; if (!t || t.completedToday) return;
+  const earned = calcPts(t.basePoints||10, t.difficulty);
+  const newStreak = (t.streak||0) + 1;
+  const best = Math.max(newStreak, t.bestStreak||0);
+  await update(ref(db,'tasks/'+id), { completedToday:true, completedAt:Date.now(), streak:newStreak, bestStreak:best });
+  await addPts(earned, 'Completed: ' + t.title);
+  await push(ref(db,'history'), { type:'task_completed', taskTitle:t.title, points:earned, streak:newStreak, ts:Date.now() });
+  if (t.schedule==='once') await update(ref(db,'tasks/'+id), {archived:true});
+  // If this was a redemption task, resolve its parent queue item
+  if (t.isRedemption && t.redemptionFor) await update(ref(db,'queue/'+t.redemptionFor), {resolved:true, redeemed:true});
+  showToast('✅ +' + earned + ' pts! Streak: ' + newStreak + (newStreak>=7 ? ' 🔥' : ''));
 }
 
 function openFailSheet(id) {
-  failingTaskId = id;
-  const t = allTasks[id];
+  failId = id;
+  const t = tasks[id];
   document.getElementById('failSheetSub').textContent = t ? 'Confessing failure for: ' + t.title : 'Confess to Sir';
   document.getElementById('failReason').value = '';
   openSheet('failSheet');
 }
 
 async function confirmFail() {
-  if (!failingTaskId) return;
-  const t = allTasks[failingTaskId];
-  if (!t) return;
+  if (!failId) return;
+  const t = tasks[failId]; if (!t) return;
   const reason = document.getElementById('failReason').value.trim();
-  const deduction = t.punishPoints || 10;
-
-  // Reset streak on failure
-  await update(ref(db, 'tasks/' + failingTaskId), { failedToday: true, failedAt: Date.now(), streak: 0 });
-  await addPoints(-deduction, 'Failed: ' + t.title);
-
-  // Queue failure for Sir + apply attached punishment
-  const queueEntry = {
-    type: 'failure',
-    taskId: failingTaskId,
-    taskTitle: t.title,
-    reason,
-    deduction,
-    ts: Date.now(),
-    reviewed: false
-  };
-  if (t.punishLink && allPunishments[t.punishLink]) {
-    const p = allPunishments[t.punishLink];
-    queueEntry.punishTitle = p.title;
-    const apRef = await push(ref(db, 'activePunishments'), {
-      punishmentId: t.punishLink,
-      title: p.title,
-      description: p.description,
-      emoji: p.emoji || '⚡',
-      taskTitle: t.title,
-      reason,
-      assignedAt: Date.now(),
-      complete: false
-    });
-    queueEntry.activePunishId = apRef.key;
-  }
-  await push(ref(db, 'queue'), queueEntry);
-
-  await push(ref(db, 'history'), {
-    type: 'task_failed',
-    taskId: failingTaskId,
-    taskTitle: t.title,
-    points: -deduction,
-    reason,
-    ts: Date.now()
+  const ded = t.punishPoints || 10;
+  await update(ref(db,'tasks/'+failId), { failedToday:true, failedAt:Date.now(), streak:0 });
+  await addPts(-ded, 'Failed: ' + t.title);
+  await push(ref(db,'queue'), {
+    type:'failure_report', taskId:failId, taskTitle:t.title,
+    punishLink: t.punishLink||null, punishPoints:ded, reason, ts:Date.now(), resolved:false
   });
-
-  closeAllSheets();
-  failingTaskId = null;
-  showToast('⚠️ Failure reported to Sir. -' + deduction + ' pts');
+  await push(ref(db,'history'), { type:'task_failed', taskTitle:t.title, points:-ded, reason, ts:Date.now() });
+  closeAllSheets(); failId = null;
+  showToast('⚠️ Failure reported. -' + ded + ' pts');
 }
 
 async function deleteTask(id) {
   if (!confirm('Remove this task?')) return;
-  await remove(ref(db, 'tasks/' + id));
+  await remove(ref(db,'tasks/'+id));
 }
 
 async function saveTask() {
   const title = document.getElementById('taskTitle').value.trim();
-  if (!title) { showToast('Please enter a task title'); return; }
-  const desc = document.getElementById('taskDesc').value.trim();
-  const diff = document.querySelector('#diffChips .chip.selected')?.dataset.val || 'simple';
-  const pts = parseInt(document.getElementById('taskPoints').value) || 10;
-  const schedule = document.getElementById('taskSchedule').value;
-  const due = document.getElementById('taskDue').value;
+  if (!title) { showToast('Enter a task title'); return; }
   const punishLink = document.getElementById('taskPunishLink').value;
-
-  const task = {
+  await push(ref(db,'tasks'), {
     title,
-    description: desc,
-    difficulty: diff,
-    basePoints: pts,
-    schedule,
-    due: due ? new Date(due).getTime() : null,
-    punishLink: punishLink || null,
-    punishPoints: punishLink && allPunishments[punishLink] ? (allPunishments[punishLink].points || 10) : 10,
-    requireProof: document.getElementById('taskRequireProof').checked,
-    createdAt: Date.now(),
-    completedToday: false,
-    failedToday: false,
-    streak: 0,
-    createdBy: 'dom'
-  };
-
-  await push(ref(db, 'tasks'), task);
-  await push(ref(db, 'history'), { type: 'task_created', taskTitle: title, ts: Date.now() });
+    description: document.getElementById('taskDesc').value.trim(),
+    difficulty:  document.querySelector('#diffChips .chip.selected')?.dataset.val || 'simple',
+    basePoints:  parseInt(document.getElementById('taskPoints').value) || 10,
+    schedule:    document.getElementById('taskSchedule').value,
+    due: document.getElementById('taskDue').value ? new Date(document.getElementById('taskDue').value).getTime() : null,
+    punishLink:  punishLink || null,
+    punishPoints: punishLink && punishments[punishLink] ? (punishments[punishLink].points||10) : 10,
+    requireProof, createdAt:Date.now(),
+    completedToday:false, failedToday:false, streak:0, bestStreak:0
+  });
+  await push(ref(db,'history'), { type:'task_created', taskTitle:title, ts:Date.now() });
   closeAllSheets();
   document.getElementById('taskTitle').value = '';
   document.getElementById('taskDesc').value = '';
+  requireProof = false; setProofToggle(false);
   showToast('✅ Task assigned');
 }
 
-// ── Rewards ──
-function listenRewards() {
-  onValue(ref(db, 'rewards'), snap => {
-    allRewards = snap.val() || {};
-    if (currentTab === 'rewards') renderRewards();
-  });
+// Proof toggle UI
+function toggleProof() { requireProof = !requireProof; setProofToggle(requireProof); }
+function setProofToggle(on) {
+  document.getElementById('proofTrack').className = 'toggle-track' + (on ? ' on' : '');
+  document.getElementById('proofThumb').className = 'toggle-thumb' + (on ? ' on' : '');
 }
 
-function renderRewards() {
-  const list = document.getElementById('rewardList');
-  const entries = Object.entries(allRewards);
-
-  if (entries.length === 0) {
-    list.innerHTML = `<div class="empty-state fade-up">
-      <div class="empty-icon">🎁</div>
-      <div class="empty-title">${currentRole === 'dom' ? 'No rewards yet' : 'No rewards available'}</div>
-      <div class="empty-desc">${currentRole === 'dom' ? 'Tap + to add rewards for Becca to earn.' : 'Sir hasn\'t added any rewards yet.'}</div>
-    </div>`;
-    return;
-  }
-
-  let html = '';
-  entries.forEach(([id, r]) => {
-    const canAfford = pointsData.balance >= r.cost;
-    const isPending = r.pendingRequest;
-
-    let actionHtml = '';
-    if (currentRole === 'sub') {
-      if (isPending) {
-        actionHtml = `<span class="rp-pending">Pending</span>`;
-      } else {
-        actionHtml = `<button class="rp-btn primary" ${canAfford ? '' : 'disabled style="opacity:.35;"'} onclick="requestReward('${id}')">Redeem</button>`;
-      }
-    } else {
-      if (isPending) {
-        actionHtml = `<button class="rp-btn primary" onclick="approveReward('${id}')">Approve</button>
-                      <button class="rp-btn ghost" onclick="denyReward('${id}')">Deny</button>`;
-      } else {
-        actionHtml = `<button class="rp-btn ghost" onclick="deleteReward('${id}')">Remove</button>`;
-      }
-    }
-
-    html += `<div class="rp-card fade-up">
-      <div class="rp-icon reward">${r.emoji || '🎁'}</div>
-      <div class="rp-info">
-        <div class="rp-title">${esc(r.title)}</div>
-        ${r.description ? `<div class="rp-desc">${esc(r.description)}</div>` : ''}
-        ${isPending ? '<div class="rp-desc" style="color:var(--amber);margin-top:2px;">⏳ Awaiting Sir\'s approval</div>' : ''}
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
-        <div class="rp-cost reward">${r.cost} pts</div>
-        <div class="rp-actions">${actionHtml}</div>
-      </div>
-    </div>`;
-  });
-  list.innerHTML = html;
-}
-
-async function saveReward() {
-  const title = document.getElementById('rewardTitle').value.trim();
-  if (!title) { showToast('Please enter a reward title'); return; }
-  await push(ref(db, 'rewards'), {
-    title,
-    description: document.getElementById('rewardDesc').value.trim(),
-    cost: parseInt(document.getElementById('rewardCost').value) || 50,
-    emoji: document.getElementById('rewardEmoji').value || '🎁',
-    createdAt: Date.now()
-  });
-  closeAllSheets();
-  document.getElementById('rewardTitle').value = '';
-  document.getElementById('rewardDesc').value = '';
-  document.getElementById('rewardEmoji').value = '';
-  showToast('🎁 Reward added');
-}
-
-async function requestReward(id) {
-  const r = allRewards[id];
-  if (!r) return;
-  if (pointsData.balance < r.cost) { showToast('Not enough points'); return; }
-  await update(ref(db, 'rewards/' + id), { pendingRequest: true, requestedAt: Date.now() });
-  await push(ref(db, 'queue'), {
-    type: 'reward_request',
-    rewardId: id,
-    rewardTitle: r.title,
-    cost: r.cost,
-    emoji: r.emoji || '🎁',
-    ts: Date.now(),
-    reviewed: false
-  });
-  showToast('🎁 Request sent to Sir!');
-}
-
-async function approveReward(id) {
-  const r = allRewards[id];
-  if (!r) return;
-  await addPoints(-r.cost, 'Reward redeemed: ' + r.title);
-  await update(ref(db, 'rewards/' + id), { pendingRequest: false, requestedAt: null });
-  await push(ref(db, 'history'), { type: 'reward_approved', rewardTitle: r.title, cost: r.cost, ts: Date.now() });
-  showToast('✅ Reward approved!');
-}
-
-async function denyReward(id) {
-  await update(ref(db, 'rewards/' + id), { pendingRequest: false, requestedAt: null });
-  showToast('Reward request denied');
-}
-
-async function deleteReward(id) {
-  if (!confirm('Remove this reward?')) return;
-  await remove(ref(db, 'rewards/' + id));
-}
-
-// ── Punishments ──
-function listenPunishments() {
-  onValue(ref(db, 'punishments'), snap => {
-    allPunishments = snap.val() || {};
-    if (currentTab === 'punishments') renderPunishments();
-    populatePunishDropdown();
-  });
-}
-
-function renderPunishments() {
-  const list = document.getElementById('punishList');
-  const entries = Object.entries(allPunishments);
-
-  if (entries.length === 0) {
-    list.innerHTML = `<div class="empty-state fade-up">
-      <div class="empty-icon">⚡</div>
-      <div class="empty-title">No punishments set</div>
-      <div class="empty-desc">${currentRole === 'dom' ? 'Tap + to build the punishment list.' : 'No punishments on record.'}</div>
-    </div>`;
-    return;
-  }
-
-  let html = '';
-  entries.forEach(([id, p]) => {
-    const domActions = currentRole === 'dom' ? `
-      <div class="rp-actions">
-        <button class="rp-btn primary" onclick="assignPunishment('${id}')">Assign</button>
-        <button class="rp-btn ghost" onclick="deletePunishment('${id}')">Remove</button>
-      </div>` : '';
-
-    html += `<div class="rp-card fade-up">
-      <div class="rp-icon punish">${p.emoji || '⚡'}</div>
-      <div class="rp-info">
-        <div class="rp-title">${esc(p.title)}</div>
-        ${p.description ? `<div class="rp-desc">${esc(p.description)}</div>` : ''}
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
-        <div class="rp-cost punish">-${p.points || 0} pts</div>
-        ${domActions}
-      </div>
-    </div>`;
-  });
-  list.innerHTML = html;
-}
-
-async function savePunishment() {
-  const title = document.getElementById('punishTitle').value.trim();
-  if (!title) { showToast('Please enter a punishment title'); return; }
-  await push(ref(db, 'punishments'), {
-    title,
-    description: document.getElementById('punishDesc').value.trim(),
-    points: parseInt(document.getElementById('punishPoints').value) || 15,
-    emoji: document.getElementById('punishEmoji').value || '⚡',
-    createdAt: Date.now()
-  });
-  closeAllSheets();
-  document.getElementById('punishTitle').value = '';
-  document.getElementById('punishDesc').value = '';
-  document.getElementById('punishEmoji').value = '';
-  showToast('⚡ Punishment added');
-}
-
-async function assignPunishment(id) {
-  const p = allPunishments[id];
-  if (!p) return;
-  await push(ref(db, 'activePunishments'), {
-    punishmentId: id,
-    title: p.title,
-    description: p.description,
-    emoji: p.emoji || '⚡',
-    assignedAt: Date.now(),
-    assignedBy: 'dom',
-    complete: false
-  });
-  await addPoints(-(p.points || 0), 'Punishment assigned: ' + p.title);
-  await push(ref(db, 'history'), { type: 'punishment_assigned', punishTitle: p.title, points: -(p.points || 0), ts: Date.now() });
-  showToast('⚡ Punishment assigned');
-}
-
-async function deletePunishment(id) {
-  if (!confirm('Remove this punishment?')) return;
-  await remove(ref(db, 'punishments/' + id));
-}
-
-function populatePunishDropdown() {
-  const sel = document.getElementById('taskPunishLink');
-  if (!sel) return;
-  const current = sel.value;
-  sel.innerHTML = '<option value="">None</option>';
-  Object.entries(allPunishments).forEach(([id, p]) => {
-    const opt = document.createElement('option');
-    opt.value = id;
-    opt.textContent = (p.emoji || '⚡') + ' ' + p.title;
-    sel.appendChild(opt);
-  });
-  sel.value = current;
-}
-
-// ── History ──
-function listenHistory() {
-  onValue(ref(db, 'history'), snap => {
-    const data = snap.val() || {};
-    if (currentTab === 'history') renderHistory(data);
-    window._historyData = data;
-  });
-}
-
-function renderHistory(data) {
-  const list = document.getElementById('historyList');
-  const entries = Object.entries(data).sort((a,b) => b[1].ts - a[1].ts).slice(0, 60);
-
-  if (entries.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div><div class="empty-title">No activity yet</div></div>`;
-    return;
-  }
-
-  const typeMap = {
-    task_completed: { icon: '✅', color: 'var(--green)', label: 'Task Completed' },
-    task_failed: { icon: '❌', color: 'var(--rose)', label: 'Task Failed' },
-    task_created: { icon: '📋', color: 'var(--blue)', label: 'Task Assigned' },
-    points_earned: { icon: '⭐', color: 'var(--gold)', label: 'Points Earned' },
-    points_lost: { icon: '💔', color: 'var(--rose)', label: 'Points Lost' },
-    reward_approved: { icon: '🎁', color: 'var(--gold)', label: 'Reward Approved' },
-    punishment_assigned: { icon: '⚡', color: 'var(--amber)', label: 'Punishment Assigned' },
-    redemption_assigned: { icon: '🌿', color: 'var(--green)', label: 'Redemption Assigned' },
-    proof_approved: { icon: '📷', color: 'var(--green)', label: 'Proof Approved' },
-    proof_denied: { icon: '📷', color: 'var(--rose)', label: 'Proof Denied' }
-  };
-
-  let html = '';
-  entries.forEach(([, e]) => {
-    const m = typeMap[e.type] || { icon: '•', color: 'var(--text-dim)', label: e.type };
-    const d = new Date(e.ts);
-    const timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    const detail = e.taskTitle || e.rewardTitle || e.punishTitle || e.reason || '';
-    const ptStr = e.points ? (e.points > 0 ? '+' + e.points : e.points) + ' pts' : '';
-    html += `<div class="rp-card fade-up" style="border-color:rgba(255,255,255,0.06);">
-      <div style="font-size:20px;flex-shrink:0;">${m.icon}</div>
-      <div class="rp-info">
-        <div class="rp-title" style="font-size:12px;color:${m.color};">${m.label}</div>
-        ${detail ? `<div class="rp-desc">${esc(detail)}</div>` : ''}
-        <div class="rp-desc" style="margin-top:2px;">${timeStr}</div>
-      </div>
-      ${ptStr ? `<div class="rp-cost" style="color:${e.points > 0 ? 'var(--green)' : 'var(--rose)'};">${ptStr}</div>` : ''}
-    </div>`;
-  });
-  list.innerHTML = html;
-}
-
-// ── Photo Proof ──
-function openProofSheet(id) {
-  proofTaskId = id;
-  const t = allTasks[id];
-  document.getElementById('proofSheetSub').textContent = t ? 'Proof for: ' + t.title : 'Submit proof';
+// ─────────────────────────────────────────────
+// PHOTO PROOF
+// ─────────────────────────────────────────────
+function openProofSheet(taskId) {
+  proofTaskId = taskId; proofDataUrl = null;
+  const t = tasks[taskId];
+  document.getElementById('proofSheetSub').textContent = t ? 'For: ' + t.title : 'Submit proof to Sir';
   document.getElementById('proofNote').value = '';
-  document.getElementById('proofPreview').style.display = 'none';
-  document.getElementById('proofFileInput').value = '';
+  document.getElementById('proofPreview').classList.add('hidden');
   openSheet('proofSheet');
 }
 
-function previewProof(input) {
-  const file = input.files[0];
-  if (!file) return;
+function handleProofFile(e) {
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('proofImg').src = e.target.result;
-    document.getElementById('proofPreview').style.display = 'block';
+  reader.onload = ev => {
+    proofDataUrl = ev.target.result;
+    const img = document.getElementById('proofPreview');
+    img.src = proofDataUrl; img.classList.remove('hidden');
   };
   reader.readAsDataURL(file);
 }
 
 async function submitProof() {
   if (!proofTaskId) return;
-  const t = allTasks[proofTaskId];
-  if (!t) return;
-  const note = document.getElementById('proofNote').value.trim();
-  const fileInput = document.getElementById('proofFileInput');
-  const file = fileInput.files[0];
-
-  // Store proof data as base64 in Firebase (suitable for small images)
-  let proofData = null;
-  if (file) {
-    proofData = await new Promise(res => {
-      const reader = new FileReader();
-      reader.onload = e => res(e.target.result);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  await update(ref(db, 'tasks/' + proofTaskId), { proofPending: true, proofSubmittedAt: Date.now() });
-  const queueEntry = {
-    type: 'proof',
-    taskId: proofTaskId,
-    taskTitle: t.title,
-    note,
-    proofData: proofData || null,
-    ts: Date.now(),
-    reviewed: false
-  };
-  await push(ref(db, 'queue'), queueEntry);
-
-  closeAllSheets();
-  proofTaskId = null;
-  showToast('📷 Proof submitted — awaiting Sir');
+  if (!proofDataUrl) { showToast('Please choose a photo first'); return; }
+  const t = tasks[proofTaskId]; if (!t) return;
+  let proofUrl = proofDataUrl;
+  try {
+    const sr = sRef(storage, 'proof/' + Date.now() + '.jpg');
+    await uploadString(sr, proofDataUrl, 'data_url');
+    proofUrl = await getDownloadURL(sr);
+  } catch(e) { /* storage unavailable — keep base64 URL in queue */ }
+  await update(ref(db,'tasks/'+proofTaskId), { proofPending:true });
+  await push(ref(db,'queue'), {
+    type:'proof_submission', taskId:proofTaskId, taskTitle:t.title,
+    proofUrl, note: document.getElementById('proofNote').value.trim(),
+    ts:Date.now(), resolved:false
+  });
+  closeAllSheets(); proofTaskId = null; proofDataUrl = null;
+  showToast("📷 Proof submitted! Awaiting Sir's approval");
 }
 
-async function approveProof(queueId) {
-  const q = allQueue[queueId];
-  if (!q) return;
-  const t = allTasks[q.taskId];
-  if (!t) return;
-  await completeTask(q.taskId);
-  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: true });
-  showToast('✅ Proof approved — task complete!');
+// Sir reviews proof
+function openProofReview(qId) {
+  reviewQId = qId;
+  const item = queue[qId]; if (!item) return;
+  document.getElementById('proofReviewSub').textContent = 'For: ' + (item.taskTitle || 'task');
+  document.getElementById('proofReviewImg').src = item.proofUrl || '';
+  const noteEl  = document.getElementById('proofReviewNote');
+  const noteText = document.getElementById('proofReviewNoteText');
+  if (item.note) { noteEl.classList.remove('hidden'); noteText.textContent = item.note; }
+  else { noteEl.classList.add('hidden'); }
+  openSheet('proofReviewSheet');
 }
 
-async function denyProof(queueId) {
-  const q = allQueue[queueId];
-  if (!q) return;
-  await update(ref(db, 'tasks/' + q.taskId), { proofPending: false });
-  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: false });
-  showToast('❌ Proof denied');
+async function approveProof() {
+  if (!reviewQId) return;
+  const item = queue[reviewQId]; if (!item) return;
+  const t = tasks[item.taskId]; if (!t) return;
+  const earned = calcPts(t.basePoints||10, t.difficulty);
+  const newStreak = (t.streak||0) + 1, best = Math.max(newStreak, t.bestStreak||0);
+  await update(ref(db,'tasks/'+item.taskId), { completedToday:true, completedAt:Date.now(), proofPending:false, streak:newStreak, bestStreak:best });
+  await update(ref(db,'queue/'+reviewQId), { resolved:true });
+  await addPts(earned, 'Proof approved: ' + t.title);
+  await push(ref(db,'history'), { type:'proof_approved', taskTitle:t.title, points:earned, ts:Date.now() });
+  if (t.schedule==='once') await update(ref(db,'tasks/'+item.taskId), {archived:true});
+  closeAllSheets(); reviewQId = null;
+  showToast('✅ Proof approved! +' + earned + ' pts');
 }
 
-// ── Queue (Sir's Approval Feed) ──
+async function denyProof() {
+  if (!reviewQId) return;
+  const item = queue[reviewQId]; if (!item) return;
+  await update(ref(db,'tasks/'+item.taskId), { proofPending:false });
+  await update(ref(db,'queue/'+reviewQId), { resolved:true });
+  await push(ref(db,'history'), { type:'proof_denied', taskTitle:item.taskTitle, ts:Date.now() });
+  closeAllSheets(); reviewQId = null;
+  showToast('Proof rejected — Becca must resubmit');
+}
+
+// ─────────────────────────────────────────────
+// QUEUE
+// ─────────────────────────────────────────────
 function listenQueue() {
-  onValue(ref(db, 'queue'), snap => {
-    allQueue = snap.val() || {};
-    const pending = Object.values(allQueue).filter(q => !q.reviewed);
-    const countEl = document.getElementById('queueCount');
-    if (pending.length > 0) {
-      countEl.style.display = 'inline';
-      countEl.textContent = pending.length;
-    } else {
-      countEl.style.display = 'none';
+  onValue(ref(db,'queue'), s => {
+    queue = s.val() || {};
+    const unresolved = Object.values(queue).filter(i => !i.resolved).length;
+    // Update tab badge
+    const tabBtn = document.getElementById('tab-queue');
+    const existing = tabBtn.querySelector('.tab-count');
+    if (existing) existing.remove();
+    if (unresolved > 0) {
+      const b = document.createElement('span');
+      b.className = 'tab-count'; b.textContent = unresolved;
+      tabBtn.appendChild(b);
     }
-    if (currentTab === 'queue') renderQueue();
+    if (curTab === 'queue') renderQueue();
+    renderPunishBanner();
   });
 }
 
 function renderQueue() {
   const list = document.getElementById('queueList');
-  const entries = Object.entries(allQueue)
-    .filter(([, q]) => !q.reviewed)
-    .sort((a, b) => b[1].ts - a[1].ts);
-
-  if (entries.length === 0) {
-    list.innerHTML = `<div class="queue-empty fade-up">
-      <div style="font-size:32px;margin-bottom:12px;opacity:.4;">✨</div>
-      <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--text-mid);margin-bottom:6px;">All clear</div>
-      <div style="font-size:10px;color:var(--text-dim);">Nothing awaiting your attention</div>
-    </div>`;
-    return;
+  const entries = Object.entries(queue).filter(([,v]) => !v.resolved).sort((a,b) => b[1].ts - a[1].ts);
+  if (!entries.length) {
+    list.innerHTML = emptyState('✅', 'All clear', 'Nothing needs your attention right now.'); return;
   }
-
   let html = '';
-  entries.forEach(([id, q]) => {
-    const d = new Date(q.ts);
-    const timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-
-    if (q.type === 'proof') {
-      html += `<div class="queue-card fade-up">
-        <div class="queue-card-header">
-          <div class="queue-type-icon queue-type-proof">📷</div>
-          <div class="queue-info">
-            <div class="queue-title">Photo Proof: ${esc(q.taskTitle)}</div>
-            ${q.note ? `<div class="queue-sub">"${esc(q.note)}"</div>` : ''}
-            <div class="queue-time">${timeStr}</div>
-          </div>
-        </div>
-        ${q.proofData ? `<img class="queue-proof-img" src="${q.proofData}" alt="proof"/>` : ''}
-        <div class="queue-actions">
-          <button class="queue-btn approve" onclick="approveProof('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Approve
-          </button>
-          <button class="queue-btn deny" onclick="denyProof('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">cancel</span> Deny
-          </button>
+  entries.forEach(([id, item]) => {
+    const time = relTime(item.ts);
+    if (item.type === 'proof_submission') {
+      html += `<div class="q-card fade-up">
+        <div class="q-head"><span class="q-type">📷 Proof</span><div class="q-title">${esc(item.taskTitle)}</div><span class="q-time">${time}</span></div>
+        <div class="q-body">
+          ${item.note ? `<div class="q-detail">💬 "${esc(item.note)}"</div>` : ''}
+          <div class="q-actions"><button class="q-btn approve" onclick="openProofReview('${id}')">👁 Review Photo</button></div>
         </div>
       </div>`;
-    } else if (q.type === 'reward_request') {
-      html += `<div class="queue-card fade-up">
-        <div class="queue-card-header">
-          <div class="queue-type-icon queue-type-reward">${q.emoji || '🎁'}</div>
-          <div class="queue-info">
-            <div class="queue-title">Reward Request: ${esc(q.rewardTitle)}</div>
-            <div class="queue-sub">Cost: ${q.cost} points</div>
-            <div class="queue-time">${timeStr}</div>
+    } else if (item.type === 'failure_report') {
+      html += `<div class="q-card fade-up">
+        <div class="q-head"><span class="q-type">⚠️ Failure</span><div class="q-title">${esc(item.taskTitle)}</div><span class="q-time">${time}</span></div>
+        <div class="q-body">
+          <div class="q-detail">${item.reason ? 'Reason: "' + esc(item.reason) + '"' : 'No reason given.'}</div>
+          <div class="q-actions">
+            <button class="q-btn redeem" onclick="openRedemptionSheet('${id}')">🌿 Assign Redemption</button>
+            <button class="q-btn deny" onclick="denyQueueItem('${id}')">Dismiss</button>
           </div>
-        </div>
-        <div class="queue-actions">
-          <button class="queue-btn approve" onclick="approveRewardFromQueue('${id}','${q.rewardId}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Approve
-          </button>
-          <button class="queue-btn deny" onclick="denyRewardFromQueue('${id}','${q.rewardId}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">cancel</span> Deny
-          </button>
         </div>
       </div>`;
-    } else if (q.type === 'failure') {
-      html += `<div class="queue-card fade-up">
-        <div class="queue-card-header">
-          <div class="queue-type-icon queue-type-failure">❌</div>
-          <div class="queue-info">
-            <div class="queue-title">Failure: ${esc(q.taskTitle)}</div>
-            ${q.reason ? `<div class="queue-sub">"${esc(q.reason)}"</div>` : '<div class="queue-sub">No reason given</div>'}
-            <div class="queue-sub" style="color:var(--rose);">-${q.deduction} pts deducted${q.punishTitle ? ' · Punishment: ' + esc(q.punishTitle) : ''}</div>
-            <div class="queue-time">${timeStr}</div>
+    } else if (item.type === 'reward_request') {
+      html += `<div class="q-card fade-up">
+        <div class="q-head"><span class="q-type">🎁 Reward</span><div class="q-title">${esc(item.rewardTitle)}</div><span class="q-time">${time}</span></div>
+        <div class="q-body">
+          <div class="q-detail">Cost: ${item.cost} pts · Balance: ${pts.balance} pts</div>
+          <div class="q-actions">
+            <button class="q-btn approve" onclick="approveQueueItem('${id}')">✓ Approve</button>
+            <button class="q-btn deny" onclick="denyQueueItem('${id}')">✕ Deny</button>
           </div>
-        </div>
-        <div class="queue-actions">
-          <button class="queue-btn approve" onclick="openRedemptionSheet('${id}','${q.activePunishId || ''}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">autorenew</span> Assign Redemption
-          </button>
-          <button class="queue-btn view" onclick="dismissQueue('${id}')">
-            <span class="material-symbols-rounded" style="font-size:14px;">done</span> Acknowledge
-          </button>
         </div>
       </div>`;
     }
   });
-  list.innerHTML = html || `<div class="queue-empty"><div style="font-size:10px;color:var(--text-dim);">No pending items</div></div>`;
+  list.innerHTML = html;
 }
 
-window.approveRewardFromQueue = async function(queueId, rewardId) {
-  await approveReward(rewardId);
-  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: true });
-};
-window.denyRewardFromQueue = async function(queueId, rewardId) {
-  await denyReward(rewardId);
-  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: false });
-};
-window.dismissQueue = async function(id) {
-  await update(ref(db, 'queue/' + id), { reviewed: true });
-};
+async function approveQueueItem(id) {
+  const item = queue[id]; if (!item) return;
+  if (item.type === 'reward_request') {
+    await addPts(-(item.cost||0), 'Reward: ' + item.rewardTitle);
+    if (item.rewardId) await update(ref(db,'rewards/'+item.rewardId), {pendingRequest:false});
+    await push(ref(db,'history'), { type:'reward_approved', rewardTitle:item.rewardTitle, cost:item.cost, ts:Date.now() });
+    showToast('🎁 Reward approved!');
+  }
+  await update(ref(db,'queue/'+id), {resolved:true});
+}
 
-// ── Redemption Tasks ──
-function openRedemptionSheet(queueId, activePunishId) {
-  redemptionPunishId = activePunishId;
-  window._redemptionQueueId = queueId;
+async function denyQueueItem(id) {
+  const item = queue[id]; if (!item) return;
+  if (item.rewardId) await update(ref(db,'rewards/'+item.rewardId), {pendingRequest:false});
+  await update(ref(db,'queue/'+id), {resolved:true});
+  showToast('Dismissed');
+}
+
+// ── Active Punishment Banner ──
+function renderPunishBanner() {
+  const banner = document.getElementById('punishBanner');
+  const failures = Object.entries(queue).filter(([,v]) => !v.resolved && v.type==='failure_report' && v.punishLink);
+  if (!failures.length) { banner.innerHTML = ''; return; }
+  const [qid, item] = failures[0];
+  const p = punishments[item.punishLink];
+  if (!p) { banner.innerHTML = ''; return; }
+  banner.innerHTML = `<div class="punish-banner">
+    <div class="punish-banner-icon">⚡</div>
+    <div class="punish-banner-body">
+      <div class="punish-banner-title">Active Punishment: ${esc(p.title)}</div>
+      ${p.description ? `<div class="punish-banner-desc">${esc(p.description)}</div>` : ''}
+      ${role==='dom' ? `<div class="punish-banner-actions">
+        <button class="punish-banner-btn redeem" onclick="openRedemptionSheet('${qid}')">🌿 Set Redemption Task</button>
+        <button class="punish-banner-btn dismiss" onclick="dismissPunishment('${qid}')">Dismiss</button>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+async function dismissPunishment(qId) {
+  await update(ref(db,'queue/'+qId), {resolved:true});
+  showToast('Punishment dismissed');
+}
+
+// ─────────────────────────────────────────────
+// REDEMPTION TASKS
+// ─────────────────────────────────────────────
+function openRedemptionSheet(qId) {
+  redemptionQId = qId;
+  const item = queue[qId];
+  document.getElementById('redemptionSheetSub').textContent = item ? 'For: ' + item.taskTitle : 'Allow Becca to earn forgiveness';
   document.getElementById('redemptionTitle').value = '';
   document.getElementById('redemptionDesc').value = '';
   document.getElementById('redemptionPoints').value = '10';
@@ -1614,102 +1060,243 @@ function openRedemptionSheet(queueId, activePunishId) {
 
 async function saveRedemptionTask() {
   const title = document.getElementById('redemptionTitle').value.trim();
-  if (!title) { showToast('Please enter a redemption task'); return; }
-  const desc = document.getElementById('redemptionDesc').value.trim();
-  const pts = parseInt(document.getElementById('redemptionPoints').value) || 10;
-
-  const taskRef = await push(ref(db, 'tasks'), {
+  if (!title) { showToast('Enter a task title'); return; }
+  await push(ref(db,'tasks'), {
     title,
-    description: desc,
-    difficulty: 'standard',
-    basePoints: pts,
-    schedule: 'once',
-    isRedemption: true,
-    linkedPunishId: redemptionPunishId || null,
-    createdAt: Date.now(),
-    completedToday: false,
-    failedToday: false,
-    streak: 0,
-    createdBy: 'dom'
+    description: document.getElementById('redemptionDesc').value.trim(),
+    difficulty:'simple', basePoints:parseInt(document.getElementById('redemptionPoints').value)||10,
+    schedule:'once', due:null, punishLink:null, punishPoints:0,
+    requireProof:true, isRedemption:true, redemptionFor:redemptionQId,
+    createdAt:Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
   });
-
-  // Add to queue as redemption type so sub sees it
-  await push(ref(db, 'queue'), {
-    type: 'redemption_assigned',
-    taskId: taskRef.key,
-    taskTitle: title,
-    ts: Date.now(),
-    reviewed: true // Dom sees, sub just gets the task
-  });
-
-  // Dismiss the failure queue item
-  if (window._redemptionQueueId) {
-    await update(ref(db, 'queue/' + window._redemptionQueueId), { reviewed: true, redemptionAssigned: true });
-  }
-
-  await push(ref(db, 'history'), { type: 'redemption_assigned', taskTitle: title, ts: Date.now() });
-  closeAllSheets();
+  if (redemptionQId) await update(ref(db,'queue/'+redemptionQId), {resolved:true, hadRedemption:true});
+  await push(ref(db,'history'), { type:'redemption_assigned', title, ts:Date.now() });
+  closeAllSheets(); redemptionQId = null;
   showToast('🌿 Redemption task assigned');
 }
 
-async function completeRedemption(taskId, punishId) {
-  await completeTask(taskId);
-  if (punishId) {
-    await update(ref(db, 'activePunishments/' + punishId), { complete: true, clearedAt: Date.now() });
+// ─────────────────────────────────────────────
+// REWARDS
+// ─────────────────────────────────────────────
+function listenRewards() {
+  onValue(ref(db,'rewards'), s => { rewards = s.val() || {}; if (curTab==='rewards') renderRewards(); });
+}
+
+function renderRewards() {
+  const list = document.getElementById('rewardList');
+  const entries = Object.entries(rewards);
+  if (!entries.length) {
+    list.innerHTML = emptyState('🎁', role==='dom' ? 'No rewards yet' : 'Nothing available',
+      role==='dom' ? 'Tap + to build the reward store.' : "Sir hasn't added any rewards yet."); return;
   }
-  showToast('🌿 Redemption complete — punishment cleared');
-}
-
-async function dismissPunishment(id) {
-  await update(ref(db, 'activePunishments/' + id), { complete: true, clearedAt: Date.now() });
-  showToast('Punishment cleared');
-}
-
-// ── Active Punishments listener (enhanced) ──
-function listenActivePunishments() {
-  onValue(ref(db, 'activePunishments'), snap => {
-    allActivePunishments = snap.val() || {};
-    const active = Object.entries(allActivePunishments).filter(([,v]) => !v.complete);
-    const banner = document.getElementById('activePunishBanner');
-    if (active.length === 0) {
-      banner.classList.add('hidden');
-      return;
+  let html = '';
+  entries.forEach(([id, r]) => {
+    const canAfford = (pts.balance||0) >= r.cost;
+    const isPending = !!r.pendingRequest;
+    let actions = '';
+    if (role === 'sub') {
+      actions = isPending
+        ? `<span class="rp-pending">⏳ Pending</span>`
+        : `<button class="rp-btn primary" ${canAfford?'':'disabled'} onclick="requestReward('${id}')">Redeem</button>`;
+    } else {
+      actions = isPending
+        ? `<button class="rp-btn green" onclick="approveReward('${id}')">Approve</button>
+           <button class="rp-btn red" onclick="denyReward('${id}')">Deny</button>`
+        : `<button class="rp-btn ghost" onclick="deleteReward('${id}')">Remove</button>`;
     }
-    banner.classList.remove('hidden');
-    banner.className = 'alert-banner warn';
-    const [apId, latest] = active[active.length - 1];
-    const domClear = currentRole === 'dom'
-      ? `<button onclick="dismissPunishment('${apId}')" style="background:none;border:none;color:var(--rose);font-size:10px;font-weight:700;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;">Clear</button>`
-      : '';
-    banner.innerHTML = `<div class="alert-icon">${latest.emoji || '⚡'}</div>
-      <div class="alert-text"><strong>Active Punishment: ${esc(latest.title)}</strong>${latest.description ? esc(latest.description) : ''}</div>
-      ${domClear}`;
+    html += `<div class="rp-card fade-up">
+      <div class="rp-icon reward">${r.emoji||'🎁'}</div>
+      <div class="rp-info">
+        <div class="rp-name">${esc(r.title)}</div>
+        ${r.description ? `<div class="rp-desc">${esc(r.description)}</div>` : ''}
+        ${isPending ? `<div class="rp-desc" style="color:var(--amber);margin-top:2px;">⏳ Awaiting Sir's approval</div>` : ''}
+      </div>
+      <div class="rp-right"><div class="rp-cost reward">${r.cost} pts</div><div class="rp-actions">${actions}</div></div>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+async function saveReward() {
+  const title = document.getElementById('rewardTitle').value.trim();
+  if (!title) { showToast('Enter a title'); return; }
+  await push(ref(db,'rewards'), {
+    title, description:document.getElementById('rewardDesc').value.trim(),
+    cost:parseInt(document.getElementById('rewardCost').value)||50,
+    emoji:document.getElementById('rewardEmoji').value||'🎁', createdAt:Date.now()
+  });
+  closeAllSheets();
+  ['rewardTitle','rewardDesc','rewardEmoji'].forEach(id => document.getElementById(id).value='');
+  showToast('🎁 Reward added');
+}
+
+async function requestReward(id) {
+  const r = rewards[id]; if (!r) return;
+  if ((pts.balance||0) < r.cost) { showToast('Not enough points'); return; }
+  await update(ref(db,'rewards/'+id), {pendingRequest:true, requestedAt:Date.now()});
+  await push(ref(db,'queue'), { type:'reward_request', rewardId:id, rewardTitle:r.title, cost:r.cost, ts:Date.now(), resolved:false });
+  showToast("🎁 Request sent to Sir!");
+}
+
+async function approveReward(id) {
+  const r = rewards[id]; if (!r) return;
+  await addPts(-r.cost, 'Reward: ' + r.title);
+  await update(ref(db,'rewards/'+id), {pendingRequest:false, requestedAt:null});
+  await push(ref(db,'history'), { type:'reward_approved', rewardTitle:r.title, cost:r.cost, ts:Date.now() });
+  showToast('✅ Reward approved!');
+}
+
+async function denyReward(id) {
+  await update(ref(db,'rewards/'+id), {pendingRequest:false, requestedAt:null});
+  showToast('Request denied');
+}
+
+async function deleteReward(id) {
+  if (!confirm('Remove this reward?')) return;
+  await remove(ref(db,'rewards/'+id));
+}
+
+// ─────────────────────────────────────────────
+// PUNISHMENTS
+// ─────────────────────────────────────────────
+function listenPunishments() {
+  onValue(ref(db,'punishments'), s => {
+    punishments = s.val() || {};
+    if (curTab==='punishments') renderPunishments();
+    fillPunishDrop();
   });
 }
 
-
-function switchTab(tab) {
-  currentTab = tab;
-  ['tasks','queue','rewards','punishments','history'].forEach(t => {
-    document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
-    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+function renderPunishments() {
+  const list = document.getElementById('punishList');
+  const entries = Object.entries(punishments);
+  if (!entries.length) {
+    list.innerHTML = emptyState('⚡', 'No punishments set',
+      role==='dom' ? 'Tap + to build the punishment list.' : 'No punishments on record.'); return;
+  }
+  let html = '';
+  entries.forEach(([id, p]) => {
+    const domActions = role==='dom' ? `<div class="rp-actions">
+      <button class="rp-btn primary" onclick="assignPunishment('${id}')">Assign</button>
+      <button class="rp-btn ghost" onclick="deletePunishment('${id}')">Remove</button>
+    </div>` : '';
+    html += `<div class="rp-card fade-up">
+      <div class="rp-icon punish">${p.emoji||'⚡'}</div>
+      <div class="rp-info">
+        <div class="rp-name">${esc(p.title)}</div>
+        ${p.description ? `<div class="rp-desc">${esc(p.description)}</div>` : ''}
+      </div>
+      <div class="rp-right"><div class="rp-cost punish">-${p.points||0} pts</div>${domActions}</div>
+    </div>`;
   });
-
-  if (tab === 'rewards') renderRewards();
-  if (tab === 'punishments') renderPunishments();
-  if (tab === 'history' && window._historyData) renderHistory(window._historyData);
-  if (tab === 'queue') renderQueue();
-
-  const isDom = currentRole === 'dom';
-  document.getElementById('fabBtn').style.display = (isDom && tab !== 'queue' && tab !== 'history') ? 'flex' : 'none';
+  list.innerHTML = html;
 }
 
-// ── FAB / Sheets ──
+async function savePunishment() {
+  const title = document.getElementById('punishTitle').value.trim();
+  if (!title) { showToast('Enter a title'); return; }
+  await push(ref(db,'punishments'), {
+    title, description:document.getElementById('punishDesc').value.trim(),
+    points:parseInt(document.getElementById('punishPoints').value)||15,
+    emoji:document.getElementById('punishEmoji').value||'⚡', createdAt:Date.now()
+  });
+  closeAllSheets();
+  ['punishTitle','punishDesc','punishEmoji'].forEach(id => document.getElementById(id).value='');
+  showToast('⚡ Punishment added');
+}
+
+async function assignPunishment(id) {
+  const p = punishments[id]; if (!p) return;
+  await push(ref(db,'queue'), {
+    type:'failure_report', taskTitle:"Sir's direct assignment",
+    punishLink:id, punishPoints:p.points||0, reason:'Assigned manually by Sir',
+    ts:Date.now(), resolved:false
+  });
+  await addPts(-(p.points||0), 'Punishment assigned: ' + p.title);
+  await push(ref(db,'history'), { type:'punishment_assigned', punishTitle:p.title, points:-(p.points||0), ts:Date.now() });
+  showToast('⚡ Punishment assigned');
+}
+
+async function deletePunishment(id) {
+  if (!confirm('Remove this punishment?')) return;
+  await remove(ref(db,'punishments/'+id));
+}
+
+function fillPunishDrop() {
+  const sel = document.getElementById('taskPunishLink'); if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">None</option>';
+  Object.entries(punishments).forEach(([id, p]) => {
+    const o = document.createElement('option');
+    o.value = id; o.textContent = (p.emoji||'⚡') + ' ' + p.title;
+    sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+// ─────────────────────────────────────────────
+// HISTORY
+// ─────────────────────────────────────────────
+let histData = {};
+function listenHistory() {
+  onValue(ref(db,'history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); });
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const entries = Object.entries(histData).sort((a,b) => b[1].ts - a[1].ts).slice(0, 80);
+  if (!entries.length) { list.innerHTML = emptyState('📜', 'No activity yet', ''); return; }
+  const typeMap = {
+    task_completed:       { icon:'✅', color:'var(--green)',  label:'Task Completed' },
+    task_failed:          { icon:'❌', color:'var(--rose)',   label:'Task Failed' },
+    task_created:         { icon:'📋', color:'var(--blue)',   label:'Task Assigned' },
+    points_earned:        { icon:'⭐', color:'var(--gold)',   label:'Points Earned' },
+    points_lost:          { icon:'💔', color:'var(--rose)',   label:'Points Lost' },
+    reward_approved:      { icon:'🎁', color:'var(--gold)',   label:'Reward Approved' },
+    punishment_assigned:  { icon:'⚡', color:'var(--amber)',  label:'Punishment Assigned' },
+    proof_approved:       { icon:'📷', color:'var(--green)',  label:'Proof Approved' },
+    proof_denied:         { icon:'🚫', color:'var(--rose)',   label:'Proof Rejected' },
+    redemption_assigned:  { icon:'🌿', color:'var(--purple)', label:'Redemption Assigned' }
+  };
+  let html = '';
+  entries.forEach(([, e]) => {
+    const m = typeMap[e.type] || { icon:'•', color:'var(--dim)', label:e.type };
+    const detail = e.taskTitle || e.rewardTitle || e.punishTitle || e.title || e.reason || '';
+    const ptStr  = e.points ? (e.points>0?'+':'') + e.points + ' pts' : '';
+    const streak = e.streak && e.streak > 1 ? ' · ' + e.streak + '-day streak' : '';
+    html += `<div class="hist-card fade-up">
+      <div class="hist-icon">${m.icon}</div>
+      <div class="hist-info">
+        <div class="hist-lbl" style="color:${m.color};">${m.label}${streak}</div>
+        ${detail ? `<div class="hist-detail">${esc(detail)}</div>` : ''}
+        <div class="hist-time">${relTime(e.ts)}</div>
+      </div>
+      ${ptStr ? `<div class="hist-pts" style="color:${e.points>0?'var(--green)':'var(--rose)'};">${ptStr}</div>` : ''}
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// TABS / NAVIGATION
+// ─────────────────────────────────────────────
+function switchTab(t) {
+  curTab = t;
+  ['tasks','queue','rewards','punishments','history'].forEach(x => {
+    document.getElementById('view-'+x).classList.toggle('hidden', x !== t);
+    document.getElementById('tab-'+x).classList.toggle('active', x === t);
+  });
+  if (t==='rewards')     renderRewards();
+  if (t==='punishments') renderPunishments();
+  if (t==='history')     renderHistory();
+  if (t==='queue')       renderQueue();
+  document.getElementById('fabBtn').style.display = role==='dom' ? 'flex' : 'none';
+}
+
 function openCreateSheet() {
-  const tab = currentTab;
-  if (tab === 'tasks') openSheet('taskSheet');
-  else if (tab === 'rewards') openSheet('rewardSheet');
-  else if (tab === 'punishments') openSheet('punishSheet');
+  if (curTab==='tasks')       openSheet('taskSheet');
+  else if (curTab==='rewards') openSheet('rewardSheet');
+  else if (curTab==='punishments') openSheet('punishSheet');
 }
 
 function openSheet(id) {
@@ -1719,74 +1306,73 @@ function openSheet(id) {
 
 function closeAllSheets() {
   document.getElementById('sheetOverlay').classList.remove('open');
-  ['taskSheet','rewardSheet','punishSheet','failSheet','proofSheet','redemptionSheet'].forEach(id => {
-    document.getElementById(id).classList.remove('open');
-  });
+  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
 }
 
-// ── Filter ──
-let filterState = 'all';
-function toggleFilter() {
+function cycleFilter() {
   const states = ['all','pending','done'];
   filterState = states[(states.indexOf(filterState) + 1) % states.length];
-  const labels = { all: 'All', pending: 'Pending', done: 'Done' };
-  document.getElementById('filterToggle').innerHTML = `<span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> ${labels[filterState]}`;
-  renderTasks(filterState);
+  document.getElementById('filterToggle').innerHTML =
+    `<span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> ${cap(filterState)}`;
+  renderTasks();
 }
 
-
-
-// ── Helpers ──
-function selectChip(groupId, el) {
-  document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('selected'));
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function pickChip(groupId, el) {
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
 }
-
-function calcPoints(base, difficulty) {
-  const mult = { simple: 1, standard: 1.5, demanding: 2, extreme: 3 };
-  return Math.round(base * (mult[difficulty] || 1));
+function calcPts(base, diff) {
+  return Math.round(base * ({simple:1, standard:1.5, demanding:2, extreme:3}[diff] || 1));
 }
-
-function scheduleLabel(s) {
-  const map = { once: 'One-off', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', weekdays: 'Weekdays', weekends: 'Weekends' };
-  return map[s] || s || 'One-off';
+function schedLbl(s) {
+  return {once:'One-off',daily:'Daily',weekly:'Weekly',monthly:'Monthly',weekdays:'Weekdays',weekends:'Weekends'}[s] || 'One-off';
 }
-
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString() + ' ' + new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+function relTime(ts) {
+  const d = Date.now()-ts, m=60000, h=3600000, dy=86400000;
+  if (d < m)  return 'just now';
+  if (d < h)  return Math.floor(d/m)  + 'm ago';
+  if (d < dy) return Math.floor(d/h)  + 'h ago';
+  return new Date(ts).toLocaleDateString();
+}
+function emptyState(icon, title, desc) {
+  return `<div class="empty fade-up"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`;
 }
 
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ── Daily reset check ──
-// Check if daily/weekday/weekend tasks need to reset
+// ─────────────────────────────────────────────
+// DAILY RESET
+// ─────────────────────────────────────────────
 function checkDailyReset() {
-  const lastReset = localStorage.getItem('dsh_last_reset');
   const today = new Date().toDateString();
-  if (lastReset === today) return;
+  if (localStorage.getItem('dsh_last_reset') === today) return;
   localStorage.setItem('dsh_last_reset', today);
-  // Reset completedToday for recurring tasks
-  Object.entries(allTasks).forEach(([id, t]) => {
-    if (['daily','weekly','monthly','weekdays','weekends'].includes(t.schedule)) {
-      if (t.completedToday || t.failedToday) {
-        const updates = {};
-        updates['tasks/' + id + '/completedToday'] = false;
-        updates['tasks/' + id + '/failedToday'] = false;
-        update(ref(db), updates);
-      }
+  Object.entries(tasks).forEach(([id, t]) => {
+    if (['daily','weekdays','weekends'].includes(t.schedule) && (t.completedToday || t.failedToday || t.proofPending)) {
+      const u = {};
+      u['tasks/'+id+'/completedToday'] = false;
+      u['tasks/'+id+'/failedToday']    = false;
+      u['tasks/'+id+'/proofPending']   = false;
+      update(ref(db), u);
     }
   });
 }
-setTimeout(checkDailyReset, 2000);
-
 </script>
 </body>
 </html>
