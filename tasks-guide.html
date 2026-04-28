@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Tasks — User Guide · Dom Sub Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-dim: rgba(212,175,55,.12);
+  --gold-b: rgba(212,175,55,.22);
+  --bg: #020814;
+  --surface: rgba(5,12,28,.85);
+  --text: #ddd;
+  --dim: #555;
+  --mid: #999;
+  --luxury: linear-gradient(135deg, #D4AF37, #F5E6A3, #C9A227);
+  --rose: #e05b6a;
+  --green: #4CAF50;
+  --blue: #64B5F6;
+  --purple: #BA68C8;
+  --amber: #FFC107;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.orb { position: absolute; border-radius: 50%; filter: blur(90px); }
+.orb-1 { width: 700px; height: 700px; top: -250px; left: -150px; background: radial-gradient(circle, rgba(212,175,55,.07), transparent 70%); }
+.orb-2 { width: 500px; height: 500px; bottom: -100px; right: -120px; background: radial-gradient(circle, rgba(186,104,200,.05), transparent 70%); }
+.orb-3 { width: 400px; height: 400px; top: 40%; left: 30%; background: radial-gradient(circle, rgba(100,181,246,.04), transparent 70%); }
+
+/* Progress */
+.progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 100; background: rgba(255,255,255,.05); }
+.progress-fill { height: 100%; background: var(--luxury); transition: width .5s cubic-bezier(.4,0,.2,1); }
+
+/* Header */
+.guide-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+  padding: calc(14px + var(--safe-t)) 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(2,8,20,.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.guide-counter { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: var(--dim); }
+.guide-logo {
+  font-family: 'Great Vibes', cursive; font-size: 22px;
+  background: var(--luxury); background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+.toc-trigger {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--dim); cursor: pointer; padding: 5px 10px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.07); background: none; transition: all .2s;
+}
+.toc-trigger:active { color: var(--gold); border-color: var(--gold-b); }
+
+/* Slide runner */
+.runner {
+  position: fixed;
+  top: calc(50px + var(--safe-t));
+  bottom: calc(72px + var(--safe-b));
+  left: 0; right: 0;
+  display: flex;
+  transition: transform .48s cubic-bezier(.4, 0, .2, 1);
+  will-change: transform;
+  z-index: 1;
+}
+
+.slide {
+  flex: 0 0 100vw; width: 100vw;
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 26px 22px 30px;
+}
+.slide::-webkit-scrollbar { display: none; }
+
+/* Bottom Nav */
+.guide-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+  padding: 12px 20px calc(12px + var(--safe-b));
+  background: rgba(2,8,20,.95); backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,.05);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.nav-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 16px; border-radius: 12px;
+  font-family: 'Montserrat', sans-serif; font-size: 9.5px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  cursor: pointer; border: none; transition: all .2s;
+}
+.nav-btn:active { transform: scale(.95); }
+.nav-btn.prev { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); color: var(--mid); }
+.nav-btn.prev:disabled { opacity: .2; pointer-events: none; }
+.nav-btn.next { background: var(--luxury); color: #020814; flex: 1; justify-content: center; }
+.nav-btn.next:disabled { opacity: .25; pointer-events: none; }
+.dots { display: flex; gap: 5px; align-items: center; }
+.dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,.15); transition: all .3s; cursor: pointer;
+}
+.dot.active { background: var(--gold); width: 18px; border-radius: 3px; }
+
+/* ═══════════════ CONTENT COMPONENTS ═══════════════ */
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.slide-content > * { animation: fadeUp .35s ease both; }
+.slide-content > *:nth-child(1) { animation-delay:.04s; }
+.slide-content > *:nth-child(2) { animation-delay:.08s; }
+.slide-content > *:nth-child(3) { animation-delay:.12s; }
+.slide-content > *:nth-child(4) { animation-delay:.16s; }
+.slide-content > *:nth-child(5) { animation-delay:.20s; }
+.slide-content > *:nth-child(6) { animation-delay:.24s; }
+.slide-content > *:nth-child(7) { animation-delay:.28s; }
+
+.s-eyebrow { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 4px; color: rgba(212,175,55,.4); margin-bottom: 9px; }
+.s-title { font-family: 'Playfair Display', serif; font-size: 27px; font-weight: 700; color: var(--text); line-height: 1.15; margin-bottom: 5px; }
+.s-title em { font-style: italic; color: var(--gold); }
+.s-sub { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: var(--dim); margin-bottom: 16px; }
+.s-intro { font-size: 12px; color: var(--mid); line-height: 1.85; margin-bottom: 20px; }
+
+/* Hero */
+.hero-logo {
+  font-family: 'Great Vibes', cursive; font-size: 68px;
+  background: var(--luxury); background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s ease-in-out infinite;
+  line-height: 1.05; display: block; margin-bottom: 4px;
+}
+.hero-tagline { font-family: 'Playfair Display', serif; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 5px; margin-bottom: 22px; }
+.hero-desc { font-size: 12.5px; color: var(--mid); line-height: 1.9; margin-bottom: 26px; }
+.hero-roles { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 28px; }
+.role-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 30px;
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+}
+.role-pill.dom { background: rgba(212,175,55,.1); border: 1px solid rgba(212,175,55,.25); color: var(--gold); }
+.role-pill.sub { background: rgba(186,104,200,.1); border: 1px solid rgba(186,104,200,.25); color: var(--purple); }
+.swipe-hint {
+  display: flex; align-items: center; gap: 8px; opacity: .35;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity:.3; } 50% { opacity:.55; } }
+.swipe-hint-text { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--mid); }
+
+/* Role block */
+.role-block { border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; }
+.role-block.dom { background: rgba(212,175,55,.05); border: 1px solid rgba(212,175,55,.15); }
+.role-block.sub { background: rgba(186,104,200,.05); border: 1px solid rgba(186,104,200,.15); }
+.rb-head { display: flex; align-items: center; gap: 8px; margin-bottom: 13px; }
+.rb-icon { font-size: 15px; }
+.rb-title { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 600; flex: 1; }
+.dom .rb-title { color: var(--gold); }
+.sub .rb-title { color: var(--purple); }
+.rb-badge { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 20px; }
+.dom .rb-badge { background: rgba(212,175,55,.12); color: var(--gold); }
+.sub .rb-badge { background: rgba(186,104,200,.12); color: var(--purple); }
+
+/* Steps */
+.steps { display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step-num {
+  width: 21px; height: 21px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9.5px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+.dom .step-num { background: rgba(212,175,55,.15); color: var(--gold); }
+.sub .step-num { background: rgba(186,104,200,.15); color: var(--purple); }
+.step-body { flex: 1; }
+.step-title { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.step-desc { font-size: 10px; color: var(--mid); line-height: 1.65; }
+.step-desc strong { color: var(--text); }
+
+/* Info card */
+.info-card { background: var(--surface); border: 1px solid var(--gold-b); border-radius: 13px; padding: 15px 17px; margin-bottom: 12px; }
+.ic-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.ic-icon { font-size: 15px; }
+.ic-title { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 600; color: var(--text); }
+.ic-body { font-size: 10.5px; color: var(--mid); line-height: 1.75; }
+
+/* Callout */
+.callout { border-radius: 11px; padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 11px; }
+.callout.gold  { background: rgba(212,175,55,.06);  border: 1px solid rgba(212,175,55,.18); }
+.callout.rose  { background: rgba(224,91,106,.06);  border: 1px solid rgba(224,91,106,.18); }
+.callout.blue  { background: rgba(100,181,246,.06); border: 1px solid rgba(100,181,246,.18); }
+.callout.green { background: rgba(76,175,80,.06);   border: 1px solid rgba(76,175,80,.18); }
+.callout.purple{ background: rgba(186,104,200,.06); border: 1px solid rgba(186,104,200,.18); }
+.callout-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.callout-title { font-size: 10px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.callout-text  { font-size: 10px; color: var(--mid); line-height: 1.65; }
+
+/* Table */
+.gt {
+  width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 12px;
+  background: var(--surface); border-radius: 13px; overflow: hidden; border: 1px solid var(--gold-b);
+}
+.gt th { text-align: left; font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.gt td { padding: 8px 12px; color: var(--mid); border-bottom: 1px solid rgba(255,255,255,.03); vertical-align: top; line-height: 1.5; }
+.gt tr:last-child td { border-bottom: none; }
+.gt td strong { color: var(--text); }
+
+/* Diff badges */
+.db { display: inline-block; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; padding: 2px 8px; border-radius: 9px; }
+.db-s  { background: rgba(76,175,80,.12);  color: #4CAF50; }
+.db-st { background: rgba(100,181,246,.12); color: #64B5F6; }
+.db-d  { background: rgba(255,193,7,.12);  color: #FFC107; }
+.db-e  { background: rgba(224,91,106,.12); color: #e05b6a; }
+
+/* Tier rows */
+.tier-row { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.tier-row:last-child { border-bottom: none; }
+.tier-badge { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; margin-top: 2px; }
+.t1 { background: rgba(255,193,7,.12); color: var(--amber); }
+.t2 { background: rgba(224,91,106,.1); color: var(--rose); }
+.t3 { background: rgba(186,104,200,.1); color: var(--purple); }
+.tier-title { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.tier-desc { font-size: 10px; color: var(--mid); line-height: 1.6; }
+
+/* Achievement grid */
+.ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 11px; }
+.ach-card { background: var(--surface); border: 1px solid var(--gold-b); border-radius: 11px; padding: 11px; display: flex; align-items: flex-start; gap: 9px; }
+.ach-emoji { font-size: 17px; flex-shrink: 0; }
+.ach-title { font-size: 9.5px; font-weight: 700; color: var(--gold); margin-bottom: 2px; }
+.ach-desc { font-size: 8.5px; color: var(--dim); line-height: 1.4; }
+
+/* Mood pills */
+.mood-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.mood-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 20px; background: var(--surface); border: 1px solid var(--gold-b); font-size: 10px; color: var(--mid); }
+.mood-pill span:first-child { font-size: 13px; }
+
+/* Rule */
+.rule { height: 1px; background: linear-gradient(90deg, transparent, var(--gold-b), transparent); margin: 16px 0; }
+
+/* Chapter list */
+.chapter-list { display: flex; flex-direction: column; gap: 5px; }
+.chapter-item { display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: var(--surface); border: 1px solid rgba(255,255,255,.05); border-radius: 11px; cursor: pointer; transition: all .18s; }
+.chapter-item:active { border-color: var(--gold-b); background: rgba(212,175,55,.05); }
+.chapter-num { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); width: 20px; flex-shrink: 0; }
+.chapter-label { font-size: 11.5px; color: var(--mid); flex: 1; font-weight: 500; }
+.chapter-arr { font-size: 11px; color: var(--dim); }
+.chapter-item.cur { border-color: var(--gold-b); background: rgba(212,175,55,.05); }
+.chapter-item.cur .chapter-label { color: var(--gold); }
+
+/* TOC overlay */
+#tocOverlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(2,8,20,.97); backdrop-filter: blur(20px);
+  display: none; flex-direction: column;
+  padding-top: var(--safe-t);
+  padding-bottom: var(--safe-b);
+}
+.toc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px 14px; border-bottom: 1px solid rgba(255,255,255,.05); flex-shrink: 0;
+}
+.toc-header-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--text); }
+.toc-close { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); background: none; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+.toc-scroll { flex: 1; overflow-y: auto; padding: 14px 22px 30px; scrollbar-width: none; }
+.toc-scroll::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="guide-header">
+  <div class="guide-counter" id="slideCounter">1 / 12</div>
+  <div class="guide-logo">Tasks</div>
+  <button class="toc-trigger" id="tocBtn">Contents</button>
+</div>
+
+<!-- ════════════ SLIDE RUNNER ════════════ -->
+<div class="runner" id="runner">
+
+  <!-- 0: INTRO -->
+  <div class="slide" data-index="0">
+    <div class="slide-content">
+      <div class="s-eyebrow">Dom Sub Hub · User Guide</div>
+      <span class="hero-logo">Tasks</span>
+      <div class="hero-tagline">Complete Reference</div>
+      <p class="hero-desc">Everything you need to know about the Tasks module — from first login through advanced consequence management. Covers both roles in full.</p>
+      <div class="hero-roles">
+        <div class="role-pill dom">👑 Sir — Dominant</div>
+        <div class="role-pill sub">🌸 Becca — Submissive</div>
+      </div>
+      <div class="rule"></div>
+      <p style="font-size:10px;color:var(--dim);line-height:1.7;margin-bottom:18px;">Use <strong style="color:var(--mid);">Next</strong> below to move through sections, or tap <strong style="color:var(--mid);">Contents</strong> above to jump to any chapter.</p>
+      <div class="swipe-hint">
+        <span class="swipe-hint-text">Swipe or tap Next to begin</span>
+        <span style="font-size:16px;color:var(--mid);">→</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1: LOGIN -->
+  <div class="slide" data-index="1">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 01</div>
+      <div class="s-title">Login &amp; <em>Role Selection</em></div>
+      <div class="s-sub">First-time setup · PIN protection</div>
+      <p class="s-intro">Each role is protected by its own 4-digit PIN stored on-device. First login walks through PIN creation — subsequent visits just require the correct PIN.</p>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">👑</div><div class="rb-title">Sir — Dominant</div><div class="rb-badge">Dom</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap the Dominant card (👑)</div><div class="step-desc">On the login screen.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Create a 4-digit PIN (first time only)</div><div class="step-desc">Enter, then confirm. Stored on-device only, never transmitted.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Enter PIN on return visits</div><div class="step-desc">App logs in automatically after the 4th digit.</div></div></div>
+        </div>
+      </div>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">🌸</div><div class="rb-title">Becca — Submissive</div><div class="rb-badge">Sub</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap the Submissive card (🌸)</div><div class="step-desc">Your PIN is entirely separate from Sir's.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Create &amp; confirm a 4-digit PIN</div><div class="step-desc">Stored locally on this device.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Daily check-in appears after login</div><div class="step-desc">A mood panel slides up automatically if you haven't checked in today. See Chapter 11.</div></div></div>
+        </div>
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-icon">🔐</div>
+        <div><div class="callout-title">PIN security</div><div class="callout-text">PINs live in device local storage only. Sessions persist within a browser tab but clear when the tab is closed.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2: OVERVIEW -->
+  <div class="slide" data-index="2">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 02</div>
+      <div class="s-title">App <em>Overview</em></div>
+      <div class="s-sub">Six tabs · Header · FAB button</div>
+      <p class="s-intro">Both roles see all six tabs — but the content and available actions differ entirely depending on who is logged in.</p>
+
+      <table class="gt">
+        <thead><tr><th>Tab</th><th>Sir sees</th><th>Becca sees</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Tasks</strong></td><td>All tasks; can delete</td><td>Her tasks; complete or fail</td></tr>
+          <tr><td><strong>Queue</strong></td><td>Proof, failures, requests</td><td>View-only for Sir's items</td></tr>
+          <tr><td><strong>Dashboard</strong></td><td>Full analytics &amp; headspace</td><td>Personal stats &amp; task requests</td></tr>
+          <tr><td><strong>Rewards</strong></td><td>Manage store; approve/deny</td><td>Browse &amp; redeem with points</td></tr>
+          <tr><td><strong>Punishments</strong></td><td>Manage list; assign manually</td><td>View active punishments</td></tr>
+          <tr><td><strong>History</strong></td><td>Full activity log</td><td>Full activity log</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout blue">
+        <div class="callout-icon">➕</div>
+        <div><div class="callout-title">The Gold FAB Button</div><div class="callout-text">Sir sees a floating gold ➕ in the bottom-right on Tasks, Rewards, and Punishments tabs. It opens the creation sheet for whichever tab is active. Becca does not see this button.</div></div>
+      </div>
+
+      <div class="callout rose">
+        <div class="callout-icon">🔴</div>
+        <div><div class="callout-title">Queue Badge</div><div class="callout-text">A red count badge on the Queue tab shows all items needing Sir's attention — failures, proof, reward requests, and Becca's task requests combined.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: TASKS -->
+  <div class="slide" data-index="3">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 03</div>
+      <div class="s-title">Tasks</div>
+      <div class="s-sub">Creating · Completing · Filtering</div>
+      <p class="s-intro">Tasks are the core of the system. Sir assigns them with full control over difficulty, schedule, and linked consequences. Becca completes them to earn points.</p>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">👑</div><div class="rb-title">Creating a Task</div><div class="rb-badge">Dom Only</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap ➕ on the Tasks tab</div><div class="step-desc">Opens the New Task sheet from the bottom.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Enter title &amp; description</div><div class="step-desc">Title shows prominently on Becca's card. Description holds full instructions.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Set difficulty, points &amp; schedule</div><div class="step-desc">Difficulty applies a multiplier (Chapter 04). Schedules: One-off, Daily, Weekdays, Weekends, Weekly, Monthly.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Optionally: due date, linked punishment, photo proof</div><div class="step-desc">Linked punishment auto-triggers on failure. Photo proof requires image submission before points are awarded.</div></div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Tap "Assign Task"</div><div class="step-desc">Appears on Becca's Tasks tab instantly.</div></div></div>
+        </div>
+      </div>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">🌸</div><div class="rb-title">Completing a Task</div><div class="rb-badge">Sub View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Find the task on the Tasks tab</div><div class="step-desc">Overdue tasks are red. Difficulty, schedule, and point value are on each card.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tap "Complete" (or "Submit Proof" for photo tasks)</div><div class="step-desc">Points awarded instantly for standard tasks. See Chapter 05 for proof tasks.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Toast confirms points &amp; streak</div><div class="step-desc">Shows points earned and current consecutive-day streak.</div></div></div>
+        </div>
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-icon">🔍</div>
+        <div><div class="callout-title">Filter Button (top-right)</div><div class="callout-text">Cycles: <strong>All</strong> → <strong>Pending</strong> (incomplete only) → <strong>Done</strong> (completed today).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4: POINTS -->
+  <div class="slide" data-index="4">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 04</div>
+      <div class="s-title">Points &amp; <em>Difficulty</em></div>
+      <div class="s-sub">Multipliers · Balance · Earned vs Lost</div>
+      <p class="s-intro">Every task has a base point value set by Sir. Difficulty applies a multiplier — rewarding harder tasks proportionally. Points are tracked in three visible buckets at the top of the Tasks tab.</p>
+
+      <table class="gt">
+        <thead><tr><th>Difficulty</th><th>Multiplier</th><th>10 base pts →</th><th>Intended for</th></tr></thead>
+        <tbody>
+          <tr><td><span class="db db-s">Simple</span></td><td style="color:var(--green);font-weight:700;">×1</td><td>10 pts</td><td>Quick everyday habits</td></tr>
+          <tr><td><span class="db db-st">Standard</span></td><td style="color:var(--blue);font-weight:700;">×1.5</td><td>15 pts</td><td>Moderate effort</td></tr>
+          <tr><td><span class="db db-d">Demanding</span></td><td style="color:var(--amber);font-weight:700;">×2</td><td>20 pts</td><td>Sustained effort or vulnerability</td></tr>
+          <tr><td><span class="db db-e">Extreme</span></td><td style="color:var(--rose);font-weight:700;">×3</td><td>30 pts</td><td>High-challenge or significant tasks</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-card">
+        <div class="ic-head"><div class="ic-icon">⭐</div><div class="ic-title">The Points Bar</div></div>
+        <div class="ic-body">Always visible at the top of Tasks:<br><br>
+          <strong style="color:var(--gold);">Balance</strong> — current spendable total<br>
+          <strong style="color:var(--green);">Earned</strong> — cumulative points earned all-time<br>
+          <strong style="color:var(--rose);">Lost</strong> — cumulative deductions from failures &amp; redeemed rewards
+        </div>
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-icon">💡</div>
+        <div><div class="callout-title">Economy tip</div><div class="callout-text">Set base points to reflect effort, then let difficulty do the scaling. A 10pt Extreme task earns 30pts — the difficulty badge signals the challenge level clearly.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5: PHOTO PROOF -->
+  <div class="slide" data-index="5">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 05</div>
+      <div class="s-title">Photo <em>Proof</em></div>
+      <div class="s-sub">Submission · Review · Approval</div>
+      <p class="s-intro">When Sir enables "Require Photo Proof," Becca cannot self-complete the task. She submits a photo — Sir reviews it in the Queue before points are awarded.</p>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">📷</div><div class="rb-title">Submitting Proof</div><div class="rb-badge">Sub View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap "Submit Proof" on the task card</div><div class="step-desc">Tasks needing proof show a blue 📷 badge and this button instead of "Complete."</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tap the upload area &amp; choose a photo</div><div class="step-desc">Selects from your camera roll. Preview appears immediately.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Add an optional note for Sir</div><div class="step-desc">Context, time of completion, or anything Sir should know.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Tap "Submit for Approval"</div><div class="step-desc">Task shows ⏳ Pending. No further action until Sir reviews.</div></div></div>
+        </div>
+      </div>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">👁</div><div class="rb-title">Reviewing Proof</div><div class="rb-badge">Dom Only</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">📷 Proof card appears in the Queue</div><div class="step-desc">Tap "Review Photo" to open the review sheet.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">View photo &amp; note</div><div class="step-desc">Full image shown alongside any note Becca submitted.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Approve or Reject</div><div class="step-desc"><strong>Approve</strong> — awards points, marks complete, updates streak. <strong>Reject</strong> — clears pending; Becca resubmits.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6: FAILURES -->
+  <div class="slide" data-index="6">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 06</div>
+      <div class="s-title">Failures &amp; <em>Consequences</em></div>
+      <div class="s-sub">Reporting · Demerit tiers · Consequence Picker</div>
+      <p class="s-intro">When Becca cannot complete a task, she reports it honestly. Points are deducted, a demerit is added, and Sir is notified. Repeated failures escalate through three tiers.</p>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">🌸</div><div class="rb-title">Reporting a Failure</div><div class="rb-badge">Sub View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap "Failure" on the task card</div><div class="step-desc">The Failure sheet opens.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Write a reason — be honest</div><div class="step-desc">Sir sees this in the Queue and it's logged in History.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Tap "Confess Failure"</div><div class="step-desc">Points deducted immediately. Streak resets to zero. Sir notified in Queue.</div></div></div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="ic-head"><div class="ic-icon">⚠️</div><div class="ic-title">Demerit Tiers</div></div>
+        <div class="ic-body" style="margin-bottom:11px;">Unresolved failures accumulate. A tier banner appears on the Tasks tab.</div>
+        <div class="tier-row"><span class="tier-badge t1">Tier 1</span><div><div class="tier-title">1–2 failures · Minor</div><div class="tier-desc">Dismiss or Redemption available in Queue.</div></div></div>
+        <div class="tier-row"><span class="tier-badge t2">Tier 2</span><div><div class="tier-title">3–4 failures · Moderate</div><div class="tier-desc">Consequence Picker button unlocks in Queue.</div></div></div>
+        <div class="tier-row"><span class="tier-badge t3">Tier 3</span><div><div class="tier-title">5+ failures · Significant</div><div class="tier-desc">High-tier consequences available in the picker pool.</div></div></div>
+      </div>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">⚡</div><div class="rb-title">Consequence Picker</div><div class="rb-badge">Dom Only · Tier 2+</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap "⚡ Consequence" on a failure in Queue</div><div class="step-desc">Three consequences drawn randomly from the curated pool.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tap 🎲 Roll Again to refresh</div><div class="step-desc">Re-draws three new options from the eligible tier pool.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Select one and tap "Apply"</div><div class="step-desc">Created as a Redemption task (photo proof required). Failure resolved.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7: REDEMPTION -->
+  <div class="slide" data-index="7">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 06 continued</div>
+      <div class="s-title"><em>Redemption</em> Tasks</div>
+      <div class="s-sub">Custom forgiveness · Point restoration</div>
+      <p class="s-intro">Alongside the Consequence Picker, Sir can write a fully custom Redemption Task — a specific act Becca must perform to earn forgiveness and restore points.</p>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">🌿</div><div class="rb-title">Assigning a Custom Redemption</div><div class="rb-badge">Dom Only</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap "🌿 Redemption" on a failure in the Queue</div><div class="step-desc">Also accessible from the active punishment banner on the Tasks tab.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Write title &amp; full instructions</div><div class="step-desc">Be specific — exactly what Becca must do and how it should be documented.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Set points restored on completion</div><div class="step-desc">What Becca earns back once Sir approves the proof photo.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Tap "Assign Redemption"</div><div class="step-desc">A purple 🌿 Redemption task appears in Becca's list. Completing it resolves the original failure.</div></div></div>
+        </div>
+      </div>
+
+      <div class="callout rose">
+        <div class="callout-icon">⚡</div>
+        <div><div class="callout-title">Active Punishment Banner</div><div class="callout-text">When an unresolved failure with a linked punishment exists, a red banner appears at the top of the Tasks tab. Sir can set a Redemption Task or Dismiss it directly — no need to navigate to the Queue.</div></div>
+      </div>
+
+      <div class="callout purple">
+        <div class="callout-icon">🌿</div>
+        <div><div class="callout-title">Redemption on Becca's side</div><div class="callout-text">Redemption tasks have a purple border and a 🌿 badge. They always require photo proof and cannot be self-completed. Once Sir approves, the original failure is resolved and points are restored.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8: REWARDS & PUNISHMENTS -->
+  <div class="slide" data-index="8">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapters 07 &amp; 08</div>
+      <div class="s-title">Rewards &amp; <em>Punishments</em></div>
+      <div class="s-sub">Store management · Redemption · Manual assignment</div>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">🎁</div><div class="rb-title">Managing Rewards</div><div class="rb-badge">Dom Only</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap ➕ on Rewards tab — enter details</div><div class="step-desc">Title, description, point cost, and an emoji icon.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Reward appears in Becca's store immediately</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Approve or deny in the Queue</div><div class="step-desc">Points only deduct on approval. Denial leaves her balance unchanged.</div></div></div>
+        </div>
+      </div>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">🌸</div><div class="rb-title">Redeeming a Reward</div><div class="rb-badge">Sub View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Browse the Rewards tab</div><div class="step-desc">Redeem is greyed out if you lack sufficient points.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tap "Redeem" — request sent to Sir</div><div class="step-desc">Shows ⏳ Pending. Points not deducted yet.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Await Sir's decision</div><div class="step-desc">Approved → points deducted, reward granted. Denied → no change.</div></div></div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">⚡</div><div class="rb-title">Managing Punishments</div><div class="rb-badge">Dom Only</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Tap ➕ on Punishments tab</div><div class="step-desc">Enter title, description, point deduction, and emoji.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Link to a task via "Attach Punishment if Failed"</div><div class="step-desc">Triggers automatically when Becca reports failure on that task.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Or assign manually via "Assign" on any punishment card</div><div class="step-desc">Deducts points immediately and creates a Queue entry.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9: QUEUE -->
+  <div class="slide" data-index="9">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 09</div>
+      <div class="s-title">The <em>Queue</em></div>
+      <div class="s-sub">Sir's action center · All pending items</div>
+      <p class="s-intro">The Queue is Sir's primary action center — a real-time feed of everything needing a decision, aggregated from across the entire app.</p>
+
+      <table class="gt">
+        <thead><tr><th>Type</th><th>What it means</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--blue);">📷 Proof</strong></td><td>Photo submitted for a proof task</td><td>Review → Approve or Reject</td></tr>
+          <tr><td><strong style="color:var(--rose);">⚠️ Failure</strong></td><td>Task failure reported</td><td>Consequence / Redemption / Dismiss</td></tr>
+          <tr><td><strong style="color:var(--gold);">🎁 Reward</strong></td><td>Reward requested from store</td><td>Approve (deducts pts) or Deny</td></tr>
+          <tr><td><strong style="color:var(--purple);">🌸 Request</strong></td><td>Task request from Becca's Dashboard</td><td>Assign as Task or Decline</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout gold">
+        <div class="callout-icon">📋</div>
+        <div><div class="callout-title">Items sorted newest first</div><div class="callout-text">Updates in real time. Once actioned, items disappear automatically. The red badge shows the combined total of unresolved items plus pending task requests.</div></div>
+      </div>
+
+      <div class="callout blue">
+        <div class="callout-icon">🌸</div>
+        <div><div class="callout-title">Task Requests section</div><div class="callout-text">Becca's task requests appear as a separate section at the bottom of the Queue. Tap "Review" on any card to open the approval sheet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10: DASHBOARD -->
+  <div class="slide" data-index="10">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapter 10</div>
+      <div class="s-title">Dashboard</div>
+      <div class="s-sub">Analytics · Headspace · Task Requests</div>
+      <p class="s-intro">The Dashboard adapts to the logged-in role — Sir gets full analytics, Becca gets personal stats and a task request form.</p>
+
+      <div class="role-block dom">
+        <div class="rb-head"><div class="rb-icon">📊</div><div class="rb-title">Sir's Dashboard</div><div class="rb-badge">Dom View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">—</div><div class="step-body"><div class="step-title">Points overview</div><div class="step-desc">Balance, cumulative earned, cumulative lost.</div></div></div>
+          <div class="step"><div class="step-num">—</div><div class="step-body"><div class="step-title">Demerits &amp; current tier</div><div class="step-desc">Unresolved failures count and active consequence tier.</div></div></div>
+          <div class="step"><div class="step-num">—</div><div class="step-body"><div class="step-title">Becca's headspace</div><div class="step-desc">Current mood, energy level (1–10), and her note from today's check-in.</div></div></div>
+          <div class="step"><div class="step-num">—</div><div class="step-body"><div class="step-title">Top streaks &amp; 7-day chart</div><div class="step-desc">Tasks with highest streaks, plus a bar chart of points earned vs. lost per day.</div></div></div>
+          <div class="step"><div class="step-num">—</div><div class="step-body"><div class="step-title">Contextual alerts</div><div class="step-desc">Auto-notices for anxious/resistant mood, low energy, escalating demerits, or pending queue items.</div></div></div>
+        </div>
+      </div>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">🌸</div><div class="rb-title">Becca's Dashboard &amp; Task Requests</div><div class="rb-badge">Sub View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">—</div><div class="step-body"><div class="step-title">Personal cards</div><div class="step-desc">Points balance, best streak, tasks done today, badge count.</div></div></div>
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Request a task from Sir</div><div class="step-desc">Describe what you want to do and why, then tap "Send Request to Sir."</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Track requests below the form</div><div class="step-desc">Status: Awaiting Sir, Assigned, or Declined.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11: CHECK-IN + ACHIEVEMENTS -->
+  <div class="slide" data-index="11">
+    <div class="slide-content">
+      <div class="s-eyebrow">Chapters 11 &amp; 12</div>
+      <div class="s-title">Check-In, Streaks <em>&amp; Badges</em></div>
+      <div class="s-sub">Mood · Energy · Achievements</div>
+
+      <div class="role-block sub">
+        <div class="rb-head"><div class="rb-icon">💭</div><div class="rb-title">Daily Mood Check-In</div><div class="rb-badge">Sub View</div></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Select a mood tile</div><div class="step-desc">Appears automatically after login if not done today.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Set energy level 1–10</div><div class="step-desc">Low energy triggers an advisory on Sir's Dashboard suggesting lighter tasks.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Add optional note for Sir</div><div class="step-desc">Physical state, limits for today, or anything worth flagging.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Submit or Skip</div><div class="step-desc">Submitted data shows on Sir's Dashboard immediately. Skipping records today as done.</div></div></div>
+        </div>
+      </div>
+
+      <div class="mood-wrap">
+        <div class="mood-pill"><span>😈</span> Playful</div><div class="mood-pill"><span>🌸</span> Soft</div>
+        <div class="mood-pill"><span>🙇</span> Obedient</div><div class="mood-pill"><span>🥺</span> Needy</div>
+        <div class="mood-pill"><span>😴</span> Tired</div><div class="mood-pill"><span>😰</span> Anxious</div>
+        <div class="mood-pill"><span>🙏</span> Grateful</div><div class="mood-pill"><span>😤</span> Resistant</div>
+        <div class="mood-pill"><span>✨</span> Proud</div><div class="mood-pill"><span>💭</span> Other</div>
+      </div>
+
+      <div class="rule"></div>
+      <p style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--dim);margin-bottom:10px;">Achievement Badges — Becca Only</p>
+
+      <div class="ach-grid">
+        <div class="ach-card"><div class="ach-emoji">🌟</div><div><div class="ach-title">First Step</div><div class="ach-desc">Complete your first task</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">⚡</div><div><div class="ach-title">On a Roll</div><div class="ach-desc">3-day streak on any task</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">🔥</div><div><div class="ach-title">Fire Streak</div><div class="ach-desc">7-day streak on any task</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">💎</div><div><div class="ach-title">Diamond</div><div class="ach-desc">30-day streak on any task</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">⭐</div><div><div class="ach-title">Century</div><div class="ach-desc">Earn 100 points total</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">🏆</div><div><div class="ach-title">Gold Standard</div><div class="ach-desc">Earn 500 points total</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">🕊️</div><div><div class="ach-title">Perfect Week</div><div class="ach-desc">7 days with no failures</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">🌿</div><div><div class="ach-title">Redeemed</div><div class="ach-desc">Complete a redemption task</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">📋</div><div><div class="ach-title">Dedicated</div><div class="ach-desc">Complete 10 tasks total</div></div></div>
+        <div class="ach-card"><div class="ach-emoji">👑</div><div><div class="ach-title">Devoted</div><div class="ach-desc">Complete 50 tasks total</div></div></div>
+      </div>
+
+      <div class="callout green">
+        <div class="callout-icon">🌟</div>
+        <div><div class="callout-title">Where badges appear</div><div class="callout-text">Earned badges show as a scrollable strip at the top of Becca's Tasks tab, below the points bar. Streaks of 7+ days show a 🔥 fire indicator on the task card and in Sir's streak panel.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /runner -->
+
+<!-- Bottom Navigation -->
+<div class="guide-nav">
+  <button class="nav-btn prev" id="prevBtn" disabled onclick="navigate(-1)">
+    ← Back
+  </button>
+  <div class="dots" id="navDots"></div>
+  <button class="nav-btn next" id="nextBtn" onclick="navigate(1)">
+    Next →
+  </button>
+</div>
+
+<!-- TOC Overlay -->
+<div id="tocOverlay">
+  <div class="toc-header">
+    <div style="font-family:'Great Vibes',cursive;font-size:22px;background:var(--luxury);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 5s ease-in-out infinite;">Tasks</div>
+    <div class="toc-header-title">Contents</div>
+    <button class="toc-close" onclick="closeToc()">Close</button>
+  </div>
+  <div class="toc-scroll">
+    <div class="chapter-list" id="tocList"></div>
+  </div>
+</div>
+
+<script>
+const CHAPTERS = [
+  { num:'00', label:'Introduction' },
+  { num:'01', label:'Login & Role Selection' },
+  { num:'02', label:'App Overview & Navigation' },
+  { num:'03', label:'Tasks — Creating & Completing' },
+  { num:'04', label:'Points & Difficulty System' },
+  { num:'05', label:'Photo Proof' },
+  { num:'06', label:'Failures & Consequences' },
+  { num:'07', label:'Redemption Tasks' },
+  { num:'08', label:'Rewards & Punishments' },
+  { num:'09', label:'The Queue' },
+  { num:'10', label:'Dashboard' },
+  { num:'11', label:'Check-In, Streaks & Badges' },
+];
+const TOTAL = CHAPTERS.length;
+let cur = 0;
+let startX = 0, dragActive = false;
+
+const runner  = document.getElementById('runner');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const counter = document.getElementById('slideCounter');
+const fill    = document.getElementById('progressFill');
+const dots    = document.getElementById('navDots');
+const tocOv   = document.getElementById('tocOverlay');
+
+function buildDots() {
+  dots.innerHTML = '';
+  const max = 9;
+  const half = Math.floor(max / 2);
+  let start = Math.max(0, Math.min(cur - half, TOTAL - max));
+  let end   = Math.min(TOTAL, start + max);
+  for (let i = start; i < end; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === cur ? ' active' : '');
+    const idx = i;
+    d.onclick = () => goTo(idx);
+    dots.appendChild(d);
+  }
+}
+
+function updateUI() {
+  runner.style.transform = `translateX(-${cur * 100}vw)`;
+  counter.textContent = `${cur + 1} / ${TOTAL}`;
+  fill.style.width = `${((cur + 1) / TOTAL) * 100}%`;
+  prevBtn.disabled = cur === 0;
+  const isLast = cur === TOTAL - 1;
+  nextBtn.innerHTML = isLast ? 'Done ✓' : 'Next →';
+  nextBtn.disabled = false;
+
+  // Reset scroll & trigger animations
+  document.querySelectorAll('.slide').forEach((s, i) => {
+    if (i === cur) {
+      s.scrollTop = 0;
+      const sc = s.querySelector('.slide-content');
+      if (sc) {
+        // Re-trigger animations by cloning
+        const clone = sc.cloneNode(true);
+        s.replaceChild(clone, sc);
+      }
+    }
+  });
+  buildDots();
+}
+
+function goTo(idx) {
+  cur = Math.max(0, Math.min(TOTAL - 1, idx));
+  updateUI();
+  closeToc();
+}
+
+function navigate(dir) {
+  if (dir === 1 && cur === TOTAL - 1) return;
+  goTo(cur + dir);
+}
+
+// Touch swipe
+runner.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+  dragActive = true;
+}, { passive: true });
+
+runner.addEventListener('touchend', e => {
+  if (!dragActive) return;
+  const dx = e.changedTouches[0].clientX - startX;
+  if (Math.abs(dx) > 48) navigate(dx < 0 ? 1 : -1);
+  dragActive = false;
+}, { passive: true });
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+  if (e.key === 'Escape') closeToc();
+});
+
+// TOC
+document.getElementById('tocBtn').onclick = () => {
+  const list = document.getElementById('tocList');
+  list.innerHTML = '';
+  CHAPTERS.forEach((ch, i) => {
+    const el = document.createElement('div');
+    el.className = 'chapter-item' + (i === cur ? ' cur' : '');
+    el.innerHTML = `<span class="chapter-num">${ch.num}</span><span class="chapter-label">${ch.label}</span><span class="chapter-arr">→</span>`;
+    el.onclick = () => goTo(i);
+    list.appendChild(el);
+  });
+  tocOv.style.display = 'flex';
+};
+
+function closeToc() { tocOv.style.display = 'none'; }
+
+// Init
+updateUI();
+</script>
+</body>
+</html>
