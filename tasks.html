@@ -553,7 +553,8 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
-const storage = getStorage(app);
+let storage = null;
+try { storage = getStorage(app); } catch(e) { console.warn('Firebase Storage not available:', e); }
 
 // ── State ──
 let role=null, pin='', settingUp=false, pendingPin='';
@@ -884,9 +885,11 @@ async function submitProof() {
   const t = tasks[proofTaskId]; if (!t) return;
   let proofUrl = proofDataUrl;
   try {
-    const sr = sRef(storage, 'proof/' + Date.now() + '.jpg');
-    await uploadString(sr, proofDataUrl, 'data_url');
-    proofUrl = await getDownloadURL(sr);
+    if (storage) {
+      const sr = sRef(storage, 'proof/' + Date.now() + '.jpg');
+      await uploadString(sr, proofDataUrl, 'data_url');
+      proofUrl = await getDownloadURL(sr);
+    }
   } catch(e) { /* storage unavailable — keep base64 URL in queue */ }
   await update(ref(db,'tasks/'+proofTaskId), { proofPending:true });
   await push(ref(db,'queue'), {
