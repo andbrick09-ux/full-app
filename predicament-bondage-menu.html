@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -64,7 +64,7 @@
         #sidebar a:hover { color: var(--gold); }
 
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; padding-bottom: 120px; }
-        .cat-section { display: none; } 
+        .cat-section { display: block; } 
         .cat-section.active { display: block; animation: fadeInPage 0.5s ease-out; }
         
         .cat-header { font-family: 'Playfair Display', serif; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin: 40px 0 20px; text-align: center; }
@@ -110,7 +110,6 @@
 
 <!-- Topbar -->
 <div class="topbar">
-  <button class="back-btn" onclick="openSidebar()" aria-label="Menu"><span class="material-symbols-rounded">menu</span></button>
   <div class="topbar-center">
     <div class="topbar-title">Predicament Menu</div>
     <div class="topbar-sub">Vault of Predicaments</div>
@@ -131,16 +130,6 @@
 </section>
 
 
-
-<aside id="sidebar">
-    <h2>Categories</h2>
-    <a onclick="showCat('cat1')">1. Beginner (1-20)</a>
-    <a onclick="showCat('cat2')">2. Pain vs. Pain (21-35)</a>
-    <a onclick="showCat('cat3')">3. Pain vs. Pleasure (36-47)</a>
-    <a onclick="showCat('cat4')">4. Pleasure vs. Pleasure & Endurance (48-67)</a>
-    <a onclick="showCat('cat5')">5. Mindfuck (68-85)</a>
-    <a onclick="showCat('cat6')">6. Specialty (86-98)</a>
-</aside>
 
 <main class="container">
 
@@ -668,17 +657,7 @@
         });
     }
 
-    function toggleMenu(open) {
-        const side = document.getElementById('sidebar');
-        open ? side.classList.add('open') : side.classList.remove('open');
-    }
-
-    function showCat(id) {
-        document.querySelectorAll('.cat-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        toggleMenu(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    
 
     window.onload = function() {
         restoreAll();
@@ -705,32 +684,6 @@
         });
     }
 </script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
-  </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
 </script>
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
 <script src="nav.js"></script>

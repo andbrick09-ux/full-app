@@ -22,14 +22,6 @@ body {
   padding-bottom: calc(var(--dsh-nav-h) + env(safe-area-inset-bottom, 0px));
 }
 
-/* ── Remove old sidebar/hamburger elements if still present ── */
-.global-sidebar,
-.sidebar-overlay,
-.floating-menu-btn,
-.back-btn {
-  display: none !important;
-}
-
 /* ════════════════════════════════════════
    THE BAR
    ════════════════════════════════════════ */
