@@ -303,6 +303,70 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 .mult-x2{background:rgba(255,193,7,.1);color:var(--amber);}
 .mult-x3{background:rgba(224,91,106,.1);color:var(--rose);}
 
+/* ── Mood Check-in ── */
+.checkin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:800;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.checkin-overlay.open{opacity:1;pointer-events:all;}
+.checkin-panel{width:100%;max-width:480px;background:#07111f;border-radius:24px 24px 0 0;border-top:1px solid var(--gold-b);padding:8px 24px calc(32px + var(--safe-b));transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);}
+.checkin-overlay.open .checkin-panel{transform:translateY(0);}
+.checkin-handle{width:40px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:12px auto 20px;}
+.checkin-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:300;font-style:italic;color:var(--text);margin-bottom:4px;text-align:center;}
+.checkin-sub{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);text-align:center;margin-bottom:24px;}
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
+.mood-btn{border:1px solid var(--gold-b);background:var(--surface);border-radius:12px;padding:12px 4px;cursor:pointer;text-align:center;transition:all .2s;}
+.mood-btn:active{transform:scale(.93);}
+.mood-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.1);}
+.mood-btn-emoji{font-size:22px;margin-bottom:4px;}
+.mood-btn-label{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);}
+.mood-btn.selected .mood-btn-label{color:var(--gold);}
+.energy-row{margin-bottom:18px;}
+.energy-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between;}
+.energy-label span{color:var(--gold);}
+.energy-slider{width:100%;accent-color:var(--gold);height:4px;}
+.checkin-note-wrap{margin-bottom:16px;}
+
+/* ── Dashboard Tab ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;}
+.dash-card{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:14px;}
+.dash-card.wide{grid-column:span 2;}
+.dash-card-label{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:6px;}
+.dash-card-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold);line-height:1;}
+.dash-card-sub{font-size:9px;color:var(--mid);margin-top:3px;}
+.dash-mood-display{display:flex;align-items:center;gap:10px;}
+.dash-mood-emoji{font-size:32px;}
+.dash-mood-info{flex:1;}
+.dash-mood-name{font-family:'Playfair Display',serif;font-size:14px;color:var(--text);}
+.dash-mood-time{font-size:8px;color:var(--dim);margin-top:2px;}
+.dash-energy-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.06);margin-top:8px;overflow:hidden;}
+.dash-energy-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),#F5E6A3);transition:width .6s ease;}
+.dash-streak-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.dash-streak-item{flex:1;text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px;}
+.dash-streak-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--amber);}
+.dash-streak-lbl{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-top:2px;}
+.dash-alert{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;margin-bottom:6px;}
+.dash-alert.warn{background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.18);}
+.dash-alert.ok{background:rgba(76,175,80,.07);border:1px solid rgba(76,175,80,.18);}
+.dash-alert.info{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.14);}
+.dash-alert-icon{font-size:16px;flex-shrink:0;}
+.dash-alert-text{font-size:10px;color:var(--mid);line-height:1.4;}
+.dash-alert-text strong{color:var(--text);font-size:11px;}
+.dash-section-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--dim);padding:14px 16px 8px;}
+
+/* Point Economy Chart */
+.chart-wrap{padding:0 16px 14px;}
+.chart-canvas-wrap{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:14px;position:relative;}
+.chart-canvas-wrap canvas{width:100%!important;height:120px!important;}
+.chart-legend{display:flex;gap:16px;margin-top:10px;}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--mid);}
+.chart-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* Sub Task Request */
+.task-request-card{background:rgba(186,104,200,.05);border:1px solid rgba(186,104,200,.2);border-radius:14px;padding:13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.task-request-icon{font-size:18px;flex-shrink:0;}
+.task-request-info{flex:1;}
+.task-request-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.task-request-desc{font-size:9.5px;color:var(--dim);line-height:1.4;}
+.task-request-actions{display:flex;gap:6px;margin-top:8px;}
+
 /* Misc */
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:11px;gap:10px;}
 .spinner{width:18px;height:18px;border:2px solid var(--gold-b);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
@@ -377,6 +441,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tasks</button>
     <button class="tab-btn" onclick="switchTab('queue')" id="tab-queue">Queue</button>
+    <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">Dashboard</button>
     <button class="tab-btn" onclick="switchTab('rewards')" id="tab-rewards">Rewards</button>
     <button class="tab-btn" onclick="switchTab('punishments')" id="tab-punishments">Punishments</button>
     <button class="tab-btn" onclick="switchTab('history')" id="tab-history">History</button>
@@ -437,6 +502,48 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
       <div class="section">
         <div class="section-head"><div class="section-lbl">Punishment List</div></div>
         <div class="task-list" id="punishList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div id="view-dashboard" class="hidden">
+      <!-- Sir's Dashboard -->
+      <div id="sirDashboard" class="hidden">
+        <div class="dash-section-lbl">Overview</div>
+        <div class="dash-grid" id="dashGrid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+        <div class="dash-section-lbl" style="margin-top:6px;">Point Economy</div>
+        <div class="chart-wrap">
+          <div class="chart-canvas-wrap">
+            <canvas id="pointsChart"></canvas>
+            <div class="chart-legend">
+              <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green)"></div>Earned</div>
+              <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--rose)"></div>Lost</div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-section-lbl">Alerts</div>
+        <div style="padding:0 16px 14px;" id="dashAlerts"></div>
+      </div>
+      <!-- Becca's Dashboard (sub view) -->
+      <div id="subDashboard" class="hidden">
+        <div class="dash-section-lbl">Your Status</div>
+        <div class="dash-grid" id="subDashGrid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+        <div class="dash-section-lbl" style="margin-top:6px;">Request a Task from Sir</div>
+        <div style="padding:0 16px 14px;">
+          <div class="fg"><label class="fl">What would you like to do?</label>
+            <input class="fi" id="taskReqTitle" placeholder="e.g. Practice a new position" maxlength="80"/>
+          </div>
+          <div class="fg"><label class="fl">Why / Context</label>
+            <textarea class="fi" id="taskReqNote" placeholder="Tell Sir why you're requesting this…" rows="2"></textarea>
+          </div>
+          <button class="submit-btn" onclick="sendTaskRequest()">Send Request to Sir</button>
+        </div>
+        <div class="dash-section-lbl">Pending Requests</div>
+        <div style="padding:0 16px 14px;" id="taskRequestList"></div>
       </div>
     </div>
 
@@ -608,6 +715,50 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
+<!-- Mood / Headspace Check-in (sub) -->
+<div class="checkin-overlay" id="checkinOverlay">
+  <div class="checkin-panel">
+    <div class="checkin-handle"></div>
+    <div class="checkin-title">Good to see you, Becca</div>
+    <div class="checkin-sub">How are you feeling right now?</div>
+    <div class="mood-grid" id="moodGrid">
+      <div class="mood-btn" data-mood="playful" onclick="pickMood(this)"><div class="mood-btn-emoji">😈</div><div class="mood-btn-label">Playful</div></div>
+      <div class="mood-btn" data-mood="soft" onclick="pickMood(this)"><div class="mood-btn-emoji">🌸</div><div class="mood-btn-label">Soft</div></div>
+      <div class="mood-btn" data-mood="obedient" onclick="pickMood(this)"><div class="mood-btn-emoji">🙇</div><div class="mood-btn-label">Obedient</div></div>
+      <div class="mood-btn" data-mood="needy" onclick="pickMood(this)"><div class="mood-btn-emoji">🥺</div><div class="mood-btn-label">Needy</div></div>
+      <div class="mood-btn" data-mood="tired" onclick="pickMood(this)"><div class="mood-btn-emoji">😴</div><div class="mood-btn-label">Tired</div></div>
+      <div class="mood-btn" data-mood="anxious" onclick="pickMood(this)"><div class="mood-btn-emoji">😰</div><div class="mood-btn-label">Anxious</div></div>
+      <div class="mood-btn" data-mood="grateful" onclick="pickMood(this)"><div class="mood-btn-emoji">🙏</div><div class="mood-btn-label">Grateful</div></div>
+      <div class="mood-btn" data-mood="resistant" onclick="pickMood(this)"><div class="mood-btn-emoji">😤</div><div class="mood-btn-label">Resistant</div></div>
+      <div class="mood-btn" data-mood="proud" onclick="pickMood(this)"><div class="mood-btn-emoji">✨</div><div class="mood-btn-label">Proud</div></div>
+      <div class="mood-btn" data-mood="other" onclick="pickMood(this)"><div class="mood-btn-emoji">💭</div><div class="mood-btn-label">Other</div></div>
+    </div>
+    <div class="energy-row">
+      <div class="energy-label">Energy Level <span id="energyVal">5</span>/10</div>
+      <input type="range" class="energy-slider" id="energySlider" min="1" max="10" value="5" oninput="document.getElementById('energyVal').textContent=this.value"/>
+    </div>
+    <div class="checkin-note-wrap fg">
+      <label class="fl">Note for Sir (optional)</label>
+      <textarea class="fi" id="checkinNote" placeholder="Anything Sir should know about your headspace today…" rows="2"></textarea>
+    </div>
+    <button class="submit-btn" onclick="submitCheckin()">Submit Check-in</button>
+    <button class="cancel-btn" onclick="skipCheckin()">Skip for Now</button>
+  </div>
+</div>
+
+<!-- Sub Task Request Sheet (already inline in dashboard, this handles Sir's review) -->
+<div class="sheet" id="taskRequestReviewSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><div class="sheet-title">Task Request</div><div class="sheet-sub" id="taskRequestReviewSub">Becca is requesting a task</div></div>
+  <div class="sheet-body">
+    <div class="alert info"><div class="alert-icon">🌸</div><div class="alert-text" id="taskRequestReviewBody">Becca has requested a task.</div></div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="q-btn approve" style="flex:1;padding:13px;" onclick="approveTaskRequest()">✓ Assign as Task</button>
+      <button class="q-btn deny" style="flex:1;padding:13px;" onclick="denyTaskRequest()">✕ Decline</button>
+    </div>
+  </div>
+</div>
+
 <nav class="bottom-nav"></nav>
 <link rel="stylesheet" href="nav.css"/>
 <script src="nav.js"></script>
@@ -739,8 +890,10 @@ function showApp() {
   document.getElementById('headerSub').textContent = isDom ? 'Dominant View' : 'Submissive View';
   document.getElementById('fabBtn').style.display = isDom ? 'flex' : 'none';
   listenPoints(); listenTasks(); listenRewards(); listenPunishments(); listenQueue(); listenHistory();
+  listenCheckin(); listenTaskRequests();
   setTimeout(checkDailyReset, 1500);
   setTimeout(renderAchievements, 2000);
+  setTimeout(maybeShowCheckin, 1000);
 }
 
 // ─────────────────────────────────────────────
@@ -1027,16 +1180,7 @@ async function denyProof() {
 function listenQueue() {
   onValue(ref(db,'queue'), s => {
     queue = s.val() || {};
-    const unresolved = Object.values(queue).filter(i => !i.resolved).length;
-    // Update tab badge
-    const tabBtn = document.getElementById('tab-queue');
-    const existing = tabBtn.querySelector('.tab-count');
-    if (existing) existing.remove();
-    if (unresolved > 0) {
-      const b = document.createElement('span');
-      b.className = 'tab-count'; b.textContent = unresolved;
-      tabBtn.appendChild(b);
-    }
+    updateQueueBadge();
     if (curTab === 'queue') renderQueue();
     renderPunishBanner();
     renderDemeritsBanner();
@@ -1090,6 +1234,29 @@ function renderQueue() {
     }
   });
   list.innerHTML = html;
+
+  // Append task requests section for Sir
+  if (role === 'dom') {
+    const reqs = Object.entries(taskRequests).filter(([,r]) => !r.resolved && !r.denied);
+    if (reqs.length) {
+      let reqHtml = `<div style="margin-top:12px;"><div class="section-lbl" style="padding:0 0 8px;">🌸 Task Requests from Becca</div>`;
+      reqs.forEach(([id,r]) => {
+        reqHtml += `<div class="task-request-card fade-up">
+          <div class="task-request-icon">🌸</div>
+          <div class="task-request-info">
+            <div class="task-request-title">${esc(r.title)}</div>
+            ${r.note?`<div class="task-request-desc">${esc(r.note)}</div>`:''}
+            <div class="task-request-desc" style="margin-top:3px;">${relTime(r.ts)}</div>
+            <div class="task-request-actions">
+              <button class="rp-btn green" onclick="openTaskRequestReview('${id}')">Review</button>
+            </div>
+          </div>
+        </div>`;
+      });
+      reqHtml += '</div>';
+      list.innerHTML += reqHtml;
+    }
+  }
 }
 
 async function approveQueueItem(id) {
@@ -1374,7 +1541,7 @@ function renderHistory() {
 // ─────────────────────────────────────────────
 function switchTab(t) {
   curTab = t;
-  ['tasks','queue','rewards','punishments','history'].forEach(x => {
+  ['tasks','queue','dashboard','rewards','punishments','history'].forEach(x => {
     document.getElementById('view-'+x).classList.toggle('hidden', x !== t);
     document.getElementById('tab-'+x).classList.toggle('active', x === t);
   });
@@ -1382,7 +1549,10 @@ function switchTab(t) {
   if (t==='punishments') renderPunishments();
   if (t==='history')     renderHistory();
   if (t==='queue')       renderQueue();
-  document.getElementById('fabBtn').style.display = role==='dom' ? 'flex' : 'none';
+  if (t==='dashboard')   renderDashboard(window._checkinData);
+  // FAB: only on dom tabs that support creation
+  const fabVisible = role==='dom' && ['tasks','rewards','punishments'].includes(t);
+  document.getElementById('fabBtn').style.display = fabVisible ? 'flex' : 'none';
 }
 
 function openCreateSheet() {
@@ -1617,6 +1787,335 @@ function renderAchievements() {
     </div>`;
   });
   list.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// PHASE 4 — DASHBOARD, MOOD CHECK-IN, CHART, TASK REQUESTS
+// ─────────────────────────────────────────────
+
+// Expose
+W.pickMood=pickMood; W.submitCheckin=submitCheckin; W.skipCheckin=skipCheckin;
+W.sendTaskRequest=sendTaskRequest; W.openTaskRequestReview=openTaskRequestReview;
+W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
+
+let selectedMood = null;
+let reviewTaskReqId = null;
+let taskRequests = {};
+
+// ── Mood check-in ──
+function maybeShowCheckin() {
+  if (role !== 'sub') return;
+  const today = new Date().toDateString();
+  const lastCheckin = localStorage.getItem('dsh_last_checkin');
+  if (lastCheckin === today) return;
+  // Show after 800ms delay so app is settled
+  setTimeout(() => {
+    document.getElementById('checkinOverlay').classList.add('open');
+  }, 800);
+}
+
+function pickMood(el) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMood = el.dataset.mood;
+}
+
+async function submitCheckin() {
+  if (!selectedMood) { showToast('Pick a mood first'); return; }
+  const energy = parseInt(document.getElementById('energySlider').value);
+  const note = document.getElementById('checkinNote').value.trim();
+  await set(ref(db,'checkin'), { mood:selectedMood, energy, note, ts:Date.now(), role:'sub' });
+  await push(ref(db,'history'), { type:'checkin', mood:selectedMood, energy, ts:Date.now() });
+  localStorage.setItem('dsh_last_checkin', new Date().toDateString());
+  closeCheckin();
+  showToast('💭 Check-in sent to Sir');
+}
+
+function skipCheckin() {
+  localStorage.setItem('dsh_last_checkin', new Date().toDateString());
+  closeCheckin();
+}
+
+function closeCheckin() {
+  document.getElementById('checkinOverlay').classList.remove('open');
+  selectedMood = null;
+  document.getElementById('checkinNote').value = '';
+  document.getElementById('energySlider').value = 5;
+  document.getElementById('energyVal').textContent = '5';
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+}
+
+// ── Dashboard ──
+function listenCheckin() {
+  onValue(ref(db,'checkin'), s => {
+    window._checkinData = s.val() || null;
+    if (curTab === 'dashboard') renderDashboard(window._checkinData);
+  });
+}
+
+function listenTaskRequests() {
+  onValue(ref(db,'taskRequests'), s => {
+    taskRequests = s.val() || {};
+    if (curTab === 'dashboard') renderDashboard(window._checkinData);
+    // Badge on queue if Sir has pending task requests
+    if (role === 'dom') {
+      const pending = Object.values(taskRequests).filter(r => !r.resolved).length;
+      const qTab = document.getElementById('tab-queue');
+      // Merge with existing queue badge
+      updateQueueBadge();
+    }
+  });
+}
+
+function updateQueueBadge() {
+  const queuePending = Object.values(queue).filter(i => !i.resolved).length;
+  const reqPending   = Object.values(taskRequests).filter(r => !r.resolved).length;
+  const total = queuePending + reqPending;
+  const btn = document.getElementById('tab-queue');
+  const existing = btn.querySelector('.tab-count');
+  if (existing) existing.remove();
+  if (total > 0) {
+    const b = document.createElement('span');
+    b.className = 'tab-count'; b.textContent = total;
+    btn.appendChild(b);
+  }
+}
+
+const MOOD_META = {
+  playful:  {emoji:'😈', label:'Playful',   color:'var(--purple)'},
+  soft:     {emoji:'🌸', label:'Soft',       color:'var(--rose)'},
+  obedient: {emoji:'🙇', label:'Obedient',   color:'var(--green)'},
+  needy:    {emoji:'🥺', label:'Needy',      color:'var(--blue)'},
+  tired:    {emoji:'😴', label:'Tired',      color:'var(--dim)'},
+  anxious:  {emoji:'😰', label:'Anxious',    color:'var(--amber)'},
+  grateful: {emoji:'🙏', label:'Grateful',   color:'var(--gold)'},
+  resistant:{emoji:'😤', label:'Resistant',  color:'var(--rose)'},
+  proud:    {emoji:'✨', label:'Proud',       color:'var(--gold)'},
+  other:    {emoji:'💭', label:'Other',       color:'var(--mid)'},
+};
+
+function renderDashboard(checkin) {
+  const isDom = role === 'dom';
+  document.getElementById('sirDashboard').classList.toggle('hidden', !isDom);
+  document.getElementById('subDashboard').classList.toggle('hidden', isDom);
+  if (isDom) renderSirDashboard(checkin);
+  else renderSubDashboard();
+}
+
+function renderSirDashboard(checkin) {
+  const activeTasks   = Object.values(tasks).filter(t => !t.archived && !t.completedToday).length;
+  const doneTasks     = Object.values(tasks).filter(t => t.completedToday).length;
+  const queuePending  = Object.values(queue).filter(i => !i.resolved).length;
+  const demerits      = getDemeritCount();
+  const bestStreak    = Math.max(0, ...Object.values(tasks).map(t => t.streak||0));
+  const mm            = checkin ? MOOD_META[checkin.mood] || MOOD_META.other : null;
+
+  document.getElementById('dashGrid').innerHTML = `
+    <div class="dash-card">
+      <div class="dash-card-label">Points Balance</div>
+      <div class="dash-card-val">${pts.balance ?? 0}</div>
+      <div class="dash-card-sub">+${pts.earned??0} earned · -${pts.lost??0} lost</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Active Demerits</div>
+      <div class="dash-card-val" style="color:${demerits>4?'var(--purple)':demerits>2?'var(--rose)':demerits>0?'var(--amber)':'var(--green)'};">${demerits}</div>
+      <div class="dash-card-sub">${demerits===0?'No active failures':getTier(demerits).label+' tier'}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Tasks Today</div>
+      <div class="dash-card-val">${doneTasks}<span style="font-size:14px;color:var(--dim);">/${doneTasks+activeTasks}</span></div>
+      <div class="dash-card-sub">${activeTasks} still pending</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Queue Items</div>
+      <div class="dash-card-val" style="color:${queuePending>0?'var(--amber)':'var(--green)'};">${queuePending}</div>
+      <div class="dash-card-sub">${queuePending===0?'Nothing pending':'Need attention'}</div>
+    </div>
+    <div class="dash-card wide">
+      <div class="dash-card-label">Becca's Headspace</div>
+      ${mm ? `<div class="dash-mood-display">
+        <div class="dash-mood-emoji">${mm.emoji}</div>
+        <div class="dash-mood-info">
+          <div class="dash-mood-name" style="color:${mm.color};">${mm.label}</div>
+          <div class="dash-mood-time">Energy ${checkin.energy}/10 · ${relTime(checkin.ts)}</div>
+          ${checkin.note ? `<div class="dash-mood-time" style="margin-top:3px;font-style:italic;">"${esc(checkin.note)}"</div>` : ''}
+        </div>
+      </div>
+      <div class="dash-energy-bar" style="margin-top:10px;"><div class="dash-energy-fill" style="width:${(checkin.energy/10)*100}%"></div></div>`
+      : `<div style="font-size:11px;color:var(--dim);font-style:italic;">No check-in today yet.</div>`}
+    </div>
+    <div class="dash-card wide">
+      <div class="dash-card-label">Top Streaks</div>
+      <div class="dash-streak-row">
+        ${Object.values(tasks).filter(t=>t.streak>0).sort((a,b)=>b.streak-a.streak).slice(0,3).map(t=>`
+          <div class="dash-streak-item">
+            <div class="dash-streak-val">${t.streak}${t.streak>=7?'🔥':''}</div>
+            <div class="dash-streak-lbl">${esc(t.title.substring(0,12))}</div>
+          </div>`).join('') || '<div style="font-size:10px;color:var(--dim);">No active streaks yet.</div>'}
+      </div>
+    </div>`;
+
+  renderDashAlerts(demerits, queuePending, activeTasks, checkin);
+  renderPointsChart();
+}
+
+function renderDashAlerts(demerits, queuePending, activeTasks, checkin) {
+  const alerts = document.getElementById('dashAlerts');
+  let html = '';
+  if (demerits >= 3) html += `<div class="dash-alert warn"><div class="dash-alert-icon">⚡</div><div class="dash-alert-text"><strong>Demerit Escalation</strong>${demerits} unresolved failures — ${getTier(demerits).label} tier active</div></div>`;
+  if (queuePending > 0) html += `<div class="dash-alert warn"><div class="dash-alert-icon">📋</div><div class="dash-alert-text"><strong>${queuePending} Queue Item${queuePending>1?'s':''}</strong>Switch to Queue to review</div></div>`;
+  if (checkin && checkin.mood === 'anxious') html += `<div class="dash-alert info"><div class="dash-alert-icon">💭</div><div class="dash-alert-text"><strong>Becca seems anxious</strong>Consider checking in before assigning heavy tasks</div></div>`;
+  if (checkin && checkin.mood === 'resistant') html += `<div class="dash-alert warn"><div class="dash-alert-icon">😤</div><div class="dash-alert-text"><strong>Becca is feeling resistant</strong>May need Sir's direct attention today</div></div>`;
+  if (checkin && checkin.energy <= 3) html += `<div class="dash-alert info"><div class="dash-alert-icon">😴</div><div class="dash-alert-text"><strong>Low energy today (${checkin.energy}/10)</strong>Consider lighter tasks</div></div>`;
+  if (!html) html = `<div class="dash-alert ok"><div class="dash-alert-icon">✅</div><div class="dash-alert-text"><strong>All clear</strong>No alerts at this time</div></div>`;
+  alerts.innerHTML = html;
+}
+
+function renderSubDashboard() {
+  const activeTasks = Object.values(tasks).filter(t => !t.archived && !t.completedToday).length;
+  const doneTasks   = Object.values(tasks).filter(t => t.completedToday).length;
+  const bestStreak  = Math.max(0, ...Object.values(tasks).map(t => t.streak||0));
+  document.getElementById('subDashGrid').innerHTML = `
+    <div class="dash-card">
+      <div class="dash-card-label">Points Balance</div>
+      <div class="dash-card-val">${pts.balance ?? 0}</div>
+      <div class="dash-card-sub">+${pts.earned??0} earned</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Best Streak</div>
+      <div class="dash-card-val" style="color:var(--amber);">${bestStreak}${bestStreak>=7?'🔥':''}</div>
+      <div class="dash-card-sub">day${bestStreak!==1?'s':''}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Done Today</div>
+      <div class="dash-card-val">${doneTasks}</div>
+      <div class="dash-card-sub">of ${doneTasks+activeTasks} tasks</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">Badges Earned</div>
+      <div class="dash-card-val" style="color:var(--gold);">${computeAchievements().filter(a=>a.earned).length}</div>
+      <div class="dash-card-sub">of ${ACHIEVEMENTS.length} total</div>
+    </div>`;
+
+  // Pending task requests
+  const reqs = Object.entries(taskRequests).filter(([,r])=>!r.resolved);
+  document.getElementById('taskRequestList').innerHTML = reqs.length
+    ? reqs.map(([id,r])=>`<div class="task-request-card fade-up">
+        <div class="task-request-icon">🌸</div>
+        <div class="task-request-info">
+          <div class="task-request-title">${esc(r.title)}</div>
+          ${r.note?`<div class="task-request-desc">${esc(r.note)}</div>`:''}
+          <div class="task-request-desc" style="margin-top:4px;">Sent ${relTime(r.ts)} · <span style="color:${r.resolved?'var(--green)':r.denied?'var(--rose)':'var(--amber)'};">${r.denied?'Declined':r.resolved?'Assigned':'Awaiting Sir'}</span></div>
+        </div>
+      </div>`).join('')
+    : `<div style="font-size:10px;color:var(--dim);padding:8px 0;">No pending requests.</div>`;
+}
+
+// ── Point Economy Chart ──
+let chartInstance = null;
+function renderPointsChart() {
+  const canvas = document.getElementById('pointsChart');
+  if (!canvas) return;
+  // Build 7-day buckets from history
+  const now = Date.now();
+  const days = 7;
+  const labels = [], earned = [], lost = [];
+  for (let i = days-1; i >= 0; i--) {
+    const d = new Date(now - i*86400000);
+    labels.push(d.toLocaleDateString([], {weekday:'short'}));
+    earned.push(0); lost.push(0);
+  }
+  Object.values(histData || {}).forEach(e => {
+    const daysAgo = Math.floor((now - e.ts) / 86400000);
+    if (daysAgo >= days) return;
+    const idx = days - 1 - daysAgo;
+    if (e.type === 'points_earned' && e.amount) earned[idx] += e.amount;
+    if (e.type === 'points_lost'   && e.amount) lost[idx]  += Math.abs(e.amount);
+  });
+
+  // Destroy previous instance
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+  const ctx = canvas.getContext('2d');
+  // Simple manual canvas chart (no external lib needed)
+  const W = canvas.offsetWidth || 300, H = 120;
+  canvas.width = W * 2; canvas.height = H * 2; // retina
+  ctx.scale(2, 2);
+  const maxVal = Math.max(10, ...earned, ...lost);
+  const padL=28, padR=8, padT=10, padB=24;
+  const chartW = W-padL-padR, chartH = H-padT-padB;
+  const barW = chartW / (days*2+days-1);
+
+  ctx.clearRect(0,0,W,H);
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
+  for (let i=0;i<=4;i++) {
+    const y = padT + chartH - (i/4)*chartH;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.25)'; ctx.font='8px Montserrat';
+    ctx.fillText(Math.round(maxVal*i/4), 0, y+3);
+  }
+  // Bars
+  labels.forEach((lbl, i) => {
+    const x = padL + i*(barW*2+barW/2);
+    const eH = (earned[i]/maxVal)*chartH;
+    const lH = (lost[i]/maxVal)*chartH;
+    // Earned bar
+    ctx.fillStyle='rgba(76,175,80,.7)';
+    ctx.fillRect(x, padT+chartH-eH, barW, eH);
+    // Lost bar
+    ctx.fillStyle='rgba(224,91,106,.7)';
+    ctx.fillRect(x+barW+1, padT+chartH-lH, barW, lH);
+    // Label
+    ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='7px Montserrat';
+    ctx.fillText(lbl, x, H-6);
+  });
+  chartInstance = { destroy: ()=>{} }; // placeholder so we can re-render
+}
+
+// ── Sub Task Requests ──
+async function sendTaskRequest() {
+  const title = document.getElementById('taskReqTitle').value.trim();
+  if (!title) { showToast('Describe what you want to do'); return; }
+  await push(ref(db,'taskRequests'), {
+    title, note: document.getElementById('taskReqNote').value.trim(),
+    ts: Date.now(), resolved: false, denied: false
+  });
+  document.getElementById('taskReqTitle').value = '';
+  document.getElementById('taskReqNote').value = '';
+  showToast('🌸 Request sent to Sir!');
+  renderSubDashboard();
+}
+
+function openTaskRequestReview(reqId) {
+  reviewTaskReqId = reqId;
+  const r = taskRequests[reqId]; if (!r) return;
+  document.getElementById('taskRequestReviewSub').textContent = 'From Becca · ' + relTime(r.ts);
+  document.getElementById('taskRequestReviewBody').innerHTML =
+    `<strong>${esc(r.title)}</strong>${r.note ? '<br>' + esc(r.note) : ''}`;
+  openSheet('taskRequestReviewSheet');
+}
+
+async function approveTaskRequest() {
+  if (!reviewTaskReqId) return;
+  const r = taskRequests[reviewTaskReqId]; if (!r) return;
+  // Create as a real task
+  await push(ref(db,'tasks'), {
+    title: r.title, description: r.note||'',
+    difficulty:'simple', basePoints:10, schedule:'once',
+    due:null, punishLink:null, punishPoints:0, requireProof:false,
+    createdAt:Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
+  });
+  await update(ref(db,'taskRequests/'+reviewTaskReqId), {resolved:true, approvedAt:Date.now()});
+  closeAllSheets(); reviewTaskReqId = null;
+  showToast('✅ Request approved and assigned!');
+}
+
+async function denyTaskRequest() {
+  if (!reviewTaskReqId) return;
+  await update(ref(db,'taskRequests/'+reviewTaskReqId), {resolved:true, denied:true});
+  closeAllSheets(); reviewTaskReqId = null;
+  showToast('Request declined');
 }
 
 // ─────────────────────────────────────────────
