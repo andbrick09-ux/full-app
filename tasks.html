@@ -197,6 +197,87 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
 /* ── Bottom nav padding ── */
 #appShell{padding-bottom:calc(64px + var(--safe-b));}
 
+/* ── Streak Badge ── */
+.streak-badge{display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,193,7,0.12);color:var(--amber);letter-spacing:.5px;}
+.streak-badge.hot{background:rgba(224,91,106,0.12);color:var(--rose);}
+
+/* ── Proof Required Badge ── */
+.proof-badge{display:inline-flex;align-items:center;gap:3px;font-size:7.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(100,181,246,0.12);color:var(--blue);letter-spacing:.5px;}
+
+/* ── Queue / Approval cards ── */
+.queue-card{background:var(--surface);border:1px solid rgba(255,193,7,0.25);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+.queue-card-header{display:flex;align-items:center;gap:12px;padding:14px;}
+.queue-type-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.queue-type-proof{background:rgba(100,181,246,0.1);}
+.queue-type-reward{background:rgba(212,175,55,0.1);}
+.queue-type-failure{background:rgba(224,91,106,0.1);}
+.queue-type-redemption{background:rgba(76,175,80,0.1);}
+.queue-info{flex:1;min-width:0;}
+.queue-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.queue-sub{font-size:9.5px;color:var(--text-dim);line-height:1.4;}
+.queue-time{font-size:8px;color:var(--text-dim);margin-top:2px;}
+.queue-actions{display:flex;border-top:1px solid rgba(255,255,255,0.04);}
+.queue-btn{flex:1;padding:11px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .15s;}
+.queue-btn:active{background:rgba(255,255,255,0.03);}
+.queue-btn.approve{color:var(--green);}
+.queue-btn.deny{color:var(--rose);}
+.queue-btn.view{color:var(--text-dim);}
+.queue-btn + .queue-btn{border-left:1px solid rgba(255,255,255,0.04);}
+.queue-badge{font-size:8px;font-weight:700;padding:3px 8px;border-radius:20px;background:rgba(255,193,7,0.15);color:var(--amber);}
+.queue-empty{text-align:center;padding:40px 24px;color:var(--text-dim);}
+.queue-proof-img{width:100%;max-height:200px;object-fit:cover;border-top:1px solid rgba(255,255,255,0.05);}
+
+/* ── Redemption Task on punishment card ── */
+.redemption-row{padding:10px 14px;border-top:1px solid rgba(76,175,80,0.15);background:rgba(76,175,80,0.04);display:flex;align-items:center;gap:10px;}
+.redemption-label{font-size:9px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.8px;flex:1;}
+.redemption-btn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:5px 10px;border-radius:8px;border:1px solid rgba(76,175,80,0.3);background:rgba(76,175,80,0.1);color:var(--green);cursor:pointer;}
+
+/* ── Photo proof preview in sheet ── */
+.proof-preview{width:100%;border-radius:11px;overflow:hidden;margin-top:8px;border:1px solid var(--gold-border);display:none;}
+.proof-preview img{width:100%;display:block;max-height:220px;object-fit:cover;}
+.proof-upload-btn{width:100%;padding:12px;background:rgba(100,181,246,0.07);border:1px dashed rgba(100,181,246,0.3);border-radius:11px;font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
+.proof-upload-btn:active{background:rgba(100,181,246,0.12);}
+
+/* ── Streak Badge ── */
+.streak-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,193,7,0.12);color:var(--amber);border:1px solid rgba(255,193,7,0.2);}
+.streak-badge.hot{background:rgba(224,91,106,0.12);color:var(--rose);border-color:rgba(224,91,106,0.2);}
+.task-streak{display:flex;align-items:center;gap:6px;padding:6px 14px 10px;border-top:1px solid rgba(255,255,255,0.03);}
+
+/* ── Approval Queue ── */
+.queue-card{background:var(--surface);border:1px solid rgba(255,193,7,0.25);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+.queue-card-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,193,7,0.05);}
+.queue-type-badge{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:8px;background:rgba(255,193,7,0.15);color:var(--amber);flex-shrink:0;}
+.queue-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);flex:1;}
+.queue-time{font-size:8px;color:var(--text-dim);flex-shrink:0;}
+.queue-body{padding:10px 14px 12px;}
+.queue-detail{font-size:10px;color:var(--text-mid);line-height:1.5;margin-bottom:10px;}
+.queue-actions{display:flex;gap:8px;}
+.queue-btn{flex:1;padding:9px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.queue-btn:active{transform:scale(.96);}
+.queue-btn.approve{background:rgba(76,175,80,0.15);color:var(--green);border:1px solid rgba(76,175,80,0.25);}
+.queue-btn.deny{background:rgba(224,91,106,0.1);color:var(--rose);border:1px solid rgba(224,91,106,0.2);}
+.queue-btn.view-proof{background:rgba(100,181,246,0.1);color:var(--blue);border:1px solid rgba(100,181,246,0.2);}
+
+/* ── Photo Proof ── */
+.proof-required-badge{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:10px;background:rgba(100,181,246,0.12);color:var(--blue);border:1px solid rgba(100,181,246,0.2);}
+.proof-upload-area{border:2px dashed rgba(100,181,246,0.3);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;margin-top:8px;}
+.proof-upload-area:active{border-color:var(--blue);background:rgba(100,181,246,0.05);}
+.proof-upload-icon{font-size:28px;margin-bottom:6px;opacity:.5;}
+.proof-upload-label{font-size:10px;color:var(--text-dim);line-height:1.4;}
+.proof-preview{width:100%;border-radius:10px;margin-top:8px;max-height:200px;object-fit:cover;display:none;}
+.proof-preview.loaded{display:block;}
+#proofFileInput{display:none;}
+
+/* ── Redemption Task ── */
+.redemption-card{background:rgba(186,104,200,0.06);border:1px solid rgba(186,104,200,0.25);border-radius:14px;overflow:hidden;}
+.redemption-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(186,104,200,0.05);}
+.redemption-icon{font-size:20px;}
+.redemption-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--purple);flex:1;}
+.redemption-body{padding:8px 14px 12px;}
+.redemption-desc{font-size:10px;color:var(--text-mid);line-height:1.5;margin-bottom:10px;}
+.redemption-action{width:100%;padding:10px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:none;cursor:pointer;background:rgba(186,104,200,0.15);color:var(--purple);border:1px solid rgba(186,104,200,0.25);transition:all .15s;}
+.redemption-action:active{transform:scale(.97);}
+
 /* ── Util ── */
 .mt-8{margin-top:8px;}
 .mt-4{margin-top:4px;}
@@ -291,6 +372,7 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
   <!-- Tab Bar -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tasks</button>
+    <button class="tab-btn" onclick="switchTab('queue')" id="tab-queue">Queue <span id="queueCount" style="display:none;background:var(--rose);color:#fff;font-size:7px;padding:1px 5px;border-radius:8px;margin-left:3px;"></span></button>
     <button class="tab-btn" onclick="switchTab('rewards')" id="tab-rewards">Rewards</button>
     <button class="tab-btn" onclick="switchTab('punishments')" id="tab-punishments">Punishments</button>
     <button class="tab-btn" onclick="switchTab('history')" id="tab-history">History</button>
@@ -334,7 +416,19 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
       </div>
     </div>
 
-    <!-- REWARDS TAB -->
+    <!-- QUEUE TAB (Sir's Approval Queue) -->
+    <div id="view-queue" class="hidden">
+      <div class="section">
+        <div class="section-head">
+          <div class="section-label">Awaiting Sir's Attention</div>
+        </div>
+        <div id="queueList">
+          <div class="loading-spinner"><div class="spinner"></div> Loading…</div>
+        </div>
+      </div>
+    </div>
+
+
     <div id="view-rewards" class="hidden">
       <div class="section">
         <div class="section-head">
@@ -436,6 +530,17 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
         <option value="">None</option>
       </select>
     </div>
+    <div class="form-group mt-8" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(100,181,246,0.05);border:1px solid rgba(100,181,246,0.15);border-radius:11px;">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--blue);">📷 Require Photo Proof</div>
+        <div style="font-size:9px;color:var(--text-dim);margin-top:2px;">Sub texts you the photo to complete</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;">
+        <input type="checkbox" id="taskRequireProof" style="opacity:0;width:0;height:0;">
+        <span onclick="this.previousElementSibling.checked=!this.previousElementSibling.checked;this.style.background=this.previousElementSibling.checked?'var(--blue)':'rgba(255,255,255,0.1)'" style="position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,0.1);border-radius:24px;transition:.2s;"></span>
+        <span onclick="this.parentElement.querySelector('input').click()" style="position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;pointer-events:none;" id="proofToggleThumb"></span>
+      </label>
+    </div>
     <button class="submit-btn" onclick="saveTask()">Assign Task</button>
     <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
@@ -499,7 +604,65 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Fail Task Sheet -->
+<!-- Photo Proof Submission Sheet (sub) -->
+<div class="sheet" id="proofSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Submit Proof</div>
+    <div class="sheet-subtitle" id="proofSheetSub">Sir requires photo proof for this task</div>
+  </div>
+  <div class="sheet-body">
+    <div class="alert-banner info">
+      <div class="alert-icon">📷</div>
+      <div class="alert-text"><strong>Photo Required</strong>Sir must approve your proof before points are awarded.</div>
+    </div>
+    <div class="mt-8">
+      <label class="proof-upload-btn" for="proofFileInput">
+        <span class="material-symbols-rounded">add_photo_alternate</span> Choose Photo
+      </label>
+      <input type="file" id="proofFileInput" accept="image/*" style="display:none;" onchange="previewProof(this)"/>
+      <div class="proof-preview" id="proofPreview"><img id="proofImg" src="" alt="proof"/></div>
+    </div>
+    <div class="form-group mt-8">
+      <label class="form-label">Note (optional)</label>
+      <textarea class="form-input" id="proofNote" placeholder="Any context for Sir…" rows="2"></textarea>
+    </div>
+    <button class="submit-btn" onclick="submitProof()">Submit for Approval</button>
+    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
+  </div>
+</div>
+
+<!-- Assign Redemption Task Sheet (Sir) -->
+<div class="sheet" id="redemptionSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Assign Redemption Task</div>
+    <div class="sheet-subtitle" id="redemptionSheetSub">Allow Becca to earn forgiveness</div>
+  </div>
+  <div class="sheet-body">
+    <div class="alert-banner info">
+      <div class="alert-icon">🌿</div>
+      <div class="alert-text"><strong>Redemption Task</strong>Becca completes this to clear the active punishment.</div>
+    </div>
+    <div class="form-group mt-8">
+      <label class="form-label">Redemption Task</label>
+      <input class="form-input" id="redemptionTitle" placeholder="e.g. Write a 200-word apology letter" maxlength="80"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Details</label>
+      <textarea class="form-input" id="redemptionDesc" placeholder="Exact instructions…" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Points Restored on Completion</label>
+      <input class="form-input" id="redemptionPoints" type="number" min="0" value="10" placeholder="10"/>
+    </div>
+    <button class="submit-btn" onclick="saveRedemptionTask()">Assign Redemption</button>
+    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
+  </div>
+</div>
+
+
+<!-- Fail Sheet -->
 <div class="sheet" id="failSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
@@ -515,7 +678,7 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
       <label class="form-label">Reason (optional)</label>
       <textarea class="form-input" id="failReason" placeholder="What happened? Be honest with Sir…" rows="3"></textarea>
     </div>
-    <button class="submit-btn text-rose" style="background:linear-gradient(135deg,#e05b6a,#c0394a);color:#fff;" onclick="confirmFail()">Confess Failure</button>
+    <button class="submit-btn" style="background:linear-gradient(135deg,#e05b6a,#c0394a);color:#fff;" onclick="confirmFail()">Confess Failure</button>
     <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
 </div>
@@ -527,14 +690,17 @@ textarea.form-input{resize:none;min-height:80px;line-height:1.5;}
 <script src="nav.js"></script>
 
 <!-- ══════════════════════════════════════════
-     FIREBASE + APP JS
+     FIREBASE + APP JS — PHASE 2
 ══════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp }
+import { getDatabase, ref, set, get, push, onValue, update, remove }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getStorage, ref as sRef, uploadString, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
 // ── Config ──
+
 const firebaseConfig = {
   apiKey: "AIzaSyBvSU5SpjuDBNn1BoH7p_njyaMOHxJwxgs",
   authDomain: "dom-sub-hub.firebaseapp.com",
@@ -545,6 +711,7 @@ const firebaseConfig = {
   measurementId: "G-13NYW9WHHB",
   databaseURL: "https://dom-sub-hub-default-rtdb.firebaseio.com"
 };
+const PHASE2_JS_START = true;
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -558,9 +725,13 @@ let currentTab = 'tasks';
 let allTasks = {};
 let allRewards = {};
 let allPunishments = {};
+let allQueue = {};
+let allActivePunishments = {};
 let pointsData = { balance: 0, earned: 0, lost: 0 };
 let failingTaskId = null;
 let editingTaskId = null;
+let proofTaskId = null;
+let redemptionPunishId = null;
 
 // Dom/Sub PINs stored in localStorage per device
 const DOM_PIN_KEY = 'dsh_dom_pin';
@@ -591,6 +762,16 @@ window.assignPunishment = assignPunishment;
 window.deleteTask = deleteTask;
 window.deleteReward = deleteReward;
 window.deletePunishment = deletePunishment;
+window.openProofSheet = openProofSheet;
+window.previewProof = previewProof;
+window.submitProof = submitProof;
+window.textProofToSir = textProofToSir;
+window.approveProof = approveProof;
+window.denyProof = denyProof;
+window.openRedemptionSheet = openRedemptionSheet;
+window.saveRedemptionTask = saveRedemptionTask;
+window.completeRedemption = completeRedemption;
+window.dismissPunishment = dismissPunishment;
 
 // ── Session restore ──
 const savedSession = sessionStorage.getItem(SESSION_KEY);
@@ -721,6 +902,8 @@ function showApp() {
   listenRewards();
   listenPunishments();
   listenHistory();
+  listenQueue();
+  listenActivePunishments();
 }
 
 // ── Points ──
@@ -785,6 +968,9 @@ function renderTasks(filter = 'all') {
     const pts = calcPoints(t.basePoints || 10, t.difficulty);
     const isDone = !!t.completedToday;
     const isOverdue = t.due && !isDone && now > t.due;
+    const streak = t.streak || 0;
+    const requiresProof = !!t.requireProof;
+    const proofPending = !!t.proofPending;
 
     let dueStr = '';
     if (t.due) {
@@ -792,13 +978,31 @@ function renderTasks(filter = 'all') {
       dueStr = `<div class="task-due${isOverdue ? ' overdue' : ''}">Due: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}${isOverdue ? ' — Overdue' : ''}</div>`;
     }
 
-    const subActions = currentRole === 'sub' && !isDone ? `
-      <button class="task-action-btn" onclick="completeTask('${id}')">
-        <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Complete
-      </button>
-      <button class="task-action-btn fail" onclick="openFailSheet('${id}')">
-        <span class="material-symbols-rounded" style="font-size:14px;">report</span> Report Failure
-      </button>` : '';
+    const streakBadge = streak > 0 ? `<span class="streak-badge${streak >= 7 ? ' hot' : ''}">🔥 ${streak}</span>` : '';
+    const proofBadge = requiresProof ? `<span class="proof-badge">📷 Proof</span>` : '';
+
+    let subActions = '';
+    if (currentRole === 'sub' && !isDone) {
+      if (requiresProof && !proofPending) {
+        subActions = `
+          <button class="task-action-btn" onclick="openProofSheet('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">add_a_photo</span> Submit Proof
+          </button>
+          <button class="task-action-btn fail" onclick="openFailSheet('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">report</span> Report Failure
+          </button>`;
+      } else if (requiresProof && proofPending) {
+        subActions = `<div style="padding:10px 14px;font-size:10px;color:var(--amber);text-align:center;">⏳ Proof submitted — awaiting Sir's approval</div>`;
+      } else {
+        subActions = `
+          <button class="task-action-btn" onclick="completeTask('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Complete
+          </button>
+          <button class="task-action-btn fail" onclick="openFailSheet('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">report</span> Report Failure
+          </button>`;
+      }
+    }
 
     const domActions = currentRole === 'dom' ? `
       <button class="task-action-btn edit" onclick="deleteTask('${id}')">
@@ -815,6 +1019,8 @@ function renderTasks(filter = 'all') {
           <div class="task-meta">
             <span class="task-badge ${diffClass}">${diffLabel}</span>
             <span class="task-badge sched-badge">${schedLabel}</span>
+            ${streakBadge}
+            ${proofBadge}
           </div>
           ${dueStr}
         </div>
@@ -832,17 +1038,18 @@ async function completeTask(id) {
   const t = allTasks[id];
   if (!t || t.completedToday) return;
   const pts = calcPoints(t.basePoints || 10, t.difficulty);
-  await update(ref(db, 'tasks/' + id), { completedToday: true, completedAt: Date.now() });
+  const newStreak = (t.streak || 0) + 1;
+  await update(ref(db, 'tasks/' + id), { completedToday: true, completedAt: Date.now(), streak: newStreak, proofPending: false });
   await addPoints(pts, 'Completed: ' + t.title);
   await push(ref(db, 'history'), {
     type: 'task_completed',
     taskId: id,
     taskTitle: t.title,
     points: pts,
+    streak: newStreak,
     ts: Date.now()
   });
-  showToast('✅ Task complete! +' + pts + ' points');
-  // Reset daily tasks at midnight (handled via schedule check)
+  showToast('✅ Task complete! +' + pts + ' pts' + (newStreak > 1 ? ' 🔥 ' + newStreak + ' streak' : ''));
   if (t.schedule === 'once') {
     await update(ref(db, 'tasks/' + id), { archived: true });
   }
@@ -863,25 +1070,36 @@ async function confirmFail() {
   const reason = document.getElementById('failReason').value.trim();
   const deduction = t.punishPoints || 10;
 
-  await update(ref(db, 'tasks/' + failingTaskId), { failedToday: true, failedAt: Date.now() });
+  // Reset streak on failure
+  await update(ref(db, 'tasks/' + failingTaskId), { failedToday: true, failedAt: Date.now(), streak: 0 });
   await addPoints(-deduction, 'Failed: ' + t.title);
 
-  // If task has attached punishment, mark it active
-  if (t.punishLink) {
+  // Queue failure for Sir + apply attached punishment
+  const queueEntry = {
+    type: 'failure',
+    taskId: failingTaskId,
+    taskTitle: t.title,
+    reason,
+    deduction,
+    ts: Date.now(),
+    reviewed: false
+  };
+  if (t.punishLink && allPunishments[t.punishLink]) {
     const p = allPunishments[t.punishLink];
-    if (p) {
-      await push(ref(db, 'activePunishments'), {
-        punishmentId: t.punishLink,
-        title: p.title,
-        description: p.description,
-        emoji: p.emoji || '⚡',
-        taskTitle: t.title,
-        reason: reason,
-        assignedAt: Date.now(),
-        complete: false
-      });
-    }
+    queueEntry.punishTitle = p.title;
+    const apRef = await push(ref(db, 'activePunishments'), {
+      punishmentId: t.punishLink,
+      title: p.title,
+      description: p.description,
+      emoji: p.emoji || '⚡',
+      taskTitle: t.title,
+      reason,
+      assignedAt: Date.now(),
+      complete: false
+    });
+    queueEntry.activePunishId = apRef.key;
   }
+  await push(ref(db, 'queue'), queueEntry);
 
   await push(ref(db, 'history'), {
     type: 'task_failed',
@@ -894,7 +1112,7 @@ async function confirmFail() {
 
   closeAllSheets();
   failingTaskId = null;
-  showToast('⚠️ Failure reported. -' + deduction + ' points');
+  showToast('⚠️ Failure reported to Sir. -' + deduction + ' pts');
 }
 
 async function deleteTask(id) {
@@ -921,9 +1139,11 @@ async function saveTask() {
     due: due ? new Date(due).getTime() : null,
     punishLink: punishLink || null,
     punishPoints: punishLink && allPunishments[punishLink] ? (allPunishments[punishLink].points || 10) : 10,
+    requireProof: document.getElementById('taskRequireProof').checked,
     createdAt: Date.now(),
     completedToday: false,
     failedToday: false,
+    streak: 0,
     createdBy: 'dom'
   };
 
@@ -1015,6 +1235,15 @@ async function requestReward(id) {
   if (!r) return;
   if (pointsData.balance < r.cost) { showToast('Not enough points'); return; }
   await update(ref(db, 'rewards/' + id), { pendingRequest: true, requestedAt: Date.now() });
+  await push(ref(db, 'queue'), {
+    type: 'reward_request',
+    rewardId: id,
+    rewardTitle: r.title,
+    cost: r.cost,
+    emoji: r.emoji || '🎁',
+    ts: Date.now(),
+    reviewed: false
+  });
   showToast('🎁 Request sent to Sir!');
 }
 
@@ -1043,22 +1272,6 @@ function listenPunishments() {
     allPunishments = snap.val() || {};
     if (currentTab === 'punishments') renderPunishments();
     populatePunishDropdown();
-  });
-
-  // Active punishments banner
-  onValue(ref(db, 'activePunishments'), snap => {
-    const active = snap.val() || {};
-    const entries = Object.entries(active).filter(([,v]) => !v.complete);
-    const banner = document.getElementById('activePunishBanner');
-    if (entries.length === 0) {
-      banner.classList.add('hidden');
-      return;
-    }
-    banner.classList.remove('hidden');
-    banner.className = 'alert-banner warn';
-    const latest = entries[entries.length - 1][1];
-    banner.innerHTML = `<div class="alert-icon">${latest.emoji || '⚡'}</div>
-      <div class="alert-text"><strong>Active Punishment: ${esc(latest.title)}</strong>${latest.description ? esc(latest.description) : ''}</div>`;
   });
 }
 
@@ -1176,7 +1389,10 @@ function renderHistory(data) {
     points_earned: { icon: '⭐', color: 'var(--gold)', label: 'Points Earned' },
     points_lost: { icon: '💔', color: 'var(--rose)', label: 'Points Lost' },
     reward_approved: { icon: '🎁', color: 'var(--gold)', label: 'Reward Approved' },
-    punishment_assigned: { icon: '⚡', color: 'var(--amber)', label: 'Punishment Assigned' }
+    punishment_assigned: { icon: '⚡', color: 'var(--amber)', label: 'Punishment Assigned' },
+    redemption_assigned: { icon: '🌿', color: 'var(--green)', label: 'Redemption Assigned' },
+    proof_approved: { icon: '📷', color: 'var(--green)', label: 'Proof Approved' },
+    proof_denied: { icon: '📷', color: 'var(--rose)', label: 'Proof Denied' }
   };
 
   let html = '';
@@ -1199,22 +1415,293 @@ function renderHistory(data) {
   list.innerHTML = html;
 }
 
-// ── Tab switching ──
+// ── Photo Proof ──
+function openProofSheet(id) {
+  proofTaskId = id;
+  const t = allTasks[id];
+  document.getElementById('proofSheetSub').textContent = t ? 'Proof for: ' + t.title : 'Submit proof';
+  document.getElementById('proofNote').value = '';
+  document.getElementById('proofPreview').style.display = 'none';
+  document.getElementById('proofFileInput').value = '';
+  openSheet('proofSheet');
+}
+
+function previewProof(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('proofImg').src = e.target.result;
+    document.getElementById('proofPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitProof() {
+  if (!proofTaskId) return;
+  const t = allTasks[proofTaskId];
+  if (!t) return;
+  const note = document.getElementById('proofNote').value.trim();
+  const fileInput = document.getElementById('proofFileInput');
+  const file = fileInput.files[0];
+
+  // Store proof data as base64 in Firebase (suitable for small images)
+  let proofData = null;
+  if (file) {
+    proofData = await new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = e => res(e.target.result);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  await update(ref(db, 'tasks/' + proofTaskId), { proofPending: true, proofSubmittedAt: Date.now() });
+  const queueEntry = {
+    type: 'proof',
+    taskId: proofTaskId,
+    taskTitle: t.title,
+    note,
+    proofData: proofData || null,
+    ts: Date.now(),
+    reviewed: false
+  };
+  await push(ref(db, 'queue'), queueEntry);
+
+  closeAllSheets();
+  proofTaskId = null;
+  showToast('📷 Proof submitted — awaiting Sir');
+}
+
+async function approveProof(queueId) {
+  const q = allQueue[queueId];
+  if (!q) return;
+  const t = allTasks[q.taskId];
+  if (!t) return;
+  await completeTask(q.taskId);
+  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: true });
+  showToast('✅ Proof approved — task complete!');
+}
+
+async function denyProof(queueId) {
+  const q = allQueue[queueId];
+  if (!q) return;
+  await update(ref(db, 'tasks/' + q.taskId), { proofPending: false });
+  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: false });
+  showToast('❌ Proof denied');
+}
+
+// ── Queue (Sir's Approval Feed) ──
+function listenQueue() {
+  onValue(ref(db, 'queue'), snap => {
+    allQueue = snap.val() || {};
+    const pending = Object.values(allQueue).filter(q => !q.reviewed);
+    const countEl = document.getElementById('queueCount');
+    if (pending.length > 0) {
+      countEl.style.display = 'inline';
+      countEl.textContent = pending.length;
+    } else {
+      countEl.style.display = 'none';
+    }
+    if (currentTab === 'queue') renderQueue();
+  });
+}
+
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  const entries = Object.entries(allQueue)
+    .filter(([, q]) => !q.reviewed)
+    .sort((a, b) => b[1].ts - a[1].ts);
+
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="queue-empty fade-up">
+      <div style="font-size:32px;margin-bottom:12px;opacity:.4;">✨</div>
+      <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--text-mid);margin-bottom:6px;">All clear</div>
+      <div style="font-size:10px;color:var(--text-dim);">Nothing awaiting your attention</div>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(([id, q]) => {
+    const d = new Date(q.ts);
+    const timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+    if (q.type === 'proof') {
+      html += `<div class="queue-card fade-up">
+        <div class="queue-card-header">
+          <div class="queue-type-icon queue-type-proof">📷</div>
+          <div class="queue-info">
+            <div class="queue-title">Photo Proof: ${esc(q.taskTitle)}</div>
+            ${q.note ? `<div class="queue-sub">"${esc(q.note)}"</div>` : ''}
+            <div class="queue-time">${timeStr}</div>
+          </div>
+        </div>
+        ${q.proofData ? `<img class="queue-proof-img" src="${q.proofData}" alt="proof"/>` : ''}
+        <div class="queue-actions">
+          <button class="queue-btn approve" onclick="approveProof('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Approve
+          </button>
+          <button class="queue-btn deny" onclick="denyProof('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">cancel</span> Deny
+          </button>
+        </div>
+      </div>`;
+    } else if (q.type === 'reward_request') {
+      html += `<div class="queue-card fade-up">
+        <div class="queue-card-header">
+          <div class="queue-type-icon queue-type-reward">${q.emoji || '🎁'}</div>
+          <div class="queue-info">
+            <div class="queue-title">Reward Request: ${esc(q.rewardTitle)}</div>
+            <div class="queue-sub">Cost: ${q.cost} points</div>
+            <div class="queue-time">${timeStr}</div>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="queue-btn approve" onclick="approveRewardFromQueue('${id}','${q.rewardId}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">check_circle</span> Approve
+          </button>
+          <button class="queue-btn deny" onclick="denyRewardFromQueue('${id}','${q.rewardId}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">cancel</span> Deny
+          </button>
+        </div>
+      </div>`;
+    } else if (q.type === 'failure') {
+      html += `<div class="queue-card fade-up">
+        <div class="queue-card-header">
+          <div class="queue-type-icon queue-type-failure">❌</div>
+          <div class="queue-info">
+            <div class="queue-title">Failure: ${esc(q.taskTitle)}</div>
+            ${q.reason ? `<div class="queue-sub">"${esc(q.reason)}"</div>` : '<div class="queue-sub">No reason given</div>'}
+            <div class="queue-sub" style="color:var(--rose);">-${q.deduction} pts deducted${q.punishTitle ? ' · Punishment: ' + esc(q.punishTitle) : ''}</div>
+            <div class="queue-time">${timeStr}</div>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="queue-btn approve" onclick="openRedemptionSheet('${id}','${q.activePunishId || ''}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">autorenew</span> Assign Redemption
+          </button>
+          <button class="queue-btn view" onclick="dismissQueue('${id}')">
+            <span class="material-symbols-rounded" style="font-size:14px;">done</span> Acknowledge
+          </button>
+        </div>
+      </div>`;
+    }
+  });
+  list.innerHTML = html || `<div class="queue-empty"><div style="font-size:10px;color:var(--text-dim);">No pending items</div></div>`;
+}
+
+window.approveRewardFromQueue = async function(queueId, rewardId) {
+  await approveReward(rewardId);
+  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: true });
+};
+window.denyRewardFromQueue = async function(queueId, rewardId) {
+  await denyReward(rewardId);
+  await update(ref(db, 'queue/' + queueId), { reviewed: true, approved: false });
+};
+window.dismissQueue = async function(id) {
+  await update(ref(db, 'queue/' + id), { reviewed: true });
+};
+
+// ── Redemption Tasks ──
+function openRedemptionSheet(queueId, activePunishId) {
+  redemptionPunishId = activePunishId;
+  window._redemptionQueueId = queueId;
+  document.getElementById('redemptionTitle').value = '';
+  document.getElementById('redemptionDesc').value = '';
+  document.getElementById('redemptionPoints').value = '10';
+  openSheet('redemptionSheet');
+}
+
+async function saveRedemptionTask() {
+  const title = document.getElementById('redemptionTitle').value.trim();
+  if (!title) { showToast('Please enter a redemption task'); return; }
+  const desc = document.getElementById('redemptionDesc').value.trim();
+  const pts = parseInt(document.getElementById('redemptionPoints').value) || 10;
+
+  const taskRef = await push(ref(db, 'tasks'), {
+    title,
+    description: desc,
+    difficulty: 'standard',
+    basePoints: pts,
+    schedule: 'once',
+    isRedemption: true,
+    linkedPunishId: redemptionPunishId || null,
+    createdAt: Date.now(),
+    completedToday: false,
+    failedToday: false,
+    streak: 0,
+    createdBy: 'dom'
+  });
+
+  // Add to queue as redemption type so sub sees it
+  await push(ref(db, 'queue'), {
+    type: 'redemption_assigned',
+    taskId: taskRef.key,
+    taskTitle: title,
+    ts: Date.now(),
+    reviewed: true // Dom sees, sub just gets the task
+  });
+
+  // Dismiss the failure queue item
+  if (window._redemptionQueueId) {
+    await update(ref(db, 'queue/' + window._redemptionQueueId), { reviewed: true, redemptionAssigned: true });
+  }
+
+  await push(ref(db, 'history'), { type: 'redemption_assigned', taskTitle: title, ts: Date.now() });
+  closeAllSheets();
+  showToast('🌿 Redemption task assigned');
+}
+
+async function completeRedemption(taskId, punishId) {
+  await completeTask(taskId);
+  if (punishId) {
+    await update(ref(db, 'activePunishments/' + punishId), { complete: true, clearedAt: Date.now() });
+  }
+  showToast('🌿 Redemption complete — punishment cleared');
+}
+
+async function dismissPunishment(id) {
+  await update(ref(db, 'activePunishments/' + id), { complete: true, clearedAt: Date.now() });
+  showToast('Punishment cleared');
+}
+
+// ── Active Punishments listener (enhanced) ──
+function listenActivePunishments() {
+  onValue(ref(db, 'activePunishments'), snap => {
+    allActivePunishments = snap.val() || {};
+    const active = Object.entries(allActivePunishments).filter(([,v]) => !v.complete);
+    const banner = document.getElementById('activePunishBanner');
+    if (active.length === 0) {
+      banner.classList.add('hidden');
+      return;
+    }
+    banner.classList.remove('hidden');
+    banner.className = 'alert-banner warn';
+    const [apId, latest] = active[active.length - 1];
+    const domClear = currentRole === 'dom'
+      ? `<button onclick="dismissPunishment('${apId}')" style="background:none;border:none;color:var(--rose);font-size:10px;font-weight:700;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;">Clear</button>`
+      : '';
+    banner.innerHTML = `<div class="alert-icon">${latest.emoji || '⚡'}</div>
+      <div class="alert-text"><strong>Active Punishment: ${esc(latest.title)}</strong>${latest.description ? esc(latest.description) : ''}</div>
+      ${domClear}`;
+  });
+}
+
+
 function switchTab(tab) {
   currentTab = tab;
-  ['tasks','rewards','punishments','history'].forEach(t => {
+  ['tasks','queue','rewards','punishments','history'].forEach(t => {
     document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
   });
 
-  // Render on demand
   if (tab === 'rewards') renderRewards();
   if (tab === 'punishments') renderPunishments();
   if (tab === 'history' && window._historyData) renderHistory(window._historyData);
+  if (tab === 'queue') renderQueue();
 
-  // FAB context
   const isDom = currentRole === 'dom';
-  document.getElementById('fabBtn').style.display = isDom ? 'flex' : 'none';
+  document.getElementById('fabBtn').style.display = (isDom && tab !== 'queue' && tab !== 'history') ? 'flex' : 'none';
 }
 
 // ── FAB / Sheets ──
@@ -1232,7 +1719,7 @@ function openSheet(id) {
 
 function closeAllSheets() {
   document.getElementById('sheetOverlay').classList.remove('open');
-  ['taskSheet','rewardSheet','punishSheet','failSheet'].forEach(id => {
+  ['taskSheet','rewardSheet','punishSheet','failSheet','proofSheet','redemptionSheet'].forEach(id => {
     document.getElementById(id).classList.remove('open');
   });
 }
