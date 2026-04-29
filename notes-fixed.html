@@ -885,6 +885,8 @@
     window.editCurrentNote   = editCurrentNote;
     window.exportNotes       = exportNotes;
     window.handleViewBackdropClick = handleViewBackdropClick;
+    window.openNewNoteModal      = openNewNoteModal;
+    window.handleModalBackdropClick = handleModalBackdropClick;
     window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
     window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
