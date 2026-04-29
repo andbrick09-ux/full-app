@@ -618,7 +618,7 @@
 
     /* ── Bottom CTA ── */
     .bottom-cta {
-      position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+      position:fixed; bottom:calc(var(--dsh-nav-h, 70px) + env(safe-area-inset-bottom, 12px)); left:50%; transform:translateX(-50%);
       width:100%; max-width:480px;
       padding: 12px 16px calc(12px + var(--safe-b));
       background:rgba(5,16,36,.95);
@@ -649,7 +649,7 @@
     /* ── Bottom Nav ── */
     /* CTA */
     .bottom-cta {
-      position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+      position:fixed; bottom:calc(var(--dsh-nav-h, 70px) + env(safe-area-inset-bottom, 12px)); left:50%; transform:translateX(-50%);
       width:100%; max-width:480px;
       padding: 12px 16px calc(12px + var(--safe-b));
       background:rgba(5,16,36,.95);
@@ -1122,7 +1122,7 @@
     }
     /* Intro CTA */
     .intro-cta-wrap {
-      position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+      position:fixed; bottom:calc(var(--dsh-nav-h, 70px) + env(safe-area-inset-bottom, 12px)); left:50%; transform:translateX(-50%);
       width:100%; max-width:480px;
       padding:12px 16px calc(12px + var(--safe-b));
       background:rgba(5,16,36,.95); backdrop-filter:blur(16px);
