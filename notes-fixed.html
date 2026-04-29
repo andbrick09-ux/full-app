@@ -554,11 +554,22 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { requireAuth, dataCol, getMyRelationshipId, sharedNotesCol } from './auth.js';
+    import { requireAuth, dataCol } from './auth.js';
     import {
       getDocs, doc, setDoc, deleteDoc, onSnapshot, collection
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
     import { auth } from './firebase-config.js';
+
+    // Graceful fallback for the new shared helpers (works with old or new auth.js)
+    let getMyRelationshipId = null;
+    let sharedNotesCol = null;
+    try {
+      const authMod = await import('./auth.js');
+      if (typeof authMod.getMyRelationshipId === 'function') getMyRelationshipId = authMod.getMyRelationshipId;
+      if (typeof authMod.sharedNotesCol === 'function') sharedNotesCol = authMod.sharedNotesCol;
+    } catch (e) {
+      console.warn('[Notes] Could not load shared helpers from auth.js — running in personal-only mode');
+    }
 
     /* ── Auth guard ── */
     let currentUser;
@@ -580,15 +591,21 @@
       currentUser = await requireAuth();
       personalCol = dataCol('notes');
 
-      // Check if user is paired
-      try {
-        relId = await getMyRelationshipId();
-        if (relId) {
-          sharedCol = await sharedNotesCol();
-          console.log('[Notes] Paired — using shared notes collection for "Shared" visibility');
+      // Check if user is paired (only if the helpers are available)
+      if (getMyRelationshipId && sharedNotesCol) {
+        try {
+          relId = await getMyRelationshipId();
+          if (relId) {
+            sharedCol = await sharedNotesCol();
+            console.log('[Notes] Paired — using shared notes collection for "Shared" visibility');
+          }
+        } catch (e) {
+          console.log('[Notes] No active relationship — shared notes disabled');
+          relId = null;
+          sharedCol = null;
         }
-      } catch (e) {
-        console.log('[Notes] No active relationship — shared notes disabled');
+      } else {
+        console.log('[Notes] Running in personal-only mode (shared helpers not found in auth.js)');
         relId = null;
         sharedCol = null;
       }
