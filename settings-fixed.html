@@ -89,7 +89,7 @@
       <div class="settings-group">
         <span class="settings-group-label">Pairing Status</span>
         <div id="pairingStatus" class="pairing-status unpaired">
-          <div style="font-size:13px; font-weight:600; color:var(--gold);" id="pairingText">Checking pairing status…</div>
+          <div style="font-size:13px; font-weight:600; color:var(--gold);" id="pairingText">Loading pairing status…</div>
           <div style="font-size:11px; color:var(--cream-mute); margin-top:4px;" id="pairingSubtext"></div>
         </div>
         <button onclick="window.location.href='pair.html'" class="settings-save-btn" style="margin-top:12px; background:transparent; border:1px solid var(--gold); color:var(--gold);">
@@ -262,6 +262,7 @@
 
       try {
         const rel = await getMyRelationship();
+        
         if (rel && rel.status === 'active') {
           statusEl.classList.remove('unpaired');
           statusEl.classList.add('paired');
@@ -270,6 +271,14 @@
           subEl.textContent = myProfile?.role === 'dom' 
             ? `Linked with your Sub` 
             : `Linked with your Dominant`;
+        } else if (rel && rel.status === 'pending') {
+          statusEl.classList.remove('paired');
+          statusEl.classList.add('unpaired');
+          textEl.textContent = 'Invite Pending';
+          textEl.style.color = '#FFB300';
+          subEl.textContent = myProfile?.role === 'dom' 
+            ? 'Waiting for your Sub to accept' 
+            : 'Waiting for your Dom to confirm';
         } else {
           statusEl.classList.remove('paired');
           statusEl.classList.add('unpaired');
@@ -278,8 +287,9 @@
           subEl.textContent = 'Pair with your partner to share notes & data';
         }
       } catch (e) {
+        console.error('Pairing status error:', e);
         textEl.textContent = 'Pairing status unavailable';
-        subEl.textContent = '';
+        subEl.textContent = 'Please try again later';
       }
     }
     
