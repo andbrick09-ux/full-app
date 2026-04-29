@@ -553,27 +553,48 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script>
-    /* ── Data store ── */
-    const STORAGE_KEY = 'dsh_notes_v2';
-    let notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  <script type="module">
+    import { requireAuth, dataCol } from './auth.js';
+    import {
+      getDocs, doc, setDoc, deleteDoc, onSnapshot
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { auth } from './firebase-config.js';
+
+    /* ── Auth guard ── */
+    let currentUser;
+    let notesCol;
+
+    /* ── State ── */
+    let notes = [];
     let activeFilter = 'all';
     let selectedAccent = 'gold';
     let selectedVisibility = 'private';
     let editingId = null;
     let viewingId = null;
 
-    /* Seed demo notes if empty */
-    if (!notes.length) {
-      notes = [
-        
-      ];
-      persist();
+    async function init() {
+      currentUser = await requireAuth();
+      notesCol = dataCol('notes');
+
+      // Real-time listener
+      onSnapshot(notesCol, snap => {
+        notes = snap.docs.map(d => d.data());
+        renderNotes();
+      });
     }
 
     /* ── Utilities ── */
     function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
-    function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
+
+    async function persist(note) {
+      // note: pass the note object to upsert, or pass null + id to delete
+      const ref = doc(notesCol, note.id);
+      await setDoc(ref, note);
+    }
+
+    async function deleteNote(id) {
+      await deleteDoc(doc(notesCol, id));
+    }
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg; t.classList.add('show');
@@ -687,7 +708,7 @@
     }
 
     /* ── Save ── */
-    function saveNote() {
+    async function saveNote() {
       const title = document.getElementById('note-title-input').value.trim();
       const body  = document.getElementById('note-body-input').value.trim();
       if (!title) { showToast('Please add a title'); return; }
@@ -698,15 +719,17 @@
       if (editingId) {
         const idx = notes.findIndex(n => n.id === editingId);
         if (idx > -1) {
-          notes[idx] = { ...notes[idx], title, body, tags, accent: selectedAccent, visibility: selectedVisibility };
+          const updated = { ...notes[idx], title, body, tags, accent: selectedAccent, visibility: selectedVisibility };
+          await persist(updated);
         }
         showToast('Note updated');
       } else {
-        notes.unshift({ id: uid(), title, body, tags, accent: selectedAccent, visibility: selectedVisibility, created: Date.now() });
+        const note = { id: uid(), title, body, tags, accent: selectedAccent, visibility: selectedVisibility, created: Date.now() };
+        await persist(note);
         showToast('Note saved');
       }
 
-      persist(); closeModal(); renderNotes();
+      closeModal();
     }
 
     /* ── View modal ── */
@@ -760,10 +783,10 @@
       document.getElementById('note-modal').classList.add('open');
     }
 
-    function deleteCurrentNote() {
+    async function deleteCurrentNote() {
       if (!viewingId) return;
-      notes = notes.filter(n => n.id !== viewingId);
-      persist(); closeViewModal(); renderNotes();
+      await deleteNote(viewingId);
+      closeViewModal();
       showToast('Note deleted');
     }
 
@@ -779,7 +802,20 @@
     }
 
     /* ── Init ── */
-    renderNotes();
+    // Expose all functions called from inline HTML onclick handlers
+    window.saveNote          = saveNote;
+    window.deleteCurrentNote = deleteCurrentNote;
+    window.setFilter         = setFilter;
+    window.setVisibility     = setVisibility;
+    window.openViewModal     = openViewModal;
+    window.closeViewModal    = closeViewModal;
+    window.editCurrentNote   = editCurrentNote;
+    window.exportNotes       = exportNotes;
+    window.handleViewBackdropClick = handleViewBackdropClick;
+    window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
+    window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
+
+    init();
   </script>
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
 <script src="nav.js"></script>

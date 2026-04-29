@@ -935,28 +935,35 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script>
+  <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
   /* ══════════════════════════════════════════════════════
      DATA & STORAGE
   ══════════════════════════════════════════════════════ */
-  const SK_EVENTS   = 'dsh_cal_events_v1';
-  const SK_TASKS    = 'dsh_cal_tasks_v1';
-  const SK_REFLECT  = 'dsh_cal_reflect_v1';
-  const SK_PROFILES = 'dsh_cal_profiles_v1';
-  const SK_ACTIVE   = 'dsh_cal_active_profile';
+    // Firestore-backed state
+  let events       = [];
+  let recurTasks   = [];
+  let reflections  = [];
+  let profiles     = { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
+  let activeProfile = 'dom';
 
-  let events       = JSON.parse(localStorage.getItem(SK_EVENTS)   || '[]');
-  let recurTasks   = JSON.parse(localStorage.getItem(SK_TASKS)     || '[]');
-  let reflections  = JSON.parse(localStorage.getItem(SK_REFLECT)   || '[]');
-  let profiles     = JSON.parse(localStorage.getItem(SK_PROFILES)  || 'null') || { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
-  let activeProfile = localStorage.getItem(SK_ACTIVE) || 'dom';
+  async function persist() {
+    const calRef = dataRef('calendar');
+    await setDoc(calRef, { events, recurTasks, reflections, profiles, activeProfile }, { merge: true });
+  }
 
-  function persist() {
-    localStorage.setItem(SK_EVENTS,   JSON.stringify(events));
-    localStorage.setItem(SK_TASKS,    JSON.stringify(recurTasks));
-    localStorage.setItem(SK_REFLECT,  JSON.stringify(reflections));
-    localStorage.setItem(SK_PROFILES, JSON.stringify(profiles));
-    localStorage.setItem(SK_ACTIVE,   activeProfile);
+  async function loadCalendarData() {
+    const snap = await getDoc(dataRef('calendar'));
+    if (snap.exists()) {
+      const d = snap.data();
+      events        = d.events       || [];
+      recurTasks    = d.recurTasks   || [];
+      reflections   = d.reflections  || [];
+      profiles      = d.profiles     || { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
+      activeProfile = d.activeProfile || 'dom';
+    }
   }
 
   /* Seed demo data */

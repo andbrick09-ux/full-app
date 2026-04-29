@@ -766,24 +766,34 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 <!-- ═══════════════ FIREBASE JS ═══════════════ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getDatabase, ref, set, get, push, onValue, update, remove }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { getStorage, ref as sRef, uploadString, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
-
+// NOTE: tasks.html uses Firebase Realtime Database for live task sync.
+// It connects to the dom-sub-hub-3e530 project.
 const firebaseConfig = {
-  apiKey:"AIzaSyBvSU5SpjuDBNn1BoH7p_njyaMOHxJwxgs",
-  authDomain:"dom-sub-hub.firebaseapp.com",
-  projectId:"dom-sub-hub",
-  storageBucket:"dom-sub-hub.firebasestorage.app",
-  messagingSenderId:"409837369295",
-  appId:"1:409837369295:web:e7efef07a0b267936084ba",
-  databaseURL:"https://dom-sub-hub-default-rtdb.firebaseio.com"
+  apiKey:"AIzaSyAV7Tmfw06rgKEY5LVOmR8bSmH0UrjB314",
+  authDomain:"dom-sub-hub-3e530.firebaseapp.com",
+  projectId:"dom-sub-hub-3e530",
+  storageBucket:"dom-sub-hub-3e530.firebasestorage.app",
+  messagingSenderId:"672279944225",
+  appId:"1:672279944225:web:18acb9fb8158a1f14b1760",
+  databaseURL:"https://dom-sub-hub-3e530-default-rtdb.firebaseio.com"
 };
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 let storage = null;
 try { storage = getStorage(app); } catch(e) { console.warn('Firebase Storage not available:', e); }
+
+// Auth guard
+const auth = getAuth(app);
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = 'login.html';
+});
 
 // ── State ──
 let role=null, pin='', settingUp=false, pendingPin='';
@@ -823,7 +833,7 @@ function selectRole(r) {
   document.getElementById('roleCardSub').classList.toggle('selected', r==='sub');
   document.getElementById('pinSection').style.display = 'block';
   pin = ''; updateDots();
-  const stored = localStorage.getItem(r==='dom' ? DPIN : SPIN);
+  const stored = sessionStorage.getItem(r==='dom' ? DPIN : SPIN);
   settingUp = !stored;
   document.getElementById('pinLabel').textContent = stored ? (r==='dom' ? "Sir's PIN" : 'Your PIN') : 'Create a 4-digit PIN';
   document.getElementById('pinNote').textContent = stored ? '' : 'First time? Create a PIN to protect this role.';
@@ -842,7 +852,7 @@ function updateDots() { for (let i=0;i<4;i++) document.getElementById('d'+i).cla
 function doLogin() {
   if (!role || pin.length < 4) return;
   const key = role==='dom' ? DPIN : SPIN;
-  const stored = localStorage.getItem(key);
+  const stored = sessionStorage.getItem(key);
   if (settingUp) {
     if (!pendingPin) {
       pendingPin = pin; pin = ''; updateDots();
@@ -858,7 +868,7 @@ function doLogin() {
       document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
       return;
     }
-    localStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
+    sessionStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
   } else {
     if (pin !== stored) {
       document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
@@ -1806,7 +1816,7 @@ let taskRequests = {};
 function maybeShowCheckin() {
   if (role !== 'sub') return;
   const today = new Date().toDateString();
-  const lastCheckin = localStorage.getItem('dsh_last_checkin');
+  const lastCheckin = sessionStorage.getItem('dsh_last_checkin');
   if (lastCheckin === today) return;
   // Show after 800ms delay so app is settled
   setTimeout(() => {
@@ -1826,13 +1836,13 @@ async function submitCheckin() {
   const note = document.getElementById('checkinNote').value.trim();
   await set(ref(db,'checkin'), { mood:selectedMood, energy, note, ts:Date.now(), role:'sub' });
   await push(ref(db,'history'), { type:'checkin', mood:selectedMood, energy, ts:Date.now() });
-  localStorage.setItem('dsh_last_checkin', new Date().toDateString());
+  sessionStorage.setItem('dsh_last_checkin', new Date().toDateString());
   closeCheckin();
   showToast('💭 Check-in sent to Sir');
 }
 
 function skipCheckin() {
-  localStorage.setItem('dsh_last_checkin', new Date().toDateString());
+  sessionStorage.setItem('dsh_last_checkin', new Date().toDateString());
   closeCheckin();
 }
 
@@ -2123,8 +2133,8 @@ async function denyTaskRequest() {
 // ─────────────────────────────────────────────
 function checkDailyReset() {
   const today = new Date().toDateString();
-  if (localStorage.getItem('dsh_last_reset') === today) return;
-  localStorage.setItem('dsh_last_reset', today);
+  if (sessionStorage.getItem('dsh_last_reset') === today) return;
+  sessionStorage.setItem('dsh_last_reset', today);
   Object.entries(tasks).forEach(([id, t]) => {
     if (['daily','weekdays','weekends'].includes(t.schedule) && (t.completedToday || t.failedToday || t.proofPending)) {
       const u = {};

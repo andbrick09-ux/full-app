@@ -3324,7 +3324,10 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { requireAuth, dataCol, dataRef } from './auth.js';
+import { doc, setDoc, deleteDoc, getDoc, getDocs, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 // ── State ──
 const STEPS = [
   { label: 'Headspace', sub: 'Pre-scene reflections' },
@@ -4111,8 +4114,8 @@ function getHistory() {
 function saveHistory(h) {
   localStorage.setItem('sp_history', JSON.stringify(h));
 }
-function updateHistoryCount() {
-  const h = getHistory();
+async function updateHistoryCount() {
+  const h = await getHistory();
   const count = h.length;
   const el = document.getElementById('historyCount');
   if (el) el.textContent = `${count} saved`;
@@ -4127,7 +4130,7 @@ function saveScene() {
   document.getElementById('saveSceneModal').classList.add('open');
 }
 
-function confirmSaveScene() {
+async function confirmSaveScene() {
   const nameInput = document.getElementById('saveSceneNameInput');
   const name = (nameInput?.value || '').trim();
   const defaultName = `Scene — ${new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}`;
@@ -4137,7 +4140,8 @@ function confirmSaveScene() {
     date: new Date().toISOString(),
     mapText: buildMapText(),
     sirsNotes: (document.getElementById('sirsNotesText')?.value || '').trim(),
-    checkin: null
+    checkin: null,
+    isHidden: false  // Dom can set true for surprise scenes
   };
   const h = getHistory();
   h.unshift(snapshot);
@@ -4157,8 +4161,8 @@ function closeHistory() {
   document.getElementById('historyBack').classList.remove('open');
 }
 
-function renderHistoryList() {
-  const h = getHistory();
+async function renderHistoryList() {
+  const h = await getHistory();
   const list = document.getElementById('historyList');
   if (h.length === 0) {
     list.innerHTML = '<div class="history-empty">No saved scenes yet.<br/>Build your first map and save it.</div>';
@@ -4391,8 +4395,8 @@ const THEMES = {
 function getSettings() {
   try { return JSON.parse(localStorage.getItem('sp_settings') || '{}'); } catch { return {}; }
 }
-function applySettings() {
-  const s = getSettings();
+async function applySettings() {
+  const s = await getSettings();
   const theme = THEMES[s.theme || 'midnight'];
   Object.entries(theme).forEach(([k,v]) => document.documentElement.style.setProperty(k, v));
   if (s.name) {
@@ -4432,7 +4436,7 @@ function selectTheme(el) {
   Object.entries(theme).forEach(([k,v]) => document.documentElement.style.setProperty(k, v));
   if (navigator.vibrate) navigator.vibrate(5);
 }
-function saveSettings() {
+async function saveSettings() {
   const theme = document.querySelector('.theme-option.selected')?.dataset.theme || 'midnight';
   const dynamic = document.querySelector('.dynamic-pill[data-dynamic].selected')?.dataset.dynamic || '';
   const fontSize = document.querySelector('#fontSizePills .dynamic-pill.selected')?.dataset.size || 'fs-medium';
@@ -4444,7 +4448,7 @@ function saveSettings() {
     limits: existing.limits || [],
     theme, dynamic, fontSize,
   };
-  localStorage.setItem('sp_settings', JSON.stringify(s));
+  await setDoc(dataRef('settings'), s, { merge: true }); _cachedSettings = s;
   applySettings();
   closeSettings();
   showToast('Settings saved \u2713');
@@ -4454,8 +4458,10 @@ function confirmClearHistory() {
   closeSettings();
   setTimeout(() => document.getElementById('clearHistoryModal').classList.add('open'), 300);
 }
-function doClearHistory() {
-  localStorage.removeItem('sp_history');
+async function doClearHistory() {
+  const col = getHistoryCol();
+  const snap = await getDocs(col);
+  for (const d of snap.docs) await deleteDoc(d.ref);
   updateHistoryCount();
   document.getElementById('clearHistoryModal').classList.remove('open');
   showToast('All scenes cleared');
@@ -4708,7 +4714,7 @@ function removeLimit(i) {
   const limits = s.limits || [];
   limits.splice(i, 1);
   s.limits = limits;
-  localStorage.setItem('sp_settings', JSON.stringify(s));
+  await setDoc(dataRef('settings'), s, { merge: true }); _cachedSettings = s;
   renderLimitsList();
   if (navigator.vibrate) navigator.vibrate(5);
 }
@@ -4793,7 +4799,7 @@ document.getElementById('surpriseBack').addEventListener('click', function(e) { 
 
 // ── Onboarding ──
 function checkOnboarding() {
-  if (!localStorage.getItem('sp_onboarded')) {
+  const ob = await getDoc(dataRef('settings')); if (!ob.data()?.onboarded) {
     setTimeout(() => {
       document.getElementById('onboardBack').classList.add('show');
     }, 600);
@@ -4811,7 +4817,7 @@ function onboardNext() {
 }
 function onboardDismiss() {
   document.getElementById('onboardBack').classList.remove('show');
-  localStorage.setItem('sp_onboarded', '1');
+  await setDoc(dataRef('settings'), { onboarded: true }, { merge: true });
   if (navigator.vibrate) navigator.vibrate([8,5,8]);
 }
 

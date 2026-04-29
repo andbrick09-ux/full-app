@@ -514,7 +514,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
 // ─── SEED ────────────────────────────────────────────────────────────────────
 const SEED = [
   {name:'Wand',             cat:'Vibration',          owner:'Shared'},
@@ -578,21 +578,32 @@ let wishF  = 'all';
 let expandedId = null;   // which toy row is expanded
 let collapsedCats = {};  // which category groups are collapsed
 
-function loadData() {
-  const st = localStorage.getItem('vault_toys_v4');
-  if (st) { toys = JSON.parse(st); }
-  else {
-    toys = SEED.map((s,i) => ({
-      id:'seed_'+i, name:s.name, category:s.cat, owner:s.owner,
-      notes:'', domRating:0, subRating:0, added:Date.now()-(SEED.length-i)*500
-    }));
-    saveToys();
-  }
-  const sw = localStorage.getItem('vault_wishes_v4');
-  wishes = sw ? JSON.parse(sw) : [];
+async function loadData() {
+  toysCol   = dataCol('vault-toys');
+  wishesCol = dataCol('vault-wishes');
+
+  onSnapshot(toysCol, snap => {
+    toys = snap.docs.map(d => d.data());
+    if (!toys.length) seedToys();
+    else renderVault();
+  });
+
+  onSnapshot(wishesCol, snap => {
+    wishes = snap.docs.map(d => d.data());
+    renderWishlist();
+  });
 }
-function saveToys()   { localStorage.setItem('vault_toys_v4',   JSON.stringify(toys));   }
-function saveWishes() { localStorage.setItem('vault_wishes_v4', JSON.stringify(wishes)); }
+
+async function seedToys() {
+  const batch = SEED.map((s, i) => ({
+    id: 'seed_' + i, name: s.name, category: s.cat, owner: s.owner,
+    notes: '', domRating: 0, subRating: 0, added: Date.now() - (SEED.length - i) * 500
+  }));
+  for (const t of batch) await saveToys(t);
+}
+
+async function saveToys(toy)   { await setDoc(doc(toysCol,   toy.id),  toy); }
+async function saveWishes(wish) { await setDoc(doc(wishesCol, wish.id), wish); }
 
 // ─── TABS ────────────────────────────────────────────────────────────────────
 function switchTab(tab, btn) {
@@ -659,7 +670,7 @@ function openWishModal(id) {
 function closeWishModal() { document.getElementById('wish-modal').classList.remove('open'); }
 
 // ─── SAVE ─────────────────────────────────────────────────────────────────────
-function saveToy() {
+async function saveToy() {
   const name = document.getElementById('t-name').value.trim();
   if (!name) return;
   const id = document.getElementById('t-id').value;
@@ -676,7 +687,7 @@ function saveToy() {
   saveToys(); closeToyModal(); renderVault();
 }
 
-function saveWish() {
+async function saveWish() {
   const name = document.getElementById('w-name').value.trim();
   if (!name) return;
   const id = document.getElementById('w-id').value;
@@ -693,23 +704,20 @@ function saveWish() {
 }
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
-function deleteToy(id) {
+async function deleteToy(id) {
   if (!confirm('Remove this toy from the vault?')) return;
-  toys = toys.filter(t=>t.id!==id);
-  if (expandedId===id) expandedId=null;
-  saveToys(); renderVault();
+  if (expandedId === id) expandedId = null;
+  await deleteDoc(doc(toysCol, id));
 }
-function deleteWish(id) {
-  wishes = wishes.filter(w=>w.id!==id);
-  saveWishes(); renderWishlist();
+async function deleteWish(id) {
+  await deleteDoc(doc(wishesCol, id));
 }
 
 // ─── ACQUIRE ──────────────────────────────────────────────────────────────────
-function acquireWish(id) {
+async function acquireWish(id) {
   const w = wishes.find(x=>x.id===id);
   if (!w) return;
-  wishes = wishes.filter(x=>x.id!==id);
-  saveWishes(); renderWishlist();
+  await deleteDoc(doc(wishesCol, id));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-vault').classList.add('active');
@@ -885,7 +893,24 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');})
 );
 
-loadData(); renderVault(); renderWishlist();
+// Expose for inline onclick handlers
+window.switchTab    = switchTab;
+window.setOwnerF    = setOwnerF;
+window.setWishF     = setWishF;
+window.openToyModal = openToyModal;
+window.closeToyModal = closeToyModal;
+window.openWishModal = openWishModal;
+window.closeWishModal = closeWishModal;
+window.saveToy      = saveToy;
+window.saveWish     = saveWish;
+window.deleteToy    = deleteToy;
+window.deleteWish   = deleteWish;
+window.acquireWish  = acquireWish;
+window.toggleRow    = toggleRow;
+window.toggleCat    = toggleCat;
+
+// Init
+requireAuth().then(() => loadData());
 </script>
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
 <script src="nav.js"></script>
