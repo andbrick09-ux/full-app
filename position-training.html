@@ -181,7 +181,12 @@
             <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
         </div>
     </div>
-    <script>
+    <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let dbRef;
+
     const P=[
         {id:'wait',num:1,name:'Wait',cat:'standing',catL:'Standing',img:'positions/pos_1_wait.png',
          detail:'The default resting position. Stand non-slouched, head upright, feet slightly apart, hands clasped behind your back with one palm in the other.',
@@ -234,10 +239,10 @@
     ];
 
     const SK='sirender_pos_training';
-    let st=load();
+    let st = getDefault(); /* loaded via firebase */
     function getDefault(){return{mastered:{},dailyPractice:{},dailyCounts:{},photoSent:{},videoSent:{},streak:0,lastDate:null,log:[]}}
     function load(){const s=localStorage.getItem(SK);if(s)try{const d=JSON.parse(s);if(!d.photoSent)d.photoSent={};if(!d.videoSent)d.videoSent={};if(!d.dailyCounts)d.dailyCounts={};return d}catch(e){}return getDefault()}
-    function save(){localStorage.setItem(SK,JSON.stringify(st))}
+    function save(){if(dbRef) setDoc(dbRef, st)}
     function getMastered(){return Object.values(st.mastered).filter(Boolean).length}
     function getCurrentIdx(){for(let i=0;i<P.length;i++){if(!st.mastered[P[i].id])return i}return P.length-1}
     function isUnlocked(i){return i===0||st.mastered[P[i-1].id]}
@@ -367,10 +372,22 @@
         save();
     }
 
-    function confirmReset(){if(confirm('Reset ALL position training progress?')){localStorage.removeItem(SK);st=getDefault();render();}}
+    function confirmReset(){if(confirm('Reset ALL position training progress?')){if(dbRef) deleteDoc(dbRef);st=getDefault();render();}}
     render();
     if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.error(e)));
-    </script>
+    
+
+(async function initFirebase() {
+  const user = await requireAuth();
+  dbRef = dataRef('training/position-training');
+  const snap = await getDoc(dbRef);
+  if (snap.exists()) {
+    st = snap.data();
+    if(!st.photoSent) st.photoSent={}; if(!st.videoSent) st.videoSent={}; if(!st.dailyCounts) st.dailyCounts={};
+  }
+  render();
+})();
+</script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">

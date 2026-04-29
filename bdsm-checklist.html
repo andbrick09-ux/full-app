@@ -658,7 +658,9 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+import { requireAuth } from './auth.js';
+requireAuth();
     // --- CLOUD API CONFIGURATION ---
     const API_URL = "https://script.google.com/macros/s/AKfycbyTBm0qNlaCPg22tTBpsv1chX5zbaY7jvU1f_hDn1vwksyxLOlaz6dtT4lEsBwNHWWR/exec";
     const APP_TOKEN = "8zhd0ajdfa8";

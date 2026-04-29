@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  Dom Sub Hub — auth.js
 //  Shared authentication & relationship helpers.
 //  All pages import from this module.
@@ -213,4 +213,13 @@ export async function partnerDataCol(path) {
   const partnerUid = await getPartnerUid();
   if (!partnerUid) throw new Error('No partner linked');
   return collection(db, 'data', partnerUid, ...path.split('/'));
+}
+
+/**
+ * Reads the settings document for a given uid.
+ * Returns the settings data object, or {} if not found.
+ */
+export async function getSettings(uid) {
+  const snap = await getDoc(doc(db, 'data', uid, 'settings'));
+  return snap.exists() ? snap.data() : {};
 }

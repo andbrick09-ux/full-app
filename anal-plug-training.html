@@ -185,7 +185,12 @@
             <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
         </div>
     </div>
-    <script>
+    <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let dbRef;
+
         const PROFILES={
             beginner:{label:'Beginner',startPlug:'XS',phases:[
                 {id:'p1',badge:'Phase 1 · Weeks 1–2',name:'First Touch',objective:'Get comfortable with the concept of anal insertion. Learn relaxation, breathing, and basic finger/XS plug use.',tasks:[
@@ -268,9 +273,9 @@
         };
 
         const SK='sirender_plug_training';
-        let state=load();function getDefault(){return{exp:null,tasks:{},completedPhases:[],sessions:0,streak:0,lastDate:null,log:[]}}
-        function load(){const s=localStorage.getItem(SK);if(s){try{return JSON.parse(s)}catch(e){}}return getDefault()}
-        function save(){localStorage.setItem(SK,JSON.stringify(state))}
+        let state = getDefault(); /* loaded via firebase */ function getDefault(){return{exp:null,tasks:{},completedPhases:[],sessions:0,streak:0,lastDate:null,log:[]}}
+        function load(){return getDefault()}
+        function save(){if(dbRef) setDoc(dbRef, state)}
         function getPhases(){return state.exp?PROFILES[state.exp].phases:[]}
         function getCurrent(){const p=getPhases();for(let i=0;i<p.length;i++){if(!state.completedPhases.includes(p[i].id))return i}return Math.max(0,p.length-1)}
         function isUnlocked(i){return i===0||state.completedPhases.includes(getPhases()[i-1].id)}
@@ -360,11 +365,22 @@
             showSection('protocol', tab || document.querySelector('.nav-tab'));
             setTimeout(()=>{const c=document.getElementById(`phase-card-${i}`);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},100);
         }
-        function confirmReset(){if(confirm('Reset ALL plug training progress?')){localStorage.removeItem(SK);state=getDefault();render();}}
+        function confirmReset(){if(confirm('Reset ALL plug training progress?')){if(dbRef) deleteDoc(dbRef);state=getDefault();render();}}
 
         render();
         if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.error(e)));
-    </script>
+    
+
+(async function initFirebase() {
+  const user = await requireAuth();
+  dbRef = dataRef('training/anal-plug-training');
+  const snap = await getDoc(dbRef);
+  if (snap.exists()) {
+    state = snap.data();
+  }
+  render();
+})();
+</script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">

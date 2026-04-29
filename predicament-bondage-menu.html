@@ -567,12 +567,31 @@
 
 </main>
 
-<script>
-    let data = JSON.parse(localStorage.getItem('predicamentData')) || {};
+<script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let predRef;
+async function initFirebase() {
+  const user = await requireAuth();
+  predRef = dataRef('predicaments');
+  const snap = await getDoc(predRef);
+  if (snap.exists()) {
+    const saved = snap.data();
+    Object.keys(saved).forEach(k => { const el = document.getElementById(k); if (el) el.checked = saved[k]; });
+  }
+}
+async function persistPred() {
+  if (!predRef) return;
+  const data = {};
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => { data[cb.id] = cb.checked; });
+  await setDoc(predRef, data);
+}
+    persistPred();
     let showActiveOnly = false;
 
     function saveData() {
-        localStorage.setItem('predicamentData', JSON.stringify(data));
+        
         updateStats();
     }
 

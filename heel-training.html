@@ -668,21 +668,37 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let heelRef;
+
+async function init() {
+  const user = await requireAuth();
+  heelRef = dataRef('training/heel');
+  const snap = await getDoc(heelRef);
+  const data = snap.exists() ? snap.data() : {};
+  entries = data.entries || [];
+  startDate = data.startDate || '';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('logDate').value = today;
+  if (startDate) document.getElementById('startDate').value = startDate;
+  renderLog();
+  updatePhaseBanner();
+}
+
+async function persistHeel() {
+  if (!heelRef) return;
+  await setDoc(heelRef, { entries: entries, startDate: startDate });
+}
+
   var selectedRating = 0;
   var selectedActivities = [];
-  var entries = JSON.parse(localStorage.getItem('heelTraining_entries') || '[]');
-  var startDate = localStorage.getItem('heelTraining_startDate') || '';
+  var entries = [];
+  var startDate = '';
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var today = new Date().toISOString().split('T')[0];
-    document.getElementById('logDate').value = today;
-    if (startDate) {
-      document.getElementById('startDate').value = startDate;
-    }
-    renderLog();
-    updatePhaseBanner();
-  });
+
 
   function showTab(name, btn) {
     document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
@@ -730,7 +746,7 @@
     };
 
     entries.unshift(entry);
-    localStorage.setItem('heelTraining_entries', JSON.stringify(entries));
+    persistHeel();
 
     document.getElementById('logHeight').value = '';
     document.getElementById('logDuration').value = '';
@@ -746,7 +762,7 @@
 
   function deleteEntry(id) {
     entries = entries.filter(function(e) { return e.id !== id; });
-    localStorage.setItem('heelTraining_entries', JSON.stringify(entries));
+    persistHeel();
     renderLog();
   }
 
@@ -781,13 +797,13 @@
 
   function saveStartDate() {
     startDate = document.getElementById('startDate').value;
-    localStorage.setItem('heelTraining_startDate', startDate);
+    persistHeel();
     updatePhaseBanner();
   }
 
   function clearStartDate() {
     startDate = '';
-    localStorage.removeItem('heelTraining_startDate');
+    persistHeel();
     document.getElementById('startDate').value = '';
     updatePhaseBanner();
   }
@@ -842,6 +858,7 @@
     t.classList.add('show');
     setTimeout(function() { t.classList.remove('show'); }, 2500);
   }
+init();
 </script>
 </body>
 </html>

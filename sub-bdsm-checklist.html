@@ -338,7 +338,28 @@ body {
   </div>
 </div>
 
-<script>
+<script type="module">
+import { requireAuth, dataRef, getSettings } from './auth.js';
+import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let subChecklistRef;
+async function initFirebase() {
+  const user = await requireAuth();
+  subChecklistRef = dataRef('checklist');
+  const snap = await getDoc(subChecklistRef);
+  if (snap.exists()) {
+    const d = snap.data();
+    CATS = d.cats || CATS;
+    HISTORY = d.history || [];
+  }
+  // Load display name from settings
+  try { const s = await getSettings(user.uid); if(s.subName) displayName = s.subName; } catch(e) {}
+  init();
+}
+async function persistFirebase() {
+  if (!subChecklistRef) return;
+  await setDoc(subChecklistRef, { cats: CATS, history: HISTORY });
+}
 // ── DATA DEFINITION ───────────────────────────────────────────────────────────
 const RAW_CATS = [
   { id:'bondage', label:'Bondage', items:[
@@ -457,7 +478,7 @@ function init() {
 }
 
 function save() {
-  localStorage.setItem(S_KEY, JSON.stringify(CATS));
+  persistFirebase();
   document.getElementById('saveLabel').textContent = 'Saved at ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
 
@@ -475,7 +496,7 @@ function closeSnapshotModal() { document.getElementById('snapModal').style.displ
 function saveSnapshot() {
   const name = document.getElementById('snapName').value || 'Snapshot';
   HISTORY.unshift({ id: Date.now(), name, date: new Date().toLocaleString(), data: JSON.parse(JSON.stringify(CATS)) });
-  localStorage.setItem(H_KEY, JSON.stringify(HISTORY));
+  persistFirebase();
   updateHistDropdown();
   closeSnapshotModal();
 }

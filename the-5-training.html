@@ -332,7 +332,12 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let dbRef;
+
         const PHASES = [
             {
                 id: 'phase1', badge: 'Phase 1 · Weeks 1–2', name: 'Foundation Building',
@@ -382,10 +387,10 @@
 
         // STATE
         const STORAGE_KEY = 'sirender_5_training';
-        let state = loadState();
+        let state = getDefaultState(); // loaded via firebase
         function getDefaultState() { return { tasks: {}, completedPhases: [], sessions: 0, streak: 0, lastDate: null, log: [] }; }
-        function loadState() { const s = localStorage.getItem(STORAGE_KEY); if (s) { try { return JSON.parse(s); } catch(e) {} } return getDefaultState(); }
-        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function loadState() {  return getDefaultState(); }
+        function saveState() { if(dbRef) setDoc(dbRef, state); }
         function getCurrent() { for (let i = 0; i < PHASES.length; i++) { if (!state.completedPhases.includes(PHASES[i].id)) return i; } return PHASES.length - 1; }
         function isUnlocked(i) { return i === 0 || state.completedPhases.includes(PHASES[i-1].id); }
         function isCompleted(i) { return state.completedPhases.includes(PHASES[i].id); }
@@ -501,13 +506,24 @@
 
         function confirmReset() {
             if (confirm('This will erase ALL your "5" training progress. Are you sure?')) {
-                localStorage.removeItem(STORAGE_KEY); state = getDefaultState(); render();
+                if(dbRef) deleteDoc(dbRef); state = getDefaultState(); render();
             }
         }
 
         render();
         if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.error(e)));
-    </script>
+    
+
+(async function initFirebase() {
+  const user = await requireAuth();
+  dbRef = dataRef('training/the-5-training');
+  const snap = await getDoc(dbRef);
+  if (snap.exists()) {
+    state = snap.data();
+  }
+  render();
+})();
+</script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">

@@ -407,7 +407,12 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let dbRef;
+
         // ════════════════════════════════════════
         // TRAINING DATA
         // ════════════════════════════════════════
@@ -472,11 +477,11 @@
         // STATE
         // ════════════════════════════════════════
         const STORAGE_KEY = 'sirender_kegel_training';
-        let state = loadState();
+        let state = getDefaultState(); // loaded via firebase
 
         function getDefaultState() { return { tasks: {}, completedWeeks: [], sessions: 0, streak: 0, lastSessionDate: null, log: [] }; }
-        function loadState() { const s = localStorage.getItem(STORAGE_KEY); if (s) { try { return JSON.parse(s); } catch(e) {} } return getDefaultState(); }
-        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function loadState() {  return getDefaultState(); }
+        function saveState() { if(dbRef) setDoc(dbRef, state); }
         function getCurrentWeek() { for (let i = 0; i < WEEKS.length; i++) { if (!state.completedWeeks.includes(WEEKS[i].id)) return i; } return WEEKS.length - 1; }
         function isWeekUnlocked(i) { return i === 0 || state.completedWeeks.includes(WEEKS[i - 1].id); }
         function isWeekCompleted(i) { return state.completedWeeks.includes(WEEKS[i].id); }
@@ -740,7 +745,7 @@
 
         function confirmReset() {
             if (confirm('This will erase ALL your Kegel training progress. Are you sure?')) {
-                localStorage.removeItem(STORAGE_KEY); state = getDefaultState(); render();
+                if(dbRef) deleteDoc(dbRef); state = getDefaultState(); render();
             }
         }
 
@@ -752,7 +757,18 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.error(e)); });
         }
-    </script>
+    
+
+(async function initFirebase() {
+  const user = await requireAuth();
+  dbRef = dataRef('training/kegel-training');
+  const snap = await getDoc(dbRef);
+  if (snap.exists()) {
+    state = snap.data();
+  }
+  render();
+})();
+</script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">

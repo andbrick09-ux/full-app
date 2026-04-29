@@ -876,7 +876,12 @@
   </div>
 </div>
 
-    <script>
+    <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let dbRef;
+
     // ════════════════════════════════════
     // TRAINING DATA
     // ════════════════════════════════════
@@ -923,7 +928,7 @@
     // STATE
     // ════════════════════════════════════
     const STORAGE_KEY = 'sirender_dt_training';
-    let state = loadState();
+    let state = getDefaultState(); // loaded via firebase
     let openWeekId = null; // track which week is open
 
     function getDefaultState() {
@@ -934,7 +939,7 @@
       if (s) { try { return JSON.parse(s); } catch(e){} }
       return getDefaultState();
     }
-    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function saveState() { if(dbRef) setDoc(dbRef, state); }
     function getCurrentWeek() {
       for (let i=0;i<WEEKS.length;i++) { if (!state.completedWeeks.includes(WEEKS[i].id)) return i; }
       return WEEKS.length-1;
@@ -995,7 +1000,7 @@
       document.getElementById('resetModal').classList.remove('open');
     }
     function doReset() {
-      localStorage.removeItem(STORAGE_KEY);
+      if(dbRef) deleteDoc(dbRef);
       state = getDefaultState();
       openWeekId = null;
       closeResetModal();
@@ -1440,7 +1445,18 @@
     // INIT
     // ════════════════════════════════════
     render();
-  </script>
+  
+
+(async function initFirebase() {
+  const user = await requireAuth();
+  dbRef = dataRef('training/deepthroat-training');
+  const snap = await getDoc(dbRef);
+  if (snap.exists()) {
+    state = snap.data();
+  }
+  render();
+})();
+</script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="global-sidebar" id="globalSidebar">

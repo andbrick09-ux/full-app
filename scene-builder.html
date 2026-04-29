@@ -765,7 +765,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px;
 <script src="nav.js"></script>
 <div id="toast" class="toast"></div>
 
-<script>
+<script type="module">
+import { requireAuth } from './auth.js';
 // ── STATE ─────────────────────────────────────────────────────────────────────
 var activeModel  = 'claude';
 var currentStep  = 0;
@@ -784,9 +785,9 @@ var MODEL_CFG = {
 };
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', function() {
-  loadKeys();
-  loadVault();
+requireAuth().then(function() {
+
+
 });
 
 // ── VAULT ─────────────────────────────────────────────────────────────────────
@@ -808,12 +809,12 @@ function closeKeySheet() { document.getElementById('keyOverlay').classList.remov
 document.getElementById('keyOverlay').addEventListener('click', function(e) { if(e.target===e.currentTarget) closeKeySheet(); });
 
 function saveKey(m, v) {
-  if(v.trim()) { localStorage.setItem('dsb_k_'+m, v.trim()); setKS(m, true); }
-  else          { localStorage.removeItem('dsb_k_'+m);        setKS(m, false); }
+  if(v.trim()) { sessionStorage.setItem('dsb_k_'+m, v.trim()); setKS(m, true); }
+  else          { sessionStorage.removeItem('dsb_k_'+m);        setKS(m, false); }
 }
 function loadKeys() {
   ['claude','grok','gemini'].forEach(function(m) {
-    var v = localStorage.getItem('dsb_k_'+m);
+    var v = sessionStorage.getItem('dsb_k_'+m);
     if(v) { document.getElementById('key-'+m).value = v; setKS(m, true); }
   });
 }
@@ -822,7 +823,7 @@ function setKS(m, ok) {
   el.textContent = ok ? '✓ Key saved' : 'Not set';
   el.className = 'key-status ' + (ok ? 'ok' : 'no');
 }
-function getKey(m) { return localStorage.getItem('dsb_k_'+m) || ''; }
+function getKey(m) { return sessionStorage.getItem('dsb_k_'+m) || ''; }
 function toggleEye(id, btn) {
   var inp = document.getElementById(id), ic = btn.querySelector('span');
   inp.type = inp.type === 'password' ? 'text' : 'password';
