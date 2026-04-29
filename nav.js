@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ============================================================
  * DOM SUB HUB — nav.js
  * Injects the bottom nav, overlay, and More sheet into every
