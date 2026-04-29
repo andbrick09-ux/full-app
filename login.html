@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#080c14" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="Dom Sub Hub — Sign in to your private protocol." />
+<title>Dom Sub Hub — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="icon-512.png" />
+<link rel="manifest" href="manifest.json" />
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --gold:#c9a84c;
+  --gold-l:#e2c47a;
+  --gold-dim:rgba(201,168,76,0.10);
+  --gold-b:rgba(201,168,76,0.20);
+  --gold-glow:rgba(201,168,76,0.40);
+  --crimson:#8b2230;
+  --bg:#080c14;
+  --surface:#0e1420;
+  --surface2:#111927;
+  --text:#f0e6d2;
+  --muted:#68707f;
+  --red:#e05268;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+html{height:100%;-webkit-text-size-adjust:100%}
+body{
+  min-height:100dvh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Raleway',sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:max(var(--safe-t),20px) 20px max(var(--safe-b),20px);
+  overflow-x:hidden;
+}
+
+/* ── Ambient orbs ── */
+.orb{position:fixed;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 68%);
+  top:-160px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;
+  animation:floatA 9s ease-in-out infinite}
+.orb2{position:fixed;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,34,48,0.05) 0%,transparent 70%);
+  bottom:80px;right:-60px;pointer-events:none;z-index:0;
+  animation:floatB 11s ease-in-out infinite}
+@keyframes floatA{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(22px)}}
+@keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+/* ── Card ── */
+.card{
+  position:relative;z-index:1;
+  width:100%;max-width:400px;
+  background:var(--surface);
+  border:1px solid var(--gold-b);
+  border-radius:28px;
+  padding:36px 28px 32px;
+  animation:slideUp .45s cubic-bezier(0.22,1,0.36,1) both;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 5%,var(--gold) 50%,transparent 95%);
+  opacity:.35;border-radius:28px 28px 0 0;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Branding ── */
+.brand{text-align:center;margin-bottom:32px}
+.brand-script{
+  font-family:'Great Vibes',cursive;
+  font-size:42px;color:var(--gold-l);
+  display:block;line-height:1;
+  text-shadow:0 0 40px var(--gold-glow);
+}
+.brand-sub{
+  font-size:9px;letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--muted);margin-top:6px;display:block;font-weight:600;
+}
+
+/* ── Mode toggle ── */
+.mode-row{display:flex;background:var(--bg);border:1px solid var(--gold-b);border-radius:14px;padding:3px;margin-bottom:28px}
+.mode-btn{
+  flex:1;padding:9px;border:none;background:none;cursor:pointer;
+  font-family:'Raleway',sans-serif;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;font-weight:600;color:var(--muted);
+  border-radius:11px;transition:all .2s;
+}
+.mode-btn.active{background:var(--gold-dim);color:var(--gold-l);border:1px solid var(--gold-b)}
+
+/* ── Form ── */
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin-bottom:7px;
+}
+.field input, .field select{
+  width:100%;padding:13px 15px;
+  background:var(--bg);border:1px solid var(--gold-b);border-radius:12px;
+  color:var(--text);font-family:'Raleway',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus, .field select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(201,168,76,0.12);
+}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+
+/* Role cards (signup only) */
+.role-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.role-card{
+  position:relative;cursor:pointer;
+  border:1px solid var(--gold-b);border-radius:14px;padding:16px 12px;
+  background:var(--bg);text-align:center;transition:all .2s;
+}
+.role-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.role-card:has(input:checked){border-color:var(--gold);background:var(--gold-dim);box-shadow:0 0 0 2px var(--gold-b)}
+.role-icon{font-size:24px;display:block;margin-bottom:6px}
+.role-name{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--gold-l)}
+.role-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4;font-family:'Cormorant Garamond',serif;font-style:italic}
+
+/* ── Submit button ── */
+.submit-btn{
+  width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
+  font-family:'Playfair Display',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(135deg,#c9a84c,#e2c47a);color:#06090f;font-weight:600;
+  box-shadow:0 6px 24px rgba(201,168,76,0.25);
+  transition:all .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.submit-btn:hover{box-shadow:0 8px 32px rgba(201,168,76,0.38);transform:translateY(-1px)}
+.submit-btn:active{transform:scale(.98);opacity:.9}
+.submit-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+
+/* ── Error ── */
+.error-msg{
+  background:rgba(224,82,104,0.10);border:1px solid rgba(224,82,104,0.25);
+  border-radius:10px;padding:11px 14px;
+  font-size:12px;color:var(--red);margin-bottom:16px;
+  display:none;line-height:1.5;
+}
+.error-msg.show{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── Divider ── */
+.divider{text-align:center;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:20px 0 0;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="orb"></div>
+<div class="orb2"></div>
+
+<div class="card">
+
+  <!-- Branding -->
+  <div class="brand">
+    <span class="brand-script">Dom Sub Hub</span>
+    <span class="brand-sub">Devotion through discipline</span>
+  </div>
+
+  <!-- Mode Toggle -->
+  <div class="mode-row">
+    <button class="mode-btn active" id="btnLogin"  onclick="setMode('login')">Sign In</button>
+    <button class="mode-btn"        id="btnSignup" onclick="setMode('signup')">Create Account</button>
+  </div>
+
+  <!-- Error -->
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Form -->
+  <form id="authForm" onsubmit="handleSubmit(event)">
+
+    <!-- Signup-only: display name -->
+    <div class="field" id="fieldName" style="display:none">
+      <label for="inputName">Your Name</label>
+      <input type="text" id="inputName" placeholder="e.g. Sir or Becca" autocomplete="name" />
+    </div>
+
+    <!-- Email -->
+    <div class="field">
+      <label for="inputEmail">Email</label>
+      <input type="email" id="inputEmail" placeholder="your@email.com" autocomplete="email" required />
+    </div>
+
+    <!-- Password -->
+    <div class="field">
+      <label for="inputPassword">Password</label>
+      <input type="password" id="inputPassword" placeholder="••••••••" autocomplete="current-password" required />
+    </div>
+
+    <!-- Signup-only: role -->
+    <div id="fieldRole" style="display:none">
+      <div class="field" style="margin-bottom:8px">
+        <label>I am the…</label>
+      </div>
+      <div class="role-group">
+        <label class="role-card">
+          <input type="radio" name="role" value="dom" />
+          <span class="role-icon">👑</span>
+          <span class="role-name">Dom</span>
+          <span class="role-desc">Sir — I lead the protocol</span>
+        </label>
+        <label class="role-card">
+          <input type="radio" name="role" value="sub" />
+          <span class="role-icon">🌸</span>
+          <span class="role-name">Sub</span>
+          <span class="role-desc">Devoted — I follow His lead</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="submit-btn" type="submit" id="submitBtn">
+      <span id="submitLabel">Sign In</span>
+    </button>
+
+  </form>
+
+  <div class="divider" id="bottomHint">New here? Switch to Create Account above.</div>
+
+</div>
+
+<script type="module">
+import { signIn, signUp, getCurrentUser } from './auth.js';
+
+// Redirect if already signed in
+getCurrentUser().then(user => {
+  if (user) window.location.href = 'index.html';
+});
+
+let mode = 'login';
+
+window.setMode = function(m) {
+  mode = m;
+  const isSignup = m === 'signup';
+
+  document.getElementById('btnLogin').classList.toggle('active', !isSignup);
+  document.getElementById('btnSignup').classList.toggle('active', isSignup);
+  document.getElementById('fieldName').style.display  = isSignup ? '' : 'none';
+  document.getElementById('fieldRole').style.display  = isSignup ? '' : 'none';
+  document.getElementById('submitLabel').textContent   = isSignup ? 'Create Account' : 'Sign In';
+  document.getElementById('bottomHint').textContent    = isSignup
+    ? 'Already have an account? Switch to Sign In above.'
+    : 'New here? Switch to Create Account above.';
+  document.getElementById('errorMsg').classList.remove('show');
+
+  const pwInput = document.getElementById('inputPassword');
+  pwInput.setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+};
+
+window.handleSubmit = async function(e) {
+  e.preventDefault();
+  const btn   = document.getElementById('submitBtn');
+  const err   = document.getElementById('errorMsg');
+  const email = document.getElementById('inputEmail').value.trim();
+  const pass  = document.getElementById('inputPassword').value;
+
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.querySelector('#submitLabel').textContent = 'Please wait…';
+
+  try {
+    if (mode === 'login') {
+      await signIn(email, pass);
+      window.location.href = 'index.html';
+    } else {
+      const name = document.getElementById('inputName').value.trim();
+      const role = document.querySelector('input[name="role"]:checked')?.value;
+
+      if (!name) throw new Error('Please enter your name.');
+      if (!role) throw new Error('Please select your role (Dom or Sub).');
+      if (pass.length < 6) throw new Error('Password must be at least 6 characters.');
+
+      await signUp(email, pass, name, role);
+
+      // After signup — go to pair page to link with partner
+      window.location.href = 'pair.html';
+    }
+  } catch (ex) {
+    const friendly = {
+      'auth/user-not-found':    'No account found with that email.',
+      'auth/wrong-password':    'Incorrect password. Please try again.',
+      'auth/email-already-in-use': 'An account with that email already exists. Try signing in.',
+      'auth/invalid-email':     'Please enter a valid email address.',
+      'auth/weak-password':     'Password must be at least 6 characters.',
+      'auth/invalid-credential': 'Incorrect email or password.',
+    };
+    err.textContent = friendly[ex.code] || ex.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.querySelector('#submitLabel').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  }
+};
+</script>
+
+</body>
+</html>

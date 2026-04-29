@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#080c14" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="Dom Sub Hub — Link your Dom and Sub accounts." />
+<title>Dom Sub Hub — Link Accounts</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="icon-512.png" />
+<link rel="manifest" href="manifest.json" />
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#c9a84c;--gold-l:#e2c47a;--gold-dim:rgba(201,168,76,0.10);
+  --gold-b:rgba(201,168,76,0.20);--gold-glow:rgba(201,168,76,0.40);
+  --bg:#080c14;--surface:#0e1420;--text:#f0e6d2;--muted:#68707f;
+  --red:#e05268;--green:#4fc38a;
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{
+  min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Raleway',sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:max(var(--safe-t),20px) 20px max(var(--safe-b),20px);overflow-x:hidden;
+}
+.orb{position:fixed;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 68%);top:-160px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;animation:floatA 9s ease-in-out infinite}
+.orb2{position:fixed;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(139,34,48,0.05) 0%,transparent 70%);bottom:80px;right:-60px;pointer-events:none;z-index:0;animation:floatB 11s ease-in-out infinite}
+@keyframes floatA{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(22px)}}
+@keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+.card{
+  position:relative;z-index:1;width:100%;max-width:400px;
+  background:var(--surface);border:1px solid var(--gold-b);border-radius:28px;
+  padding:36px 28px 32px;animation:slideUp .45s cubic-bezier(0.22,1,0.36,1) both;
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 50%,transparent 95%);opacity:.35;border-radius:28px 28px 0 0}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+.brand{text-align:center;margin-bottom:28px}
+.brand-script{font-family:'Great Vibes',cursive;font-size:38px;color:var(--gold-l);display:block;text-shadow:0 0 40px var(--gold-glow)}
+.brand-sub{font-size:9px;letter-spacing:3.5px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;font-weight:600}
+
+.step{display:none}.step.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.step-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-l);margin-bottom:8px;text-align:center}
+.step-body{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:24px}
+.step-body strong{color:var(--gold-l);font-style:normal;font-weight:600}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:7px}
+.field input{width:100%;padding:13px 15px;background:var(--bg);border:1px solid var(--gold-b);border-radius:12px;color:var(--text);font-family:'Raleway',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.12)}
+
+.primary-btn{width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;font-family:'Playfair Display',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(135deg,#c9a84c,#e2c47a);color:#06090f;font-weight:600;box-shadow:0 6px 24px rgba(201,168,76,0.25);transition:all .2s;margin-top:4px}
+.primary-btn:hover{box-shadow:0 8px 32px rgba(201,168,76,0.38);transform:translateY(-1px)}
+.primary-btn:active{transform:scale(.98)}
+.primary-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+
+.secondary-btn{width:100%;padding:13px;border:1px solid var(--gold-b);border-radius:14px;cursor:pointer;font-family:'Raleway',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:none;color:var(--gold);transition:all .2s;margin-top:10px}
+.secondary-btn:hover{background:var(--gold-dim);border-color:var(--gold)}
+.secondary-btn:active{transform:scale(.98)}
+
+.error-msg{background:rgba(224,82,104,0.10);border:1px solid rgba(224,82,104,0.25);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--red);margin-bottom:16px;display:none;line-height:1.5}
+.error-msg.show{display:block}
+.success-msg{background:rgba(79,195,138,0.10);border:1px solid rgba(79,195,138,0.25);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--green);margin-bottom:16px;display:none;line-height:1.5;text-align:center}
+.success-msg.show{display:block}
+
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold-dim);border:1px solid var(--gold-b);border-radius:30px;
+  padding:10px 18px;font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--gold-l);font-weight:600;margin-bottom:20px;
+}
+
+.skip-link{text-align:center;margin-top:18px;font-size:11px;color:var(--muted)}
+.skip-link a{color:var(--gold);text-decoration:none}
+.skip-link a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="orb"></div>
+<div class="orb2"></div>
+
+<div class="card">
+  <div class="brand">
+    <span class="brand-script">Dom Sub Hub</span>
+    <span class="brand-sub">Link Your Accounts</span>
+  </div>
+
+  <!-- ── Step: Loading ── -->
+  <div class="step active" id="stepLoading">
+    <p class="step-body">Loading your profile…</p>
+  </div>
+
+  <!-- ── Step: Dom — Send Invite ── -->
+  <div class="step" id="stepDomInvite">
+    <h2 class="step-title">Invite Your Sub</h2>
+    <p class="step-body">Enter your Sub's email address to link her account to yours. She must already have created an account.</p>
+    <div class="error-msg" id="domError"></div>
+    <div class="success-msg" id="domSuccess"></div>
+    <div class="field">
+      <label for="subEmail">Sub's Email Address</label>
+      <input type="email" id="subEmail" placeholder="sub@email.com" />
+    </div>
+    <button class="primary-btn" id="inviteBtn" onclick="sendInvite()">Send Invite</button>
+    <div class="skip-link">
+      <a href="index.html">Skip for now — link later in Settings</a>
+    </div>
+  </div>
+
+  <!-- ── Step: Sub — Accept Invite ── -->
+  <div class="step" id="stepSubAccept">
+    <h2 class="step-title">A Link Awaits</h2>
+    <p class="step-body">Your Dom has sent you a pairing invite. Accept it to connect your accounts and share your protocol data.</p>
+    <div class="error-msg" id="subError"></div>
+    <div class="success-msg" id="subSuccess"></div>
+    <button class="primary-btn" id="acceptBtn" onclick="acceptInvite()">Accept &amp; Link Accounts</button>
+    <button class="secondary-btn" onclick="window.location.href='index.html'">Not Now</button>
+  </div>
+
+  <!-- ── Step: Already Paired ── -->
+  <div class="step" id="stepAlreadyPaired">
+    <h2 class="step-title" style="margin-bottom:16px">Already Linked</h2>
+    <div style="text-align:center;margin-bottom:20px">
+      <span class="badge">✦ &nbsp;Accounts Connected</span>
+    </div>
+    <p class="step-body">Your Dom and Sub accounts are already linked. Your data is shared between both.</p>
+    <button class="primary-btn" onclick="window.location.href='index.html'">Continue to App</button>
+  </div>
+
+  <!-- ── Step: No Pending Invite ── -->
+  <div class="step" id="stepSubNoPending">
+    <h2 class="step-title">No Invite Yet</h2>
+    <p class="step-body">Your Dom hasn't sent you a pairing invite yet. Ask him to send one from his account, then come back here.</p>
+    <button class="primary-btn" onclick="checkForInvite()">Check Again</button>
+    <div class="skip-link"><a href="index.html">Continue without linking</a></div>
+  </div>
+
+</div>
+
+<script type="module">
+import { requireAuth, getMyProfile, getRelationship, sendPairingInvite, acceptPairingInvite } from './auth.js';
+
+let myProfile = null;
+
+async function init() {
+  await requireAuth();
+  myProfile = await getMyProfile();
+  const rel = await getRelationship();
+
+  hideAll();
+
+  if (rel?.status === 'active') {
+    show('stepAlreadyPaired');
+    return;
+  }
+
+  if (myProfile.role === 'dom') {
+    if (rel?.status === 'pending') {
+      // Already sent invite — show pending state
+      const s = document.getElementById('domSuccess');
+      s.textContent = 'Invite sent! Waiting for your Sub to accept.';
+      s.classList.add('show');
+    }
+    show('stepDomInvite');
+  } else {
+    // Sub: check for pending invite
+    const { query, collection, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { auth, db } = await import('./firebase-config.js');
+    const uid = auth.currentUser.uid;
+    const q = query(collection(db, 'relationships'), where('subId', '==', uid), where('status', '==', 'pending'));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      show('stepSubNoPending');
+    } else {
+      show('stepSubAccept');
+    }
+  }
+}
+
+function hideAll() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+}
+function show(id) {
+  document.getElementById(id).classList.add('active');
+}
+
+window.sendInvite = async function() {
+  const btn   = document.getElementById('inviteBtn');
+  const err   = document.getElementById('domError');
+  const ok    = document.getElementById('domSuccess');
+  const email = document.getElementById('subEmail').value.trim();
+  err.classList.remove('show');
+  ok.classList.remove('show');
+  if (!email) { err.textContent = 'Please enter your Sub\'s email.'; err.classList.add('show'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  try {
+    await sendPairingInvite(email);
+    ok.textContent = 'Invite sent! Ask your Sub to open pair.html and accept the link.';
+    ok.classList.add('show');
+    btn.textContent = 'Invite Sent ✓';
+  } catch(ex) {
+    err.textContent = ex.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Send Invite';
+  }
+};
+
+window.acceptInvite = async function() {
+  const btn = document.getElementById('acceptBtn');
+  const err = document.getElementById('subError');
+  const ok  = document.getElementById('subSuccess');
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'Linking…';
+  try {
+    await acceptPairingInvite();
+    ok.textContent = '✦ Accounts linked! Redirecting to your hub…';
+    ok.classList.add('show');
+    setTimeout(() => window.location.href = 'index.html', 1800);
+  } catch(ex) {
+    err.textContent = ex.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Accept & Link Accounts';
+  }
+};
+
+window.checkForInvite = async function() {
+  hideAll();
+  show('stepLoading');
+  await init();
+};
+
+init();
+</script>
+</body>
+</html>
