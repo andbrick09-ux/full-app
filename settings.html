@@ -162,27 +162,60 @@
       <button class="settings-save-btn" onclick="saveSettings()">
         <span class="material-symbols-rounded">save</span>
         Save Changes
-      </button>
 
+      <div class="settings-group" style="margin-top:28px">
+        <span class="settings-group-label">Account</span>
+        <div style="background:rgba(5,16,36,.85);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light)" id="acctName">&#x2014;</div>
+          <div style="font-size:11px;letter-spacing:1px;color:var(--gold);margin:4px 0 2px" id="acctRole">&#x2014;</div>
+          <div style="font-size:11px;color:var(--cream-mute)" id="acctEmail">&#x2014;</div>
+        </div>
+        <button class="settings-danger-btn" onclick="handleSignOut()">
+          <span class="material-symbols-rounded">logout</span>
+          Sign Out
+        </button>
+      </div>
+
+      </button>
+        <button class="settings-danger-btn" onclick="clearHistory()">
       <button class="settings-danger-btn" onclick="clearHistory()">
-        <span class="material-symbols-rounded">delete_forever</span>
-        Clear All App Data (Scenes & Progress)
+        Clear All App Data
       </button>
     </div>
   </div>
 
   <div id="toast" class="toast">Changes Saved</div>
 
-  <script src="globalNavigationLoader.js"></script> <!-- Placeholder for structural reasons, but we use injected HTML below -->
+  <script type="module">
+    import { requireAuth, getMyProfile, logOut, dataRef } from './auth.js';
+    import { getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-  <script>
-    // LocalStorage Interface
-    function getSettings() {
-      try { return JSON.parse(localStorage.getItem('sp_settings') || '{}'); } catch { return {}; }
+    let settingsCache = {};
+    let currentUser = null;
+    let myProfile   = null;
+
+    async function init() {
+      currentUser = await requireAuth();
+      myProfile   = await getMyProfile();
+
+      // Show account info
+      document.getElementById('acctName').textContent  = myProfile?.displayName || currentUser.email;
+      document.getElementById('acctRole').textContent  = myProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub';
+      document.getElementById('acctEmail').textContent = currentUser.email;
+
+      await loadSettings();
+    }
+
+    async function getSettings() {
+      try {
+        const snap = await getDoc(dataRef('settings'));
+        settingsCache = snap.exists() ? snap.data() : {};
+      } catch { settingsCache = {}; }
+      return settingsCache;
     }
     
-    function loadSettings() {
-      const s = getSettings();
+    async function loadSettings() {
+      const s = await getSettings();
       document.getElementById('settingName').value = s.subName || '';
       document.getElementById('settingPartnerName').value = s.domName || '';
       document.getElementById('settingSafeWord').value = s.safeWord || '';
@@ -205,25 +238,30 @@
       renderLimitsList();
     }
     
-    function saveSettings() {
-      const existing = getSettings();
-      const themeEl = document.querySelector('.theme-option.selected');
-      const sizeEl = document.querySelector('.dynamic-pill.selected');
-      
+    async function saveSettings() {
+      const existing = settingsCache;
+      const themeEl  = document.querySelector('.theme-option.selected');
+      const sizeEl   = document.querySelector('.dynamic-pill.selected');
       const activeTs = Array.from(document.querySelectorAll('.training-toggle:checked')).map(c => c.value);
-      
+
       const s = {
         ...existing,
-        subName: document.getElementById('settingName').value.trim(),
-        domName: document.getElementById('settingPartnerName').value.trim(),
-        safeWord: document.getElementById('settingSafeWord').value.trim(),
-        theme: themeEl ? themeEl.dataset.theme : 'midnight',
-        fontSize: sizeEl ? sizeEl.dataset.size : 'fs-medium',
+        subName:         document.getElementById('settingName').value.trim(),
+        domName:         document.getElementById('settingPartnerName').value.trim(),
+        safeWord:        document.getElementById('settingSafeWord').value.trim(),
+        theme:           themeEl ? themeEl.dataset.theme : 'midnight',
+        fontSize:        sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
         activeTrainings: activeTs
       };
-      
-      localStorage.setItem('sp_settings', JSON.stringify(s));
-      showToast('Settings saved successfully');
+
+      try {
+        await setDoc(dataRef('settings'), s, { merge: true });
+        settingsCache = s;
+        showToast('Settings saved ✦');
+      } catch(ex) {
+        showToast('Save failed — check your connection');
+        console.error(ex);
+      }
     }
     
     function selectTheme(el) {
@@ -237,9 +275,9 @@
     }
     
     function renderLimitsList() {
-      const list = document.getElementById('limitsList');
-      const limits = getSettings().limits || [];
-      if (!limits.length) { 
+      const list   = document.getElementById('limitsList');
+      const limits = settingsCache.limits || [];
+      if (!limits.length) {
         list.innerHTML = '<div class="limits-empty">No hard limits active. Sir will have full creative freedom.</div>'; 
         return; 
       }
@@ -253,43 +291,43 @@
         </div>`).join('');
     }
     
-    function addLimit() {
+    async function addLimit() {
       const input = document.getElementById('limitInput');
       const val = (input.value||'').trim();
       if (!val) return;
       
-      const s = getSettings();
-      const limits = s.limits || [];
-      if (!limits.includes(val)) { 
-        limits.push(val); 
-        s.limits = limits; 
-        localStorage.setItem('sp_settings', JSON.stringify(s)); 
+      const limits = settingsCache.limits || [];
+      if (!limits.includes(val)) {
+        limits.push(val);
+        settingsCache.limits = limits;
+        await setDoc(dataRef('settings'), { limits }, { merge: true });
       }
       input.value = '';
       renderLimitsList();
     }
-    
-    function removeLimit(i) {
-      const s = getSettings();
-      const limits = s.limits || [];
+
+    async function removeLimit(i) {
+      const limits = (settingsCache.limits || []);
       limits.splice(i, 1);
-      s.limits = limits;
-      localStorage.setItem('sp_settings', JSON.stringify(s));
+      settingsCache.limits = limits;
+      await setDoc(dataRef('settings'), { limits }, { merge: true });
       renderLimitsList();
     }
     
-    function clearHistory() {
-      if (confirm('Are you absolutely sure you want to clear ALL scenes, histories, and progression check-ins? This cannot be undone.')) {
-        localStorage.removeItem('sp_history');
-        if(confirm('Do you also want to clear all your global profile settings and limits?')) {
-          localStorage.removeItem('sp_settings');
-          localStorage.removeItem('bdsm_checklist');
-          localStorage.removeItem('sp_onboarded');
-        }
-        showToast('Application Data Cleared');
+    async function clearHistory() {
+      if (confirm('Are you absolutely sure you want to clear ALL your Firestore data? This cannot be undone.')) {
+        // In Phase 3+ we will delete Firestore subcollections here.
+        // For now, just clear settings doc.
+        await setDoc(dataRef('settings'), {});
+        settingsCache = {};
+        showToast('Settings cleared');
         setTimeout(() => location.reload(), 1500);
       }
     }
+
+    window.handleSignOut = async function() {
+      if (confirm('Sign out of Dom Sub Hub?')) await logOut();
+    };
 
     function showToast(msg) {
       const t = document.getElementById('toast');
@@ -297,36 +335,18 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3000);
     }
-    
-    loadSettings();
+
+    // Make functions globally accessible from inline onclick handlers
+    window.saveSettings  = saveSettings;
+    window.selectTheme   = selectTheme;
+    window.selectFontSize = selectFontSize;
+    window.addLimit      = addLimit;
+    window.removeLimit   = removeLimit;
+    window.clearHistory  = clearHistory;
+    window.renderLimitsList = renderLimitsList;
+
+    init();
   </script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
-  </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
-</script>
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
 <script src="nav.js"></script>
 </body>
