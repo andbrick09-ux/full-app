@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -47,10 +47,24 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .pin-btn{background:var(--surface);border:1px solid var(--gold-b);border-radius:12px;padding:14px;font-family:'Montserrat',sans-serif;font-size:18px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;}
 .pin-btn:active{background:var(--gold-dim);border-color:var(--gold);transform:scale(.95);}
 .pin-btn.del{font-size:14px;color:var(--dim);}
+.pin-spacer{visibility:hidden;}
 .login-btn{width:100%;max-width:320px;padding:16px;background:var(--luxury);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:opacity .2s;}
 .login-btn:disabled{opacity:.3;cursor:default;}
 .login-error{font-size:11px;color:var(--rose);text-align:center;margin-top:10px;min-height:16px;}
 .login-note{font-size:10px;color:var(--dim);text-align:center;margin-top:12px;line-height:1.5;}
+
+/* ── Custom Confirm ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:900;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.confirm-overlay.open{opacity:1;pointer-events:all;}
+.confirm-card{background:#07111f;border:1px solid var(--gold-b);border-radius:18px;padding:22px 20px;max-width:340px;width:100%;transform:scale(.92);transition:transform .25s cubic-bezier(.32,0,.67,0);}
+.confirm-overlay.open .confirm-card{transform:scale(1);}
+.confirm-icon{font-size:32px;text-align:center;margin-bottom:8px;}
+.confirm-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--text);text-align:center;margin-bottom:6px;}
+.confirm-msg{font-size:11px;color:var(--mid);text-align:center;line-height:1.5;margin-bottom:18px;}
+.confirm-actions{display:flex;gap:8px;}
+.confirm-btn{flex:1;padding:11px;border-radius:11px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;border:none;cursor:pointer;}
+.confirm-btn.cancel{background:rgba(255,255,255,.05);color:var(--mid);border:1px solid rgba(255,255,255,.07);}
+.confirm-btn.confirm{background:linear-gradient(135deg,#e05b6a,#c0394a);color:#fff;}
 
 /* ── App Shell ── */
 #appShell{display:none;flex-direction:column;min-height:100dvh;padding-bottom:calc(72px + var(--safe-b));}
@@ -381,6 +395,19 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 <div class="glow-orb"></div>
 <div id="toast" class="toast"></div>
 
+<!-- ═══════════════ Custom Confirm Dialog ═══════════════ -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-card">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg">This action cannot be undone.</div>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" id="confirmCancelBtn">Cancel</button>
+      <button class="confirm-btn confirm" id="confirmOkBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ LOGIN ═══════════════ -->
 <div id="loginScreen">
   <div class="login-logo">Tasks</div>
@@ -414,7 +441,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
       <button class="pin-btn" onclick="pinPress('7')">7</button>
       <button class="pin-btn" onclick="pinPress('8')">8</button>
       <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <button class="pin-btn" onclick="pinPress('')"></button>
+      <div class="pin-btn pin-spacer" aria-hidden="true"></div>
       <button class="pin-btn" onclick="pinPress('0')">0</button>
       <button class="pin-btn del" onclick="pinDel()">⌫</button>
     </div>
@@ -561,6 +588,9 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
     <span class="material-symbols-rounded">add</span>
   </button>
 
+  <!-- Bottom Nav (only shown when logged in) -->
+  <nav class="bottom-nav"></nav>
+
 </div><!-- /appShell -->
 
 <!-- ═══════════════ SHEETS ═══════════════ -->
@@ -695,7 +725,6 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Bottom Nav -->
 <!-- Consequence Picker Sheet (Sir picks escalated punishment) -->
 <div class="sheet" id="consequenceSheet">
   <div class="sheet-handle"></div>
@@ -746,7 +775,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Sub Task Request Sheet (already inline in dashboard, this handles Sir's review) -->
+<!-- Sub Task Request Sheet -->
 <div class="sheet" id="taskRequestReviewSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header"><div class="sheet-title">Task Request</div><div class="sheet-sub" id="taskRequestReviewSub">Becca is requesting a task</div></div>
@@ -759,18 +788,17 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<nav class="bottom-nav"></nav>
 <link rel="stylesheet" href="nav.css"/>
 <script src="nav.js"></script>
 
 <!-- ═══════════════ FIREBASE JS ═══════════════ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getDatabase, ref, set, get, push, onValue, update, remove }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { getStorage, ref as sRef, uploadString, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
 // NOTE: tasks.html uses Firebase Realtime Database for live task sync.
 // It connects to the dom-sub-hub-3e530 project.
 const firebaseConfig = {
@@ -784,16 +812,12 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
 let storage = null;
 try { storage = getStorage(app); } catch(e) { console.warn('Firebase Storage not available:', e); }
 
-// Auth guard
-const auth = getAuth(app);
-onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = 'login.html';
-});
+// NOTE: PIN-based auth handles access. Firebase Anonymous Auth is not required for RTDB
+// reads/writes here as long as your security rules allow it. If you re-enable Firebase
+// Auth later, gate it on its own page rather than auto-redirecting from this one.
 
 // ── State ──
 let role=null, pin='', settingUp=false, pendingPin='';
@@ -803,6 +827,29 @@ let pts={balance:0,earned:0,lost:0};
 let failId=null, proofTaskId=null, reviewQId=null, redemptionQId=null;
 let proofDataUrl=null, requireProof=false;
 const DPIN='dsh_dom_pin', SPIN='dsh_sub_pin', SESS='dsh_session_role';
+const RESET_KEY='dsh_last_reset', CHECKIN_KEY='dsh_last_checkin';
+
+// ── Custom confirm helper ──
+let _confirmResolver = null;
+function customConfirm({title='Are you sure?', message='', icon='⚠️', okText='Confirm', cancelText='Cancel'} = {}) {
+  return new Promise(resolve => {
+    document.getElementById('confirmIcon').textContent  = icon;
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent   = message;
+    document.getElementById('confirmOkBtn').textContent     = okText;
+    document.getElementById('confirmCancelBtn').textContent = cancelText;
+    document.getElementById('confirmOverlay').classList.add('open');
+    _confirmResolver = resolve;
+  });
+}
+document.getElementById('confirmOkBtn').addEventListener('click', () => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if (_confirmResolver) { _confirmResolver(true); _confirmResolver = null; }
+});
+document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if (_confirmResolver) { _confirmResolver(false); _confirmResolver = null; }
+});
 
 // ── Expose to inline handlers ──
 const W = window;
@@ -832,8 +879,9 @@ function selectRole(r) {
   document.getElementById('roleCardDom').classList.toggle('selected', r==='dom');
   document.getElementById('roleCardSub').classList.toggle('selected', r==='sub');
   document.getElementById('pinSection').style.display = 'block';
-  pin = ''; updateDots();
-  const stored = sessionStorage.getItem(r==='dom' ? DPIN : SPIN);
+  pin = ''; pendingPin = ''; updateDots();
+  // PINs persist across sessions via localStorage; fall back to sessionStorage if older value exists.
+  const stored = localStorage.getItem(r==='dom' ? DPIN : SPIN) || sessionStorage.getItem(r==='dom' ? DPIN : SPIN);
   settingUp = !stored;
   document.getElementById('pinLabel').textContent = stored ? (r==='dom' ? "Sir's PIN" : 'Your PIN') : 'Create a 4-digit PIN';
   document.getElementById('pinNote').textContent = stored ? '' : 'First time? Create a PIN to protect this role.';
@@ -843,6 +891,7 @@ function selectRole(r) {
 
 function pinPress(d) {
   if (!role || pin.length >= 4) return;
+  if (!d) return; // ignore empty / spacer presses
   pin += d; updateDots();
   if (pin.length === 4) { document.getElementById('loginBtn').disabled = false; setTimeout(doLogin, 200); }
 }
@@ -852,7 +901,7 @@ function updateDots() { for (let i=0;i<4;i++) document.getElementById('d'+i).cla
 function doLogin() {
   if (!role || pin.length < 4) return;
   const key = role==='dom' ? DPIN : SPIN;
-  const stored = sessionStorage.getItem(key);
+  const stored = localStorage.getItem(key) || sessionStorage.getItem(key);
   if (settingUp) {
     if (!pendingPin) {
       pendingPin = pin; pin = ''; updateDots();
@@ -868,7 +917,7 @@ function doLogin() {
       document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
       return;
     }
-    sessionStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
+    localStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
   } else {
     if (pin !== stored) {
       document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
@@ -1066,7 +1115,8 @@ async function confirmFail() {
 }
 
 async function deleteTask(id) {
-  if (!confirm('Remove this task?')) return;
+  const ok = await customConfirm({title:'Remove this task?', message:'This will delete the task permanently.', icon:'🗑️', okText:'Remove'});
+  if (!ok) return;
   await remove(ref(db,'tasks/'+id));
 }
 
@@ -1201,7 +1251,7 @@ function listenQueue() {
 function renderQueue() {
   const list = document.getElementById('queueList');
   const entries = Object.entries(queue).filter(([,v]) => !v.resolved).sort((a,b) => b[1].ts - a[1].ts);
-  if (!entries.length) {
+  if (!entries.length && !(role==='dom' && Object.values(taskRequests).some(r => !r.resolved && !r.denied))) {
     list.innerHTML = emptyState('✅', 'All clear', 'Nothing needs your attention right now.'); return;
   }
   let html = '';
@@ -1243,15 +1293,14 @@ function renderQueue() {
       </div>`;
     }
   });
-  list.innerHTML = html;
 
   // Append task requests section for Sir
   if (role === 'dom') {
     const reqs = Object.entries(taskRequests).filter(([,r]) => !r.resolved && !r.denied);
     if (reqs.length) {
-      let reqHtml = `<div style="margin-top:12px;"><div class="section-lbl" style="padding:0 0 8px;">🌸 Task Requests from Becca</div>`;
+      html += `<div style="margin-top:12px;"><div class="section-lbl" style="padding:0 0 8px;">🌸 Task Requests from Becca</div>`;
       reqs.forEach(([id,r]) => {
-        reqHtml += `<div class="task-request-card fade-up">
+        html += `<div class="task-request-card fade-up">
           <div class="task-request-icon">🌸</div>
           <div class="task-request-info">
             <div class="task-request-title">${esc(r.title)}</div>
@@ -1263,10 +1312,11 @@ function renderQueue() {
           </div>
         </div>`;
       });
-      reqHtml += '</div>';
-      list.innerHTML += reqHtml;
+      html += '</div>';
     }
   }
+
+  list.innerHTML = html || emptyState('✅', 'All clear', 'Nothing needs your attention right now.');
 }
 
 async function approveQueueItem(id) {
@@ -1420,7 +1470,8 @@ async function denyReward(id) {
 }
 
 async function deleteReward(id) {
-  if (!confirm('Remove this reward?')) return;
+  const ok = await customConfirm({title:'Remove this reward?', message:'It will be removed from the store.', icon:'🗑️', okText:'Remove'});
+  if (!ok) return;
   await remove(ref(db,'rewards/'+id));
 }
 
@@ -1486,7 +1537,8 @@ async function assignPunishment(id) {
 }
 
 async function deletePunishment(id) {
-  if (!confirm('Remove this punishment?')) return;
+  const ok = await customConfirm({title:'Remove this punishment?', message:'It will be removed from the list.', icon:'🗑️', okText:'Remove'});
+  if (!ok) return;
   await remove(ref(db,'punishments/'+id));
 }
 
@@ -1525,7 +1577,8 @@ function renderHistory() {
     proof_approved:       { icon:'📷', color:'var(--green)',  label:'Proof Approved' },
     proof_denied:         { icon:'🚫', color:'var(--rose)',   label:'Proof Rejected' },
     redemption_assigned:  { icon:'🌿', color:'var(--purple)', label:'Redemption Assigned' },
-    consequence_assigned: { icon:'⚡', color:'var(--rose)',   label:'Consequence Assigned' }
+    consequence_assigned: { icon:'⚡', color:'var(--rose)',   label:'Consequence Assigned' },
+    checkin:              { icon:'💭', color:'var(--blue)',   label:'Mood Check-in' }
   };
   let html = '';
   entries.forEach(([, e]) => {
@@ -1566,7 +1619,20 @@ function switchTab(t) {
 }
 
 function openCreateSheet() {
-  if (curTab==='tasks')       openSheet('taskSheet');
+  if (curTab==='tasks') {
+    // reset task-sheet state every time it opens so requireProof doesn't carry over
+    requireProof = false;
+    setProofToggle(false);
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('taskPoints').value = '10';
+    document.getElementById('taskSchedule').value = 'once';
+    document.getElementById('taskDue').value = '';
+    document.getElementById('taskPunishLink').value = '';
+    document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.remove('selected'));
+    document.querySelector('#diffChips .chip[data-val="simple"]').classList.add('selected');
+    openSheet('taskSheet');
+  }
   else if (curTab==='rewards') openSheet('rewardSheet');
   else if (curTab==='punishments') openSheet('punishSheet');
 }
@@ -1655,12 +1721,10 @@ const CONSEQUENCES = [
 let currentConsequenceTaskId = null;
 let currentConsequencePicked = null;
 
-// Expose new functions
 W.rollConsequence = rollConsequence;
 W.applyConsequence = applyConsequence;
 W.openConsequencePicker = openConsequencePicker;
 
-// ── Demerit count = unresolved failure_report queue items ──
 function getDemeritCount() {
   return Object.values(queue).filter(i => !i.resolved && i.type === 'failure_report').length;
 }
@@ -1684,7 +1748,6 @@ function renderDemeritsBanner() {
   </div>`;
 }
 
-// ── Consequence Picker ──
 function openConsequencePicker(taskId) {
   currentConsequenceTaskId = taskId;
   const count = getDemeritCount();
@@ -1700,11 +1763,9 @@ function openConsequencePicker(taskId) {
 function rollConsequence() {
   const count = getDemeritCount();
   const tierNum = TIER.indexOf(getTier(count));
-  // Include consequences at or below current tier
   const eligible = CONSEQUENCES.filter(c => c.tier <= Math.max(tierNum, 1));
-  // Pick 3 random without replacement
-  const shuffled = eligible.sort(() => Math.random() - 0.5).slice(0, 3);
-  currentConsequencePicked = shuffled[0]; // default select first
+  const shuffled = eligible.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+  currentConsequencePicked = shuffled[0];
   renderConsequenceCards(shuffled);
 }
 
@@ -1723,7 +1784,6 @@ function renderConsequenceCards(pool) {
     </div>`;
   });
   document.getElementById('consequenceCards').innerHTML = html;
-  // Store pool on window for selectConsequence
   window._consequencePool = pool;
 }
 
@@ -1736,7 +1796,6 @@ W.selectConsequence = function(el, globalIdx) {
 async function applyConsequence() {
   if (!currentConsequencePicked) return;
   const c = currentConsequencePicked;
-  // Add as a redemption-style task with photo proof
   await push(ref(db,'tasks'), {
     title: c.emoji + ' ' + c.title,
     description: c.desc,
@@ -1749,7 +1808,6 @@ async function applyConsequence() {
   await push(ref(db,'history'), {
     type: 'consequence_assigned', title: c.title, tier: c.tier, pts: c.pts, ts: Date.now()
   });
-  // Resolve the queue item if linked
   if (currentConsequenceTaskId && queue[currentConsequenceTaskId]) {
     await update(ref(db,'queue/'+currentConsequenceTaskId), {resolved:true, hadConsequence:true});
   }
@@ -1803,7 +1861,6 @@ function renderAchievements() {
 // PHASE 4 — DASHBOARD, MOOD CHECK-IN, CHART, TASK REQUESTS
 // ─────────────────────────────────────────────
 
-// Expose
 W.pickMood=pickMood; W.submitCheckin=submitCheckin; W.skipCheckin=skipCheckin;
 W.sendTaskRequest=sendTaskRequest; W.openTaskRequestReview=openTaskRequestReview;
 W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
@@ -1812,13 +1869,12 @@ let selectedMood = null;
 let reviewTaskReqId = null;
 let taskRequests = {};
 
-// ── Mood check-in ──
 function maybeShowCheckin() {
   if (role !== 'sub') return;
   const today = new Date().toDateString();
-  const lastCheckin = sessionStorage.getItem('dsh_last_checkin');
+  // Use localStorage so check-in throttling persists across sessions
+  const lastCheckin = localStorage.getItem(CHECKIN_KEY);
   if (lastCheckin === today) return;
-  // Show after 800ms delay so app is settled
   setTimeout(() => {
     document.getElementById('checkinOverlay').classList.add('open');
   }, 800);
@@ -1836,13 +1892,13 @@ async function submitCheckin() {
   const note = document.getElementById('checkinNote').value.trim();
   await set(ref(db,'checkin'), { mood:selectedMood, energy, note, ts:Date.now(), role:'sub' });
   await push(ref(db,'history'), { type:'checkin', mood:selectedMood, energy, ts:Date.now() });
-  sessionStorage.setItem('dsh_last_checkin', new Date().toDateString());
+  localStorage.setItem(CHECKIN_KEY, new Date().toDateString());
   closeCheckin();
   showToast('💭 Check-in sent to Sir');
 }
 
 function skipCheckin() {
-  sessionStorage.setItem('dsh_last_checkin', new Date().toDateString());
+  localStorage.setItem(CHECKIN_KEY, new Date().toDateString());
   closeCheckin();
 }
 
@@ -1855,7 +1911,6 @@ function closeCheckin() {
   document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
 }
 
-// ── Dashboard ──
 function listenCheckin() {
   onValue(ref(db,'checkin'), s => {
     window._checkinData = s.val() || null;
@@ -1867,19 +1922,14 @@ function listenTaskRequests() {
   onValue(ref(db,'taskRequests'), s => {
     taskRequests = s.val() || {};
     if (curTab === 'dashboard') renderDashboard(window._checkinData);
-    // Badge on queue if Sir has pending task requests
-    if (role === 'dom') {
-      const pending = Object.values(taskRequests).filter(r => !r.resolved).length;
-      const qTab = document.getElementById('tab-queue');
-      // Merge with existing queue badge
-      updateQueueBadge();
-    }
+    if (curTab === 'queue') renderQueue();
+    updateQueueBadge();
   });
 }
 
 function updateQueueBadge() {
   const queuePending = Object.values(queue).filter(i => !i.resolved).length;
-  const reqPending   = Object.values(taskRequests).filter(r => !r.resolved).length;
+  const reqPending   = Object.values(taskRequests).filter(r => !r.resolved && !r.denied).length;
   const total = queuePending + reqPending;
   const btn = document.getElementById('tab-queue');
   const existing = btn.querySelector('.tab-count');
@@ -1917,7 +1967,6 @@ function renderSirDashboard(checkin) {
   const doneTasks     = Object.values(tasks).filter(t => t.completedToday).length;
   const queuePending  = Object.values(queue).filter(i => !i.resolved).length;
   const demerits      = getDemeritCount();
-  const bestStreak    = Math.max(0, ...Object.values(tasks).map(t => t.streak||0));
   const mm            = checkin ? MOOD_META[checkin.mood] || MOOD_META.other : null;
 
   document.getElementById('dashGrid').innerHTML = `
@@ -2007,26 +2056,23 @@ function renderSubDashboard() {
       <div class="dash-card-sub">of ${ACHIEVEMENTS.length} total</div>
     </div>`;
 
-  // Pending task requests
-  const reqs = Object.entries(taskRequests).filter(([,r])=>!r.resolved);
+  const reqs = Object.entries(taskRequests).filter(([,r])=>!r.resolved && !r.denied);
   document.getElementById('taskRequestList').innerHTML = reqs.length
     ? reqs.map(([id,r])=>`<div class="task-request-card fade-up">
         <div class="task-request-icon">🌸</div>
         <div class="task-request-info">
           <div class="task-request-title">${esc(r.title)}</div>
           ${r.note?`<div class="task-request-desc">${esc(r.note)}</div>`:''}
-          <div class="task-request-desc" style="margin-top:4px;">Sent ${relTime(r.ts)} · <span style="color:${r.resolved?'var(--green)':r.denied?'var(--rose)':'var(--amber)'};">${r.denied?'Declined':r.resolved?'Assigned':'Awaiting Sir'}</span></div>
+          <div class="task-request-desc" style="margin-top:4px;">Sent ${relTime(r.ts)} · <span style="color:var(--amber);">Awaiting Sir</span></div>
         </div>
       </div>`).join('')
     : `<div style="font-size:10px;color:var(--dim);padding:8px 0;">No pending requests.</div>`;
 }
 
 // ── Point Economy Chart ──
-let chartInstance = null;
 function renderPointsChart() {
   const canvas = document.getElementById('pointsChart');
   if (!canvas) return;
-  // Build 7-day buckets from history
   const now = Date.now();
   const days = 7;
   const labels = [], earned = [], lost = [];
@@ -2043,13 +2089,10 @@ function renderPointsChart() {
     if (e.type === 'points_lost'   && e.amount) lost[idx]  += Math.abs(e.amount);
   });
 
-  // Destroy previous instance
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-
   const ctx = canvas.getContext('2d');
-  // Simple manual canvas chart (no external lib needed)
   const W = canvas.offsetWidth || 300, H = 120;
-  canvas.width = W * 2; canvas.height = H * 2; // retina
+  canvas.width = W * 2; canvas.height = H * 2;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scaling so re-renders don't compound
   ctx.scale(2, 2);
   const maxVal = Math.max(10, ...earned, ...lost);
   const padL=28, padR=8, padT=10, padB=24;
@@ -2057,7 +2100,6 @@ function renderPointsChart() {
   const barW = chartW / (days*2+days-1);
 
   ctx.clearRect(0,0,W,H);
-  // Grid lines
   ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
   for (let i=0;i<=4;i++) {
     const y = padT + chartH - (i/4)*chartH;
@@ -2065,22 +2107,17 @@ function renderPointsChart() {
     ctx.fillStyle='rgba(255,255,255,.25)'; ctx.font='8px Montserrat';
     ctx.fillText(Math.round(maxVal*i/4), 0, y+3);
   }
-  // Bars
   labels.forEach((lbl, i) => {
     const x = padL + i*(barW*2+barW/2);
     const eH = (earned[i]/maxVal)*chartH;
     const lH = (lost[i]/maxVal)*chartH;
-    // Earned bar
     ctx.fillStyle='rgba(76,175,80,.7)';
     ctx.fillRect(x, padT+chartH-eH, barW, eH);
-    // Lost bar
     ctx.fillStyle='rgba(224,91,106,.7)';
     ctx.fillRect(x+barW+1, padT+chartH-lH, barW, lH);
-    // Label
     ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='7px Montserrat';
     ctx.fillText(lbl, x, H-6);
   });
-  chartInstance = { destroy: ()=>{} }; // placeholder so we can re-render
 }
 
 // ── Sub Task Requests ──
@@ -2109,7 +2146,6 @@ function openTaskRequestReview(reqId) {
 async function approveTaskRequest() {
   if (!reviewTaskReqId) return;
   const r = taskRequests[reviewTaskReqId]; if (!r) return;
-  // Create as a real task
   await push(ref(db,'tasks'), {
     title: r.title, description: r.note||'',
     difficulty:'simple', basePoints:10, schedule:'once',
@@ -2129,12 +2165,12 @@ async function denyTaskRequest() {
 }
 
 // ─────────────────────────────────────────────
-// DAILY RESET
+// DAILY RESET (uses localStorage so it survives full app restarts)
 // ─────────────────────────────────────────────
 function checkDailyReset() {
   const today = new Date().toDateString();
-  if (sessionStorage.getItem('dsh_last_reset') === today) return;
-  sessionStorage.setItem('dsh_last_reset', today);
+  if (localStorage.getItem(RESET_KEY) === today) return;
+  localStorage.setItem(RESET_KEY, today);
   Object.entries(tasks).forEach(([id, t]) => {
     if (['daily','weekdays','weekends'].includes(t.schedule) && (t.completedToday || t.failedToday || t.proofPending)) {
       const u = {};
