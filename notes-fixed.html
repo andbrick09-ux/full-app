@@ -214,6 +214,32 @@
       font-family: 'Playfair Display', serif; font-style: italic;
     }
 
+    /* Rendered Markdown styles (used in view modal) */
+    .note-quote {
+      border-left: 3px solid var(--gold);
+      padding-left: 14px;
+      margin: 12px 0;
+      color: #bbb;
+      font-style: italic;
+    }
+    .note-list {
+      padding-left: 22px;
+      margin: 8px 0;
+    }
+    .note-li {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+    .note-li.bullet::marker { color: var(--gold); }
+    .note-li.numbered::marker { color: #64B5F6; }
+    .note-hr {
+      border: none;
+      border-top: 1px solid rgba(212,175,55,0.3);
+      margin: 16px 0;
+    }
+    #view-body strong { color: var(--gold); font-weight: 600; }
+    #view-body em { color: #ddd; font-style: italic; }
+
     /* Stagger card animations */
     .note-card:nth-child(1) { animation-delay: 0.05s; }
     .note-card:nth-child(2) { animation-delay: 0.12s; }
@@ -306,7 +332,49 @@
       outline: none; transition: border-color 0.2s, box-shadow 0.2s;
       margin-bottom: 18px;
     }
-    .field-textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+    .field-textarea { min-height: 220px; resize: vertical; line-height: 1.7; font-size: 14px; }
+
+    /* Rich text toolbar */
+    .rich-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .rich-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #ddd;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rich-btn:hover {
+      background: rgba(212,175,55,0.15);
+      color: var(--gold);
+    }
+    .rich-btn:active {
+      transform: scale(0.92);
+    }
+    .rich-sep {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      margin: 0 4px;
+    }
+
     .field-input:focus, .field-textarea:focus, .field-select:focus {
       border-color: rgba(212,175,55,0.4);
       box-shadow: 0 0 0 3px rgba(212,175,55,0.07);
@@ -504,7 +572,18 @@
       <input id="note-title-input" class="field-input" type="text" placeholder="Note heading…" />
 
       <label class="field-label">Content</label>
-      <textarea id="note-body-input" class="field-textarea" placeholder="Write your thoughts here…"></textarea>
+      <!-- Rich text toolbar -->
+      <div class="rich-toolbar">
+        <button type="button" class="rich-btn" onclick="wrapSelection('**','**')" title="Bold (Ctrl/Cmd+B)">B</button>
+        <button type="button" class="rich-btn" onclick="wrapSelection('*','*')" title="Italic (Ctrl/Cmd+I)">I</button>
+        <span class="rich-sep"></span>
+        <button type="button" class="rich-btn" onclick="insertListItem('- ')" title="Bullet list">•</button>
+        <button type="button" class="rich-btn" onclick="insertListItem('1. ')" title="Numbered list">1.</button>
+        <span class="rich-sep"></span>
+        <button type="button" class="rich-btn" onclick="wrapSelection('> ','')" title="Quote">❝</button>
+        <button type="button" class="rich-btn" onclick="insertAtCursor('---\n')" title="Horizontal rule">—</button>
+      </div>
+      <textarea id="note-body-input" class="field-textarea" placeholder="Write your thoughts here… Use **bold**, *italic*, - bullets, 1. numbered lists"></textarea>
 
       <label class="field-label">Tags (comma-separated)</label>
       <input id="note-tags-input" class="field-input" type="text" placeholder="e.g. scene, reflection, rule" />
@@ -737,6 +816,77 @@
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
+    /**
+     * Lightweight Markdown renderer for note bodies.
+     * Supports: **bold**, *italic*, - bullets, 1. numbered lists, > quotes, --- hr
+     * Safe: escapes HTML first, then converts Markdown.
+     */
+    function renderMarkdown(text) {
+      if (!text) return '';
+      let html = escHtml(text);
+
+      // Horizontal rules
+      html = html.replace(/^---$/gm, '<hr class="note-hr">');
+
+      // Blockquotes
+      html = html.replace(/^>\s?(.*)$/gm, '<blockquote class="note-quote">$1</blockquote>');
+
+      // Numbered lists (simple)
+      html = html.replace(/^\d+\.\s+(.*)$/gm, '<li class="note-li numbered">$1</li>');
+      html = html.replace(/(<li class="note-li numbered">.*<\/li>\n?)+/g, '<ol class="note-list">$&</ol>');
+
+      // Bullet lists (simple)
+      html = html.replace(/^-\s+(.*)$/gm, '<li class="note-li bullet">$1</li>');
+      html = html.replace(/(<li class="note-li bullet">.*<\/li>\n?)+/g, '<ul class="note-list">$&</ul>');
+
+      // Bold **text**
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+      // Italic *text*
+      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+      // Line breaks
+      html = html.replace(/\n/g, '<br>');
+
+      return html;
+    }
+
+    /* ── Rich text helpers for body textarea ── */
+    function wrapSelection(before, after) {
+      const ta = document.getElementById('note-body-input');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = ta.value.substring(start, end);
+      const newText = before + selected + after;
+      ta.value = ta.value.substring(0, start) + newText + ta.value.substring(end);
+      ta.focus();
+      ta.setSelectionRange(start + before.length, start + before.length + selected.length);
+    }
+
+    function insertAtCursor(text) {
+      const ta = document.getElementById('note-body-input');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      ta.value = ta.value.substring(0, start) + text + ta.value.substring(start);
+      ta.focus();
+      ta.setSelectionRange(start + text.length, start + text.length);
+    }
+
+    function insertListItem(prefix) {
+      const ta = document.getElementById('note-body-input');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const before = ta.value.substring(0, start);
+      const after = ta.value.substring(start);
+      // If not at start of line, add newline first
+      const needsNewline = before.length > 0 && !before.endsWith('\n');
+      const insertText = (needsNewline ? '\n' : '') + prefix;
+      ta.value = before + insertText + after;
+      ta.focus();
+      ta.setSelectionRange(start + insertText.length, start + insertText.length);
+    }
+
     /* ── New note modal ── */
     function openNewNoteModal() {
       editingId = null;
@@ -830,7 +980,7 @@
       document.getElementById('view-badges').innerHTML = visiBadge;
       document.getElementById('view-title').textContent = n.title;
       document.getElementById('view-meta').textContent  = date;
-      document.getElementById('view-body').textContent  = n.body;
+      document.getElementById('view-body').innerHTML  = renderMarkdown(n.body);
       document.getElementById('view-tags').innerHTML = (n.tags||[]).map(t =>
         `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${t}</span>`
       ).join('');
@@ -904,6 +1054,10 @@
     window.handleViewBackdropClick = handleViewBackdropClick;
     window.openNewNoteModal      = openNewNoteModal;
     window.handleModalBackdropClick = handleModalBackdropClick;
+    window.wrapSelection         = wrapSelection;
+    window.insertAtCursor        = insertAtCursor;
+    window.insertListItem        = insertListItem;
+    window.renderNotes           = renderNotes;
     window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
     window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
