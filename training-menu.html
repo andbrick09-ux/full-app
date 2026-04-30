@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -14,11 +14,32 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link rel="apple-touch-icon" href="icon-512.png"/>
   <link rel="stylesheet" href="styles.css"/>
-<link rel="stylesheet" href="nav.css" />
+  <link rel="stylesheet" href="nav.css"/>
+  <style>
+    /* Locked card styling */
+    .menu-card.locked {
+      opacity: 0.45;
+      cursor: default;
+      position: relative;
+      filter: grayscale(0.4);
+    }
+    .menu-card.locked::after {
+      content: 'Locked by Sir';
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold, #D4AF37);
+      opacity: 0.6;
+    }
+  </style>
 </head>
 <body data-nav="training">
 
-  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-center">
       <div class="topbar-title">Dom Sub Hub</div>
@@ -27,43 +48,42 @@
   </div>
 
   <div class="main">
-
     <div class="menu-grid">
-      <a href="the-5-training.html" class="menu-card">
+      <a href="the-5-training.html" class="menu-card" data-training="the-5-training.html">
         <span class="menu-card-icon">🖐️</span>
         <span class="menu-card-title">The "5" Training</span>
         <span class="menu-card-desc">Classical conditioning protocol to cum on Sir's command. 4-phase program with edging, trigger association, and maintenance.</span>
       </a>
 
-      <a href="anal-plug-training.html" class="menu-card">
+      <a href="anal-plug-training.html" class="menu-card" data-training="anal-plug-training.html">
         <span class="menu-card-icon">💎</span>
         <span class="menu-card-title">Anal Plug Training</span>
         <span class="menu-card-desc">Progressive size and duration training program with tracking and scheduled milestones.</span>
       </a>
 
-      <a href="deepthroat-training.html" class="menu-card">
+      <a href="deepthroat-training.html" class="menu-card" data-training="deepthroat-training.html">
         <span class="menu-card-icon">👄</span>
         <span class="menu-card-title">Deep Throat Training</span>
         <span class="menu-card-desc">Step-by-step depth and endurance conditioning with techniques and progress tracking.</span>
       </a>
 
-      <a href="kegel-training.html" class="menu-card">
+      <a href="kegel-training.html" class="menu-card" data-training="kegel-training.html">
         <span class="menu-card-icon">🔐</span>
         <span class="menu-card-title">Kegel Training</span>
         <span class="menu-card-desc">Pelvic floor strengthening routines with timed exercises and intensity progression.</span>
       </a>
 
-      <a href="position-training.html" class="menu-card">
+      <a href="position-training.html" class="menu-card" data-training="position-training.html">
         <span class="menu-card-icon">🧎‍♀️</span>
         <span class="menu-card-title">Position Training</span>
         <span class="menu-card-desc">12 submissive positions with step-by-step form instructions, hold durations, and mastery tracking.</span>
       </a>
     </div>
-
   </div>
 
   <div id="toast" class="toast">Locked by Sir</div>
 
+  <!-- Service worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -73,61 +93,85 @@
 
     function showToast(msg) {
       const t = document.getElementById('toast');
-      if(t) {
+      if (t) {
         t.textContent = msg;
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
       }
     }
+  </script>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      let s = {};
-      try { s = JSON.parse(localStorage.getItem('sp_settings') || '{}'); } catch(e){}
-      
-      // Default fallback if no settings found
-      const active = s.activeTrainings || ['anal-plug-training.html', 'position-training.html', 'kegel-training.html'];
-      
-      const cards = document.querySelectorAll('.menu-card');
-      cards.forEach(c => {
-        const h = c.getAttribute('href');
-        if (h && !active.includes(h)) {
-          c.classList.add('locked');
-          c.removeAttribute('href');
-          c.onclick = (e) => { e.preventDefault(); showToast("This training is currently locked by Sir"); };
-          const icon = c.querySelector('.menu-card-icon');
-          if (icon) icon.innerHTML = "🔒";
+  <!-- Load active trainings from Firestore -->
+  <script type="module">
+    import { requireAuth } from './auth.js';
+    import { dataRef } from './auth.js';
+    import { getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    const DEFAULT_ACTIVE = ['anal-plug-training.html', 'position-training.html', 'kegel-training.html'];
+
+    async function applyTrainingLocks() {
+      // Require auth — redirects to login if not signed in
+      await requireAuth();
+
+      let active = DEFAULT_ACTIVE;
+      try {
+        const snap = await getDoc(dataRef('settings'));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (Array.isArray(data.activeTrainings) && data.activeTrainings.length > 0) {
+            active = data.activeTrainings;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load training settings, using defaults.', e);
+      }
+
+      document.querySelectorAll('.menu-card[data-training]').forEach(card => {
+        const training = card.getAttribute('data-training');
+        if (!active.includes(training)) {
+          // Lock it
+          card.classList.add('locked');
+          card.removeAttribute('href');
+          const icon = card.querySelector('.menu-card-icon');
+          if (icon) icon.textContent = '🔒';
+          card.onclick = (e) => {
+            e.preventDefault();
+            showToast('This training is currently locked by Sir');
+          };
         }
       });
-    });
+    }
+
+    applyTrainingLocks();
   </script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="global-sidebar" id="globalSidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">Dom Sub Hub</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+      <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+      <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+      <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
+      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
+      <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
+      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
+    </div>
   </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
-</script>
-<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
-<script src="nav.js"></script>
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebarOverlay').classList.add('open');
+      document.getElementById('globalSidebar').classList.add('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebarOverlay').classList.remove('open');
+      document.getElementById('globalSidebar').classList.remove('open');
+    }
+  </script>
+  <script src="nav.js"></script>
 </body>
 </html>
