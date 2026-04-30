@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -659,132 +659,139 @@
   </div>
 
   <script type="module">
-import { requireAuth } from './auth.js';
-requireAuth();
-    // --- CLOUD API CONFIGURATION ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbyTBm0qNlaCPg22tTBpsv1chX5zbaY7jvU1f_hDn1vwksyxLOlaz6dtT4lEsBwNHWWR/exec";
-    const APP_TOKEN = "8zhd0ajdfa8";
+    import { requireAuth, getMyProfile, dataRef, partnerDataRef } from './auth.js';
+    import { getDoc, setDoc, onSnapshot, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    // App State
+    // --- STATE ---
     let APP_STATE = { p1: { data: [], history: [] }, p2: { data: [], history: [] } };
     let activeP = 'p1', activeTab = 'all', isCompare = false, searchQ = '';
     let filters = { tried: [], rating: [], limit: [], role: [], motive: [] };
+    let myUid, role, myProfile;
 
-    // API Fetch and Initialize
+    // References
+    let myChecklistRef, partnerChecklistRef;
+
     async function init() {
-      document.getElementById('saveLabel').textContent = 'Connecting to Cloud...';
+      document.getElementById('saveLabel').textContent = 'Connecting...';
+      const user = await requireAuth();
+      myUid = user.uid;
+      myProfile = await getMyProfile();
+      role = myProfile?.role || 'sub';
 
-      try {
-        // The &t=... adds a millisecond timestamp so the URL is uniquely fresh every time
-        const response = await fetch(`${API_URL}?token=${APP_TOKEN}&t=${new Date().getTime()}`);
+      myChecklistRef = dataRef('checklist');
 
-        const sheetData = await response.json();
-
-        if (sheetData.error) throw new Error(sheetData.error);
-
-        // Group the flat spreadsheet rows into categories
-        const categories = [...new Set(sheetData.map(row => row.Category))];
-
-        categories.forEach(cat => {
-          const itemsInCat = sheetData.filter(row => row.Category === cat);
-          const catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-          let p1Items = itemsInCat.map(row => ({
-            n: row.Activity, d: row.Description || '',
-            tried: row.Andy_Tried || '', rating: row.Andy_Rating || '', role: row.Andy_Role || '', limit: row.Andy_Limit || '', motive: row.Andy_Motive || '', note: row.Andy_Note || ''
-          }));
-
-          let p2Items = itemsInCat.map(row => ({
-            n: row.Activity, d: row.Description || '',
-            tried: row.Becca_Tried || '', rating: row.Becca_Rating || '', role: row.Becca_Role || '', limit: row.Becca_Limit || '', motive: row.Becca_Motive || '', note: row.Becca_Note || ''
-          }));
-
-          APP_STATE.p1.data.push({ id: catId, label: cat, items: p1Items });
-          APP_STATE.p2.data.push({ id: catId, label: cat, items: p2Items });
-        });
-
-        document.getElementById('saveLabel').textContent = 'Synced with Cloud';
+      // Listen to my checklist
+      onSnapshot(myChecklistRef, s => {
+        if (!s.exists()) {
+          const seed = getSeedData();
+          setDoc(myChecklistRef, { categories: seed, history: [] });
+          APP_STATE.p1.data = seed;
+          APP_STATE.p1.history = [];
+        } else {
+          APP_STATE.p1.data = s.data().categories || [];
+          APP_STATE.p1.history = s.data().history || [];
+        }
+        document.getElementById('saveLabel').textContent = 'Live Synced';
         document.getElementById('saveLabel').style.color = 'var(--green)';
-        save(); // Cache to local storage as fallback
+        updateTabs();
+        updateHistDropdown();
+        render();
+        renderFilterDashboard();
+      });
 
-      } catch (error) {
-        console.error("Failed to load cloud data:", error);
-        document.getElementById('saveLabel').textContent = 'Offline (Using Cache)';
-        document.getElementById('saveLabel').style.color = 'var(--red)';
-        const saved = localStorage.getItem('bdsm_portal_vTRAD_SYNC_2026');
-        if (saved) APP_STATE = JSON.parse(saved);
+      // Try to listen to partner checklist
+      try {
+        partnerChecklistRef = await partnerDataRef('checklist');
+        onSnapshot(partnerChecklistRef, s => {
+          if (s.exists()) {
+            APP_STATE.p2.data = s.data().categories || [];
+            if (isCompare) render();
+          }
+        });
+      } catch (e) {
+        console.log("No partner linked for comparison.");
+        document.getElementById('btnCompare').style.display = 'none';
       }
+    }
 
-      // Inject category tabs dynamically
+    function getSeedData() {
+      // Standard BDSM categories and items if Firestore is empty
+      return [
+        { id: 'impact', label: 'Impact Play', items: [
+          { n: 'Spanking', d: 'Using hands or light paddles on the buttocks.', tried: '', rating: '', limit: '', role: '', motive: '', note: '' },
+          { n: 'Cane', d: 'Sharp, stinging sensation with a thin rod.', tried: '', rating: '', limit: '', role: '', motive: '', note: '' },
+          { n: 'Flogging', d: 'Multi-tail impact for thuddy or stinging feel.', tried: '', rating: '', limit: '', role: '', motive: '', note: '' }
+        ]},
+        { id: 'restraint', label: 'Restraints', items: [
+          { n: 'Cuffs', d: 'Wrist or ankle restraints (metal/leather).', tried: '', rating: '', limit: '', role: '', motive: '', note: '' },
+          { n: 'Rope Bondage', d: 'Shibari or functional ties.', tried: '', rating: '', limit: '', role: '', motive: '', note: '' }
+        ]},
+        { id: 'sensory', label: 'Sensory', items: [
+          { n: 'Blindfolds', d: 'Depriving sight to enhance other senses.', tried: '', rating: '', limit: '', role: '', motive: '', note: '' },
+          { n: 'Temperature', d: 'Wax play or ice cubes.', tried: '', rating: '', limit: '', role: '', motive: '', note: '' }
+        ]}
+      ];
+    }
+
+    function updateTabs() {
       const nav = document.getElementById('tabsNav');
-      nav.innerHTML = '<button class="tab-btn active" id="tab-all" onclick="setTab(\'all\', this)">All Categories</button>';
+      const cur = activeTab;
+      nav.innerHTML = `<button class="tab-btn ${cur==='all'?'active':''}" id="tab-all" onclick="setTab('all', this)">All Categories</button>`;
       APP_STATE.p1.data.forEach(c => {
         const b = document.createElement('button');
-        b.className = 'tab-btn';
+        b.className = 'tab-btn' + (cur === c.id ? ' active' : '');
         b.textContent = c.label;
         b.onclick = () => setTab(c.id, b);
         nav.appendChild(b);
       });
-
-      render();
-      updateHistDropdown();
-      renderFilterDashboard();
     }
 
-    // API Post (Live Sync)
-    async function syncToCloud(itemName, profile, field, value) {
-      const payload = { token: APP_TOKEN, profile: profile, itemName: itemName, field: field, value: value };
-
-      try {
-        document.getElementById('saveLabel').textContent = 'Syncing...';
-        document.getElementById('saveLabel').style.color = 'var(--gold)';
-
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          document.getElementById('saveLabel').textContent = 'Live Synced';
-          document.getElementById('saveLabel').style.color = 'var(--green)';
-        } else {
-          console.error("Cloud Error:", result.error);
-          document.getElementById('saveLabel').textContent = 'Sync Error';
-          document.getElementById('saveLabel').style.color = 'var(--red)';
-        }
-      } catch (err) {
-        console.error("Network Error:", err);
-        document.getElementById('saveLabel').textContent = 'Offline (Saved Locally)';
-        document.getElementById('saveLabel').style.color = 'var(--red)';
-      }
+    async function saveChange() {
+      await setDoc(myChecklistRef, { categories: APP_STATE.p1.data }, { merge: true });
     }
-
-    function save() { localStorage.setItem('bdsm_portal_vTRAD_SYNC_2026', JSON.stringify(APP_STATE)); }
 
     // --- UI LOGIC ---
-    function setProfile(p) {
-      activeP = p; isCompare = false; document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
+    window.setProfile = (p) => {
+      activeP = p; isCompare = false; 
+      document.getElementById('profileSwitcher').className = `profile-switcher ${p}-active`;
       document.getElementById('p1-btn').classList.toggle('active', p === 'p1');
       document.getElementById('p2-btn').classList.toggle('active', p === 'p2');
-      render(); updateHistDropdown();
-    }
+      render();
+    };
 
-    function setTab(id, b) { activeTab = id; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); render(); }
-    function toggleCompare() { isCompare = !isCompare; render(); }
-    function handleSearch(v) { searchQ = v.toLowerCase(); render(); }
-    function clearFilters() { searchQ = ''; document.getElementById('searchInput').value = ''; Object.keys(filters).forEach(k => filters[k] = []); renderFilterDashboard(); render(); }
+    window.setTab = (id, b) => { 
+      activeTab = id; 
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); 
+      b.classList.add('active'); 
+      render(); 
+    };
+
+    window.toggleCompare = () => { isCompare = !isCompare; render(); };
+    window.handleSearch = (v) => { searchQ = v.toLowerCase(); render(); };
+    window.clearFilters = () => { 
+      searchQ = ''; 
+      document.getElementById('searchInput').value = ''; 
+      Object.keys(filters).forEach(k => filters[k] = []); 
+      renderFilterDashboard(); 
+      render(); 
+    };
 
     function render() {
       const main = document.getElementById('mainContent');
-      if (!APP_STATE[activeP] || !APP_STATE[activeP].data.length) { main.innerHTML = '<div style="text-align:center; padding:40px; color:#444;">No data loaded.</div>'; return; }
+      if (!APP_STATE.p1.data.length) { 
+        main.innerHTML = '<div style="text-align:center; padding:40px; color:#444;">No data loaded.</div>'; 
+        return; 
+      }
 
-      const cats = activeTab === 'all' ? APP_STATE[activeP].data : APP_STATE[activeP].data.filter(c => c.id == activeTab);
+      const cats = activeTab === 'all' ? APP_STATE.p1.data : APP_STATE.p1.data.filter(c => c.id == activeTab);
       let html = '';
 
-      if (isCompare) { document.getElementById('scoreCard').style.display = 'block'; calculateSynergy(); }
-      else { document.getElementById('scoreCard').style.display = 'none'; }
+      if (isCompare) { 
+        document.getElementById('scoreCard').style.display = 'block'; 
+        calculateSynergy(); 
+      } else { 
+        document.getElementById('scoreCard').style.display = 'none'; 
+      }
 
       let fC = 0; Object.values(filters).forEach(v => fC += v.length);
       document.getElementById('advFilterBtn').classList.toggle('active', fC > 0);
@@ -801,7 +808,11 @@ requireAuth();
         vis.forEach((item) => {
           const idx = cat.items.indexOf(item);
           const p1 = APP_STATE.p1.data.find(c => c.id === cat.id).items[idx];
-          const p2 = APP_STATE.p2.data.find(c => c.id === cat.id).items[idx];
+          // Find corresponding item in p2 if exists
+          let p2 = { tried:'', rating:'', limit:'', role:'', motive:'', note:'' };
+          const p2Cat = APP_STATE.p2.data.find(c => c.id === cat.id);
+          if (p2Cat && p2Cat.items[idx]) p2 = p2Cat.items[idx];
+
           const isM = (p1.tried === 'yes' || p1.tried === 'no-want') && (p2.tried === 'yes' || p2.tried === 'no-want');
 
           html += `<div class="activity-item ${isCompare && isM ? 'match' : ''}">
@@ -809,7 +820,7 @@ requireAuth();
             ${isCompare ? renderCell(p1, 'Andy', 'p1', cat.id, idx) : ''}
             ${isCompare ? renderCell(p2, 'Becca', 'p2', cat.id, idx) : ''}
             ${!isCompare ? renderCell(item, activeP === 'p1' ? 'Andy' : 'Becca', activeP, cat.id, idx) : ''}
-        </div></div>${!isCompare ? `<input type="text" class="note-input" placeholder="Notes & Reflections..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}</div>`;
+        </div></div>${!isCompare && activeP === 'p1' ? `<input type="text" class="note-input" placeholder="Notes & Reflections..." value="${item.note || ''}" onchange="updateNote('${cat.id}', ${idx}, this.value)">` : ''}</div>`;
         });
         html += `</div></div>`;
       });
@@ -817,11 +828,11 @@ requireAuth();
     }
 
     function renderCell(res, name, pKey, cid, idx) {
-      const isE = activeP === pKey && !isCompare;
+      const isE = pKey === 'p1' && !isCompare;
       const sS = res.tried !== ''; const eS = res.rating !== ''; const bS = res.limit !== '';
       const statusLabel = res.tried === 'yes' ? 'TRIED IT' : (res.tried === 'no-want' ? 'WANT' : (res.tried === 'no-dont' ? 'NO' : ''));
 
-      return `<div class="profile-cell" style="opacity:${isCompare || activeP === pKey ? '1' : '0.2'}">
+      return `<div class="profile-cell" style="opacity:${isCompare || pKey === 'p1' ? '1' : '0.2'}">
         ${isCompare ? `<div style="font-size:9px; color:var(--gold); font-weight:700; margin-bottom:5px; text-transform:uppercase;">${name}</div>` : ''}
         <div class="kink-grid">
             <div class="kink-pill ${sS ? 'filled' : ''} ${res.tried === 'yes' ? 'status-yes' : (res.tried === 'no-want' ? 'status-want' : '')}" onclick="${isE ? `triggerSheet('${cid}', ${idx}, 'tried')` : ''}"><span class="pill-title">Status</span><span class="pill-value">${statusLabel}</span></div>
@@ -837,8 +848,10 @@ requireAuth();
       let total = 0, mutual = 0;
       APP_STATE.p1.data.forEach((cat, cIdx) => {
         const p2Cat = APP_STATE.p2.data[cIdx];
+        if (!p2Cat) return;
         cat.items.forEach((i1, idx) => {
           const i2 = p2Cat.items[idx];
+          if (!i2) return;
           const hasP1 = i1.tried === 'yes' || i1.tried === 'no-want';
           const hasP2 = i2.tried === 'yes' || i2.tried === 'no-want';
           if (hasP1 || hasP2) total++;
@@ -872,11 +885,18 @@ requireAuth();
       });
     }
 
-    function toggleFilterValue(key, val) { if (filters[key].includes(val)) filters[key] = filters[key].filter(v => v !== val); else filters[key].push(val); renderFilterDashboard(); render(); }
-    function openFilterSheet() { document.getElementById('sheetOverlay').style.display = 'block'; document.getElementById('filterSheet').classList.add('open'); }
+    window.toggleFilterValue = (key, val) => { 
+      if (filters[key].includes(val)) filters[key] = filters[key].filter(v => v !== val); 
+      else filters[key].push(val); 
+      renderFilterDashboard(); render(); 
+    };
+    window.openFilterSheet = () => { 
+      document.getElementById('sheetOverlay').style.display = 'block'; 
+      document.getElementById('filterSheet').classList.add('open'); 
+    };
 
-    function triggerSheet(cid, i, f) {
-      const item = APP_STATE[activeP].data.find(c => c.id == cid).items[i];
+    window.triggerSheet = (cid, i, f) => {
+      const item = APP_STATE.p1.data.find(c => c.id == cid).items[i];
       const CONFIGS = {
         limit: [{ lab: 'No Limit', val: '' }, { lab: 'Soft Limit', val: 'Soft Limit' }, { lab: 'Hard Limit', val: 'Hard Limit' }],
         tried: [{ lab: 'Tried It', val: 'yes' }, { lab: 'Want to try', val: 'no-want' }, { lab: 'No Interest', val: 'no-dont' }, { lab: 'Clear Selection', val: '' }],
@@ -890,41 +910,67 @@ requireAuth();
         const d = document.createElement('div'); d.className = 'sheet-option';
         d.onclick = () => {
           item[f] = o.val;
-          save();
-          syncToCloud(item.n, activeP, f, o.val);
+          saveChange();
           render();
           closeSheets();
         };
         d.textContent = o.lab; cont.appendChild(d);
       });
-      document.getElementById('sheetOverlay').style.display = 'block'; document.getElementById('bottomSheet').classList.add('open');
-    }
+      document.getElementById('sheetOverlay').style.display = 'block'; 
+      document.getElementById('bottomSheet').classList.add('open');
+    };
 
-    function closeSheets() { document.getElementById('sheetOverlay').style.display = 'none'; document.getElementById('bottomSheet').classList.remove('open'); document.getElementById('filterSheet').classList.remove('open'); }
-    function updateNote(cid, idx, val) {
-      const item = APP_STATE[activeP].data.find(c => c.id == cid).items[idx];
+    window.closeSheets = () => { 
+      document.getElementById('sheetOverlay').style.display = 'none'; 
+      document.getElementById('bottomSheet').classList.remove('open'); 
+      document.getElementById('filterSheet').classList.remove('open'); 
+    };
+
+    window.updateNote = (cid, idx, val) => {
+      const item = APP_STATE.p1.data.find(c => c.id == cid).items[idx];
       item.note = val;
-      save();
-      syncToCloud(item.n, activeP, 'note', val);
+      saveChange();
+    };
+
+    window.openSnapshotModal = () => { document.getElementById('snapModal').style.display = 'block'; };
+    window.closeSnapshotModal = () => { document.getElementById('snapModal').style.display = 'none'; };
+    window.saveSnapshot = async () => {
+      const name = document.getElementById('snapName').value || 'Snapshot';
+      const snap = { id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE.p1.data)) };
+      const hist = [snap, ...(APP_STATE.p1.history || [])].slice(0, 20);
+      await updateDoc(myChecklistRef, { history: hist });
+      closeSnapshotModal();
+    };
+
+    function updateHistDropdown() {
+      const d = document.getElementById('historySelect');
+      if (!d) return;
+      d.innerHTML = '<option value="">History Vault</option>';
+      const hist = APP_STATE.p1.history || [];
+      hist.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.id;
+        o.textContent = `${s.name} (${s.date})`;
+        d.appendChild(o);
+      });
     }
 
-    function openSnapshotModal() { document.getElementById('snapModal').style.display = 'block'; }
-    function closeSnapshotModal() { document.getElementById('snapModal').style.display = 'none'; }
-    function saveSnapshot() {
-      const name = document.getElementById('snapName').value || 'Snapshot';
-      APP_STATE[activeP].history.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: JSON.parse(JSON.stringify(APP_STATE[activeP].data)) });
-      save(); updateHistDropdown(); closeSnapshotModal(); render();
-    }
-    function updateHistDropdown() {
-      const d = document.getElementById('historySelect'); d.innerHTML = '<option value="">Vault</option>';
-      if (!APP_STATE[activeP] || !APP_STATE[activeP].history) return;
-      APP_STATE[activeP].history.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} (${s.date})`; d.appendChild(o); });
-    }
-    function compareHistory(id) {
-      const snap = APP_STATE[activeP].history.find(h => h.id == id);
-      if (snap) { APP_STATE[activeP].data = JSON.parse(JSON.stringify(snap.data)); render(); }
-    }
-    function resetApp() { if (confirm("Wipe local cache? App will reload from cloud.")) { localStorage.removeItem('bdsm_portal_vTRAD_SYNC_2026'); location.reload(); } }
+    window.compareHistory = (id) => {
+      if (!id) return;
+      const snap = (APP_STATE.p1.history || []).find(h => h.id == id);
+      if (snap) {
+        APP_STATE.p1.data = JSON.parse(JSON.stringify(snap.data));
+        render();
+      }
+    };
+
+    window.resetApp = () => { 
+      if (confirm("Wipe local cache? App will reload from cloud.")) { 
+        location.reload(); 
+      } 
+    };
+
+    window.init = init;
   </script>
   <!-- Global Sidebar Menu -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>

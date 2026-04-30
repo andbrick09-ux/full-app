@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -164,93 +164,143 @@ body{
 
 </div>
 
-<script>
-'use strict';
+<script type="module">
+import { requireAuth, dataRef, dataCol } from './auth.js';
+import { getDoc, setDoc, onSnapshot, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+requireAuth().then(async (user) => {
+  initWeekTracker();
+  initRecentScenes();
+});
 
 /* ── Week tracker ── */
-(function(){
-  var LABELS=['M','T','W','T','F','S','S'];
-  var today=new Date(); today.setHours(0,0,0,0);
-  var dow=today.getDay();
-  var mon=new Date(today); mon.setDate(today.getDate()-((dow+6)%7));
-  var KEY='dsh_week_done';
-  var saved=[];
-  try{saved=JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){}
-  var cut=new Date(today); cut.setDate(today.getDate()-14);
-  saved=saved.filter(function(d){return new Date(d)>=cut;});
+async function initWeekTracker() {
+  const LABELS = ['M','T','W','T','F','S','S'];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dow = today.getDay();
+  const mon = new Date(today); mon.setDate(today.getDate()-((dow+6)%7));
+  const weekRef = dataRef('stats/week');
+  
+  let saved = [];
+  try {
+    const snap = await getDoc(weekRef);
+    if (snap.exists()) {
+      saved = snap.data().done || [];
+    }
+  } catch(e) { console.error("Error loading week stats:", e); }
+  
+  const cut = new Date(today); cut.setDate(today.getDate()-14);
+  saved = saved.filter(d => new Date(d) >= cut);
 
-  var row=document.getElementById('weekRow');
-  for(var i=0;i<7;i++){
-    var day=new Date(mon); day.setDate(mon.getDate()+i);
-    var iso=day.toISOString().slice(0,10);
-    var isToday=day.getTime()===today.getTime();
-    var isFuture=day>today;
-    var isDone=saved.indexOf(iso)!==-1;
-    var dot=document.createElement('div');
-    dot.className='wdot';
-    dot.textContent=LABELS[i];
-    dot.dataset.iso=iso;
-    if(isDone)dot.classList.add('done');
-    else if(isToday)dot.classList.add('today');
-    else if(isFuture)dot.classList.add('future');
-    if(!isFuture){
-      dot.addEventListener('click',function(){
-        var d=this.dataset.iso;
-        var idx=saved.indexOf(d);
-        if(idx===-1){saved.push(d);this.classList.add('done');this.classList.remove('today');}
-        else{saved.splice(idx,1);this.classList.remove('done');
-          if(d===new Date().toISOString().slice(0,10))this.classList.add('today');}
-        try{localStorage.setItem(KEY,JSON.stringify(saved));}catch(e){}
-        recalc(saved,mon,today);
+  const row = document.getElementById('weekRow');
+  row.innerHTML = '';
+  for(let i=0; i<7; i++) {
+    const day = new Date(mon); day.setDate(mon.getDate()+i);
+    const iso = day.toISOString().slice(0,10);
+    const isToday = day.getTime() === today.getTime();
+    const isFuture = day > today;
+    const isDone = saved.indexOf(iso) !== -1;
+    
+    const dot = document.createElement('div');
+    dot.className = 'wdot';
+    dot.textContent = LABELS[i];
+    dot.dataset.iso = iso;
+    if(isDone) dot.classList.add('done');
+    else if(isToday) dot.classList.add('today');
+    else if(isFuture) dot.classList.add('future');
+    
+    if(!isFuture) {
+      dot.addEventListener('click', async function() {
+        const d = this.dataset.iso;
+        const idx = saved.indexOf(d);
+        if(idx === -1) {
+          saved.push(d);
+          this.classList.add('done');
+          this.classList.remove('today');
+        } else {
+          saved.splice(idx,1);
+          this.classList.remove('done');
+          if(d === new Date().toISOString().slice(0,10)) this.classList.add('today');
+        }
+        await setDoc(weekRef, { done: saved }, { merge: true });
+        recalc(saved, mon, today);
       });
     }
     row.appendChild(dot);
   }
-  recalc(saved,mon,today);
-})();
+  recalc(saved, mon, today);
+}
 
-function recalc(saved,mon,today){
-  var streak=0,cur=new Date(today);
-  while(true){
-    var iso=cur.toISOString().slice(0,10);
-    if(saved.indexOf(iso)!==-1){streak++;cur.setDate(cur.getDate()-1);}
-    else if(cur.getTime()===today.getTime()&&streak===0){
+function recalc(saved, mon, today) {
+  let streak = 0, cur = new Date(today);
+  while(true) {
+    const iso = cur.toISOString().slice(0,10);
+    if(saved.indexOf(iso) !== -1) {
+      streak++;
       cur.setDate(cur.getDate()-1);
-      if(saved.indexOf(cur.toISOString().slice(0,10))!==-1){streak++;cur.setDate(cur.getDate()-1);}
-      else break;
-    }else break;
+    } else if(cur.getTime() === today.getTime() && streak === 0) {
+      cur.setDate(cur.getDate()-1);
+      if(saved.indexOf(cur.toISOString().slice(0,10)) !== -1) {
+        streak++;
+        cur.setDate(cur.getDate()-1);
+      } else break;
+    } else break;
   }
-  document.getElementById('streakVal').textContent=streak;
-  var elapsed=Math.floor((today-mon)/86400000)+1,done=0;
-  for(var i=0;i<elapsed;i++){var d=new Date(mon);d.setDate(mon.getDate()+i);if(saved.indexOf(d.toISOString().slice(0,10))!==-1)done++;}
-  document.getElementById('compVal').textContent=elapsed>0?Math.round(done/elapsed*100)+'%':'—';
+  document.getElementById('streakVal').textContent = streak;
+  const elapsed = Math.floor((today-mon)/86400000)+1;
+  let done = 0;
+  for(let i=0; i<elapsed; i++) {
+    const d = new Date(mon);
+    d.setDate(mon.getDate()+i);
+    if(saved.indexOf(d.toISOString().slice(0,10)) !== -1) done++;
+  }
+  document.getElementById('compVal').textContent = elapsed > 0 ? Math.round(done/elapsed*100)+'%' : '—';
 }
 
 /* ── Recent scenes ── */
-(function(){
-  var list=document.getElementById('scenesList');
-  var scenes=[],keys=['dsh_saved_scenes','savedScenes','scenes'];
-  for(var k=0;k<keys.length;k++){try{var r=localStorage.getItem(keys[k]);if(r){scenes=JSON.parse(r);break;}}catch(e){}}
-  document.getElementById('scenesVal').textContent=scenes.length;
-  if(!scenes.length){
-    list.innerHTML='<div class="empty"><p>No scenes saved yet.<br>Build your first map for Sir.</p><a href="scene-menu.html">Begin Building \u2192</a></div>';
-    return;
-  }
-  var ICONS=['🎭','🌹','⚡','🔒','🕯️','🎲'];
-  scenes.slice(-3).reverse().forEach(function(s,i){
-    var name=esc(s.name||s.title||('Scene '+(scenes.length-i)));
-    var date=s.savedAt||s.date||'';
-    var stars=parseInt(s.rating)||0;
-    var ds=date?new Date(date).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Saved scene';
-    var ss=stars?'\u2605'.repeat(stars)+'\u2606'.repeat(5-stars):'';
-    var a=document.createElement('a');
-    a.href='scene-menu.html';a.className='srow';
-    a.innerHTML='<div class="sico">'+ICONS[i%ICONS.length]+'</div><div style="flex:1;min-width:0"><span class="sname">'+name+'</span><span class="smeta">'+ds+'</span></div>'+(ss?'<span class="sstars">'+ss+'</span>':'');
-    list.appendChild(a);
-  });
-})();
+function initRecentScenes() {
+  const list = document.getElementById('scenesList');
+  const q = query(dataCol('scenes'), orderBy('date', 'desc'), limit(3));
+  
+  onSnapshot(q, (snap) => {
+    const scenes = [];
+    snap.forEach(doc => scenes.push(doc.data()));
+    
+    // For the total count stat, we'll fetch full collection size or a stats doc
+    getDoc(dataRef('stats/scenes')).then(sDoc => {
+      if(sDoc.exists()) document.getElementById('scenesVal').textContent = sDoc.data().count || 0;
+      else document.getElementById('scenesVal').textContent = 0;
+    });
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    if(scenes.length === 0) {
+      list.innerHTML = '<div class="empty"><p>No scenes saved yet.<br>Build your first map for Sir.</p><a href="scene-menu.html">Begin Building \u2192</a></div>';
+      return;
+    }
+    
+    const ICONS = ['🎭','🌹','⚡','🔒','🕯️','🎲'];
+    list.innerHTML = '';
+    scenes.forEach((s, i) => {
+      const name = esc(s.name || s.title || 'Scene');
+      const date = s.date || '';
+      const stars = s.checkin ? parseInt(s.checkin.rating) : 0;
+      const ds = date ? new Date(date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'Saved scene';
+      const ss = stars ? '\u2605'.repeat(stars) + '\u2606'.repeat(5-stars) : '';
+      
+      const a = document.createElement('a');
+      a.href = 'scene-menu.html';
+      a.className = 'srow';
+      a.innerHTML = `<div class="sico">${ICONS[i % ICONS.length]}</div>
+                     <div style="flex:1;min-width:0">
+                       <span class="sname">${name}</span>
+                       <span class="smeta">${ds}</span>
+                     </div>
+                     ${ss ? `<span class="sstars">${ss}</span>` : ''}`;
+      list.appendChild(a);
+    });
+  });
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->

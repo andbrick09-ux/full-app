@@ -766,7 +766,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px;
 <div id="toast" class="toast"></div>
 
 <script type="module">
-import { requireAuth } from './auth.js';
+import { requireAuth, dataRef } from './auth.js';
+import { getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 // ── STATE ─────────────────────────────────────────────────────────────────────
 var activeModel  = 'claude';
 var currentStep  = 0;

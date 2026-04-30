@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -927,19 +927,35 @@ let dbRef;
     // ════════════════════════════════════
     // STATE
     // ════════════════════════════════════
-    const STORAGE_KEY = 'sirender_dt_training';
-    let state = getDefaultState(); // loaded via firebase
-    let openWeekId = null; // track which week is open
+    // ════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════
+    let state = getDefaultState();
+    let openWeekId = null;
 
     function getDefaultState() {
       return { tasks:{}, completedWeeks:[], sessions:0, log:[], depthLog:[] };
     }
-    function loadState() {
-      const s = localStorage.getItem(STORAGE_KEY);
-      if (s) { try { return JSON.parse(s); } catch(e){} }
-      return getDefaultState();
+    
+    async function saveState() { 
+      if(dbRef) await setDoc(dbRef, state); 
     }
-    function saveState() { if(dbRef) setDoc(dbRef, state); }
+
+    async function init() {
+      const user = await requireAuth();
+      dbRef = dataRef('training/deepthroat-training');
+      
+      onSnapshot(dbRef, (snap) => {
+        if (snap.exists()) {
+          state = snap.data();
+        } else {
+          state = getDefaultState();
+          saveState();
+        }
+        render();
+      });
+    }
+
     function getCurrentWeek() {
       for (let i=0;i<WEEKS.length;i++) { if (!state.completedWeeks.includes(WEEKS[i].id)) return i; }
       return WEEKS.length-1;
@@ -1444,18 +1460,7 @@ let dbRef;
     // ════════════════════════════════════
     // INIT
     // ════════════════════════════════════
-    render();
-  
-
-(async function initFirebase() {
-  const user = await requireAuth();
-  dbRef = dataRef('training/deepthroat-training');
-  const snap = await getDoc(dbRef);
-  if (snap.exists()) {
-    state = snap.data();
-  }
-  render();
-})();
+    init();
 </script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>

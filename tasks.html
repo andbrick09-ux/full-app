@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -9,6 +9,7 @@
 <title>Tasks — Dom Sub Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
   --gold:#D4AF37;--gold-dim:rgba(212,175,55,.15);--gold-b:rgba(212,175,55,.2);
@@ -30,27 +31,6 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 #loginScreen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
 .login-logo{font-family:'Great Vibes',cursive;font-size:52px;background:var(--luxury);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s ease-in-out infinite;margin-bottom:4px;}
 .login-sub{font-size:9px;text-transform:uppercase;letter-spacing:4px;color:rgba(212,175,55,.4);margin-bottom:40px;}
-.role-title{font-family:'Playfair Display',serif;font-size:13px;color:var(--mid);margin-bottom:16px;}
-.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:320px;margin-bottom:28px;}
-.role-card{border:1px solid var(--gold-b);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface);}
-.role-card:active{transform:scale(.97);}
-.role-card.selected{border-color:var(--gold);background:rgba(212,175,55,.08);}
-.role-card-icon{font-size:28px;margin-bottom:8px;}
-.role-card-name{font-family:'Playfair Display',serif;font-size:13px;color:var(--text);}
-.role-card-sub{font-size:9px;color:var(--dim);margin-top:3px;}
-.pin-section{width:100%;max-width:320px;margin-bottom:20px;}
-.pin-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px;text-align:center;}
-.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:16px;}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--gold-b);transition:all .2s;}
-.pin-dot.filled{background:var(--gold);border-color:var(--gold);}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.pin-btn{background:var(--surface);border:1px solid var(--gold-b);border-radius:12px;padding:14px;font-family:'Montserrat',sans-serif;font-size:18px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;}
-.pin-btn:active{background:var(--gold-dim);border-color:var(--gold);transform:scale(.95);}
-.pin-btn.del{font-size:14px;color:var(--dim);}
-.login-btn{width:100%;max-width:320px;padding:16px;background:var(--luxury);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:opacity .2s;}
-.login-btn:disabled{opacity:.3;cursor:default;}
-.login-error{font-size:11px;color:var(--rose);text-align:center;margin-top:10px;min-height:16px;}
-.login-note{font-size:10px;color:var(--dim);text-align:center;margin-top:12px;line-height:1.5;}
 
 /* ── App Shell ── */
 #appShell{display:none;flex-direction:column;min-height:100dvh;padding-bottom:calc(72px + var(--safe-b));}
@@ -69,7 +49,7 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 /* ── Tab Bar ── */
 .tab-bar{display:flex;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(2,8,20,.85);position:sticky;top:64px;z-index:99;overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:1;min-width:58px;padding:11px 5px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab-btn{flex:1;min-width:58px;padding:11px 5px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;position:relative;}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
 .tab-count{background:var(--rose);color:#fff;font-size:7px;padding:1px 5px;border-radius:8px;margin-left:3px;display:inline-block;vertical-align:middle;}
 
@@ -117,12 +97,6 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .task-due.overdue{color:var(--rose);}
 .task-desc{font-size:10px;color:var(--dim);padding:8px 14px 10px;line-height:1.5;border-top:1px solid rgba(255,255,255,.03);}
 
-/* Streak */
-.task-streak{padding:5px 14px 9px;border-top:1px solid rgba(255,255,255,.03);display:flex;align-items:center;gap:6px;}
-.streak-pill{display:inline-flex;align-items:center;gap:3px;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,193,7,.12);color:var(--amber);}
-.streak-pill.fire{background:rgba(224,91,106,.1);color:var(--rose);}
-.streak-best{font-size:8px;color:var(--dim);}
-
 /* Task Actions */
 .task-actions{display:flex;border-top:1px solid rgba(255,255,255,.04);}
 .t-btn{flex:1;padding:10px 5px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s;color:var(--mid);}
@@ -152,13 +126,8 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .rp-cost.reward{color:var(--gold);}.rp-cost.punish{color:var(--rose);}
 .rp-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
 .rp-btn{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:5px 9px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;}
-.rp-btn:active{opacity:.8;transform:scale(.96);}
-.rp-btn:disabled{opacity:.3;cursor:default;}
 .rp-btn.primary{background:var(--gold);color:var(--bg);}
-.rp-btn.green{background:rgba(76,175,80,.14);color:var(--green);border:1px solid rgba(76,175,80,.22);}
 .rp-btn.red{background:rgba(224,91,106,.1);color:var(--rose);border:1px solid rgba(224,91,106,.18);}
-.rp-btn.ghost{background:rgba(255,255,255,.05);color:var(--mid);border:1px solid rgba(255,255,255,.07);}
-.rp-pending{font-size:8px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:8px;background:rgba(255,193,7,.12);color:var(--amber);}
 
 /* ── Queue Cards ── */
 .q-card{background:var(--surface);border:1px solid rgba(255,193,7,.2);border-radius:14px;overflow:hidden;}
@@ -170,10 +139,8 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .q-detail{font-size:9.5px;color:var(--mid);line-height:1.5;margin-bottom:9px;}
 .q-actions{display:flex;gap:7px;}
 .q-btn{flex:1;padding:9px 5px;border-radius:10px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border:1px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;}
-.q-btn:active{transform:scale(.96);}
 .q-btn.approve{background:rgba(76,175,80,.12);color:var(--green);border-color:rgba(76,175,80,.2);}
 .q-btn.deny{background:rgba(224,91,106,.08);color:var(--rose);border-color:rgba(224,91,106,.18);}
-.q-btn.redeem{background:rgba(186,104,200,.1);color:var(--purple);border-color:rgba(186,104,200,.2);}
 
 /* ── Punishment Banner ── */
 .punish-banner{margin:10px 16px 0;border-radius:12px;padding:12px 13px;background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.2);display:flex;align-items:flex-start;gap:10px;}
@@ -181,10 +148,6 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .punish-banner-body{flex:1;}
 .punish-banner-title{font-size:11px;font-weight:700;color:var(--rose);margin-bottom:2px;}
 .punish-banner-desc{font-size:9.5px;color:var(--mid);line-height:1.4;}
-.punish-banner-actions{display:flex;gap:6px;margin-top:8px;}
-.punish-banner-btn{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:5px 10px;border-radius:8px;border:none;cursor:pointer;}
-.punish-banner-btn.redeem{background:rgba(186,104,200,.14);color:var(--purple);}
-.punish-banner-btn.dismiss{background:rgba(255,255,255,.05);color:var(--dim);}
 
 /* ── History ── */
 .hist-card{background:var(--surface);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:11px 13px;display:flex;align-items:flex-start;gap:10px;}
@@ -215,157 +178,19 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .fl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:7px;display:block;}
 .fi{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:11px 13px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;}
 .fi:focus{border-color:var(--gold-b);}
-.fi::placeholder{color:var(--dim);}
-textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 .fselect{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23D4AF37'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 .chip-group{display:flex;flex-wrap:wrap;gap:7px;}
 .chip{padding:7px 13px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);font-size:11px;font-weight:600;color:var(--mid);cursor:pointer;transition:all .15s;}
 .chip.selected{border-color:var(--gold);background:rgba(212,175,55,.1);color:var(--gold);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .submit-btn{width:100%;padding:14px;background:var(--luxury);border:none;border-radius:13px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;margin-top:7px;transition:opacity .2s;}
-.submit-btn:active{opacity:.85;}
 .cancel-btn{width:100%;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:13px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;margin-top:7px;}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:rgba(100,181,246,.05);border:1px solid rgba(100,181,246,.14);border-radius:11px;cursor:pointer;}
-.toggle-main{font-size:11px;font-weight:600;color:var(--blue);}
-.toggle-sub{font-size:9px;color:var(--dim);margin-top:2px;}
 .toggle-wrap{position:relative;width:44px;height:24px;flex-shrink:0;}
 .toggle-track{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:24px;transition:.2s;}
 .toggle-track.on{background:var(--blue);}
 .toggle-thumb{position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none;}
 .toggle-thumb.on{transform:translateX(20px);}
-
-/* Proof upload */
-.proof-area{border:2px dashed rgba(100,181,246,.28);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
-.proof-area:active{border-color:var(--blue);background:rgba(100,181,246,.05);}
-.proof-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.proof-upload-icon{font-size:30px;margin-bottom:6px;opacity:.45;}
-.proof-upload-text{font-size:10px;color:var(--dim);line-height:1.5;}
-.proof-preview{width:100%;border-radius:10px;margin-top:9px;max-height:200px;object-fit:cover;}
-
-/* Alert banners */
-.alert{border-radius:11px;padding:11px 13px;display:flex;align-items:flex-start;gap:9px;}
-.alert.warn{background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.2);}
-.alert.info{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.16);}
-.alert.blue{background:rgba(100,181,246,.06);border:1px solid rgba(100,181,246,.16);}
-.alert-icon{font-size:17px;flex-shrink:0;}
-.alert-text{font-size:10px;color:var(--mid);line-height:1.5;}
-.alert-text strong{color:var(--text);display:block;font-size:11px;margin-bottom:1px;}
-
-/* ── Demerit Tier Banner ── */
-.demerit-banner{margin:10px 16px 0;border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px;}
-.demerit-banner.tier-1{background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.22);}
-.demerit-banner.tier-2{background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.22);}
-.demerit-banner.tier-3{background:rgba(186,104,200,.1);border:1px solid rgba(186,104,200,.3);}
-.demerit-icon{font-size:20px;flex-shrink:0;}
-.demerit-body{flex:1;}
-.demerit-title{font-size:11px;font-weight:700;margin-bottom:2px;}
-.tier-1 .demerit-title{color:var(--amber);}
-.tier-2 .demerit-title{color:var(--rose);}
-.tier-3 .demerit-title{color:var(--purple);}
-.demerit-desc{font-size:9px;color:var(--mid);line-height:1.4;}
-.demerit-count{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;flex-shrink:0;}
-.tier-1 .demerit-count{color:var(--amber);}
-.tier-2 .demerit-count{color:var(--rose);}
-.tier-3 .demerit-count{color:var(--purple);}
-
-/* ── Consequence Picker Sheet ── */
-.consequence-card{background:var(--surface);border:1px solid var(--gold-b);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;}
-.consequence-card:active{border-color:var(--gold);background:rgba(212,175,55,.06);}
-.consequence-card.selected{border-color:var(--rose);background:rgba(224,91,106,.06);}
-.consequence-emoji{font-size:22px;flex-shrink:0;}
-.consequence-info{flex:1;}
-.consequence-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
-.consequence-desc{font-size:9.5px;color:var(--dim);line-height:1.4;}
-.consequence-tier{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:8px;flex-shrink:0;}
-.consequence-tier.t1{background:rgba(255,193,7,.12);color:var(--amber);}
-.consequence-tier.t2{background:rgba(224,91,106,.1);color:var(--rose);}
-.consequence-tier.t3{background:rgba(186,104,200,.1);color:var(--purple);}
-.reroll-btn{width:100%;padding:11px;border-radius:11px;border:1px solid var(--gold-b);background:transparent;font-family:'Playfair Display',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;margin-bottom:8px;transition:all .2s;}
-.reroll-btn:active{background:rgba(212,175,55,.08);}
-
-/* ── Achievement Badges ── */
-.achievements-wrap{margin:10px 16px 0;}
-.achievements-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.achievements-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--dim);}
-.achievements-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
-.achievements-scroll::-webkit-scrollbar{display:none;}
-.achievement-pill{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:20px;border:1px solid var(--gold-b);background:var(--surface);white-space:nowrap;flex-shrink:0;transition:all .2s;}
-.achievement-pill.earned{border-color:var(--gold);background:rgba(212,175,55,.08);}
-.achievement-pill.locked{opacity:.35;}
-.achievement-emoji{font-size:14px;}
-.achievement-name{font-size:9px;font-weight:700;color:var(--text);}
-.achievement-pill.earned .achievement-name{color:var(--gold);}
-
-/* ── Difficulty Multiplier Visual ── */
-.mult-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:7px;margin-left:2px;}
-.mult-x1{background:rgba(76,175,80,.1);color:var(--green);}
-.mult-x15{background:rgba(100,181,246,.1);color:var(--blue);}
-.mult-x2{background:rgba(255,193,7,.1);color:var(--amber);}
-.mult-x3{background:rgba(224,91,106,.1);color:var(--rose);}
-
-/* ── Mood Check-in ── */
-.checkin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:800;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
-.checkin-overlay.open{opacity:1;pointer-events:all;}
-.checkin-panel{width:100%;max-width:480px;background:#07111f;border-radius:24px 24px 0 0;border-top:1px solid var(--gold-b);padding:8px 24px calc(32px + var(--safe-b));transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);}
-.checkin-overlay.open .checkin-panel{transform:translateY(0);}
-.checkin-handle{width:40px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:12px auto 20px;}
-.checkin-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:300;font-style:italic;color:var(--text);margin-bottom:4px;text-align:center;}
-.checkin-sub{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);text-align:center;margin-bottom:24px;}
-.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
-.mood-btn{border:1px solid var(--gold-b);background:var(--surface);border-radius:12px;padding:12px 4px;cursor:pointer;text-align:center;transition:all .2s;}
-.mood-btn:active{transform:scale(.93);}
-.mood-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.1);}
-.mood-btn-emoji{font-size:22px;margin-bottom:4px;}
-.mood-btn-label{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);}
-.mood-btn.selected .mood-btn-label{color:var(--gold);}
-.energy-row{margin-bottom:18px;}
-.energy-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between;}
-.energy-label span{color:var(--gold);}
-.energy-slider{width:100%;accent-color:var(--gold);height:4px;}
-.checkin-note-wrap{margin-bottom:16px;}
-
-/* ── Dashboard Tab ── */
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;}
-.dash-card{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:14px;}
-.dash-card.wide{grid-column:span 2;}
-.dash-card-label{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:6px;}
-.dash-card-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold);line-height:1;}
-.dash-card-sub{font-size:9px;color:var(--mid);margin-top:3px;}
-.dash-mood-display{display:flex;align-items:center;gap:10px;}
-.dash-mood-emoji{font-size:32px;}
-.dash-mood-info{flex:1;}
-.dash-mood-name{font-family:'Playfair Display',serif;font-size:14px;color:var(--text);}
-.dash-mood-time{font-size:8px;color:var(--dim);margin-top:2px;}
-.dash-energy-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.06);margin-top:8px;overflow:hidden;}
-.dash-energy-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),#F5E6A3);transition:width .6s ease;}
-.dash-streak-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
-.dash-streak-item{flex:1;text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px;}
-.dash-streak-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--amber);}
-.dash-streak-lbl{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-top:2px;}
-.dash-alert{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;margin-bottom:6px;}
-.dash-alert.warn{background:rgba(224,91,106,.07);border:1px solid rgba(224,91,106,.18);}
-.dash-alert.ok{background:rgba(76,175,80,.07);border:1px solid rgba(76,175,80,.18);}
-.dash-alert.info{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.14);}
-.dash-alert-icon{font-size:16px;flex-shrink:0;}
-.dash-alert-text{font-size:10px;color:var(--mid);line-height:1.4;}
-.dash-alert-text strong{color:var(--text);font-size:11px;}
-.dash-section-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--dim);padding:14px 16px 8px;}
-
-/* Point Economy Chart */
-.chart-wrap{padding:0 16px 14px;}
-.chart-canvas-wrap{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:14px;position:relative;}
-.chart-canvas-wrap canvas{width:100%!important;height:120px!important;}
-.chart-legend{display:flex;gap:16px;margin-top:10px;}
-.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--mid);}
-.chart-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-
-/* Sub Task Request */
-.task-request-card{background:rgba(186,104,200,.05);border:1px solid rgba(186,104,200,.2);border-radius:14px;padding:13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
-.task-request-icon{font-size:18px;flex-shrink:0;}
-.task-request-info{flex:1;}
-.task-request-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
-.task-request-desc{font-size:9.5px;color:var(--dim);line-height:1.4;}
-.task-request-actions{display:flex;gap:6px;margin-top:8px;}
 
 /* Misc */
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:11px;gap:10px;}
@@ -373,64 +198,24 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 .toast{position:fixed;bottom:calc(82px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(20px);background:#1a2840;border:1px solid var(--gold-b);border-radius:12px;padding:10px 18px;font-size:11px;font-weight:600;color:var(--text);z-index:600;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .hidden{display:none!important;}
-.mt-8{margin-top:8px;}
 .fade-up{animation:fadeUp .3s ease both;}
 </style>
 </head>
-<body data-nav="more">
+<body>
 <div class="glow-orb"></div>
 <div id="toast" class="toast"></div>
 
-<!-- ═══════════════ LOGIN ═══════════════ -->
+<!-- ═══════════════ LOADING ═══════════════ -->
 <div id="loginScreen">
   <div class="login-logo">Tasks</div>
-  <div class="login-sub">Dom Sub Hub</div>
-  <div class="role-title">I am the…</div>
-  <div class="role-cards">
-    <div class="role-card" id="roleCardDom" onclick="selectRole('dom')">
-      <div class="role-card-icon">👑</div>
-      <div class="role-card-name">Dominant</div>
-      <div class="role-card-sub">Sir</div>
-    </div>
-    <div class="role-card" id="roleCardSub" onclick="selectRole('sub')">
-      <div class="role-card-icon">🌸</div>
-      <div class="role-card-name">Submissive</div>
-      <div class="role-card-sub">Becca</div>
-    </div>
-  </div>
-  <div class="pin-section" id="pinSection" style="display:none;">
-    <div class="pin-label" id="pinLabel">Enter PIN</div>
-    <div class="pin-dots" id="pinDots">
-      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-btn" onclick="pinPress('1')">1</button>
-      <button class="pin-btn" onclick="pinPress('2')">2</button>
-      <button class="pin-btn" onclick="pinPress('3')">3</button>
-      <button class="pin-btn" onclick="pinPress('4')">4</button>
-      <button class="pin-btn" onclick="pinPress('5')">5</button>
-      <button class="pin-btn" onclick="pinPress('6')">6</button>
-      <button class="pin-btn" onclick="pinPress('7')">7</button>
-      <button class="pin-btn" onclick="pinPress('8')">8</button>
-      <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <button class="pin-btn" onclick="pinPress('')"></button>
-      <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn del" onclick="pinDel()">⌫</button>
-    </div>
-    <div class="login-error" id="pinError"></div>
-    <div class="login-note" id="pinNote"></div>
-  </div>
-  <button class="login-btn" id="loginBtn" disabled onclick="doLogin()">Enter</button>
+  <div class="login-sub">Connecting...</div>
+  <div class="loading"><div class="spinner"></div></div>
 </div>
 
 <!-- ═══════════════ APP SHELL ═══════════════ -->
 <div id="appShell">
-
   <div class="app-header">
-    <a href="index.html" class="header-back">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </a>
+    <a href="index.html" class="header-back"><span class="material-symbols-rounded">arrow_back</span></a>
     <div class="header-title">
       <div class="header-title-main">Tasks</div>
       <div class="header-title-sub" id="headerSub">Dom Sub Hub</div>
@@ -441,321 +226,69 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tasks</button>
     <button class="tab-btn" onclick="switchTab('queue')" id="tab-queue">Queue</button>
-    <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">Dashboard</button>
     <button class="tab-btn" onclick="switchTab('rewards')" id="tab-rewards">Rewards</button>
     <button class="tab-btn" onclick="switchTab('punishments')" id="tab-punishments">Punishments</button>
     <button class="tab-btn" onclick="switchTab('history')" id="tab-history">History</button>
   </div>
 
   <div id="tabContent">
-
-    <!-- TASKS TAB -->
     <div id="view-tasks">
       <div class="points-bar">
         <div class="pts-icon">⭐</div>
-        <div class="pts-info">
-          <div class="pts-val" id="ptBal">—</div>
-          <div class="pts-lbl">Points Balance</div>
-        </div>
+        <div class="pts-info"><div class="pts-val" id="ptBal">—</div><div class="pts-lbl">Points Balance</div></div>
         <div class="pts-stats">
           <div class="pts-stat"><div class="pts-stat-val c-green" id="ptEarned">—</div><div class="pts-stat-lbl">Earned</div></div>
           <div class="pts-stat"><div class="pts-stat-val c-rose" id="ptLost">—</div><div class="pts-stat-lbl">Lost</div></div>
         </div>
       </div>
-      <div id="punishBanner"></div>
-      <div id="demeritsBanner"></div>
-      <div id="achievementsStrip" class="achievements-wrap hidden">
-        <div class="achievements-head">
-          <div class="achievements-lbl">Achievements</div>
+      <div class="section" id="chartSection">
+        <div class="section-head"><div class="section-lbl">Performance Trend</div></div>
+        <div class="glass-card" style="padding:15px; background:rgba(2,8,20,0.4); border:1px solid var(--gold-b); border-radius:14px; margin-bottom:15px;">
+          <canvas id="pointsChart" height="150"></canvas>
         </div>
-        <div class="achievements-scroll" id="achievementsList"></div>
       </div>
+      <div id="punishBanner"></div>
       <div class="section">
-        <div class="section-head">
-          <div class="section-lbl">Active Tasks</div>
-          <div class="section-action" id="filterToggle" onclick="cycleFilter()">
-            <span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> All
-          </div>
-        </div>
+        <div class="section-head"><div class="section-lbl">Active Tasks</div></div>
         <div class="task-list" id="taskList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
-
-    <!-- QUEUE TAB -->
     <div id="view-queue" class="hidden">
-      <div class="section">
-        <div class="section-head"><div class="section-lbl">Awaiting Sir's Attention</div></div>
-        <div class="task-list" id="queueList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
-      </div>
+      <div class="section"><div class="section-head"><div class="section-lbl">Queue</div></div><div class="task-list" id="queueList"></div></div>
     </div>
-
-    <!-- REWARDS TAB -->
     <div id="view-rewards" class="hidden">
-      <div class="section">
-        <div class="section-head"><div class="section-lbl">Reward Store</div></div>
-        <div class="task-list" id="rewardList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
-      </div>
+      <div class="section"><div class="section-head"><div class="section-lbl">Store</div></div><div class="task-list" id="rewardList"></div></div>
     </div>
-
-    <!-- PUNISHMENTS TAB -->
     <div id="view-punishments" class="hidden">
-      <div class="section">
-        <div class="section-head"><div class="section-lbl">Punishment List</div></div>
-        <div class="task-list" id="punishList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
-      </div>
+      <div class="section"><div class="section-head"><div class="section-lbl">Punishments</div></div><div class="task-list" id="punishList"></div></div>
     </div>
-
-    <!-- DASHBOARD TAB -->
-    <div id="view-dashboard" class="hidden">
-      <!-- Sir's Dashboard -->
-      <div id="sirDashboard" class="hidden">
-        <div class="dash-section-lbl">Overview</div>
-        <div class="dash-grid" id="dashGrid">
-          <div class="loading"><div class="spinner"></div></div>
-        </div>
-        <div class="dash-section-lbl" style="margin-top:6px;">Point Economy</div>
-        <div class="chart-wrap">
-          <div class="chart-canvas-wrap">
-            <canvas id="pointsChart"></canvas>
-            <div class="chart-legend">
-              <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green)"></div>Earned</div>
-              <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--rose)"></div>Lost</div>
-            </div>
-          </div>
-        </div>
-        <div class="dash-section-lbl">Alerts</div>
-        <div style="padding:0 16px 14px;" id="dashAlerts"></div>
-      </div>
-      <!-- Becca's Dashboard (sub view) -->
-      <div id="subDashboard" class="hidden">
-        <div class="dash-section-lbl">Your Status</div>
-        <div class="dash-grid" id="subDashGrid">
-          <div class="loading"><div class="spinner"></div></div>
-        </div>
-        <div class="dash-section-lbl" style="margin-top:6px;">Request a Task from Sir</div>
-        <div style="padding:0 16px 14px;">
-          <div class="fg"><label class="fl">What would you like to do?</label>
-            <input class="fi" id="taskReqTitle" placeholder="e.g. Practice a new position" maxlength="80"/>
-          </div>
-          <div class="fg"><label class="fl">Why / Context</label>
-            <textarea class="fi" id="taskReqNote" placeholder="Tell Sir why you're requesting this…" rows="2"></textarea>
-          </div>
-          <button class="submit-btn" onclick="sendTaskRequest()">Send Request to Sir</button>
-        </div>
-        <div class="dash-section-lbl">Pending Requests</div>
-        <div style="padding:0 16px 14px;" id="taskRequestList"></div>
-      </div>
-    </div>
-
-    <!-- HISTORY TAB -->
     <div id="view-history" class="hidden">
-      <div class="section">
-        <div class="section-head"><div class="section-lbl">Activity Log</div></div>
-        <div class="task-list" id="historyList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
-      </div>
+      <div class="section"><div class="section-head"><div class="section-lbl">History</div></div><div class="task-list" id="historyList"></div></div>
     </div>
+  </div>
 
-  </div><!-- /tabContent -->
-
-  <button class="fab" id="fabBtn" onclick="openCreateSheet()" style="display:none;">
-    <span class="material-symbols-rounded">add</span>
-  </button>
-
-</div><!-- /appShell -->
+  <button class="fab" id="fabBtn" onclick="openCreateSheet()" style="display:none;"><span class="material-symbols-rounded">add</span></button>
+</div>
 
 <!-- ═══════════════ SHEETS ═══════════════ -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeAllSheets()"></div>
 
-<!-- Task Sheet -->
 <div class="sheet" id="taskSheet">
   <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">New Task</div>
-    <div class="sheet-sub">Assign a task for Becca</div>
-  </div>
+  <div class="sheet-header"><div class="sheet-title">New Task</div></div>
   <div class="sheet-body">
-    <div class="fg"><label class="fl">Task Title</label><input class="fi" id="taskTitle" placeholder="e.g. Morning affirmations" maxlength="80"/></div>
-    <div class="fg"><label class="fl">Description (optional)</label><textarea class="fi" id="taskDesc" placeholder="Instructions or details…" rows="3"></textarea></div>
-    <div class="fg"><label class="fl">Difficulty</label>
-      <div class="chip-group" id="diffChips">
-        <div class="chip selected" data-val="simple" onclick="pickChip('diffChips',this)">Simple</div>
-        <div class="chip" data-val="standard" onclick="pickChip('diffChips',this)">Standard</div>
-        <div class="chip" data-val="demanding" onclick="pickChip('diffChips',this)">Demanding</div>
-        <div class="chip" data-val="extreme" onclick="pickChip('diffChips',this)">Extreme</div>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="fg" style="margin-bottom:0;"><label class="fl">Base Points</label><input class="fi" id="taskPoints" type="number" min="1" max="500" value="10"/></div>
-      <div class="fg" style="margin-bottom:0;"><label class="fl">Schedule</label>
-        <select class="fi fselect" id="taskSchedule">
-          <option value="once">One-off</option><option value="daily">Daily</option>
-          <option value="weekly">Weekly</option><option value="monthly">Monthly</option>
-          <option value="weekdays">Weekdays</option><option value="weekends">Weekends</option>
-        </select>
-      </div>
-    </div>
-    <div class="fg mt-8"><label class="fl">Due Date &amp; Time (optional)</label><input class="fi" id="taskDue" type="datetime-local"/></div>
-    <div class="fg mt-8"><label class="fl">Attach Punishment if Failed</label>
-      <select class="fi fselect" id="taskPunishLink"><option value="">None</option></select>
-    </div>
-    <div class="toggle-row mt-8" onclick="toggleProof()">
-      <div><div class="toggle-main">📷 Require Photo Proof</div><div class="toggle-sub">Sub must submit a photo to complete</div></div>
-      <div class="toggle-wrap"><div class="toggle-track" id="proofTrack"></div><div class="toggle-thumb" id="proofThumb"></div></div>
-    </div>
+    <div class="fg"><label class="fl">Title</label><input class="fi" id="taskTitle" maxlength="80"/></div>
+    <div class="fg"><label class="fl">Points</label><input class="fi" id="taskPoints" type="number" value="10"/></div>
     <button class="submit-btn" onclick="saveTask()">Assign Task</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
   </div>
 </div>
 
-<!-- Reward Sheet -->
-<div class="sheet" id="rewardSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">New Reward</div><div class="sheet-sub">Add to the reward store</div></div>
-  <div class="sheet-body">
-    <div class="fg"><label class="fl">Reward Title</label><input class="fi" id="rewardTitle" placeholder="e.g. Choose the next scene" maxlength="80"/></div>
-    <div class="fg"><label class="fl">Description</label><textarea class="fi" id="rewardDesc" placeholder="What does this reward entail?" rows="2"></textarea></div>
-    <div class="fg"><label class="fl">Point Cost</label><input class="fi" id="rewardCost" type="number" min="1" value="50"/></div>
-    <div class="fg"><label class="fl">Emoji</label><input class="fi" id="rewardEmoji" placeholder="🎁" maxlength="4"/></div>
-    <button class="submit-btn" onclick="saveReward()">Add Reward</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-<!-- Punishment Sheet -->
-<div class="sheet" id="punishSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">New Punishment</div><div class="sheet-sub">Add to the punishment list</div></div>
-  <div class="sheet-body">
-    <div class="fg"><label class="fl">Title</label><input class="fi" id="punishTitle" placeholder="e.g. 20 strikes with the paddle" maxlength="80"/></div>
-    <div class="fg"><label class="fl">Description</label><textarea class="fi" id="punishDesc" placeholder="Full details…" rows="2"></textarea></div>
-    <div class="fg"><label class="fl">Point Deduction</label><input class="fi" id="punishPoints" type="number" min="0" value="15"/></div>
-    <div class="fg"><label class="fl">Emoji</label><input class="fi" id="punishEmoji" placeholder="⚡" maxlength="4"/></div>
-    <button class="submit-btn" onclick="savePunishment()">Add Punishment</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-<!-- Fail Sheet -->
 <div class="sheet" id="failSheet">
   <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">Report Failure</div><div class="sheet-sub" id="failSheetSub">Confess to Sir</div></div>
+  <div class="sheet-header"><div class="sheet-title">Report Failure</div></div>
   <div class="sheet-body">
-    <div class="alert warn"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>This will notify Sir</strong>Any attached punishment will be applied and points deducted.</div></div>
-    <div class="fg mt-8"><label class="fl">Reason (optional)</label><textarea class="fi" id="failReason" placeholder="What happened? Be honest with Sir…" rows="3"></textarea></div>
-    <button class="submit-btn" style="background:linear-gradient(135deg,#e05b6a,#c0394a);color:#fff;" onclick="confirmFail()">Confess Failure</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-<!-- Photo Proof Sheet (sub submits) -->
-<div class="sheet" id="proofSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">Submit Proof</div><div class="sheet-sub" id="proofSheetSub">Sir requires photo proof</div></div>
-  <div class="sheet-body">
-    <div class="alert blue"><div class="alert-icon">📷</div><div class="alert-text"><strong>Photo Required</strong>Sir must approve before points are awarded.</div></div>
-    <div class="proof-area mt-8">
-      <input type="file" accept="image/*" onchange="handleProofFile(event)"/>
-      <div class="proof-upload-icon">📷</div>
-      <div class="proof-upload-text">Tap to choose a photo</div>
-    </div>
-    <img class="proof-preview hidden" id="proofPreview" alt="preview"/>
-    <div class="fg mt-8"><label class="fl">Note for Sir (optional)</label><textarea class="fi" id="proofNote" placeholder="Any context…" rows="2"></textarea></div>
-    <button class="submit-btn" onclick="submitProof()">Submit for Approval</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-<!-- Proof Review Sheet (Sir reviews) -->
-<div class="sheet" id="proofReviewSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">Review Proof</div><div class="sheet-sub" id="proofReviewSub">Becca submitted photo proof</div></div>
-  <div class="sheet-body">
-    <img id="proofReviewImg" alt="submitted proof" style="width:100%;border-radius:12px;margin-bottom:11px;max-height:240px;object-fit:cover;"/>
-    <div class="alert info hidden" id="proofReviewNote">
-      <div class="alert-icon">💬</div><div class="alert-text" id="proofReviewNoteText"></div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:10px;">
-      <button class="q-btn approve" style="flex:1;padding:13px;" onclick="approveProof()">✓ Approve &amp; Award Points</button>
-      <button class="q-btn deny" style="flex:1;padding:13px;" onclick="denyProof()">✕ Reject</button>
-    </div>
-  </div>
-</div>
-
-<!-- Redemption Task Sheet (Sir assigns) -->
-<div class="sheet" id="redemptionSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">Assign Redemption Task</div><div class="sheet-sub" id="redemptionSheetSub">Allow Becca to earn forgiveness</div></div>
-  <div class="sheet-body">
-    <div class="alert info"><div class="alert-icon">🌿</div><div class="alert-text"><strong>Redemption Task</strong>Completing this clears the active punishment.</div></div>
-    <div class="fg mt-8"><label class="fl">Task Title</label><input class="fi" id="redemptionTitle" placeholder="e.g. Write a 200-word apology letter" maxlength="80"/></div>
-    <div class="fg"><label class="fl">Full Instructions</label><textarea class="fi" id="redemptionDesc" placeholder="Exact details…" rows="3"></textarea></div>
-    <div class="fg"><label class="fl">Points Restored on Completion</label><input class="fi" id="redemptionPoints" type="number" min="0" value="10"/></div>
-    <button class="submit-btn" onclick="saveRedemptionTask()">Assign Redemption</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Cancel</button>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<!-- Consequence Picker Sheet (Sir picks escalated punishment) -->
-<div class="sheet" id="consequenceSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-title">Consequence Picker</div>
-    <div class="sheet-sub" id="consequenceSheetSub">Choose a fitting consequence</div>
-  </div>
-  <div class="sheet-body">
-    <div class="alert warn" style="margin-bottom:12px;">
-      <div class="alert-icon">⚡</div>
-      <div class="alert-text" id="consequenceAlertText"><strong>Demerit escalation active</strong>Repeated failures trigger escalated consequences.</div>
-    </div>
-    <button class="reroll-btn" onclick="rollConsequence()">🎲 Roll Again</button>
-    <div id="consequenceCards"></div>
-    <button class="submit-btn" onclick="applyConsequence()">Apply This Consequence</button>
-    <button class="cancel-btn" onclick="closeAllSheets()">Skip for Now</button>
-  </div>
-</div>
-
-<!-- Mood / Headspace Check-in (sub) -->
-<div class="checkin-overlay" id="checkinOverlay">
-  <div class="checkin-panel">
-    <div class="checkin-handle"></div>
-    <div class="checkin-title">Good to see you, Becca</div>
-    <div class="checkin-sub">How are you feeling right now?</div>
-    <div class="mood-grid" id="moodGrid">
-      <div class="mood-btn" data-mood="playful" onclick="pickMood(this)"><div class="mood-btn-emoji">😈</div><div class="mood-btn-label">Playful</div></div>
-      <div class="mood-btn" data-mood="soft" onclick="pickMood(this)"><div class="mood-btn-emoji">🌸</div><div class="mood-btn-label">Soft</div></div>
-      <div class="mood-btn" data-mood="obedient" onclick="pickMood(this)"><div class="mood-btn-emoji">🙇</div><div class="mood-btn-label">Obedient</div></div>
-      <div class="mood-btn" data-mood="needy" onclick="pickMood(this)"><div class="mood-btn-emoji">🥺</div><div class="mood-btn-label">Needy</div></div>
-      <div class="mood-btn" data-mood="tired" onclick="pickMood(this)"><div class="mood-btn-emoji">😴</div><div class="mood-btn-label">Tired</div></div>
-      <div class="mood-btn" data-mood="anxious" onclick="pickMood(this)"><div class="mood-btn-emoji">😰</div><div class="mood-btn-label">Anxious</div></div>
-      <div class="mood-btn" data-mood="grateful" onclick="pickMood(this)"><div class="mood-btn-emoji">🙏</div><div class="mood-btn-label">Grateful</div></div>
-      <div class="mood-btn" data-mood="resistant" onclick="pickMood(this)"><div class="mood-btn-emoji">😤</div><div class="mood-btn-label">Resistant</div></div>
-      <div class="mood-btn" data-mood="proud" onclick="pickMood(this)"><div class="mood-btn-emoji">✨</div><div class="mood-btn-label">Proud</div></div>
-      <div class="mood-btn" data-mood="other" onclick="pickMood(this)"><div class="mood-btn-emoji">💭</div><div class="mood-btn-label">Other</div></div>
-    </div>
-    <div class="energy-row">
-      <div class="energy-label">Energy Level <span id="energyVal">5</span>/10</div>
-      <input type="range" class="energy-slider" id="energySlider" min="1" max="10" value="5" oninput="document.getElementById('energyVal').textContent=this.value"/>
-    </div>
-    <div class="checkin-note-wrap fg">
-      <label class="fl">Note for Sir (optional)</label>
-      <textarea class="fi" id="checkinNote" placeholder="Anything Sir should know about your headspace today…" rows="2"></textarea>
-    </div>
-    <button class="submit-btn" onclick="submitCheckin()">Submit Check-in</button>
-    <button class="cancel-btn" onclick="skipCheckin()">Skip for Now</button>
-  </div>
-</div>
-
-<!-- Sub Task Request Sheet (already inline in dashboard, this handles Sir's review) -->
-<div class="sheet" id="taskRequestReviewSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header"><div class="sheet-title">Task Request</div><div class="sheet-sub" id="taskRequestReviewSub">Becca is requesting a task</div></div>
-  <div class="sheet-body">
-    <div class="alert info"><div class="alert-icon">🌸</div><div class="alert-text" id="taskRequestReviewBody">Becca has requested a task.</div></div>
-    <div style="display:flex;gap:10px;margin-top:14px;">
-      <button class="q-btn approve" style="flex:1;padding:13px;" onclick="approveTaskRequest()">✓ Assign as Task</button>
-      <button class="q-btn deny" style="flex:1;padding:13px;" onclick="denyTaskRequest()">✕ Decline</button>
-    </div>
+    <div class="fg"><label class="fl">Reason</label><textarea class="fi" id="failReason" rows="3"></textarea></div>
+    <button class="submit-btn" style="background:var(--rose);color:#fff;" onclick="confirmFail()">Confess</button>
   </div>
 </div>
 
@@ -763,1388 +296,267 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 <link rel="stylesheet" href="nav.css"/>
 <script src="nav.js"></script>
 
-<!-- ═══════════════ FIREBASE JS ═══════════════ -->
+<!-- ═══════════════ SCRIPT ═══════════════ -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getDatabase, ref, set, get, push, onValue, update, remove }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-import { getStorage, ref as sRef, uploadString, getDownloadURL }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
-// NOTE: tasks.html uses Firebase Realtime Database for live task sync.
-// It connects to the dom-sub-hub-3e530 project.
-const firebaseConfig = {
-  apiKey:"AIzaSyAV7Tmfw06rgKEY5LVOmR8bSmH0UrjB314",
-  authDomain:"dom-sub-hub-3e530.firebaseapp.com",
-  projectId:"dom-sub-hub-3e530",
-  storageBucket:"dom-sub-hub-3e530.firebasestorage.app",
-  messagingSenderId:"672279944225",
-  appId:"1:672279944225:web:18acb9fb8158a1f14b1760",
-  databaseURL:"https://dom-sub-hub-3e530-default-rtdb.firebaseio.com"
-};
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-let storage = null;
-try { storage = getStorage(app); } catch(e) { console.warn('Firebase Storage not available:', e); }
+import { requireAuth, getMyProfile, dataRef, dataCol, partnerDataRef, partnerDataCol } from './auth.js';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit, addDoc, serverTimestamp, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// Auth guard
-const auth = getAuth(app);
-onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = 'login.html';
-});
+let role, myProfile;
+let tasks = {}, points = { balance: 0, earned: 0, lost: 0 }, rewards = {}, punishments = {}, queue = {}, history = [];
+let tasksCol, pointsDoc, rewardsCol, punishmentsCol, queueCol, historyCol;
+let curTab = 'tasks', failId = null;
+let pChart = null;
+const todayKey = new Date().toDateString();
 
-// ── State ──
-let role=null, pin='', settingUp=false, pendingPin='';
-let curTab='tasks', filterState='all';
-let tasks={}, rewards={}, punishments={}, queue={};
-let pts={balance:0,earned:0,lost:0};
-let failId=null, proofTaskId=null, reviewQId=null, redemptionQId=null;
-let proofDataUrl=null, requireProof=false;
-const DPIN='dsh_dom_pin', SPIN='dsh_sub_pin', SESS='dsh_session_role';
+async function init() {
+  const user = await requireAuth();
+  myProfile = await getMyProfile();
+  role = myProfile?.role || 'sub';
 
-// ── Expose to inline handlers ──
-const W = window;
-W.selectRole=selectRole; W.pinPress=pinPress; W.pinDel=pinDel; W.doLogin=doLogin; W.logout=logout;
-W.switchTab=switchTab; W.openCreateSheet=openCreateSheet; W.closeAllSheets=closeAllSheets;
-W.pickChip=pickChip; W.toggleProof=toggleProof; W.cycleFilter=cycleFilter;
-W.saveTask=saveTask; W.completeTask=completeTask; W.openFailSheet=openFailSheet;
-W.confirmFail=confirmFail; W.deleteTask=deleteTask;
-W.handleProofFile=handleProofFile; W.openProofSheet=openProofSheet; W.submitProof=submitProof;
-W.openProofReview=openProofReview; W.approveProof=approveProof; W.denyProof=denyProof;
-W.saveReward=saveReward; W.requestReward=requestReward; W.approveReward=approveReward;
-W.denyReward=denyReward; W.deleteReward=deleteReward;
-W.savePunishment=savePunishment; W.assignPunishment=assignPunishment; W.deletePunishment=deletePunishment;
-W.approveQueueItem=approveQueueItem; W.denyQueueItem=denyQueueItem;
-W.openRedemptionSheet=openRedemptionSheet; W.saveRedemptionTask=saveRedemptionTask;
-W.dismissPunishment=dismissPunishment;
-
-// ── Session restore ──
-const saved = sessionStorage.getItem(SESS);
-if (saved) { role = saved; showApp(); }
-
-// ─────────────────────────────────────────────
-// LOGIN
-// ─────────────────────────────────────────────
-function selectRole(r) {
-  role = r;
-  document.getElementById('roleCardDom').classList.toggle('selected', r==='dom');
-  document.getElementById('roleCardSub').classList.toggle('selected', r==='sub');
-  document.getElementById('pinSection').style.display = 'block';
-  pin = ''; updateDots();
-  const stored = sessionStorage.getItem(r==='dom' ? DPIN : SPIN);
-  settingUp = !stored;
-  document.getElementById('pinLabel').textContent = stored ? (r==='dom' ? "Sir's PIN" : 'Your PIN') : 'Create a 4-digit PIN';
-  document.getElementById('pinNote').textContent = stored ? '' : 'First time? Create a PIN to protect this role.';
-  document.getElementById('loginBtn').disabled = true;
-  document.getElementById('pinError').textContent = '';
-}
-
-function pinPress(d) {
-  if (!role || pin.length >= 4) return;
-  pin += d; updateDots();
-  if (pin.length === 4) { document.getElementById('loginBtn').disabled = false; setTimeout(doLogin, 200); }
-}
-function pinDel() { pin = pin.slice(0,-1); updateDots(); document.getElementById('loginBtn').disabled = pin.length < 4; }
-function updateDots() { for (let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled', i < pin.length); }
-
-function doLogin() {
-  if (!role || pin.length < 4) return;
-  const key = role==='dom' ? DPIN : SPIN;
-  const stored = sessionStorage.getItem(key);
-  if (settingUp) {
-    if (!pendingPin) {
-      pendingPin = pin; pin = ''; updateDots();
-      document.getElementById('loginBtn').disabled = true;
-      document.getElementById('pinLabel').textContent = 'Confirm PIN';
-      document.getElementById('pinNote').textContent = 'Enter the same PIN again.';
-      return;
-    }
-    if (pin !== pendingPin) {
-      document.getElementById('pinError').textContent = "PINs don't match. Try again.";
-      pin = ''; pendingPin = ''; updateDots();
-      document.getElementById('loginBtn').disabled = true;
-      document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
-      return;
-    }
-    sessionStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
+  if (role === 'sub') {
+    tasksCol = dataCol('tasks');
+    pointsDoc = dataRef('stats/points');
+    rewardsCol = dataCol('rewards');
+    punishmentsCol = dataCol('punishments');
+    queueCol = dataCol('queue');
+    historyCol = dataCol('history');
   } else {
-    if (pin !== stored) {
-      document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
-      pin = ''; updateDots(); document.getElementById('loginBtn').disabled = true; return;
+    try {
+      tasksCol = await partnerDataCol('tasks');
+      pointsDoc = await partnerDataRef('stats/points');
+      rewardsCol = await partnerDataCol('rewards');
+      punishmentsCol = await partnerDataCol('punishments');
+      queueCol = await partnerDataCol('queue');
+      historyCol = await partnerDataCol('history');
+    } catch (e) {
+      alert("No partner linked.");
+      window.location.href = 'index.html';
+      return;
     }
   }
-  sessionStorage.setItem(SESS, role); showApp();
-}
 
-function logout() {
-  sessionStorage.removeItem(SESS); role = null; pin = ''; pendingPin = '';
-  document.getElementById('appShell').classList.remove('visible');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('roleCardDom').classList.remove('selected');
-  document.getElementById('roleCardSub').classList.remove('selected');
-  document.getElementById('pinSection').style.display = 'none';
-  updateDots();
-}
-
-// ─────────────────────────────────────────────
-// APP INIT
-// ─────────────────────────────────────────────
-function showApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').classList.add('visible');
-  const isDom = role === 'dom';
-  document.getElementById('headerBadge').textContent = isDom ? '👑 Sir' : '🌸 Becca';
-  document.getElementById('appShell').className = 'visible ' + (isDom ? 'role-dom' : 'role-sub');
-  document.getElementById('headerSub').textContent = isDom ? 'Dominant View' : 'Submissive View';
-  document.getElementById('fabBtn').style.display = isDom ? 'flex' : 'none';
-  listenPoints(); listenTasks(); listenRewards(); listenPunishments(); listenQueue(); listenHistory();
-  listenCheckin(); listenTaskRequests();
-  setTimeout(checkDailyReset, 1500);
-  setTimeout(renderAchievements, 2000);
-  setTimeout(maybeShowCheckin, 1000);
+  document.getElementById('headerBadge').textContent = role === 'dom' ? '👑 Sir' : '🌸 ' + (myProfile?.displayName || 'Sub');
+  document.getElementById('appShell').className = 'visible ' + (role === 'dom' ? 'role-dom' : 'role-sub');
+  document.getElementById('fabBtn').style.display = role === 'dom' ? 'flex' : 'none';
+  
+  // Daily Reset (Sub only or first login)
+  if (localStorage.getItem('task_reset_day') !== todayKey) {
+    const qSnap = await getDocs(tasksCol);
+    for (const d of qSnap.docs) {
+      await updateDoc(d.ref, { completedToday: false, failedToday: false, pendingApproval: false });
+    }
+    localStorage.setItem('task_reset_day', todayKey);
+  }
+
+  startListeners();
 }
 
-// ─────────────────────────────────────────────
-// POINTS
-// ─────────────────────────────────────────────
-function listenPoints() {
-  onValue(ref(db,'points'), s => {
-    pts = s.val() || {balance:0,earned:0,lost:0};
-    document.getElementById('ptBal').textContent    = pts.balance ?? 0;
-    document.getElementById('ptEarned').textContent = pts.earned  ?? 0;
-    document.getElementById('ptLost').textContent   = pts.lost    ?? 0;
+function startListeners() {
+  onSnapshot(pointsDoc, s => {
+    points = s.exists() ? s.data() : { balance: 0, earned: 0, lost: 0 };
+    document.getElementById('ptBal').textContent = points.balance ?? 0;
+    document.getElementById('ptEarned').textContent = points.earned ?? 0;
+    document.getElementById('ptLost').textContent = points.lost ?? 0;
+  });
+  onSnapshot(tasksCol, s => {
+    tasks = {}; s.forEach(d => { if (!d.data().archived) tasks[d.id] = { id: d.id, ...d.data() }; });
+    renderTasks();
+  });
+  onSnapshot(rewardsCol, s => {
+    rewards = {}; s.forEach(d => rewards[d.id] = { id: d.id, ...d.data() });
+    renderRewards();
+  });
+  onSnapshot(punishmentsCol, s => {
+    punishments = {}; s.forEach(d => punishments[d.id] = { id: d.id, ...d.data() });
+    renderPunishments();
+  });
+  onSnapshot(query(queueCol, where('resolved', '==', false)), s => {
+    queue = {}; s.forEach(d => queue[d.id] = { id: d.id, ...d.data() });
+    updateQueueBadge();
+    renderQueue();
+  });
+  onSnapshot(query(historyCol, orderBy('ts', 'desc'), limit(50)), s => {
+    history = []; s.forEach(d => history.push({ id: d.id, ...d.data() }));
+    renderHistory();
+    updateChart();
   });
 }
 
-async function addPts(amount, reason) {
-  const s = await get(ref(db,'points'));
-  const d = s.val() || {balance:0,earned:0,lost:0};
-  await set(ref(db,'points'), {
-    balance: (d.balance||0) + amount,
-    earned:  amount > 0 ? (d.earned||0) + amount  : (d.earned||0),
-    lost:    amount < 0 ? (d.lost||0) + Math.abs(amount) : (d.lost||0)
-  });
-  await push(ref(db,'history'), { type: amount>0?'points_earned':'points_lost', amount, reason, ts: Date.now() });
-}
+function updateChart() {
+  const ctx = document.getElementById('pointsChart')?.getContext('2d');
+  if (!ctx || !history.length) return;
 
-// ─────────────────────────────────────────────
-// TASKS
-// ─────────────────────────────────────────────
-function listenTasks() {
-  onValue(ref(db,'tasks'), s => { tasks = s.val() || {}; renderTasks(); fillPunishDrop(); });
+  // Calculate cumulative trend
+  const sortedHist = [...history].sort((a,b) => a.ts - b.ts);
+  let cum = points.balance - history.reduce((acc, h) => acc + (h.amount || 0), 0);
+  const labels = [];
+  const data = [];
+
+  sortedHist.forEach(h => {
+    cum += (h.amount || 0);
+    labels.push(new Date(h.ts).toLocaleDateString(undefined, {month:'short', day:'numeric'}));
+    data.push(cum);
+  });
+
+  if (pChart) pChart.destroy();
+  pChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Points',
+        data: data,
+        borderColor: '#D4AF37',
+        backgroundColor: 'rgba(212,175,55,0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: { 
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#666', font: { size: 9 } }
+        }
+      }
+    }
+  });
 }
 
 function renderTasks() {
   const list = document.getElementById('taskList');
-  const entries = Object.entries(tasks).filter(([,t]) => !t.archived);
-  if (!entries.length) {
-    list.innerHTML = emptyState('📋',
-      role==='dom' ? 'No tasks yet' : 'No tasks assigned',
-      role==='dom' ? 'Tap + to assign a task.' : "Sir hasn't assigned any tasks yet.");
-    return;
-  }
-  const now = Date.now();
   let html = '';
-  entries.forEach(([id, t]) => {
-    if (filterState==='pending' && t.completedToday) return;
-    if (filterState==='done'    && !t.completedToday) return;
-    const done        = !!t.completedToday;
-    const proofPend   = !!t.proofPending;
-    const earnedPts   = calcPts(t.basePoints||10, t.difficulty);
-    const streak      = t.streak || 0;
-    const best        = t.bestStreak || 0;
-    const overdue     = t.due && !done && now > t.due;
-    const diffClass   = 'diff-' + (t.difficulty||'simple');
-    const diffLabel   = cap(t.difficulty||'simple');
-    const multMap     = {simple:'×1',standard:'×1.5',demanding:'×2',extreme:'×3'};
-    const multClass   = {simple:'mult-x1',standard:'mult-x15',demanding:'mult-x2',extreme:'mult-x3'};
-    const multBadge   = `<span class="mult-badge ${multClass[t.difficulty||'simple']}">${multMap[t.difficulty||'simple']}</span>`;
-
-    const dueLine = t.due
-      ? `<div class="task-due${overdue?' overdue':''}">${overdue?'⚠ Overdue — ':''}Due ${fmtDate(t.due)}</div>` : '';
-
-    const proofBadge      = t.requireProof ? `<span class="badge badge-proof">📷${proofPend?' Pending':' Req.'}</span>` : '';
-    const redemptionBadge = t.isRedemption ? `<span class="badge badge-redemption">🌿 Redemption</span>` : '';
-
-    const streakHtml = streak > 0
-      ? `<div class="task-streak">
-           <span class="streak-pill${streak>=7?' fire':''}">${streak>=7?'🔥':'⚡'} ${streak}-day streak</span>
-           ${best > streak ? `<span class="streak-best">Best: ${best}</span>` : ''}
-         </div>` : '';
-
-    // Action buttons
-    let actions = '';
-    if (role==='sub' && !done) {
-      if (t.requireProof && !proofPend) {
-        actions = `<div class="task-actions">
-          <button class="t-btn proof" onclick="openProofSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">photo_camera</span> Submit Proof
-          </button>
-          <button class="t-btn fail" onclick="openFailSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
-          </button>
-        </div>`;
-      } else if (!t.requireProof) {
-        actions = `<div class="task-actions">
-          <button class="t-btn complete" onclick="completeTask('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">check_circle</span> Complete
-          </button>
-          <button class="t-btn fail" onclick="openFailSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
-          </button>
-        </div>`;
-      }
-    }
-    if (role==='dom') {
-      actions = `<div class="task-actions">
-        <button class="t-btn remove" onclick="deleteTask('${id}')">
-          <span class="material-symbols-rounded" style="font-size:13px;">delete</span> Remove
-        </button>
-      </div>`;
-    }
-
-    html += `<div class="task-card${done?' done':''}${t.requireProof?' proof-required':''}${t.isRedemption?' is-redemption':''} fade-up">
+  Object.entries(tasks).forEach(([id, t]) => {
+    const done = !!t.completedToday;
+    const pending = !!t.pendingApproval;
+    const failed = !!t.failedToday;
+    html += `<div class="task-card${done?' done':''}${pending?' proof-required':''}${failed?' done':''} fade-up">
       <div class="task-card-header">
-        <div class="task-check">${done ? '✓' : ''}</div>
-        <div class="task-info">
-          <div class="task-name">${esc(t.title)}</div>
-          <div class="task-meta">
-            <span class="badge ${diffClass}">${diffLabel}</span>
-            <span class="badge badge-sched">${schedLbl(t.schedule)}</span>
-            ${proofBadge}${redemptionBadge}
-          </div>
-          ${dueLine}
-        </div>
-        <div class="task-pts">+${earnedPts}${multBadge}</div>
+        <div class="task-check">${done ? '✓' : (pending ? '⏳' : (failed ? '⚠' : ''))}</div>
+        <div class="task-info"><div class="task-name">${t.title}</div></div>
+        <div class="task-pts">${failed ? '-' : '+'}${t.basePoints||10}</div>
       </div>
-      ${t.description ? `<div class="task-desc">${esc(t.description)}</div>` : ''}
-      ${streakHtml}
-      ${actions}
+      ${(role==='sub' && !done && !pending && !failed) ? `<div class="task-actions"><button class="t-btn complete" onclick="completeTask('${id}')">✓ Complete</button><button class="t-btn fail" onclick="openFailSheet('${id}')">⚠ Failure</button></div>` : (role==='dom' ? `<div class="task-actions"><button class="t-btn remove" onclick="deleteTask('${id}')">✕ Remove</button></div>` : '')}
     </div>`;
   });
-  list.innerHTML = html || `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">All done!</div></div>`;
-}
-
-async function completeTask(id) {
-  const t = tasks[id]; if (!t || t.completedToday) return;
-  const earned = calcPts(t.basePoints||10, t.difficulty);
-  const newStreak = (t.streak||0) + 1;
-  const best = Math.max(newStreak, t.bestStreak||0);
-  await update(ref(db,'tasks/'+id), { completedToday:true, completedAt:Date.now(), streak:newStreak, bestStreak:best });
-  await addPts(earned, 'Completed: ' + t.title);
-  await push(ref(db,'history'), { type:'task_completed', taskTitle:t.title, points:earned, streak:newStreak, ts:Date.now() });
-  if (t.schedule==='once') await update(ref(db,'tasks/'+id), {archived:true});
-  // If this was a redemption task, resolve its parent queue item
-  if (t.isRedemption && t.redemptionFor) await update(ref(db,'queue/'+t.redemptionFor), {resolved:true, redeemed:true});
-  showToast('✅ +' + earned + ' pts! Streak: ' + newStreak + (newStreak>=7 ? ' 🔥' : ''));
-}
-
-function openFailSheet(id) {
-  failId = id;
-  const t = tasks[id];
-  document.getElementById('failSheetSub').textContent = t ? 'Confessing failure for: ' + t.title : 'Confess to Sir';
-  document.getElementById('failReason').value = '';
-  openSheet('failSheet');
-}
-
-async function confirmFail() {
-  if (!failId) return;
-  const t = tasks[failId]; if (!t) return;
-  const reason = document.getElementById('failReason').value.trim();
-  const ded = t.punishPoints || 10;
-  await update(ref(db,'tasks/'+failId), { failedToday:true, failedAt:Date.now(), streak:0 });
-  await addPts(-ded, 'Failed: ' + t.title);
-  await push(ref(db,'queue'), {
-    type:'failure_report', taskId:failId, taskTitle:t.title,
-    punishLink: t.punishLink||null, punishPoints:ded, reason, ts:Date.now(), resolved:false
-  });
-  await push(ref(db,'history'), { type:'task_failed', taskTitle:t.title, points:-ded, reason, ts:Date.now() });
-  closeAllSheets(); failId = null;
-  showToast('⚠️ Failure reported. -' + ded + ' pts');
-}
-
-async function deleteTask(id) {
-  if (!confirm('Remove this task?')) return;
-  await remove(ref(db,'tasks/'+id));
-}
-
-async function saveTask() {
-  const title = document.getElementById('taskTitle').value.trim();
-  if (!title) { showToast('Enter a task title'); return; }
-  const punishLink = document.getElementById('taskPunishLink').value;
-  await push(ref(db,'tasks'), {
-    title,
-    description: document.getElementById('taskDesc').value.trim(),
-    difficulty:  document.querySelector('#diffChips .chip.selected')?.dataset.val || 'simple',
-    basePoints:  parseInt(document.getElementById('taskPoints').value) || 10,
-    schedule:    document.getElementById('taskSchedule').value,
-    due: document.getElementById('taskDue').value ? new Date(document.getElementById('taskDue').value).getTime() : null,
-    punishLink:  punishLink || null,
-    punishPoints: punishLink && punishments[punishLink] ? (punishments[punishLink].points||10) : 10,
-    requireProof, createdAt:Date.now(),
-    completedToday:false, failedToday:false, streak:0, bestStreak:0
-  });
-  await push(ref(db,'history'), { type:'task_created', taskTitle:title, ts:Date.now() });
-  closeAllSheets();
-  document.getElementById('taskTitle').value = '';
-  document.getElementById('taskDesc').value = '';
-  requireProof = false; setProofToggle(false);
-  showToast('✅ Task assigned');
-}
-
-// Proof toggle UI
-function toggleProof() { requireProof = !requireProof; setProofToggle(requireProof); }
-function setProofToggle(on) {
-  document.getElementById('proofTrack').className = 'toggle-track' + (on ? ' on' : '');
-  document.getElementById('proofThumb').className = 'toggle-thumb' + (on ? ' on' : '');
-}
-
-// ─────────────────────────────────────────────
-// PHOTO PROOF
-// ─────────────────────────────────────────────
-function openProofSheet(taskId) {
-  proofTaskId = taskId; proofDataUrl = null;
-  const t = tasks[taskId];
-  document.getElementById('proofSheetSub').textContent = t ? 'For: ' + t.title : 'Submit proof to Sir';
-  document.getElementById('proofNote').value = '';
-  document.getElementById('proofPreview').classList.add('hidden');
-  openSheet('proofSheet');
-}
-
-function handleProofFile(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    proofDataUrl = ev.target.result;
-    const img = document.getElementById('proofPreview');
-    img.src = proofDataUrl; img.classList.remove('hidden');
-  };
-  reader.readAsDataURL(file);
-}
-
-async function submitProof() {
-  if (!proofTaskId) return;
-  if (!proofDataUrl) { showToast('Please choose a photo first'); return; }
-  const t = tasks[proofTaskId]; if (!t) return;
-  let proofUrl = proofDataUrl;
-  try {
-    if (storage) {
-      const sr = sRef(storage, 'proof/' + Date.now() + '.jpg');
-      await uploadString(sr, proofDataUrl, 'data_url');
-      proofUrl = await getDownloadURL(sr);
-    }
-  } catch(e) { /* storage unavailable — keep base64 URL in queue */ }
-  await update(ref(db,'tasks/'+proofTaskId), { proofPending:true });
-  await push(ref(db,'queue'), {
-    type:'proof_submission', taskId:proofTaskId, taskTitle:t.title,
-    proofUrl, note: document.getElementById('proofNote').value.trim(),
-    ts:Date.now(), resolved:false
-  });
-  closeAllSheets(); proofTaskId = null; proofDataUrl = null;
-  showToast("📷 Proof submitted! Awaiting Sir's approval");
-}
-
-// Sir reviews proof
-function openProofReview(qId) {
-  reviewQId = qId;
-  const item = queue[qId]; if (!item) return;
-  document.getElementById('proofReviewSub').textContent = 'For: ' + (item.taskTitle || 'task');
-  document.getElementById('proofReviewImg').src = item.proofUrl || '';
-  const noteEl  = document.getElementById('proofReviewNote');
-  const noteText = document.getElementById('proofReviewNoteText');
-  if (item.note) { noteEl.classList.remove('hidden'); noteText.textContent = item.note; }
-  else { noteEl.classList.add('hidden'); }
-  openSheet('proofReviewSheet');
-}
-
-async function approveProof() {
-  if (!reviewQId) return;
-  const item = queue[reviewQId]; if (!item) return;
-  const t = tasks[item.taskId]; if (!t) return;
-  const earned = calcPts(t.basePoints||10, t.difficulty);
-  const newStreak = (t.streak||0) + 1, best = Math.max(newStreak, t.bestStreak||0);
-  await update(ref(db,'tasks/'+item.taskId), { completedToday:true, completedAt:Date.now(), proofPending:false, streak:newStreak, bestStreak:best });
-  await update(ref(db,'queue/'+reviewQId), { resolved:true });
-  await addPts(earned, 'Proof approved: ' + t.title);
-  await push(ref(db,'history'), { type:'proof_approved', taskTitle:t.title, points:earned, ts:Date.now() });
-  if (t.schedule==='once') await update(ref(db,'tasks/'+item.taskId), {archived:true});
-  closeAllSheets(); reviewQId = null;
-  showToast('✅ Proof approved! +' + earned + ' pts');
-}
-
-async function denyProof() {
-  if (!reviewQId) return;
-  const item = queue[reviewQId]; if (!item) return;
-  await update(ref(db,'tasks/'+item.taskId), { proofPending:false });
-  await update(ref(db,'queue/'+reviewQId), { resolved:true });
-  await push(ref(db,'history'), { type:'proof_denied', taskTitle:item.taskTitle, ts:Date.now() });
-  closeAllSheets(); reviewQId = null;
-  showToast('Proof rejected — Becca must resubmit');
-}
-
-// ─────────────────────────────────────────────
-// QUEUE
-// ─────────────────────────────────────────────
-function listenQueue() {
-  onValue(ref(db,'queue'), s => {
-    queue = s.val() || {};
-    updateQueueBadge();
-    if (curTab === 'queue') renderQueue();
-    renderPunishBanner();
-    renderDemeritsBanner();
-    renderAchievements();
-  });
-}
-
-function renderQueue() {
-  const list = document.getElementById('queueList');
-  const entries = Object.entries(queue).filter(([,v]) => !v.resolved).sort((a,b) => b[1].ts - a[1].ts);
-  if (!entries.length) {
-    list.innerHTML = emptyState('✅', 'All clear', 'Nothing needs your attention right now.'); return;
-  }
-  let html = '';
-  entries.forEach(([id, item]) => {
-    const time = relTime(item.ts);
-    if (item.type === 'proof_submission') {
-      html += `<div class="q-card fade-up">
-        <div class="q-head"><span class="q-type">📷 Proof</span><div class="q-title">${esc(item.taskTitle)}</div><span class="q-time">${time}</span></div>
-        <div class="q-body">
-          ${item.note ? `<div class="q-detail">💬 "${esc(item.note)}"</div>` : ''}
-          <div class="q-actions"><button class="q-btn approve" onclick="openProofReview('${id}')">👁 Review Photo</button></div>
-        </div>
-      </div>`;
-    } else if (item.type === 'failure_report') {
-      const count = getDemeritCount();
-      const tierNum = TIER.indexOf(getTier(count));
-      const showConsequence = tierNum >= 1;
-      html += `<div class="q-card fade-up">
-        <div class="q-head"><span class="q-type">⚠️ Failure</span><div class="q-title">${esc(item.taskTitle)}</div><span class="q-time">${time}</span></div>
-        <div class="q-body">
-          <div class="q-detail">${item.reason ? 'Reason: "' + esc(item.reason) + '"' : 'No reason given.'}</div>
-          <div class="q-actions">
-            ${showConsequence ? `<button class="q-btn deny" style="background:rgba(186,104,200,.1);color:var(--purple);border-color:rgba(186,104,200,.2);" onclick="openConsequencePicker('${id}')">⚡ Consequence</button>` : ''}
-            <button class="q-btn redeem" onclick="openRedemptionSheet('${id}')">🌿 Redemption</button>
-            <button class="q-btn deny" onclick="denyQueueItem('${id}')">Dismiss</button>
-          </div>
-        </div>
-      </div>`;
-    } else if (item.type === 'reward_request') {
-      html += `<div class="q-card fade-up">
-        <div class="q-head"><span class="q-type">🎁 Reward</span><div class="q-title">${esc(item.rewardTitle)}</div><span class="q-time">${time}</span></div>
-        <div class="q-body">
-          <div class="q-detail">Cost: ${item.cost} pts · Balance: ${pts.balance} pts</div>
-          <div class="q-actions">
-            <button class="q-btn approve" onclick="approveQueueItem('${id}')">✓ Approve</button>
-            <button class="q-btn deny" onclick="denyQueueItem('${id}')">✕ Deny</button>
-          </div>
-        </div>
-      </div>`;
-    }
-  });
-  list.innerHTML = html;
-
-  // Append task requests section for Sir
-  if (role === 'dom') {
-    const reqs = Object.entries(taskRequests).filter(([,r]) => !r.resolved && !r.denied);
-    if (reqs.length) {
-      let reqHtml = `<div style="margin-top:12px;"><div class="section-lbl" style="padding:0 0 8px;">🌸 Task Requests from Becca</div>`;
-      reqs.forEach(([id,r]) => {
-        reqHtml += `<div class="task-request-card fade-up">
-          <div class="task-request-icon">🌸</div>
-          <div class="task-request-info">
-            <div class="task-request-title">${esc(r.title)}</div>
-            ${r.note?`<div class="task-request-desc">${esc(r.note)}</div>`:''}
-            <div class="task-request-desc" style="margin-top:3px;">${relTime(r.ts)}</div>
-            <div class="task-request-actions">
-              <button class="rp-btn green" onclick="openTaskRequestReview('${id}')">Review</button>
-            </div>
-          </div>
-        </div>`;
-      });
-      reqHtml += '</div>';
-      list.innerHTML += reqHtml;
-    }
-  }
-}
-
-async function approveQueueItem(id) {
-  const item = queue[id]; if (!item) return;
-  if (item.type === 'reward_request') {
-    await addPts(-(item.cost||0), 'Reward: ' + item.rewardTitle);
-    if (item.rewardId) await update(ref(db,'rewards/'+item.rewardId), {pendingRequest:false});
-    await push(ref(db,'history'), { type:'reward_approved', rewardTitle:item.rewardTitle, cost:item.cost, ts:Date.now() });
-    showToast('🎁 Reward approved!');
-  }
-  await update(ref(db,'queue/'+id), {resolved:true});
-}
-
-async function denyQueueItem(id) {
-  const item = queue[id]; if (!item) return;
-  if (item.rewardId) await update(ref(db,'rewards/'+item.rewardId), {pendingRequest:false});
-  await update(ref(db,'queue/'+id), {resolved:true});
-  showToast('Dismissed');
-}
-
-// ── Active Punishment Banner ──
-function renderPunishBanner() {
-  const banner = document.getElementById('punishBanner');
-  const failures = Object.entries(queue).filter(([,v]) => !v.resolved && v.type==='failure_report' && v.punishLink);
-  if (!failures.length) { banner.innerHTML = ''; return; }
-  const [qid, item] = failures[0];
-  const p = punishments[item.punishLink];
-  if (!p) { banner.innerHTML = ''; return; }
-  banner.innerHTML = `<div class="punish-banner">
-    <div class="punish-banner-icon">⚡</div>
-    <div class="punish-banner-body">
-      <div class="punish-banner-title">Active Punishment: ${esc(p.title)}</div>
-      ${p.description ? `<div class="punish-banner-desc">${esc(p.description)}</div>` : ''}
-      ${role==='dom' ? `<div class="punish-banner-actions">
-        <button class="punish-banner-btn redeem" onclick="openRedemptionSheet('${qid}')">🌿 Set Redemption Task</button>
-        <button class="punish-banner-btn dismiss" onclick="dismissPunishment('${qid}')">Dismiss</button>
-      </div>` : ''}
-    </div>
-  </div>`;
-}
-
-async function dismissPunishment(qId) {
-  await update(ref(db,'queue/'+qId), {resolved:true});
-  showToast('Punishment dismissed');
-}
-
-// ─────────────────────────────────────────────
-// REDEMPTION TASKS
-// ─────────────────────────────────────────────
-function openRedemptionSheet(qId) {
-  redemptionQId = qId;
-  const item = queue[qId];
-  document.getElementById('redemptionSheetSub').textContent = item ? 'For: ' + item.taskTitle : 'Allow Becca to earn forgiveness';
-  document.getElementById('redemptionTitle').value = '';
-  document.getElementById('redemptionDesc').value = '';
-  document.getElementById('redemptionPoints').value = '10';
-  openSheet('redemptionSheet');
-}
-
-async function saveRedemptionTask() {
-  const title = document.getElementById('redemptionTitle').value.trim();
-  if (!title) { showToast('Enter a task title'); return; }
-  await push(ref(db,'tasks'), {
-    title,
-    description: document.getElementById('redemptionDesc').value.trim(),
-    difficulty:'simple', basePoints:parseInt(document.getElementById('redemptionPoints').value)||10,
-    schedule:'once', due:null, punishLink:null, punishPoints:0,
-    requireProof:true, isRedemption:true, redemptionFor:redemptionQId,
-    createdAt:Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
-  });
-  if (redemptionQId) await update(ref(db,'queue/'+redemptionQId), {resolved:true, hadRedemption:true});
-  await push(ref(db,'history'), { type:'redemption_assigned', title, ts:Date.now() });
-  closeAllSheets(); redemptionQId = null;
-  showToast('🌿 Redemption task assigned');
-}
-
-// ─────────────────────────────────────────────
-// REWARDS
-// ─────────────────────────────────────────────
-function listenRewards() {
-  onValue(ref(db,'rewards'), s => { rewards = s.val() || {}; if (curTab==='rewards') renderRewards(); });
+  list.innerHTML = html || '<div class="empty">No tasks</div>';
 }
 
 function renderRewards() {
   const list = document.getElementById('rewardList');
-  const entries = Object.entries(rewards);
-  if (!entries.length) {
-    list.innerHTML = emptyState('🎁', role==='dom' ? 'No rewards yet' : 'Nothing available',
-      role==='dom' ? 'Tap + to build the reward store.' : "Sir hasn't added any rewards yet."); return;
-  }
   let html = '';
-  entries.forEach(([id, r]) => {
-    const canAfford = (pts.balance||0) >= r.cost;
-    const isPending = !!r.pendingRequest;
-    let actions = '';
-    if (role === 'sub') {
-      actions = isPending
-        ? `<span class="rp-pending">⏳ Pending</span>`
-        : `<button class="rp-btn primary" ${canAfford?'':'disabled'} onclick="requestReward('${id}')">Redeem</button>`;
-    } else {
-      actions = isPending
-        ? `<button class="rp-btn green" onclick="approveReward('${id}')">Approve</button>
-           <button class="rp-btn red" onclick="denyReward('${id}')">Deny</button>`
-        : `<button class="rp-btn ghost" onclick="deleteReward('${id}')">Remove</button>`;
-    }
-    html += `<div class="rp-card fade-up">
-      <div class="rp-icon reward">${r.emoji||'🎁'}</div>
-      <div class="rp-info">
-        <div class="rp-name">${esc(r.title)}</div>
-        ${r.description ? `<div class="rp-desc">${esc(r.description)}</div>` : ''}
-        ${isPending ? `<div class="rp-desc" style="color:var(--amber);margin-top:2px;">⏳ Awaiting Sir's approval</div>` : ''}
-      </div>
-      <div class="rp-right"><div class="rp-cost reward">${r.cost} pts</div><div class="rp-actions">${actions}</div></div>
-    </div>`;
+  Object.entries(rewards).forEach(([id, r]) => {
+    html += `<div class="rp-card fade-up"><div class="rp-info"><div class="rp-name">${r.title}</div></div><div class="rp-right"><div class="rp-cost reward">${r.cost} pts</div><button class="rp-btn primary" onclick="requestReward('${id}')">Redeem</button></div></div>`;
   });
-  list.innerHTML = html;
-}
-
-async function saveReward() {
-  const title = document.getElementById('rewardTitle').value.trim();
-  if (!title) { showToast('Enter a title'); return; }
-  await push(ref(db,'rewards'), {
-    title, description:document.getElementById('rewardDesc').value.trim(),
-    cost:parseInt(document.getElementById('rewardCost').value)||50,
-    emoji:document.getElementById('rewardEmoji').value||'🎁', createdAt:Date.now()
-  });
-  closeAllSheets();
-  ['rewardTitle','rewardDesc','rewardEmoji'].forEach(id => document.getElementById(id).value='');
-  showToast('🎁 Reward added');
-}
-
-async function requestReward(id) {
-  const r = rewards[id]; if (!r) return;
-  if ((pts.balance||0) < r.cost) { showToast('Not enough points'); return; }
-  await update(ref(db,'rewards/'+id), {pendingRequest:true, requestedAt:Date.now()});
-  await push(ref(db,'queue'), { type:'reward_request', rewardId:id, rewardTitle:r.title, cost:r.cost, ts:Date.now(), resolved:false });
-  showToast("🎁 Request sent to Sir!");
-}
-
-async function approveReward(id) {
-  const r = rewards[id]; if (!r) return;
-  await addPts(-r.cost, 'Reward: ' + r.title);
-  await update(ref(db,'rewards/'+id), {pendingRequest:false, requestedAt:null});
-  await push(ref(db,'history'), { type:'reward_approved', rewardTitle:r.title, cost:r.cost, ts:Date.now() });
-  showToast('✅ Reward approved!');
-}
-
-async function denyReward(id) {
-  await update(ref(db,'rewards/'+id), {pendingRequest:false, requestedAt:null});
-  showToast('Request denied');
-}
-
-async function deleteReward(id) {
-  if (!confirm('Remove this reward?')) return;
-  await remove(ref(db,'rewards/'+id));
-}
-
-// ─────────────────────────────────────────────
-// PUNISHMENTS
-// ─────────────────────────────────────────────
-function listenPunishments() {
-  onValue(ref(db,'punishments'), s => {
-    punishments = s.val() || {};
-    if (curTab==='punishments') renderPunishments();
-    fillPunishDrop();
-  });
+  list.innerHTML = html || '<div class="empty">No rewards</div>';
 }
 
 function renderPunishments() {
   const list = document.getElementById('punishList');
-  const entries = Object.entries(punishments);
-  if (!entries.length) {
-    list.innerHTML = emptyState('⚡', 'No punishments set',
-      role==='dom' ? 'Tap + to build the punishment list.' : 'No punishments on record.'); return;
-  }
   let html = '';
-  entries.forEach(([id, p]) => {
-    const domActions = role==='dom' ? `<div class="rp-actions">
-      <button class="rp-btn primary" onclick="assignPunishment('${id}')">Assign</button>
-      <button class="rp-btn ghost" onclick="deletePunishment('${id}')">Remove</button>
-    </div>` : '';
-    html += `<div class="rp-card fade-up">
-      <div class="rp-icon punish">${p.emoji||'⚡'}</div>
-      <div class="rp-info">
-        <div class="rp-name">${esc(p.title)}</div>
-        ${p.description ? `<div class="rp-desc">${esc(p.description)}</div>` : ''}
-      </div>
-      <div class="rp-right"><div class="rp-cost punish">-${p.points||0} pts</div>${domActions}</div>
-    </div>`;
-  });
-  list.innerHTML = html;
-}
-
-async function savePunishment() {
-  const title = document.getElementById('punishTitle').value.trim();
-  if (!title) { showToast('Enter a title'); return; }
-  await push(ref(db,'punishments'), {
-    title, description:document.getElementById('punishDesc').value.trim(),
-    points:parseInt(document.getElementById('punishPoints').value)||15,
-    emoji:document.getElementById('punishEmoji').value||'⚡', createdAt:Date.now()
-  });
-  closeAllSheets();
-  ['punishTitle','punishDesc','punishEmoji'].forEach(id => document.getElementById(id).value='');
-  showToast('⚡ Punishment added');
-}
-
-async function assignPunishment(id) {
-  const p = punishments[id]; if (!p) return;
-  await push(ref(db,'queue'), {
-    type:'failure_report', taskTitle:"Sir's direct assignment",
-    punishLink:id, punishPoints:p.points||0, reason:'Assigned manually by Sir',
-    ts:Date.now(), resolved:false
-  });
-  await addPts(-(p.points||0), 'Punishment assigned: ' + p.title);
-  await push(ref(db,'history'), { type:'punishment_assigned', punishTitle:p.title, points:-(p.points||0), ts:Date.now() });
-  showToast('⚡ Punishment assigned');
-}
-
-async function deletePunishment(id) {
-  if (!confirm('Remove this punishment?')) return;
-  await remove(ref(db,'punishments/'+id));
-}
-
-function fillPunishDrop() {
-  const sel = document.getElementById('taskPunishLink'); if (!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">None</option>';
   Object.entries(punishments).forEach(([id, p]) => {
-    const o = document.createElement('option');
-    o.value = id; o.textContent = (p.emoji||'⚡') + ' ' + p.title;
-    sel.appendChild(o);
+    html += `<div class="rp-card fade-up"><div class="rp-info"><div class="rp-name">${p.title}</div></div><div class="rp-right"><div class="rp-cost punish">-${p.points} pts</div></div></div>`;
   });
-  sel.value = cur;
+  list.innerHTML = html || '<div class="empty">No punishments</div>';
 }
 
-// ─────────────────────────────────────────────
-// HISTORY
-// ─────────────────────────────────────────────
-let histData = {};
-function listenHistory() {
-  onValue(ref(db,'history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); renderAchievements(); });
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  let html = '';
+  Object.entries(queue).forEach(([id, q]) => {
+    html += `<div class="q-card fade-up"><div class="q-head"><div class="q-type">${q.type}</div><div class="q-title">${q.taskTitle || q.rewardTitle}</div></div><div class="q-body"><div class="q-actions"><button class="q-btn approve" onclick="approveQueueItem('${id}')">Approve</button><button class="q-btn deny" onclick="denyQueueItem('${id}')">Deny</button></div></div></div>`;
+  });
+  list.innerHTML = html || '<div class="empty">Queue clear</div>';
 }
 
 function renderHistory() {
   const list = document.getElementById('historyList');
-  const entries = Object.entries(histData).sort((a,b) => b[1].ts - a[1].ts).slice(0, 80);
-  if (!entries.length) { list.innerHTML = emptyState('📜', 'No activity yet', ''); return; }
-  const typeMap = {
-    task_completed:       { icon:'✅', color:'var(--green)',  label:'Task Completed' },
-    task_failed:          { icon:'❌', color:'var(--rose)',   label:'Task Failed' },
-    task_created:         { icon:'📋', color:'var(--blue)',   label:'Task Assigned' },
-    points_earned:        { icon:'⭐', color:'var(--gold)',   label:'Points Earned' },
-    points_lost:          { icon:'💔', color:'var(--rose)',   label:'Points Lost' },
-    reward_approved:      { icon:'🎁', color:'var(--gold)',   label:'Reward Approved' },
-    punishment_assigned:  { icon:'⚡', color:'var(--amber)',  label:'Punishment Assigned' },
-    proof_approved:       { icon:'📷', color:'var(--green)',  label:'Proof Approved' },
-    proof_denied:         { icon:'🚫', color:'var(--rose)',   label:'Proof Rejected' },
-    redemption_assigned:  { icon:'🌿', color:'var(--purple)', label:'Redemption Assigned' },
-    consequence_assigned: { icon:'⚡', color:'var(--rose)',   label:'Consequence Assigned' }
-  };
   let html = '';
-  entries.forEach(([, e]) => {
-    const m = typeMap[e.type] || { icon:'•', color:'var(--dim)', label:e.type };
-    const detail = e.taskTitle || e.rewardTitle || e.punishTitle || e.title || e.reason || '';
-    const ptStr  = e.points ? (e.points>0?'+':'') + e.points + ' pts' : '';
-    const streak = e.streak && e.streak > 1 ? ' · ' + e.streak + '-day streak' : '';
-    html += `<div class="hist-card fade-up">
-      <div class="hist-icon">${m.icon}</div>
-      <div class="hist-info">
-        <div class="hist-lbl" style="color:${m.color};">${m.label}${streak}</div>
-        ${detail ? `<div class="hist-detail">${esc(detail)}</div>` : ''}
-        <div class="hist-time">${relTime(e.ts)}</div>
-      </div>
-      ${ptStr ? `<div class="hist-pts" style="color:${e.points>0?'var(--green)':'var(--rose)'};">${ptStr}</div>` : ''}
-    </div>`;
+  history.forEach(h => {
+    html += `<div class="hist-card fade-up"><div class="hist-info"><div class="hist-lbl">${h.type}</div><div class="hist-time">${new Date(h.ts).toLocaleString()}</div></div></div>`;
   });
-  list.innerHTML = html;
-}
-
-// ─────────────────────────────────────────────
-// TABS / NAVIGATION
-// ─────────────────────────────────────────────
-function switchTab(t) {
-  curTab = t;
-  ['tasks','queue','dashboard','rewards','punishments','history'].forEach(x => {
-    document.getElementById('view-'+x).classList.toggle('hidden', x !== t);
-    document.getElementById('tab-'+x).classList.toggle('active', x === t);
-  });
-  if (t==='rewards')     renderRewards();
-  if (t==='punishments') renderPunishments();
-  if (t==='history')     renderHistory();
-  if (t==='queue')       renderQueue();
-  if (t==='dashboard')   renderDashboard(window._checkinData);
-  // FAB: only on dom tabs that support creation
-  const fabVisible = role==='dom' && ['tasks','rewards','punishments'].includes(t);
-  document.getElementById('fabBtn').style.display = fabVisible ? 'flex' : 'none';
-}
-
-function openCreateSheet() {
-  if (curTab==='tasks')       openSheet('taskSheet');
-  else if (curTab==='rewards') openSheet('rewardSheet');
-  else if (curTab==='punishments') openSheet('punishSheet');
-}
-
-function openSheet(id) {
-  document.getElementById('sheetOverlay').classList.add('open');
-  document.getElementById(id).classList.add('open');
-}
-
-function closeAllSheets() {
-  document.getElementById('sheetOverlay').classList.remove('open');
-  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
-}
-
-function cycleFilter() {
-  const states = ['all','pending','done'];
-  filterState = states[(states.indexOf(filterState) + 1) % states.length];
-  document.getElementById('filterToggle').innerHTML =
-    `<span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> ${cap(filterState)}`;
-  renderTasks();
-}
-
-// ─────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────
-function pickChip(groupId, el) {
-  document.querySelectorAll('#'+groupId+' .chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-function calcPts(base, diff) {
-  return Math.round(base * ({simple:1, standard:1.5, demanding:2, extreme:3}[diff] || 1));
-}
-function schedLbl(s) {
-  return {once:'One-off',daily:'Daily',weekly:'Weekly',monthly:'Monthly',weekdays:'Weekdays',weekends:'Weekends'}[s] || 'One-off';
-}
-function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function fmtDate(ts) {
-  return new Date(ts).toLocaleDateString() + ' ' + new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-}
-function relTime(ts) {
-  const d = Date.now()-ts, m=60000, h=3600000, dy=86400000;
-  if (d < m)  return 'just now';
-  if (d < h)  return Math.floor(d/m)  + 'm ago';
-  if (d < dy) return Math.floor(d/h)  + 'h ago';
-  return new Date(ts).toLocaleDateString();
-}
-function emptyState(icon, title, desc) {
-  return `<div class="empty fade-up"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`;
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// ─────────────────────────────────────────────
-// PHASE 3 — DEMERITS, ACHIEVEMENTS, CONSEQUENCE PICKER
-// ─────────────────────────────────────────────
-
-// Demerit tier thresholds
-const TIER = [ {min:0,max:0,label:null}, {min:1,max:2,label:'Minor',cls:'tier-1',icon:'⚠️',desc:'1–2 unresolved failures. Minor correction expected.'},
-  {min:3,max:4,label:'Moderate',cls:'tier-2',icon:'🔴',desc:'3–4 failures. Moderate escalation. Sir\'s attention required.'},
-  {min:5,max:99,label:'Significant',cls:'tier-3',icon:'💀',desc:'5+ failures. Significant consequences in effect.'} ];
-
-// Consequence pool — filtered by tier
-const CONSEQUENCES = [
-  {emoji:'📝',title:'Devotion Letter',desc:'Write a 300-word letter of apology and devotion.',tier:1,pts:5},
-  {emoji:'🙇',title:'Kneeling Meditation',desc:'Hold the Ready position for 20 minutes with photo proof.',tier:1,pts:10},
-  {emoji:'🚫',title:'Privilege Loss',desc:'Forfeit the Get Dreamy ritual or a favourite scent for 48 hours.',tier:1,pts:10},
-  {emoji:'📵',title:'Device Silence',desc:'3 hours of total silence — no social media except messages to Sir.',tier:1,pts:5},
-  {emoji:'🛁',title:'Ritual Reset',desc:'Full grooming ritual completed and documented with photos.',tier:2,pts:15},
-  {emoji:'🔒',title:'24hr Abstinence',desc:'24 hours of total sexual abstinence — no touching, no content.',tier:2,pts:20},
-  {emoji:'🏠',title:'Double Domestic',desc:'Two extra domestic service tasks assigned by Sir on the spot.',tier:2,pts:15},
-  {emoji:'⏳',title:'Extended Edge',desc:'30 minutes of edging — bring to the brink, stop, repeat every 5 min.',tier:2,pts:20},
-  {emoji:'🌑',title:'Total Reset Protocol',desc:'48 hours of withdrawal — no privileges, no play, service only.',tier:3,pts:30},
-  {emoji:'📋',title:'Full Rule Recital',desc:'Write out every rule and expectation from scratch. Submit for review.',tier:3,pts:25},
-  {emoji:'🎭',title:'Public Submission',desc:'A structured humility task defined entirely by Sir\'s discretion.',tier:3,pts:35},
-];
-
-let currentConsequenceTaskId = null;
-let currentConsequencePicked = null;
-
-// Expose new functions
-W.rollConsequence = rollConsequence;
-W.applyConsequence = applyConsequence;
-W.openConsequencePicker = openConsequencePicker;
-
-// ── Demerit count = unresolved failure_report queue items ──
-function getDemeritCount() {
-  return Object.values(queue).filter(i => !i.resolved && i.type === 'failure_report').length;
-}
-
-function getTier(count) {
-  return TIER.find(t => count >= t.min && count <= t.max) || TIER[0];
-}
-
-function renderDemeritsBanner() {
-  const banner = document.getElementById('demeritsBanner');
-  const count = getDemeritCount();
-  const tier = getTier(count);
-  if (!tier.label) { banner.innerHTML = ''; return; }
-  banner.innerHTML = `<div class="demerit-banner ${tier.cls}">
-    <div class="demerit-icon">${tier.icon}</div>
-    <div class="demerit-body">
-      <div class="demerit-title">${tier.label} Infraction — Tier ${TIER.indexOf(tier)}</div>
-      <div class="demerit-desc">${tier.desc}</div>
-    </div>
-    <div class="demerit-count">${count}</div>
-  </div>`;
-}
-
-// ── Consequence Picker ──
-function openConsequencePicker(taskId) {
-  currentConsequenceTaskId = taskId;
-  const count = getDemeritCount();
-  const tier = getTier(count);
-  document.getElementById('consequenceSheetSub').textContent =
-    tier.label ? tier.label + ' tier — ' + count + ' unresolved failure' + (count!==1?'s':'') : 'Choose a fitting consequence';
-  document.getElementById('consequenceAlertText').innerHTML =
-    `<strong>${tier.label || 'Demerit'} escalation active</strong>${tier.desc || 'Assign a consequence for this failure.'}`;
-  rollConsequence();
-  openSheet('consequenceSheet');
-}
-
-function rollConsequence() {
-  const count = getDemeritCount();
-  const tierNum = TIER.indexOf(getTier(count));
-  // Include consequences at or below current tier
-  const eligible = CONSEQUENCES.filter(c => c.tier <= Math.max(tierNum, 1));
-  // Pick 3 random without replacement
-  const shuffled = eligible.sort(() => Math.random() - 0.5).slice(0, 3);
-  currentConsequencePicked = shuffled[0]; // default select first
-  renderConsequenceCards(shuffled);
-}
-
-function renderConsequenceCards(pool) {
-  const tierClass = ['','t1','t2','t3'];
-  const tierLabel = ['','Minor','Moderate','Significant'];
-  let html = '';
-  pool.forEach((c, i) => {
-    html += `<div class="consequence-card${i===0?' selected':''}" onclick="selectConsequence(this, ${CONSEQUENCES.indexOf(c)})">
-      <div class="consequence-emoji">${c.emoji}</div>
-      <div class="consequence-info">
-        <div class="consequence-title">${c.title}</div>
-        <div class="consequence-desc">${c.desc}</div>
-      </div>
-      <span class="consequence-tier ${tierClass[c.tier]}">${tierLabel[c.tier]}</span>
-    </div>`;
-  });
-  document.getElementById('consequenceCards').innerHTML = html;
-  // Store pool on window for selectConsequence
-  window._consequencePool = pool;
-}
-
-W.selectConsequence = function(el, globalIdx) {
-  document.querySelectorAll('.consequence-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  currentConsequencePicked = CONSEQUENCES[globalIdx];
-};
-
-async function applyConsequence() {
-  if (!currentConsequencePicked) return;
-  const c = currentConsequencePicked;
-  // Add as a redemption-style task with photo proof
-  await push(ref(db,'tasks'), {
-    title: c.emoji + ' ' + c.title,
-    description: c.desc,
-    difficulty: 'demanding', basePoints: c.pts,
-    schedule: 'once', due: null, punishLink: null, punishPoints: 0,
-    requireProof: true, isRedemption: true,
-    redemptionFor: currentConsequenceTaskId || null,
-    createdAt: Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
-  });
-  await push(ref(db,'history'), {
-    type: 'consequence_assigned', title: c.title, tier: c.tier, pts: c.pts, ts: Date.now()
-  });
-  // Resolve the queue item if linked
-  if (currentConsequenceTaskId && queue[currentConsequenceTaskId]) {
-    await update(ref(db,'queue/'+currentConsequenceTaskId), {resolved:true, hadConsequence:true});
-  }
-  closeAllSheets();
-  currentConsequenceTaskId = null; currentConsequencePicked = null;
-  showToast('⚡ Consequence assigned: ' + c.title);
-}
-
-// ── Achievement Badges ──
-const ACHIEVEMENTS = [
-  {id:'first_complete', emoji:'🌟', name:'First Step',    desc:'Complete your first task',           check: (t,h) => Object.values(h).some(e=>e.type==='task_completed')},
-  {id:'streak_3',       emoji:'⚡', name:'On a Roll',     desc:'3-day streak on any task',           check: (t,h) => Object.values(t).some(x=>x.streak>=3)},
-  {id:'streak_7',       emoji:'🔥', name:'Fire Streak',   desc:'7-day streak on any task',           check: (t,h) => Object.values(t).some(x=>x.streak>=7)},
-  {id:'streak_30',      emoji:'💎', name:'Diamond',       desc:'30-day streak on any task',          check: (t,h) => Object.values(t).some(x=>x.streak>=30)},
-  {id:'pts_100',        emoji:'⭐', name:'Century',       desc:'Earn 100 points total',              check: (t,h,p) => (p.earned||0) >= 100},
-  {id:'pts_500',        emoji:'🏆', name:'Gold Standard', desc:'Earn 500 points total',              check: (t,h,p) => (p.earned||0) >= 500},
-  {id:'no_fails_7',     emoji:'🕊️', name:'Perfect Week',  desc:'7 days with no failures reported',  check: (t,h) => {
-    const now = Date.now(), week = 7*86400000;
-    return !Object.values(h).some(e=>e.type==='task_failed' && now-e.ts < week);
-  }},
-  {id:'redeemed',       emoji:'🌿', name:'Redeemed',      desc:'Complete a redemption task',         check: (t,h) => Object.values(h).some(e=>e.type==='task_completed' && Object.values(t).some(x=>x.isRedemption&&x.completedToday))},
-  {id:'tasks_10',       emoji:'📋', name:'Dedicated',     desc:'Complete 10 tasks total',            check: (t,h) => Object.values(h).filter(e=>e.type==='task_completed').length >= 10},
-  {id:'tasks_50',       emoji:'👑', name:'Devoted',       desc:'Complete 50 tasks total',            check: (t,h) => Object.values(h).filter(e=>e.type==='task_completed').length >= 50},
-];
-
-function computeAchievements() {
-  return ACHIEVEMENTS.map(a => ({
-    ...a,
-    earned: a.check(tasks, histData || {}, pts)
-  }));
-}
-
-function renderAchievements() {
-  const strip = document.getElementById('achievementsStrip');
-  const list  = document.getElementById('achievementsList');
-  if (role !== 'sub') { strip.classList.add('hidden'); return; }
-  const all = computeAchievements();
-  const earnedAny = all.some(a => a.earned);
-  strip.classList.toggle('hidden', !earnedAny);
-  let html = '';
-  all.filter(a => a.earned).forEach(a => {
-    html += `<div class="achievement-pill earned" title="${a.desc}">
-      <span class="achievement-emoji">${a.emoji}</span>
-      <span class="achievement-name">${a.name}</span>
-    </div>`;
-  });
-  list.innerHTML = html;
-}
-
-// ─────────────────────────────────────────────
-// PHASE 4 — DASHBOARD, MOOD CHECK-IN, CHART, TASK REQUESTS
-// ─────────────────────────────────────────────
-
-// Expose
-W.pickMood=pickMood; W.submitCheckin=submitCheckin; W.skipCheckin=skipCheckin;
-W.sendTaskRequest=sendTaskRequest; W.openTaskRequestReview=openTaskRequestReview;
-W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
-
-let selectedMood = null;
-let reviewTaskReqId = null;
-let taskRequests = {};
-
-// ── Mood check-in ──
-function maybeShowCheckin() {
-  if (role !== 'sub') return;
-  const today = new Date().toDateString();
-  const lastCheckin = sessionStorage.getItem('dsh_last_checkin');
-  if (lastCheckin === today) return;
-  // Show after 800ms delay so app is settled
-  setTimeout(() => {
-    document.getElementById('checkinOverlay').classList.add('open');
-  }, 800);
-}
-
-function pickMood(el) {
-  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedMood = el.dataset.mood;
-}
-
-async function submitCheckin() {
-  if (!selectedMood) { showToast('Pick a mood first'); return; }
-  const energy = parseInt(document.getElementById('energySlider').value);
-  const note = document.getElementById('checkinNote').value.trim();
-  await set(ref(db,'checkin'), { mood:selectedMood, energy, note, ts:Date.now(), role:'sub' });
-  await push(ref(db,'history'), { type:'checkin', mood:selectedMood, energy, ts:Date.now() });
-  sessionStorage.setItem('dsh_last_checkin', new Date().toDateString());
-  closeCheckin();
-  showToast('💭 Check-in sent to Sir');
-}
-
-function skipCheckin() {
-  sessionStorage.setItem('dsh_last_checkin', new Date().toDateString());
-  closeCheckin();
-}
-
-function closeCheckin() {
-  document.getElementById('checkinOverlay').classList.remove('open');
-  selectedMood = null;
-  document.getElementById('checkinNote').value = '';
-  document.getElementById('energySlider').value = 5;
-  document.getElementById('energyVal').textContent = '5';
-  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-}
-
-// ── Dashboard ──
-function listenCheckin() {
-  onValue(ref(db,'checkin'), s => {
-    window._checkinData = s.val() || null;
-    if (curTab === 'dashboard') renderDashboard(window._checkinData);
-  });
-}
-
-function listenTaskRequests() {
-  onValue(ref(db,'taskRequests'), s => {
-    taskRequests = s.val() || {};
-    if (curTab === 'dashboard') renderDashboard(window._checkinData);
-    // Badge on queue if Sir has pending task requests
-    if (role === 'dom') {
-      const pending = Object.values(taskRequests).filter(r => !r.resolved).length;
-      const qTab = document.getElementById('tab-queue');
-      // Merge with existing queue badge
-      updateQueueBadge();
-    }
-  });
+  list.innerHTML = html || '<div class="empty">No history</div>';
 }
 
 function updateQueueBadge() {
-  const queuePending = Object.values(queue).filter(i => !i.resolved).length;
-  const reqPending   = Object.values(taskRequests).filter(r => !r.resolved).length;
-  const total = queuePending + reqPending;
-  const btn = document.getElementById('tab-queue');
-  const existing = btn.querySelector('.tab-count');
-  if (existing) existing.remove();
-  if (total > 0) {
-    const b = document.createElement('span');
-    b.className = 'tab-count'; b.textContent = total;
-    btn.appendChild(b);
-  }
+  const count = Object.keys(queue).length;
+  document.getElementById('tab-queue').innerHTML = `Queue ${count ? `<span class="tab-count">${count}</span>` : ''}`;
 }
 
-const MOOD_META = {
-  playful:  {emoji:'😈', label:'Playful',   color:'var(--purple)'},
-  soft:     {emoji:'🌸', label:'Soft',       color:'var(--rose)'},
-  obedient: {emoji:'🙇', label:'Obedient',   color:'var(--green)'},
-  needy:    {emoji:'🥺', label:'Needy',      color:'var(--blue)'},
-  tired:    {emoji:'😴', label:'Tired',      color:'var(--dim)'},
-  anxious:  {emoji:'😰', label:'Anxious',    color:'var(--amber)'},
-  grateful: {emoji:'🙏', label:'Grateful',   color:'var(--gold)'},
-  resistant:{emoji:'😤', label:'Resistant',  color:'var(--rose)'},
-  proud:    {emoji:'✨', label:'Proud',       color:'var(--gold)'},
-  other:    {emoji:'💭', label:'Other',       color:'var(--mid)'},
+async function addPts(amount, reason) {
+  const nb = (points.balance || 0) + amount;
+  const ne = amount > 0 ? (points.earned || 0) + amount : (points.earned || 0);
+  const nl = amount < 0 ? (points.lost || 0) + Math.abs(amount) : (points.lost || 0);
+  await setDoc(pointsDoc, { balance: nb, earned: ne, lost: nl }, { merge: true });
+  await addDoc(historyCol, { type: amount > 0 ? 'earned' : 'lost', amount, reason, ts: Date.now() });
+}
+
+window.completeTask = async id => {
+  const t = tasks[id]; if (!t) return;
+  await updateDoc(doc(tasksCol, id), { pendingApproval: true });
+  await addDoc(queueCol, { type: 'completion', taskId: id, taskTitle: t.title, ts: Date.now(), resolved: false });
+};
+window.openFailSheet = id => { failId = id; openSheet('failSheet'); };
+window.confirmFail = async () => {
+  if (!failId) return;
+  await updateDoc(doc(tasksCol, failId), { failedToday: true });
+  await addDoc(queueCol, { type: 'failure', taskId: failId, taskTitle: tasks[failId].title, ts: Date.now(), resolved: false });
+  closeAllSheets();
+};
+window.deleteTask = async id => { if (confirm('Delete?')) await deleteDoc(doc(tasksCol, id)); };
+window.saveTask = async () => {
+  const title = document.getElementById('taskTitle').value;
+  await addDoc(tasksCol, { title, basePoints: parseInt(document.getElementById('taskPoints').value), completedToday: false, archived: false });
+  closeAllSheets();
+};
+window.switchTab = t => {
+  curTab = t;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
+  document.querySelectorAll('#tabContent > div').forEach(v => v.classList.toggle('hidden', v.id !== 'view-'+t));
+};
+window.openSheet = id => { document.getElementById('sheetOverlay').classList.add('open'); document.getElementById(id).classList.add('open'); };
+window.closeAllSheets = () => { document.getElementById('sheetOverlay').classList.remove('open'); document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); };
+window.openCreateSheet = () => { if (curTab === 'tasks') openSheet('taskSheet'); };
+window.requestReward = async id => {
+  const r = rewards[id]; if (!r) return;
+  if (points.balance < r.cost) { alert('Not enough points.'); return; }
+  await addDoc(queueCol, { type: 'redemption', rewardId: id, rewardTitle: r.title, cost: r.cost, ts: Date.now(), resolved: false });
+  alert('Request sent to Sir.');
+};
+window.denyQueueItem = async id => {
+  const q = queue[id]; if (!q) return;
+  if (q.type === 'completion' && q.taskId) {
+    await updateDoc(doc(tasksCol, q.taskId), { pendingApproval: false });
+  }
+  await updateDoc(doc(queueCol, id), { resolved: true });
+};
+window.approveQueueItem = async id => {
+  const q = queue[id]; if (!q) return;
+  if (q.type === 'completion' && q.taskId) {
+    const t = tasks[q.taskId];
+    if (t) {
+      await updateDoc(doc(tasksCol, q.taskId), { completedToday: true, pendingApproval: false });
+      await addPts(t.basePoints || 10, 'Approved: ' + t.title);
+    }
+  } else if (q.type === 'failure' && q.taskId) {
+    const t = tasks[q.taskId];
+    if (t) {
+      await addPts(-(t.basePoints || 10), 'Failure: ' + t.title);
+    }
+  } else if (q.type === 'redemption' && q.rewardId) {
+    await addPts(-q.cost, 'Reward: ' + q.rewardTitle);
+  }
+  await updateDoc(doc(queueCol, id), { resolved: true });
 };
 
-function renderDashboard(checkin) {
-  const isDom = role === 'dom';
-  document.getElementById('sirDashboard').classList.toggle('hidden', !isDom);
-  document.getElementById('subDashboard').classList.toggle('hidden', isDom);
-  if (isDom) renderSirDashboard(checkin);
-  else renderSubDashboard();
-}
-
-function renderSirDashboard(checkin) {
-  const activeTasks   = Object.values(tasks).filter(t => !t.archived && !t.completedToday).length;
-  const doneTasks     = Object.values(tasks).filter(t => t.completedToday).length;
-  const queuePending  = Object.values(queue).filter(i => !i.resolved).length;
-  const demerits      = getDemeritCount();
-  const bestStreak    = Math.max(0, ...Object.values(tasks).map(t => t.streak||0));
-  const mm            = checkin ? MOOD_META[checkin.mood] || MOOD_META.other : null;
-
-  document.getElementById('dashGrid').innerHTML = `
-    <div class="dash-card">
-      <div class="dash-card-label">Points Balance</div>
-      <div class="dash-card-val">${pts.balance ?? 0}</div>
-      <div class="dash-card-sub">+${pts.earned??0} earned · -${pts.lost??0} lost</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">Active Demerits</div>
-      <div class="dash-card-val" style="color:${demerits>4?'var(--purple)':demerits>2?'var(--rose)':demerits>0?'var(--amber)':'var(--green)'};">${demerits}</div>
-      <div class="dash-card-sub">${demerits===0?'No active failures':getTier(demerits).label+' tier'}</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">Tasks Today</div>
-      <div class="dash-card-val">${doneTasks}<span style="font-size:14px;color:var(--dim);">/${doneTasks+activeTasks}</span></div>
-      <div class="dash-card-sub">${activeTasks} still pending</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">Queue Items</div>
-      <div class="dash-card-val" style="color:${queuePending>0?'var(--amber)':'var(--green)'};">${queuePending}</div>
-      <div class="dash-card-sub">${queuePending===0?'Nothing pending':'Need attention'}</div>
-    </div>
-    <div class="dash-card wide">
-      <div class="dash-card-label">Becca's Headspace</div>
-      ${mm ? `<div class="dash-mood-display">
-        <div class="dash-mood-emoji">${mm.emoji}</div>
-        <div class="dash-mood-info">
-          <div class="dash-mood-name" style="color:${mm.color};">${mm.label}</div>
-          <div class="dash-mood-time">Energy ${checkin.energy}/10 · ${relTime(checkin.ts)}</div>
-          ${checkin.note ? `<div class="dash-mood-time" style="margin-top:3px;font-style:italic;">"${esc(checkin.note)}"</div>` : ''}
-        </div>
-      </div>
-      <div class="dash-energy-bar" style="margin-top:10px;"><div class="dash-energy-fill" style="width:${(checkin.energy/10)*100}%"></div></div>`
-      : `<div style="font-size:11px;color:var(--dim);font-style:italic;">No check-in today yet.</div>`}
-    </div>
-    <div class="dash-card wide">
-      <div class="dash-card-label">Top Streaks</div>
-      <div class="dash-streak-row">
-        ${Object.values(tasks).filter(t=>t.streak>0).sort((a,b)=>b.streak-a.streak).slice(0,3).map(t=>`
-          <div class="dash-streak-item">
-            <div class="dash-streak-val">${t.streak}${t.streak>=7?'🔥':''}</div>
-            <div class="dash-streak-lbl">${esc(t.title.substring(0,12))}</div>
-          </div>`).join('') || '<div style="font-size:10px;color:var(--dim);">No active streaks yet.</div>'}
-      </div>
-    </div>`;
-
-  renderDashAlerts(demerits, queuePending, activeTasks, checkin);
-  renderPointsChart();
-}
-
-function renderDashAlerts(demerits, queuePending, activeTasks, checkin) {
-  const alerts = document.getElementById('dashAlerts');
-  let html = '';
-  if (demerits >= 3) html += `<div class="dash-alert warn"><div class="dash-alert-icon">⚡</div><div class="dash-alert-text"><strong>Demerit Escalation</strong>${demerits} unresolved failures — ${getTier(demerits).label} tier active</div></div>`;
-  if (queuePending > 0) html += `<div class="dash-alert warn"><div class="dash-alert-icon">📋</div><div class="dash-alert-text"><strong>${queuePending} Queue Item${queuePending>1?'s':''}</strong>Switch to Queue to review</div></div>`;
-  if (checkin && checkin.mood === 'anxious') html += `<div class="dash-alert info"><div class="dash-alert-icon">💭</div><div class="dash-alert-text"><strong>Becca seems anxious</strong>Consider checking in before assigning heavy tasks</div></div>`;
-  if (checkin && checkin.mood === 'resistant') html += `<div class="dash-alert warn"><div class="dash-alert-icon">😤</div><div class="dash-alert-text"><strong>Becca is feeling resistant</strong>May need Sir's direct attention today</div></div>`;
-  if (checkin && checkin.energy <= 3) html += `<div class="dash-alert info"><div class="dash-alert-icon">😴</div><div class="dash-alert-text"><strong>Low energy today (${checkin.energy}/10)</strong>Consider lighter tasks</div></div>`;
-  if (!html) html = `<div class="dash-alert ok"><div class="dash-alert-icon">✅</div><div class="dash-alert-text"><strong>All clear</strong>No alerts at this time</div></div>`;
-  alerts.innerHTML = html;
-}
-
-function renderSubDashboard() {
-  const activeTasks = Object.values(tasks).filter(t => !t.archived && !t.completedToday).length;
-  const doneTasks   = Object.values(tasks).filter(t => t.completedToday).length;
-  const bestStreak  = Math.max(0, ...Object.values(tasks).map(t => t.streak||0));
-  document.getElementById('subDashGrid').innerHTML = `
-    <div class="dash-card">
-      <div class="dash-card-label">Points Balance</div>
-      <div class="dash-card-val">${pts.balance ?? 0}</div>
-      <div class="dash-card-sub">+${pts.earned??0} earned</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">Best Streak</div>
-      <div class="dash-card-val" style="color:var(--amber);">${bestStreak}${bestStreak>=7?'🔥':''}</div>
-      <div class="dash-card-sub">day${bestStreak!==1?'s':''}</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">Done Today</div>
-      <div class="dash-card-val">${doneTasks}</div>
-      <div class="dash-card-sub">of ${doneTasks+activeTasks} tasks</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-label">Badges Earned</div>
-      <div class="dash-card-val" style="color:var(--gold);">${computeAchievements().filter(a=>a.earned).length}</div>
-      <div class="dash-card-sub">of ${ACHIEVEMENTS.length} total</div>
-    </div>`;
-
-  // Pending task requests
-  const reqs = Object.entries(taskRequests).filter(([,r])=>!r.resolved);
-  document.getElementById('taskRequestList').innerHTML = reqs.length
-    ? reqs.map(([id,r])=>`<div class="task-request-card fade-up">
-        <div class="task-request-icon">🌸</div>
-        <div class="task-request-info">
-          <div class="task-request-title">${esc(r.title)}</div>
-          ${r.note?`<div class="task-request-desc">${esc(r.note)}</div>`:''}
-          <div class="task-request-desc" style="margin-top:4px;">Sent ${relTime(r.ts)} · <span style="color:${r.resolved?'var(--green)':r.denied?'var(--rose)':'var(--amber)'};">${r.denied?'Declined':r.resolved?'Assigned':'Awaiting Sir'}</span></div>
-        </div>
-      </div>`).join('')
-    : `<div style="font-size:10px;color:var(--dim);padding:8px 0;">No pending requests.</div>`;
-}
-
-// ── Point Economy Chart ──
-let chartInstance = null;
-function renderPointsChart() {
-  const canvas = document.getElementById('pointsChart');
-  if (!canvas) return;
-  // Build 7-day buckets from history
-  const now = Date.now();
-  const days = 7;
-  const labels = [], earned = [], lost = [];
-  for (let i = days-1; i >= 0; i--) {
-    const d = new Date(now - i*86400000);
-    labels.push(d.toLocaleDateString([], {weekday:'short'}));
-    earned.push(0); lost.push(0);
-  }
-  Object.values(histData || {}).forEach(e => {
-    const daysAgo = Math.floor((now - e.ts) / 86400000);
-    if (daysAgo >= days) return;
-    const idx = days - 1 - daysAgo;
-    if (e.type === 'points_earned' && e.amount) earned[idx] += e.amount;
-    if (e.type === 'points_lost'   && e.amount) lost[idx]  += Math.abs(e.amount);
-  });
-
-  // Destroy previous instance
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-
-  const ctx = canvas.getContext('2d');
-  // Simple manual canvas chart (no external lib needed)
-  const W = canvas.offsetWidth || 300, H = 120;
-  canvas.width = W * 2; canvas.height = H * 2; // retina
-  ctx.scale(2, 2);
-  const maxVal = Math.max(10, ...earned, ...lost);
-  const padL=28, padR=8, padT=10, padB=24;
-  const chartW = W-padL-padR, chartH = H-padT-padB;
-  const barW = chartW / (days*2+days-1);
-
-  ctx.clearRect(0,0,W,H);
-  // Grid lines
-  ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
-  for (let i=0;i<=4;i++) {
-    const y = padT + chartH - (i/4)*chartH;
-    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.25)'; ctx.font='8px Montserrat';
-    ctx.fillText(Math.round(maxVal*i/4), 0, y+3);
-  }
-  // Bars
-  labels.forEach((lbl, i) => {
-    const x = padL + i*(barW*2+barW/2);
-    const eH = (earned[i]/maxVal)*chartH;
-    const lH = (lost[i]/maxVal)*chartH;
-    // Earned bar
-    ctx.fillStyle='rgba(76,175,80,.7)';
-    ctx.fillRect(x, padT+chartH-eH, barW, eH);
-    // Lost bar
-    ctx.fillStyle='rgba(224,91,106,.7)';
-    ctx.fillRect(x+barW+1, padT+chartH-lH, barW, lH);
-    // Label
-    ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='7px Montserrat';
-    ctx.fillText(lbl, x, H-6);
-  });
-  chartInstance = { destroy: ()=>{} }; // placeholder so we can re-render
-}
-
-// ── Sub Task Requests ──
-async function sendTaskRequest() {
-  const title = document.getElementById('taskReqTitle').value.trim();
-  if (!title) { showToast('Describe what you want to do'); return; }
-  await push(ref(db,'taskRequests'), {
-    title, note: document.getElementById('taskReqNote').value.trim(),
-    ts: Date.now(), resolved: false, denied: false
-  });
-  document.getElementById('taskReqTitle').value = '';
-  document.getElementById('taskReqNote').value = '';
-  showToast('🌸 Request sent to Sir!');
-  renderSubDashboard();
-}
-
-function openTaskRequestReview(reqId) {
-  reviewTaskReqId = reqId;
-  const r = taskRequests[reqId]; if (!r) return;
-  document.getElementById('taskRequestReviewSub').textContent = 'From Becca · ' + relTime(r.ts);
-  document.getElementById('taskRequestReviewBody').innerHTML =
-    `<strong>${esc(r.title)}</strong>${r.note ? '<br>' + esc(r.note) : ''}`;
-  openSheet('taskRequestReviewSheet');
-}
-
-async function approveTaskRequest() {
-  if (!reviewTaskReqId) return;
-  const r = taskRequests[reviewTaskReqId]; if (!r) return;
-  // Create as a real task
-  await push(ref(db,'tasks'), {
-    title: r.title, description: r.note||'',
-    difficulty:'simple', basePoints:10, schedule:'once',
-    due:null, punishLink:null, punishPoints:0, requireProof:false,
-    createdAt:Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
-  });
-  await update(ref(db,'taskRequests/'+reviewTaskReqId), {resolved:true, approvedAt:Date.now()});
-  closeAllSheets(); reviewTaskReqId = null;
-  showToast('✅ Request approved and assigned!');
-}
-
-async function denyTaskRequest() {
-  if (!reviewTaskReqId) return;
-  await update(ref(db,'taskRequests/'+reviewTaskReqId), {resolved:true, denied:true});
-  closeAllSheets(); reviewTaskReqId = null;
-  showToast('Request declined');
-}
-
-// ─────────────────────────────────────────────
-// DAILY RESET
-// ─────────────────────────────────────────────
-function checkDailyReset() {
-  const today = new Date().toDateString();
-  if (sessionStorage.getItem('dsh_last_reset') === today) return;
-  sessionStorage.setItem('dsh_last_reset', today);
-  Object.entries(tasks).forEach(([id, t]) => {
-    if (['daily','weekdays','weekends'].includes(t.schedule) && (t.completedToday || t.failedToday || t.proofPending)) {
-      const u = {};
-      u['tasks/'+id+'/completedToday'] = false;
-      u['tasks/'+id+'/failedToday']    = false;
-      u['tasks/'+id+'/proofPending']   = false;
-      update(ref(db), u);
-    }
-  });
-}
+init();
 </script>
 </body>
 </html>

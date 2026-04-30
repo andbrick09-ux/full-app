@@ -565,7 +565,12 @@ body::before {
 <div class="dsh-toast" id="toast"></div>
 
 <script src="nav.js"></script>
-<script>
+<script type="module">
+import { requireAuth, dataRef, getSettings } from './auth.js';
+import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let vaultRef;
+
 // ══════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════
@@ -576,14 +581,14 @@ var PRESETS     = ['warm-up','peak energy','rhythmic','intense impact','sensual'
 var vault = [], searchResults = [], nextPageToken = '', lastQuery = '', currentFilter = 'all', deleteTargetId = null, plItems = [];
 
 var adderRole = 'dom';
-try { var _s=JSON.parse(localStorage.getItem('sp_settings')||'{}'); if(_s.role) adderRole=_s.role.toLowerCase().includes('sub')?'sub':'dom'; } catch(e){}
+/* Role set by Firebase */
 
 // ══════════════════════════════════════
 //  PERSISTENCE
 // ══════════════════════════════════════
-function loadVault(){ try{ vault=JSON.parse(localStorage.getItem(VAULT_KEY)||'[]'); }catch(e){ vault=[]; } }
-function saveVault(){ localStorage.setItem(VAULT_KEY,JSON.stringify(vault)); updateBadge(); }
-function getKey(){ return localStorage.getItem(API_KEY_KEY)||''; }
+async function loadVault() { if(vaultRef) { const snap=await getDoc(vaultRef); vault=snap.exists()?snap.data().songs||[]:[]; updateBadge(); } }catch(e){ vault=[]; } }
+function saveVault() { if(vaultRef) setDoc(vaultRef,{songs:vault}); updateBadge(); }
+function getKey(){ return sessionStorage.getItem(API_KEY_KEY)||''; }
 function updateBadge(){ var n=vault.length; document.getElementById('vaultBadge').textContent=n+(n===1?' Song':' Songs'); }
 
 // ══════════════════════════════════════
@@ -595,7 +600,7 @@ function closeApiModal(){ document.getElementById('apiBack').classList.remove('o
 function saveApiKey(){
   var v=document.getElementById('apiKeyInput').value.trim();
   if(!v){ showToast('Please enter a key'); return; }
-  localStorage.setItem(API_KEY_KEY,v); closeApiModal(); checkBanner(); showToast('API key saved ✓');
+  sessionStorage.setItem(API_KEY_KEY,v); closeApiModal(); checkBanner(); showToast('API key saved ✓');
 }
 
 // ══════════════════════════════════════
@@ -854,6 +859,15 @@ function decode(s){ var t=document.createElement('textarea'); t.innerHTML=s; ret
 // ══════════════════════════════════════
 loadVault(); updateBadge(); checkBanner();
 if('serviceWorker' in navigator) window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+
+(async function initFirebase() {
+  const user = await requireAuth();
+  vaultRef = dataRef('song-vault');
+  await loadVault();
+  const s = await getSettings(user.uid);
+  if(s.role) adderRole = s.role.toLowerCase().includes('sub')?'sub':'dom';
+  renderVault();
+})();
 </script>
 </body>
 </html>

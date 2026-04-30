@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -78,12 +78,22 @@
 
   </div>
 
-  <script>
-    function acceptProtocol() {
-      localStorage.setItem('acceptedSirProtocol', 'true');
-      alert('✅ Sir’s Protocol accepted. You are now officially devoted.');
-    }
-  </script>
+  <script type="module">
+import { requireAuth, dataRef } from './auth.js';
+import { setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+requireAuth();
+
+window.acceptProtocol = async function() {
+  try {
+    await setDoc(dataRef('settings'), { acceptedSirProtocol: true }, { merge: true });
+    alert('✅ Sir’s Protocol accepted. You are now officially devoted.');
+  } catch(e) {
+    console.error("Error saving protocol acceptance:", e);
+    alert('Failed to save. Please check your connection.');
+  }
+};
+</script>
 
   <!-- nav.js injects bottom nav + More sheet -->
   <script src="nav.js"></script>

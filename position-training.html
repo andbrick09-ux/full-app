@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -238,11 +238,34 @@ let dbRef;
          context:'Puts you completely on display for Sir\'s evaluation. Every body part visible and accessible. Sir may circle, touch, adjust, or comment. Remain perfectly still.',hold:'Until Sir completes the inspection'}
     ];
 
-    const SK='sirender_pos_training';
-    let st = getDefault(); /* loaded via firebase */
+    let st = getDefault();
+    let dbRef;
+
     function getDefault(){return{mastered:{},dailyPractice:{},dailyCounts:{},photoSent:{},videoSent:{},streak:0,lastDate:null,log:[]}}
-    function load(){const s=localStorage.getItem(SK);if(s)try{const d=JSON.parse(s);if(!d.photoSent)d.photoSent={};if(!d.videoSent)d.videoSent={};if(!d.dailyCounts)d.dailyCounts={};return d}catch(e){}return getDefault()}
-    function save(){if(dbRef) setDoc(dbRef, st)}
+    
+    async function save(){ if(dbRef) await setDoc(dbRef, st); }
+
+    async function init() {
+      const user = await requireAuth();
+      dbRef = dataRef('training/position-training');
+      
+      onSnapshot(dbRef, (snap) => {
+        if (snap.exists()) {
+          st = snap.data();
+          // Ensure nested objects exist
+          if(!st.photoSent) st.photoSent={}; 
+          if(!st.videoSent) st.videoSent={}; 
+          if(!st.dailyCounts) st.dailyCounts={};
+          if(!st.dailyPractice) st.dailyPractice={};
+          if(!st.mastered) st.mastered={};
+        } else {
+          st = getDefault();
+          save();
+        }
+        render();
+      });
+    }
+
     function getMastered(){return Object.values(st.mastered).filter(Boolean).length}
     function getCurrentIdx(){for(let i=0;i<P.length;i++){if(!st.mastered[P[i].id])return i}return P.length-1}
     function isUnlocked(i){return i===0||st.mastered[P[i-1].id]}
@@ -373,20 +396,7 @@ let dbRef;
     }
 
     function confirmReset(){if(confirm('Reset ALL position training progress?')){if(dbRef) deleteDoc(dbRef);st=getDefault();render();}}
-    render();
-    if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.error(e)));
-    
-
-(async function initFirebase() {
-  const user = await requireAuth();
-  dbRef = dataRef('training/position-training');
-  const snap = await getDoc(dbRef);
-  if (snap.exists()) {
-    st = snap.data();
-    if(!st.photoSent) st.photoSent={}; if(!st.videoSent) st.videoSent={}; if(!st.dailyCounts) st.dailyCounts={};
-  }
-  render();
-})();
+    init();
 </script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
