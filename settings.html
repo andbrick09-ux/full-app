@@ -238,7 +238,7 @@
       document.getElementById('acctRole').innerHTML  = `<span style="font-size:11px;color:var(--cream-mute)">Role:</span> ${myProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub'}`;
 
       await loadSettings();
-      await loadRelationship();   // NEW: load pairing status
+      await loadRelationship();
     }
 
     async function getSettings() {
@@ -251,7 +251,7 @@
     
     async function loadSettings() {
       const s = await getSettings();
-      document.getElementById('settingName').value = s.subName || '';
+      document.getElementById('settingName').value = s.name || s.subName || '';
       document.getElementById('settingPartnerName').value = s.domName || '';
       
       const theme = s.theme || 'midnight';
@@ -276,7 +276,6 @@
       const btn = document.querySelector('.settings-save-btn');
       const originalText = btn.innerHTML;
 
-      // Show loading state
       btn.disabled = true;
       btn.innerHTML = `<span class="material-symbols-rounded">hourglass_empty</span> Saving...`;
 
@@ -287,7 +286,7 @@
 
       const s = {
         ...existing,
-        subName:         document.getElementById('settingName').value.trim(),
+        name:            document.getElementById('settingName').value.trim(),
         domName:         document.getElementById('settingPartnerName').value.trim(),
         theme:           themeEl ? themeEl.dataset.theme : 'midnight',
         fontSize:        sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
@@ -299,7 +298,6 @@
         settingsCache = s;
         showToast('Settings saved successfully ✦');
         
-        // Brief success state on button
         btn.innerHTML = `<span class="material-symbols-rounded">check</span> Saved!`;
         setTimeout(() => {
           btn.innerHTML = originalText;
@@ -307,14 +305,9 @@
         }, 1200);
       } catch(ex) {
         console.error('Save error:', ex);
-        
         let msg = 'Save failed — check your connection';
-        if (ex.message && ex.message.includes('permission')) {
-          msg = 'Permission denied — check Firestore rules';
-        } else if (ex.message && ex.message.includes('authenticated')) {
-          msg = 'Not logged in — please log in again';
-        }
-        
+        if (ex.message && ex.message.includes('permission')) msg = 'Permission denied — check Firestore rules';
+        if (ex.message && ex.message.includes('authenticated')) msg = 'Not logged in — please log in again';
         showToast(msg);
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -380,10 +373,6 @@
       }
     }
 
-    // ============================================================
-    // NEW: Relationship / Pairing functions (integrated from pair.html)
-    // ============================================================
-
     async function loadRelationship() {
       const card = document.getElementById('relStatusCard');
       const inviteForm = document.getElementById('inviteForm');
@@ -399,19 +388,16 @@
         const role = myProfile?.role;
 
         if (rel && rel.status === 'active') {
-          // PAIRED STATE — fetch real partner info
           const partnerUid = await getPartnerUid();
           const partnerProfile = partnerUid ? await getUserProfile(partnerUid) : null;
           const partnerName = partnerProfile?.displayName || 'your partner';
           const partnerRole = partnerProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub';
 
-          // Auto-fill Partner Name field with real name and make readonly
           partnerInput.value = partnerName;
           partnerInput.readOnly = true;
           partnerInput.style.background = 'rgba(5,16,36,.6)';
           partnerInput.style.cursor = 'default';
 
-          // Show in relationship card
           const partnerLabel = role === 'dom' ? 'Sub' : 'Dom';
           card.innerHTML = `
             <div style="display:flex;align-items:center;gap:14px">
@@ -428,7 +414,6 @@
           `;
         } 
         else {
-          // Not paired — allow editing Partner Name
           partnerInput.readOnly = false;
           partnerInput.style.background = 'rgba(5,16,36,.85)';
           partnerInput.style.cursor = 'text';
@@ -461,7 +446,6 @@
     window.sendInviteFromSettings = async function() {
       const emailInput = document.getElementById('inviteEmail');
       const msg = document.getElementById('inviteMsg');
-      const btn = event.currentTarget;
       
       const email = (emailInput.value || '').trim();
       if (!email) {
@@ -479,7 +463,6 @@
         msg.textContent = 'Invite sent! Ask your Sub to accept in their Settings.';
         emailInput.value = '';
         
-        // Refresh after short delay
         setTimeout(() => {
           loadRelationship();
           showToast('Invite sent successfully ✦');
@@ -503,11 +486,9 @@
         setTimeout(async () => {
           await loadRelationship();
           showToast('Successfully paired ✦');
-          // Also refresh partner name if empty
           const partnerField = document.getElementById('settingPartnerName');
           if (!partnerField.value.trim()) {
             partnerField.value = 'Sir';
-            // Optionally auto-save
           }
         }, 900);
       } catch (ex) {
@@ -527,7 +508,6 @@
         showToast('Accounts unpaired successfully');
         setTimeout(() => {
           loadRelationship();
-          // Clear the partner name field for cleanliness
           document.getElementById('settingPartnerName').value = '';
         }, 600);
       } catch (ex) {
@@ -542,7 +522,6 @@
       }
     };
 
-    // Make functions globally accessible
     window.saveSettings  = saveSettings;
     window.selectTheme   = selectTheme;
     window.selectFontSize = selectFontSize;
