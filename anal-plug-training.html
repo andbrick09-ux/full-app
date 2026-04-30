@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>Dom Sub Hub — Anal Plug Training</title>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great Vibes&display=swap" rel="stylesheet"/>
   <link rel="manifest" href="manifest.json"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link rel="apple-touch-icon" href="icon-512.png"/>
@@ -129,11 +129,11 @@
             <div class="info-card">
                 <div class="card-title">Progressive Plug Sizing</div>
                 <p class="card-text" style="margin-bottom:16px;opacity:.8">Each size must be mastered before advancing. "Mastered" means comfortable insertion, 2+ hours of wear, and removal without discomfort.</p>
-                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#90CAF9,#64B5F6);width:28px;height:42px">XS</div><div class="plug-info"><div class="plug-size">Extra Small — The Starter</div><div class="plug-dims">~0.75" / 2cm diameter · 2.5" insertable</div><div class="plug-notes">Your entry point. Barely larger than a finger. Focus: learning to relax the sphincter for insertion and removal.</div></div></div>
-                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#81C784,#66BB6A);width:32px;height:48px">S</div><div class="plug-info"><div class="plug-size">Small — The Foundation</div><div class="plug-dims">~1" / 2.5cm diameter · 3" insertable</div><div class="plug-notes">The training workhorse. Most of your early wear time happens here. Goal: 2-hour comfortable wear.</div></div></div>
-                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#FFB74D,#FFA726);width:36px;height:52px">M</div><div class="plug-info"><div class="plug-size">Medium — The Standard</div><div class="plug-dims">~1.25" / 3.2cm diameter · 3.5" insertable</div><div class="plug-notes">Noticeable stretch. This is where you learn to move, sit, and function normally while plugged.</div></div></div>
-                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#E57373,#EF5350);width:40px;height:56px">L</div><div class="plug-info"><div class="plug-size">Large — The Challenge</div><div class="plug-dims">~1.5" / 3.8cm diameter · 4" insertable</div><div class="plug-notes">Significant presence. Extended wear builds real endurance. You will feel this during all activities.</div></div></div>
-                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,var(--gold),#c5a028);width:44px;height:60px">XL</div><div class="plug-info"><div class="plug-size">Extra Large — Sir's Pride</div><div class="plug-dims">~1.75"+ / 4.5cm diameter · 4.5" insertable</div><div class="plug-notes">The mastery size. Comfortable wear at this size means your training is complete. Reserved for advanced trainees only.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#90CAF9,#64B5F6);width:28px;height:42px">XS</div><div class="plug-info"><div class="plug-size">Extra Small — The Starter</div><div class="plug-dims">\~0.75" / 2cm diameter · 2.5" insertable</div><div class="plug-notes">Your entry point. Barely larger than a finger. Focus: learning to relax the sphincter for insertion and removal.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#81C784,#66BB6A);width:32px;height:48px">S</div><div class="plug-info"><div class="plug-size">Small — The Foundation</div><div class="plug-dims">\~1" / 2.5cm diameter · 3" insertable</div><div class="plug-notes">The training workhorse. Most of your early wear time happens here. Goal: 2-hour comfortable wear.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#FFB74D,#FFA726);width:36px;height:52px">M</div><div class="plug-info"><div class="plug-size">Medium — The Standard</div><div class="plug-dims">\~1.25" / 3.2cm diameter · 3.5" insertable</div><div class="plug-notes">Noticeable stretch. This is where you learn to move, sit, and function normally while plugged.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,#E57373,#EF5350);width:40px;height:56px">L</div><div class="plug-info"><div class="plug-size">Large — The Challenge</div><div class="plug-dims">\~1.5" / 3.8cm diameter · 4" insertable</div><div class="plug-notes">Significant presence. Extended wear builds real endurance. You will feel this during all activities.</div></div></div>
+                <div class="plug-card"><div class="plug-visual" style="background:linear-gradient(135deg,var(--gold),#c5a028);width:44px;height:60px">XL</div><div class="plug-info"><div class="plug-size">Extra Large — Sir's Pride</div><div class="plug-dims">\~1.75"+ / 4.5cm diameter · 4.5" insertable</div><div class="plug-notes">The mastery size. Comfortable wear at this size means your training is complete. Reserved for advanced trainees only.</div></div></div>
             </div>
         </div>
 
@@ -187,9 +187,10 @@
     </div>
     <script type="module">
 import { requireAuth, dataRef } from './auth.js';
-import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 let dbRef;
+let unsubscribe = null;
 
         const PROFILES={
             beginner:{label:'Beginner',startPlug:'XS',phases:[
@@ -280,7 +281,7 @@ let dbRef;
         function getCurrent(){const p=getPhases();for(let i=0;i<p.length;i++){if(!state.completedPhases.includes(p[i].id))return i}return Math.max(0,p.length-1)}
         function isUnlocked(i){return i===0||state.completedPhases.includes(getPhases()[i-1].id)}
         function isCompleted(i){return state.completedPhases.includes(getPhases()[i].id)}
-        function allDone(pid){return getPhases().find(p=>p.id===pid).tasks.every(t=>state.tasks[`${pid}_${t.id}`])}
+        function allDone(pid){return getPhases().find(p=>p.id===pid).tasks.every(t=>state.tasks[`\( {pid}_ \){t.id}`])}
 
         function showSection(id,btn){
             document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
@@ -309,7 +310,7 @@ let dbRef;
             // Dots
             const dots=document.getElementById('progressDots');
             if(!phases.length){dots.innerHTML='';} else {
-                dots.innerHTML=phases.map((_,i)=>{let c='phase-dot';if(isCompleted(i))c+=' completed';else if(i===getCurrent())c+=' active';return `<div class="${c}" onclick="scrollTo(${i})"></div>`}).join('');
+                dots.innerHTML=phases.map((_,i)=>{let c='phase-dot';if(isCompleted(i))c+=' completed';else if(i===getCurrent())c+=' active';return `<div class="\( {c}" onclick="scrollTo( \){i})"></div>`}).join('');
             }
             // Stats
             document.getElementById('stat-phase').textContent=!phases.length?'—':(isCompleted(phases.length-1)?'✓':(getCurrent()+1));
@@ -325,7 +326,7 @@ let dbRef;
                 const ul=isUnlocked(i),co=isCompleted(i),cu=i===getCurrent(),ad=allDone(phase.id);
                 let icon='🔒';if(co)icon='✅';else if(ul)icon=cu?'🔥':'⬜';
                 let cc='phase-card';if(!ul)cc+=' locked';if(co)cc+=' completed-card';
-                return `<div class="${cc}" id="phase-card-${i}"><div class="phase-header" onclick="togglePhase('${phase.id}')"><div class="phase-info"><div class="phase-badge">${phase.badge}</div><div class="phase-name">${phase.name}</div><div class="phase-objective">${phase.objective}</div></div><div class="phase-status">${icon}</div></div><div class="phase-body" id="body-${phase.id}">${phase.tasks.map(t=>{const k=`${phase.id}_${t.id}`,d=state.tasks[k];return `<div class="task-group-label" style="margin-top:16px">${t.schedule}</div><div class="task-item"><div class="task-check ${d?'checked':''}" onclick="toggleTask('${phase.id}','${t.id}')">${d?'✓':''}</div><div class="task-text"><div class="task-name" style="${d?'text-decoration:line-through;opacity:.5':''}">${t.name}</div><div class="task-detail">${t.detail}</div>${t.why?`<div class="task-why">↳ ${t.why}</div>`:''}</div></div>`}).join('')}<div class="tip-card"><div class="tip-label">💡 Sir's Tip</div><div class="tip-text">${phase.tip}</div></div><button class="complete-phase-btn" onclick="completePhase('${phase.id}')" ${!ad||co?'disabled':''}>${co?'✓ Phase Completed':(ad?'Mark Phase Complete':'Complete all tasks to advance')}</button></div></div>`
+                return `<div class="\( {cc}" id="phase-card- \){i}"><div class="phase-header" onclick="togglePhase('\( {phase.id}')"><div class="phase-info"><div class="phase-badge"> \){phase.badge}</div><div class="phase-name">\( {phase.name}</div><div class="phase-objective"> \){phase.objective}</div></div><div class="phase-status">\( {icon}</div></div><div class="phase-body" id="body- \){phase.id}">\( {phase.tasks.map(t=>{const k=` \){phase.id}_\( {t.id}`,d=state.tasks[k];return `<div class="task-group-label" style="margin-top:16px"> \){t.schedule}</div><div class="task-item"><div class="task-check \( {d?'checked':''}" onclick="toggleTask(' \){phase.id}','\( {t.id}')"> \){d?'✓':''}</div><div class="task-text"><div class="task-name" style="\( {d?'text-decoration:line-through;opacity:.5':''}"> \){t.name}</div><div class="task-detail">\( {t.detail}</div> \){t.why?`<div class="task-why">↳ \( {t.why}</div>`:''}</div></div>`}).join('')}<div class="tip-card"><div class="tip-label">💡 Sir's Tip</div><div class="tip-text"> \){phase.tip}</div></div><button class="complete-phase-btn" onclick="completePhase('${phase.id}')" \( {!ad||co?'disabled':''}> \){co?'✓ Phase Completed':(ad?'Mark Phase Complete':'Complete all tasks to advance')}</button></div></div>`
             }).join('');
             const cb=document.getElementById(`body-${phases[getCurrent()].id}`);if(cb)cb.classList.add('open');
             renderLog();
@@ -334,13 +335,13 @@ let dbRef;
         function renderLog(){
             const lc=document.getElementById('logEntries');
             if(!state.log.length){lc.innerHTML='<div class="log-empty">No sessions recorded yet.</div>';return;}
-            lc.innerHTML=state.log.slice(0,20).map(e=>`<div class="log-entry"><span class="log-level">${e.level}</span><span class="log-note">${e.note}</span><span class="log-date">${e.date}</span></div>`).join('');
+            lc.innerHTML=state.log.slice(0,20).map(e=>`<div class="log-entry"><span class="log-level">\( {e.level}</span><span class="log-note"> \){e.note}</span><span class="log-date">${e.date}</span></div>`).join('');
         }
 
         function togglePhase(pid){const b=document.getElementById(`body-${pid}`);if(b.classList.contains('open'))b.classList.remove('open');else{document.querySelectorAll('.phase-body').forEach(x=>x.classList.remove('open'));b.classList.add('open');}}
 
         function toggleTask(pid,tid){
-            const k=`${pid}_${tid}`;state.tasks[k]=!state.tasks[k];
+            const k=`\( {pid}_ \){tid}`;state.tasks[k]=!state.tasks[k];
             if(state.tasks[k]){
                 const p=getPhases().find(x=>x.id===pid),t=p.tasks.find(x=>x.id===tid);
                 state.sessions++;
@@ -359,7 +360,7 @@ let dbRef;
         }
 
         function updateStreak(){const t=new Date().toDateString();if(state.lastDate){const d=Math.floor((new Date(t)-new Date(state.lastDate))/864e5);if(d===1)state.streak++;else if(d>1)state.streak=1;}else state.streak=1;state.lastDate=t;}
-        function addLog(level,note){const n=new Date();state.log.unshift({level,note,date:`${n.getMonth()+1}/${n.getDate()} ${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`});save();}
+        function addLog(level,note){const n=new Date();state.log.unshift({level,note,date:`\( {n.getMonth()+1}/ \){n.getDate()} \( {n.getHours()}: \){String(n.getMinutes()).padStart(2,'0')}`});save();}
         function scrollTo(i){
             const tab = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.textContent.toLowerCase() === 'protocol');
             showSection('protocol', tab || document.querySelector('.nav-tab'));
@@ -374,12 +375,20 @@ let dbRef;
 (async function initFirebase() {
   const user = await requireAuth();
   dbRef = dataRef('training/anal-plug-training');
-  const snap = await getDoc(dbRef);
-  if (snap.exists()) {
-    state = snap.data();
-  }
-  render();
+  unsubscribe = onSnapshot(dbRef, (snap) => {
+    if (snap.exists()) {
+      state = snap.data();
+    } else {
+      state = getDefault();
+    }
+    render();
+  });
 })();
+
+// Cleanup listener when leaving page
+window.addEventListener('beforeunload', () => {
+  if (unsubscribe) unsubscribe();
+});
 </script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
