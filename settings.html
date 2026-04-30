@@ -278,7 +278,14 @@
     }
     
     async function saveSettings() {
-      const existing = settingsCache;
+      const btn = document.querySelector('.settings-save-btn');
+      const originalText = btn.innerHTML;
+
+      // Show loading state
+      btn.disabled = true;
+      btn.innerHTML = `<span class="material-symbols-rounded">hourglass_empty</span> Saving...`;
+
+      const existing = settingsCache || {};
       const themeEl  = document.querySelector('.theme-option.selected');
       const sizeEl   = document.querySelector('.dynamic-pill.selected');
       const activeTs = Array.from(document.querySelectorAll('.training-toggle:checked')).map(c => c.value);
@@ -296,10 +303,27 @@
       try {
         await setDoc(dataRef('settings'), s, { merge: true });
         settingsCache = s;
-        showToast('Settings saved ✦');
+        showToast('Settings saved successfully ✦');
+        
+        // Brief success state on button
+        btn.innerHTML = `<span class="material-symbols-rounded">check</span> Saved!`;
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 1200);
       } catch(ex) {
-        showToast('Save failed — check your connection');
-        console.error(ex);
+        console.error('Save error:', ex);
+        
+        let msg = 'Save failed — check your connection';
+        if (ex.message && ex.message.includes('permission')) {
+          msg = 'Permission denied — check Firestore rules';
+        } else if (ex.message && ex.message.includes('authenticated')) {
+          msg = 'Not logged in — please log in again';
+        }
+        
+        showToast(msg);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
       }
     }
     
