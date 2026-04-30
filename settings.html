@@ -193,7 +193,8 @@
         </div>
       </div>
       
-      <button class="settings-save-btn" onclick="saveSettings()">
+      <!-- FIX 2: Added id="saveBtn" so saveSettings targets the correct button -->
+      <button class="settings-save-btn" id="saveBtn" onclick="saveSettings()">
         <span class="material-symbols-rounded">save</span>
         Save Changes
       </button>
@@ -273,7 +274,8 @@
     }
     
     async function saveSettings() {
-      const btn = document.querySelector('.settings-save-btn');
+      // FIX 2: Target save button by ID, not class (which also matches the Send invite button)
+      const btn = document.getElementById('saveBtn');
       const originalText = btn.innerHTML;
 
       btn.disabled = true;
@@ -399,13 +401,15 @@
           partnerInput.style.cursor = 'default';
 
           const partnerLabel = role === 'dom' ? 'Sub' : 'Dom';
+
+          // FIX 1: Corrected broken template literal — \( and \) replaced with ${ and }
           card.innerHTML = `
             <div style="display:flex;align-items:center;gap:14px">
               <div style="font-size:28px">🔗</div>
               <div style="flex:1">
                 <div class="rel-badge active">PAIRED &amp; ACTIVE</div>
                 <div style="margin-top:6px;font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light)">
-                  \( {partnerLabel}: <strong> \){partnerName}</strong> <span style="font-size:12px;opacity:0.8">(${partnerRole})</span>
+                  ${partnerLabel}: <strong>${partnerName}</strong> <span style="font-size:12px;opacity:0.8">(${partnerRole})</span>
                 </div>
                 <div style="font-size:11px;color:var(--cream-mute);margin-top:2px">Connected • Relationship ID: ${rel.id.substring(0,8)}…</div>
               </div>
