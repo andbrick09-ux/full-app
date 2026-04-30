@@ -75,12 +75,12 @@
       <div class="settings-group">
         <span class="settings-group-label">Personalization</span>
         <div class="settings-field">
-          <label>Your Name (Sub)</label>
-          <input class="settings-input" id="settingName" type="text" maxlength="30" placeholder="e.g. Becca"/>
+          <label>Your Name</label>
+          <input class="settings-input" id="settingName" type="text" maxlength="30"/>
         </div>
         <div class="settings-field">
-          <label>Partner's Name (Dominant)</label>
-          <input class="settings-input" id="settingPartnerName" type="text" maxlength="30" placeholder="e.g. Sir"/>
+          <label>Partner's Name</label>
+          <input class="settings-input" id="settingPartnerName" type="text" maxlength="30"/>
         </div>
         <div class="settings-field">
           <label>Safeword</label>
@@ -225,7 +225,7 @@
 
   <script type="module">
     import { requireAuth, getMyProfile, logOut, dataRef, 
-             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid } from './auth.js';
+             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile } from './auth.js';
     import { getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     let settingsCache = {};
@@ -237,9 +237,9 @@
       myProfile   = await getMyProfile();
 
       // Show account info
-      document.getElementById('acctName').textContent  = myProfile?.displayName || currentUser.email;
-      document.getElementById('acctRole').textContent  = myProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub';
-      document.getElementById('acctEmail').textContent = currentUser.email;
+      document.getElementById('acctName').innerHTML = `<span style="font-size:11px;color:var(--cream-mute)">Username:</span> ${myProfile?.displayName || currentUser.email}`;
+      document.getElementById('acctEmail').innerHTML = `<span style="font-size:11px;color:var(--cream-mute)">Email:</span> ${currentUser.email}`;
+      document.getElementById('acctRole').innerHTML  = `<span style="font-size:11px;color:var(--cream-mute)">Role:</span> ${myProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub'}`;
 
       await loadSettings();
       await loadRelationship();   // NEW: load pairing status
@@ -370,6 +370,7 @@
       const card = document.getElementById('relStatusCard');
       const inviteForm = document.getElementById('inviteForm');
       const acceptArea = document.getElementById('acceptArea');
+      const partnerInput = document.getElementById('settingPartnerName');
       
       inviteForm.style.display = 'none';
       acceptArea.style.display = 'none';
@@ -378,10 +379,21 @@
       try {
         const rel = await getRelationship();
         const role = myProfile?.role;
-        const domName = document.getElementById('settingPartnerName').value.trim() || 'your Dominant';
 
         if (rel && rel.status === 'active') {
-          // PAIRED STATE
+          // PAIRED STATE — fetch real partner info
+          const partnerUid = await getPartnerUid();
+          const partnerProfile = partnerUid ? await getUserProfile(partnerUid) : null;
+          const partnerName = partnerProfile?.displayName || 'your partner';
+          const partnerRole = partnerProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub';
+
+          // Auto-fill Partner Name field with real name and make readonly
+          partnerInput.value = partnerName;
+          partnerInput.readOnly = true;
+          partnerInput.style.background = 'rgba(5,16,36,.6)';
+          partnerInput.style.cursor = 'default';
+
+          // Show in relationship card
           const partnerLabel = role === 'dom' ? 'Sub' : 'Dom';
           card.innerHTML = `
             <div style="display:flex;align-items:center;gap:14px">
@@ -389,7 +401,7 @@
               <div style="flex:1">
                 <div class="rel-badge active">PAIRED &amp; ACTIVE</div>
                 <div style="margin-top:6px;font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light)">
-                  \( {partnerLabel}: <strong> \){domName}</strong>
+                  \( {partnerLabel}: <strong> \){partnerName}</strong> <span style="font-size:12px;opacity:0.8">(${partnerRole})</span>
                 </div>
                 <div style="font-size:11px;color:var(--cream-mute);margin-top:2px">Connected • Relationship ID: ${rel.id.substring(0,8)}…</div>
               </div>
@@ -397,27 +409,30 @@
             <button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>
           `;
         } 
-        else if (role === 'dom') {
-          // DOM — show invite form
-          card.innerHTML = `
-            <div style="text-align:center;padding:8px 4px">
-              <div style="font-size:13px;color:var(--cream-mute)">No Sub currently paired</div>
-              <div style="font-size:11px;margin-top:4px">Use the form below to send an invite</div>
-            </div>
-          `;
-          inviteForm.style.display = 'block';
-        } 
         else {
-          // SUB — not paired
-          card.innerHTML = `
-            <div style="text-align:center;padding:12px 4px">
-              <div style="font-size:13px;color:var(--cream-mute)">Not paired with a Dom yet</div>
-              <div style="font-size:11px;margin-top:4px">Ask your Dominant to send you a pairing invite from their Settings</div>
-            </div>
-          `;
-          // Optional: show a "Check for pending invite" button for Subs
-          acceptArea.style.display = 'block';
-          document.getElementById('acceptMsg').innerHTML = 'If your Dom has sent an invite, tap above to accept.';
+          // Not paired — allow editing Partner Name
+          partnerInput.readOnly = false;
+          partnerInput.style.background = 'rgba(5,16,36,.85)';
+          partnerInput.style.cursor = 'text';
+
+          if (role === 'dom') {
+            card.innerHTML = `
+              <div style="text-align:center;padding:8px 4px">
+                <div style="font-size:13px;color:var(--cream-mute)">No Sub currently paired</div>
+                <div style="font-size:11px;margin-top:4px">Use the form below to send an invite</div>
+              </div>
+            `;
+            inviteForm.style.display = 'block';
+          } else {
+            card.innerHTML = `
+              <div style="text-align:center;padding:12px 4px">
+                <div style="font-size:13px;color:var(--cream-mute)">Not paired with a Dom yet</div>
+                <div style="font-size:11px;margin-top:4px">Ask your Dominant to send you a pairing invite from their Settings</div>
+              </div>
+            `;
+            acceptArea.style.display = 'block';
+            document.getElementById('acceptMsg').innerHTML = 'If your Dom has sent an invite, tap above to accept.';
+          }
         }
       } catch (e) {
         console.error(e);
