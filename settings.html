@@ -82,10 +82,6 @@
           <label>Partner's Name</label>
           <input class="settings-input" id="settingPartnerName" type="text" maxlength="30"/>
         </div>
-        <div class="settings-field">
-          <label>Safeword</label>
-          <input class="settings-input" id="settingSafeWord" type="text" maxlength="30" placeholder="e.g. Red" style="color:var(--red); font-weight: 600;"/>
-        </div>
       </div>
 
       <!-- RELATIONSHIP (NEW INTEGRATED SECTION) -->
@@ -257,7 +253,6 @@
       const s = await getSettings();
       document.getElementById('settingName').value = s.subName || '';
       document.getElementById('settingPartnerName').value = s.domName || '';
-      document.getElementById('settingSafeWord').value = s.safeWord || '';
       
       const theme = s.theme || 'midnight';
       document.querySelectorAll('.theme-option').forEach(el => {
@@ -294,7 +289,6 @@
         ...existing,
         subName:         document.getElementById('settingName').value.trim(),
         domName:         document.getElementById('settingPartnerName').value.trim(),
-        safeWord:        document.getElementById('settingSafeWord').value.trim(),
         theme:           themeEl ? themeEl.dataset.theme : 'midnight',
         fontSize:        sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
         activeTrainings: activeTs
