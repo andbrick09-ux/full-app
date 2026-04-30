@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Heel Training Protocol</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&family=Great Vibes&display=swap" rel="stylesheet">
 <style>
   :root {
     --midnight: #0a0e1a;
@@ -405,7 +405,7 @@
 <div class="app-wrap">
 
   <header class="app-header">
-    <span class="script">Sir&#39;s Protocol</span>
+    <span class="script">Sir's Protocol</span>
     <h1>Heel Training</h1>
     <p class="subtitle">Grace Through Discipline</p>
   </header>
@@ -430,7 +430,7 @@
   <!-- LOG PANEL -->
   <div class="panel active" id="tab-log">
     <div class="card">
-      <div class="card-title">Log Today&#39;s Session</div>
+      <div class="card-title">Log Today's Session</div>
       <div class="form-row">
         <div>
           <label>Date</label>
@@ -557,7 +557,7 @@
           <div class="day-row"><div class="day-name">Thursday</div><div class="day-desc">Full service session &mdash; all household tasks in heels</div></div>
           <div class="day-row"><div class="day-name">Friday</div><div class="day-desc">Endurance &mdash; 90 min wear with posture check reminders</div></div>
           <div class="day-row"><div class="day-name">Saturday</div><div class="day-desc">Supervised outdoor walk (one block, block heel) + presentation</div></div>
-          <div class="day-row"><div class="day-name">Sunday</div><div class="day-desc">Rest &mdash; extended foot care, journal, Sir&rsquo;s review</div></div>
+          <div class="day-row"><div class="day-name">Sunday</div><div class="day-desc">Rest &mdash; extended foot care, journal, Sir’s review</div></div>
         </div>
       </div>
     </div>
@@ -670,22 +670,24 @@
 
 <script type="module">
 import { requireAuth, dataRef } from './auth.js';
-import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 let heelRef;
+let unsubscribe = null;
 
 async function init() {
   const user = await requireAuth();
   heelRef = dataRef('training/heel');
-  const snap = await getDoc(heelRef);
-  const data = snap.exists() ? snap.data() : {};
-  entries = data.entries || [];
-  startDate = data.startDate || '';
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('logDate').value = today;
-  if (startDate) document.getElementById('startDate').value = startDate;
-  renderLog();
-  updatePhaseBanner();
+  unsubscribe = onSnapshot(heelRef, (snap) => {
+    const data = snap.exists() ? snap.data() : {};
+    entries = data.entries || [];
+    startDate = data.startDate || '';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('logDate').value = today;
+    if (startDate) document.getElementById('startDate').value = startDate;
+    renderLog();
+    updatePhaseBanner();
+  });
 }
 
 async function persistHeel() {
@@ -757,7 +759,7 @@ async function persistHeel() {
     document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('selected'); });
 
     renderLog();
-    showToast('Session recorded \u2726');
+    showToast('Session recorded ✦');
   }
 
   function deleteEntry(id) {
@@ -810,8 +812,8 @@ async function persistHeel() {
 
   function getCurrentPhase(daysIn) {
     if (daysIn < 1) return null;
-    if (daysIn <= 14) return { num: 1, name: 'Foundation', weeks: 'Week 1\u20132' };
-    if (daysIn <= 28) return { num: 2, name: 'Endurance', weeks: 'Week 3\u20134' };
+    if (daysIn <= 14) return { num: 1, name: 'Foundation', weeks: 'Week 1–2' };
+    if (daysIn <= 28) return { num: 2, name: 'Endurance', weeks: 'Week 3–4' };
     return { num: 3, name: 'Mastery', weeks: 'Week 5+' };
   }
 
@@ -825,9 +827,9 @@ async function persistHeel() {
     document.getElementById('phase3indicator').innerHTML = '';
 
     if (!startDate) {
-      phaseLabel.textContent = 'Phase 1 \u2014 Foundation';
+      phaseLabel.textContent = 'Phase 1 — Foundation';
       weekLabel.textContent = 'Set your start date in Program tab';
-      daysEl.textContent = '\u2014';
+      daysEl.textContent = '—';
       return;
     }
 
@@ -839,13 +841,13 @@ async function persistHeel() {
     if (daysIn < 1) {
       phaseLabel.textContent = 'Training begins soon';
       weekLabel.textContent = 'Your protocol awaits';
-      daysEl.textContent = '\u2014';
+      daysEl.textContent = '—';
       return;
     }
 
     var phase = getCurrentPhase(daysIn);
     daysEl.textContent = daysIn;
-    phaseLabel.textContent = 'Phase ' + phase.num + ' \u2014 ' + phase.name;
+    phaseLabel.textContent = 'Phase ' + phase.num + ' — ' + phase.name;
     weekLabel.textContent = phase.weeks;
 
     document.getElementById('phase' + phase.num + 'indicator').innerHTML =
@@ -859,6 +861,11 @@ async function persistHeel() {
     setTimeout(function() { t.classList.remove('show'); }, 2500);
   }
 init();
+
+// Cleanup listener on page leave
+window.addEventListener('beforeunload', () => {
+  if (unsubscribe) unsubscribe();
+});
 </script>
 </body>
 </html>
