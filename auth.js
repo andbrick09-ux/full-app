@@ -178,6 +178,48 @@ export async function acceptPairingInvite() {
   return relDoc.id;
 }
 
+/**
+ * Unpairs the current user from their partner.
+ * Sets the relationship status to 'inactive' and clears relationshipId
+ * on both users' profiles.
+ */
+export async function unpair() {
+  const me = auth.currentUser;
+  if (!me) throw new Error('Not signed in');
+
+  const profile = await getMyProfile();
+  if (!profile?.relationshipId) {
+    throw new Error('You are not currently paired with anyone.');
+  }
+
+  const relId = profile.relationshipId;
+
+  // Load the relationship to know who the partner is
+  const relSnap = await getDoc(doc(db, 'relationships', relId));
+  if (!relSnap.exists()) {
+    // Clean up orphaned reference
+    await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
+    throw new Error('Relationship record not found. Cleared stale reference.');
+  }
+
+  const relData = relSnap.data();
+  const partnerUid = relData.domId === me.uid ? relData.subId : relData.domId;
+
+  // Mark as inactive
+  await updateDoc(doc(db, 'relationships', relId), {
+    status: 'inactive',
+    unpairedAt: serverTimestamp()
+  });
+
+  // Clear relationshipId on both sides
+  await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
+  if (partnerUid) {
+    await updateDoc(doc(db, 'users', partnerUid), { relationshipId: null });
+  }
+
+  return true;
+}
+
 // ── Data path helpers ─────────────────────────────────────────────────────────
 
 /**
