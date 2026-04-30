@@ -103,21 +103,32 @@
 
   <!-- Load active trainings from Firestore -->
   <script type="module">
-    import { requireAuth } from './auth.js';
-    import { dataRef } from './auth.js';
+    import { requireAuth, getMyProfile, dataRef, partnerDataRef } from './auth.js';
     import { getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     const DEFAULT_ACTIVE = ['anal-plug-training.html', 'position-training.html', 'kegel-training.html'];
 
     async function applyTrainingLocks() {
-      // Require auth — redirects to login if not signed in
       await requireAuth();
+      const profile = await getMyProfile();
+      const role = profile?.role;
 
       let active = DEFAULT_ACTIVE;
       try {
-        const snap = await getDoc(dataRef('settings'));
-        if (snap.exists()) {
-          const data = snap.data();
+        // Subs read the Dom's settings (the Dom sets which trainings are active).
+        // Doms read their own settings so they always see everything unlocked.
+        let settingsSnap;
+        if (role === 'sub') {
+          // partnerDataRef returns the Dom's data path
+          const ref = await partnerDataRef('settings');
+          settingsSnap = await getDoc(ref);
+        } else {
+          // Dom sees all cards unlocked — no locking needed
+          return;
+        }
+
+        if (settingsSnap.exists()) {
+          const data = settingsSnap.data();
           if (Array.isArray(data.activeTrainings) && data.activeTrainings.length > 0) {
             active = data.activeTrainings;
           }
@@ -129,7 +140,6 @@
       document.querySelectorAll('.menu-card[data-training]').forEach(card => {
         const training = card.getAttribute('data-training');
         if (!active.includes(training)) {
-          // Lock it
           card.classList.add('locked');
           card.removeAttribute('href');
           const icon = card.querySelector('.menu-card-icon');
