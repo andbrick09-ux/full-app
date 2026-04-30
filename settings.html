@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -50,6 +50,12 @@
     
     .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--gold); color:#051024; padding:12px 24px; border-radius:30px; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; box-shadow:0 8px 25px rgba(212,175,55,0.4); opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.22,.68,0,1.2); z-index:1000; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* Relationship section polish */
+    #relStatusCard { transition: all .2s ease; }
+    .rel-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:1px; padding:2px 10px; border-radius:20px; }
+    .rel-badge.active { background:rgba(76,175,80,.15); color:#81c784; border:1px solid rgba(76,175,80,.3); }
+    .rel-badge.pending { background:rgba(255,193,7,.15); color:#ffd54f; border:1px solid rgba(255,193,7,.3); }
   </style>
 <link rel="stylesheet" href="nav.css" />
 </head>
@@ -60,11 +66,12 @@
     <div class="topbar">
       <div class="topbar-center">
         <h1 class="topbar-title">Settings</h1>
-        <div class="topbar-sub">App Preferences</div>
+        <div class="topbar-sub">App Preferences &amp; Relationship</div>
       </div>
     </div>
 
     <div class="settings-container" id="settingsSheet">
+      <!-- PERSONALIZATION -->
       <div class="settings-group">
         <span class="settings-group-label">Personalization</span>
         <div class="settings-field">
@@ -81,6 +88,37 @@
         </div>
       </div>
 
+      <!-- RELATIONSHIP (NEW INTEGRATED SECTION) -->
+      <div class="settings-group">
+        <span class="settings-group-label">Relationship</span>
+        
+        <div id="relStatusCard" style="background:rgba(5,16,36,.85);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;min-height:82px">
+          <!-- Dynamically populated by loadRelationship() -->
+        </div>
+        
+        <!-- Dom: Invite form -->
+        <div id="inviteForm" style="display:none">
+          <div class="settings-field">
+            <label>Send Pairing Invite to Your Sub</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="settings-input" id="inviteEmail" type="email" placeholder="sub@example.com" style="flex:1">
+              <button onclick="sendInviteFromSettings()" class="settings-save-btn" style="width:auto;padding:12px 18px;white-space:nowrap">Send</button>
+            </div>
+            <div id="inviteMsg" style="font-size:11px;margin-top:6px;color:var(--cream-mute)"></div>
+          </div>
+        </div>
+        
+        <!-- Sub: Accept pending invite -->
+        <div id="acceptArea" style="display:none">
+          <button onclick="acceptInviteFromSettings()" class="settings-save-btn" style="margin-top:4px">
+            <span class="material-symbols-rounded">link</span>
+            Accept Pending Invite &amp; Link Accounts
+          </button>
+          <div id="acceptMsg" style="font-size:11px;margin-top:8px;color:var(--cream-mute);text-align:center"></div>
+        </div>
+      </div>
+
+      <!-- THEME ENGINE -->
       <div class="settings-group">
         <span class="settings-group-label">Theme Engine</span>
         <div class="theme-options" id="themeOptions">
@@ -116,7 +154,7 @@
       </div>
   
       <div class="settings-group">
-        <span class="settings-group-label">Typography & Display</span>
+        <span class="settings-group-label">Typography &amp; Display</span>
         <div class="settings-field">
           <label>Global Text Size</label>
           <div style="display:flex;gap:8px;margin-top:8px;" id="fontSizePills">
@@ -162,6 +200,7 @@
       <button class="settings-save-btn" onclick="saveSettings()">
         <span class="material-symbols-rounded">save</span>
         Save Changes
+      </button>
 
       <div class="settings-group" style="margin-top:28px">
         <span class="settings-group-label">Account</span>
@@ -176,8 +215,6 @@
         </button>
       </div>
 
-      </button>
-        <button class="settings-danger-btn" onclick="clearHistory()">
       <button class="settings-danger-btn" onclick="clearHistory()">
         Clear All App Data
       </button>
@@ -187,7 +224,8 @@
   <div id="toast" class="toast">Changes Saved</div>
 
   <script type="module">
-    import { requireAuth, getMyProfile, logOut, dataRef } from './auth.js';
+    import { requireAuth, getMyProfile, logOut, dataRef, 
+             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid } from './auth.js';
     import { getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     let settingsCache = {};
@@ -204,6 +242,7 @@
       document.getElementById('acctEmail').textContent = currentUser.email;
 
       await loadSettings();
+      await loadRelationship();   // NEW: load pairing status
     }
 
     async function getSettings() {
@@ -316,8 +355,6 @@
     
     async function clearHistory() {
       if (confirm('Are you absolutely sure you want to clear ALL your Firestore data? This cannot be undone.')) {
-        // In Phase 3+ we will delete Firestore subcollections here.
-        // For now, just clear settings doc.
         await setDoc(dataRef('settings'), {});
         settingsCache = {};
         showToast('Settings cleared');
@@ -325,18 +362,148 @@
       }
     }
 
-    window.handleSignOut = async function() {
-      if (confirm('Sign out of Dom Sub Hub?')) await logOut();
-    };
+    // ============================================================
+    // NEW: Relationship / Pairing functions (integrated from pair.html)
+    // ============================================================
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
+    async function loadRelationship() {
+      const card = document.getElementById('relStatusCard');
+      const inviteForm = document.getElementById('inviteForm');
+      const acceptArea = document.getElementById('acceptArea');
+      
+      inviteForm.style.display = 'none';
+      acceptArea.style.display = 'none';
+      card.innerHTML = '<div style="text-align:center;padding:12px;color:var(--cream-mute);font-size:13px">Loading relationship status…</div>';
+
+      try {
+        const rel = await getRelationship();
+        const role = myProfile?.role;
+        const domName = document.getElementById('settingPartnerName').value.trim() || 'your Dominant';
+
+        if (rel && rel.status === 'active') {
+          // PAIRED STATE
+          const partnerLabel = role === 'dom' ? 'Sub' : 'Dom';
+          card.innerHTML = `
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:28px">🔗</div>
+              <div style="flex:1">
+                <div class="rel-badge active">PAIRED &amp; ACTIVE</div>
+                <div style="margin-top:6px;font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light)">
+                  \( {partnerLabel}: <strong> \){domName}</strong>
+                </div>
+                <div style="font-size:11px;color:var(--cream-mute);margin-top:2px">Connected • Relationship ID: ${rel.id.substring(0,8)}…</div>
+              </div>
+            </div>
+            <button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>
+          `;
+        } 
+        else if (role === 'dom') {
+          // DOM — show invite form
+          card.innerHTML = `
+            <div style="text-align:center;padding:8px 4px">
+              <div style="font-size:13px;color:var(--cream-mute)">No Sub currently paired</div>
+              <div style="font-size:11px;margin-top:4px">Use the form below to send an invite</div>
+            </div>
+          `;
+          inviteForm.style.display = 'block';
+        } 
+        else {
+          // SUB — not paired
+          card.innerHTML = `
+            <div style="text-align:center;padding:12px 4px">
+              <div style="font-size:13px;color:var(--cream-mute)">Not paired with a Dom yet</div>
+              <div style="font-size:11px;margin-top:4px">Ask your Dominant to send you a pairing invite from their Settings</div>
+            </div>
+          `;
+          // Optional: show a "Check for pending invite" button for Subs
+          acceptArea.style.display = 'block';
+          document.getElementById('acceptMsg').innerHTML = 'If your Dom has sent an invite, tap above to accept.';
+        }
+      } catch (e) {
+        console.error(e);
+        card.innerHTML = `<div style="color:#e57373;font-size:12px;text-align:center;padding:8px">Error loading relationship status</div>`;
+      }
     }
 
-    // Make functions globally accessible from inline onclick handlers
+    window.sendInviteFromSettings = async function() {
+      const emailInput = document.getElementById('inviteEmail');
+      const msg = document.getElementById('inviteMsg');
+      const btn = event.currentTarget;
+      
+      const email = (emailInput.value || '').trim();
+      if (!email) {
+        msg.style.color = '#e57373';
+        msg.textContent = 'Please enter your Sub\'s email address.';
+        return;
+      }
+      
+      msg.style.color = 'var(--cream-mute)';
+      msg.textContent = 'Sending invite…';
+      
+      try {
+        await sendPairingInvite(email);
+        msg.style.color = '#81c784';
+        msg.textContent = 'Invite sent! Ask your Sub to accept in their Settings.';
+        emailInput.value = '';
+        
+        // Refresh after short delay
+        setTimeout(() => {
+          loadRelationship();
+          showToast('Invite sent successfully ✦');
+        }, 1200);
+      } catch (ex) {
+        msg.style.color = '#e57373';
+        msg.textContent = ex.message || 'Failed to send invite.';
+        console.error(ex);
+      }
+    };
+
+    window.acceptInviteFromSettings = async function() {
+      const msg = document.getElementById('acceptMsg');
+      msg.textContent = 'Linking accounts…';
+      
+      try {
+        await acceptPairingInvite();
+        msg.style.color = '#81c784';
+        msg.textContent = 'Accounts linked! Refreshing…';
+        
+        setTimeout(async () => {
+          await loadRelationship();
+          showToast('Successfully paired ✦');
+          // Also refresh partner name if empty
+          const partnerField = document.getElementById('settingPartnerName');
+          if (!partnerField.value.trim()) {
+            partnerField.value = 'Sir';
+            // Optionally auto-save
+          }
+        }, 900);
+      } catch (ex) {
+        msg.style.color = '#e57373';
+        msg.textContent = ex.message || 'No pending invite found.';
+      }
+    };
+
+    window.unpairFromSettings = async function() {
+      if (!confirm('Are you sure you want to unpair? This will break the connection on both sides.')) return;
+      
+      const card = document.getElementById('relStatusCard');
+      card.style.opacity = '0.6';
+      
+      try {
+        await unpair();
+        showToast('Accounts unpaired successfully');
+        setTimeout(() => {
+          loadRelationship();
+          // Clear the partner name field for cleanliness
+          document.getElementById('settingPartnerName').value = '';
+        }, 600);
+      } catch (ex) {
+        showToast(ex.message || 'Failed to unpair');
+        card.style.opacity = '1';
+      }
+    };
+
+    // Make functions globally accessible
     window.saveSettings  = saveSettings;
     window.selectTheme   = selectTheme;
     window.selectFontSize = selectFontSize;
@@ -344,6 +511,7 @@
     window.removeLimit   = removeLimit;
     window.clearHistory  = clearHistory;
     window.renderLimitsList = renderLimitsList;
+    window.loadRelationship = loadRelationship;
 
     init();
   </script>
