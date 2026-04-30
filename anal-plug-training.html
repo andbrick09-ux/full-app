@@ -185,12 +185,21 @@
             <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
         </div>
     </div>
-    <script type="module">
-import { requireAuth, dataRef } from './auth.js';
-import { doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-let dbRef;
+    <script>
+// ==================== DEMO MODE - Works when opened directly as file ====================
+let dbRef = { path: 'demo' };
 let unsubscribe = null;
+
+async function requireAuth() { return { uid: 'demo-user' }; }
+function dataRef(path) { return { path }; }
+
+function loadDemoState() {
+  const saved = localStorage.getItem('anal_plug_training_demo');
+  return saved ? JSON.parse(saved) : null;
+}
+function saveDemoState() {
+  localStorage.setItem('anal_plug_training_demo', JSON.stringify(state));
+}
 
         const PROFILES={
             beginner:{label:'Beginner',startPlug:'XS',phases:[
@@ -276,7 +285,7 @@ let unsubscribe = null;
         const SK='sirender_plug_training';
         let state = getDefault(); /* loaded via firebase */ function getDefault(){return{exp:null,tasks:{},completedPhases:[],sessions:0,streak:0,lastDate:null,log:[]}}
         function load(){return getDefault()}
-        function save(){if(dbRef) setDoc(dbRef, state)}
+        function save(){ saveDemoState(); }
         function getPhases(){return state.exp?PROFILES[state.exp].phases:[]}
         function getCurrent(){const p=getPhases();for(let i=0;i<p.length;i++){if(!state.completedPhases.includes(p[i].id))return i}return Math.max(0,p.length-1)}
         function isUnlocked(i){return i===0||state.completedPhases.includes(getPhases()[i-1].id)}
@@ -366,29 +375,21 @@ let unsubscribe = null;
             showSection('protocol', tab || document.querySelector('.nav-tab'));
             setTimeout(()=>{const c=document.getElementById(`phase-card-${i}`);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},100);
         }
-        function confirmReset(){if(confirm('Reset ALL plug training progress?')){if(dbRef) deleteDoc(dbRef);state=getDefault();render();}}
+        function confirmReset(){if(confirm('Reset ALL progress?')){state=getDefault();saveDemoState();render();}}
 
         render();
         if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.error(e)));
     
 
-(async function initFirebase() {
-  const user = await requireAuth();
-  dbRef = dataRef('training/anal-plug-training');
-  unsubscribe = onSnapshot(dbRef, (snap) => {
-    if (snap.exists()) {
-      state = snap.data();
-    } else {
-      state = getDefault();
-    }
-    render();
-  });
-})();
+// Load from localStorage for demo
+const savedState = loadDemoState();
+if (savedState) state = savedState;
 
-// Cleanup listener when leaving page
-window.addEventListener('beforeunload', () => {
-  if (unsubscribe) unsubscribe();
-});
+// Auto-render on load
+render();
+
+// Demo notice
+console.log('%c[Demo Mode] Anal Plug Training running locally (buttons now work)', 'color:#c9a84c');
 </script>
 <!-- Global Sidebar Menu -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
