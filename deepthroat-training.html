@@ -420,11 +420,17 @@
       return { tasks:{}, completedWeeks:[], sessions:0, log:[], depthLog:[] };
     }
 
-    // FIX 2: saveState is async, uses merge:true, handles errors
+    // saveState: writes every field explicitly so no field can silently wipe another
     async function saveState() {
       if (!dbRef) return;
       try {
-        await setDoc(dbRef, state, { merge: true });
+        await setDoc(dbRef, {
+          tasks:          state.tasks          || {},
+          completedWeeks: state.completedWeeks || [],
+          sessions:       state.sessions       || 0,
+          log:            state.log            || [],
+          depthLog:       state.depthLog       || [],
+        });
       } catch(e) {
         console.error('saveState error:', e);
       }
@@ -858,7 +864,7 @@
       }, 100);
     }
 
-    // FIX 1: Expose ALL functions to window so onclick= attributes work
+    // Expose ALL functions to window so onclick= attributes work
     window.openRefDrawer    = openRefDrawer;
     window.closeRefDrawer   = closeRefDrawer;
     window.toggleAcc        = toggleAcc;
@@ -878,17 +884,40 @@
     window.saveDepth        = saveDepth;
     window.scrollToWeek     = scrollToWeek;
 
-    // FIX 3: Don't render until Firebase has loaded state
+    // Show a loading placeholder so weeks container is never blank
+    function showLoadingState() {
+      document.getElementById('weeksContainer').innerHTML =
+        '<div style="text-align:center;padding:40px 20px;color:rgba(212,175,55,0.4);font-family:\'Playfair Display\',serif;font-size:14px;font-style:italic;letter-spacing:1px;">' +
+        'Loading protocol\u2026</div>';
+    }
+
+    // Merge loaded data safely — never lose tasks if a field is missing
+    function mergeLoadedState(data) {
+      return {
+        tasks:          data.tasks          || {},
+        completedWeeks: data.completedWeeks || [],
+        sessions:       data.sessions       || 0,
+        log:            data.log            || [],
+        depthLog:       data.depthLog       || [],
+      };
+    }
+
+    // Init — render loading placeholder immediately, then load from Firestore
+    showLoadingState();
+
     (async function init() {
-      const user = await requireAuth();
-      dbRef = dataRef('training/deepthroat-training');
-      const snap = await getDoc(dbRef);
-      if (snap.exists()) {
-        state = snap.data();
-        if (!state.depthLog) state.depthLog = [];
-        if (!state.log)      state.log = [];
+      try {
+        const user = await requireAuth();
+        dbRef = dataRef('training/deepthroat-training');
+        const snap = await getDoc(dbRef);
+        if (snap.exists()) {
+          state = mergeLoadedState(snap.data());
+        }
+      } catch(e) {
+        console.error('Init error:', e);
+        // Still render with default state so the page is usable
       }
-      render(); // single render after state is loaded
+      render();
     })();
   </script>
 
