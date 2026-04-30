@@ -1,276 +1,542 @@
-// ============================================================
-//  Dom Sub Hub — auth.js
-//  Shared authentication & relationship helpers.
-//  All pages import from this module.
-// ============================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#051024"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>Dom Sub Hub — Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    :root {
+      --cream: #f0e6d2;
+      --cream-dim: rgba(240,230,211,0.7);
+      --cream-mute: rgba(240,230,211,0.35);
+    }
+    body { min-height: 100dvh; background: var(--bg); color: var(--cream); overflow-x: hidden; position: relative; }
+    .glow-orb { position: fixed; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%); top: -120px; left: 50%; transform: translateX(-50%); pointer-events: none; z-index: 0; }
+    .shell { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+    .settings-container { padding: 24px 20px 40px; }
+    .settings-group { margin-bottom:28px; }
+    .settings-group-label { font-family:'Playfair Display',serif; font-size:10px; font-weight:600; letter-spacing:3px; color:var(--gold); text-transform:uppercase; margin-bottom:14px; display:block; border-bottom:1px solid var(--border); padding-bottom:6px; }
+    .settings-field { margin-bottom:16px; }
+    .settings-field label { font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; color:var(--cream-dim); margin-bottom:6px; display:block; }
+    .settings-input { width:100%; padding:14px 16px; background:rgba(5,16,36,.85); border:1px solid var(--border); border-radius:12px; color:var(--cream); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; transition:all .2s; }
+    .settings-input:focus { border-color:var(--gold); transform:scale(1.01); background:rgba(5,16,36,1); }
+    .theme-options { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
+    .theme-option { padding:10px; border-radius:12px; background:rgba(5,16,36,.85); border:1px solid var(--border); cursor:pointer; text-align:center; transition:all .2s; }
+    .theme-option.selected { border-color:var(--gold); background:rgba(212,175,55,.1); box-shadow:0 0 10px rgba(212,175,55,.15); }
+    .theme-swatch { height:36px; border-radius:8px; margin-bottom:8px; border:1px solid rgba(255,255,255,.1); }
+    .theme-name { font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; color:var(--cream-dim); }
+    .theme-option.selected .theme-name { color:var(--gold); }
+    .limits-input-row { display:flex; gap:10px; margin-bottom:12px; }
+    .limits-add-btn { width:46px; border-radius:12px; background:rgba(212,175,55,.12); border:1px solid rgba(212,175,55,.3); color:var(--gold); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
+    .limits-add-btn:active { transform:scale(.95); }
+    .limits-list { display:flex; flex-direction:column; gap:8px; }
+    .limits-empty { font-family:'Montserrat',sans-serif; font-size:11px; color:var(--cream-mute); font-style:italic; }
+    .limits-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px; background:rgba(244,67,54,.08); border:1px solid rgba(244,67,54,.2); }
+    .limits-item-text { flex:1; font-family:'Montserrat',sans-serif; font-size:13px; color:#ffcdd2; }
+    .limits-item-del { background:transparent; border:none; color:rgba(244,67,54,.8); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; }
+    .limits-item-del:active { transform:scale(.9); }
+    .dynamic-pill { padding:10px 18px; border-radius:20px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; background:rgba(5,16,36,.85); border:1px solid var(--border); color:var(--cream-dim); cursor:pointer; transition:all .2s; flex:1; text-align:center; }
+    .dynamic-pill.selected { background:rgba(212,175,55,.15); border-color:var(--gold); color:var(--gold-light); }
+    .settings-save-btn { width:100%; padding:16px; border-radius:14px; background:var(--luxury-gradient); color:#051024; font-family:'Playfair Display',serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:none; cursor:pointer; transition:all .2s; margin-top:10px; box-shadow:0 6px 20px rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .settings-save-btn:active { transform:scale(.98); }
+    .settings-danger-btn { width:100%; padding:16px; border-radius:14px; background:transparent; border:1px solid rgba(244,67,54,.4); color:#e57373; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; cursor:pointer; transition:all .2s; margin-top:16px; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .settings-danger-btn:active { background:rgba(244,67,54,.15); }
+    
+    .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--gold); color:#051024; padding:12px 24px; border-radius:30px; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; box-shadow:0 8px 25px rgba(212,175,55,0.4); opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.22,.68,0,1.2); z-index:1000; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-import { auth, db } from './firebase-config.js';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    /* Relationship section polish */
+    #relStatusCard { transition: all .2s ease; }
+    .rel-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:1px; padding:2px 10px; border-radius:20px; }
+    .rel-badge.active { background:rgba(76,175,80,.15); color:#81c784; border:1px solid rgba(76,175,80,.3); }
+    .rel-badge.pending { background:rgba(255,193,7,.15); color:#ffd54f; border:1px solid rgba(255,193,7,.3); }
+  </style>
+<link rel="stylesheet" href="nav.css" />
+</head>
+<body data-nav="more">
+  <div class="glow-orb"></div>
+  
+  <div class="shell">
+    <div class="topbar">
+      <div class="topbar-center">
+        <h1 class="topbar-title">Settings</h1>
+        <div class="topbar-sub">App Preferences &amp; Relationship</div>
+      </div>
+    </div>
 
-// ── Auth state ────────────────────────────────────────────────────────────────
+    <div class="settings-container" id="settingsSheet">
+      <!-- PERSONALIZATION -->
+      <div class="settings-group">
+        <span class="settings-group-label">Personalization</span>
+        <div class="settings-field">
+          <label>Your Name</label>
+          <input class="settings-input" id="settingName" type="text" maxlength="30"/>
+        </div>
+        <div class="settings-field">
+          <label>Partner's Name</label>
+          <input class="settings-input" id="settingPartnerName" type="text" maxlength="30"/>
+        </div>
+        <div class="settings-field">
+          <label>Safeword</label>
+          <input class="settings-input" id="settingSafeWord" type="text" maxlength="30" placeholder="e.g. Red" style="color:var(--red); font-weight: 600;"/>
+        </div>
+      </div>
 
-/**
- * Returns a Promise that resolves with the current Firebase User,
- * or redirects to login.html if not signed in.
- */
-export function requireAuth() {
-  return new Promise((resolve) => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      unsub();
-      if (!user) {
-        window.location.href = 'login.html';
-      } else {
-        resolve(user);
+      <!-- RELATIONSHIP (NEW INTEGRATED SECTION) -->
+      <div class="settings-group">
+        <span class="settings-group-label">Relationship</span>
+        
+        <div id="relStatusCard" style="background:rgba(5,16,36,.85);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;min-height:82px">
+          <!-- Dynamically populated by loadRelationship() -->
+        </div>
+        
+        <!-- Dom: Invite form -->
+        <div id="inviteForm" style="display:none">
+          <div class="settings-field">
+            <label>Send Pairing Invite to Your Sub</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="settings-input" id="inviteEmail" type="email" placeholder="sub@example.com" style="flex:1">
+              <button onclick="sendInviteFromSettings()" class="settings-save-btn" style="width:auto;padding:12px 18px;white-space:nowrap">Send</button>
+            </div>
+            <div id="inviteMsg" style="font-size:11px;margin-top:6px;color:var(--cream-mute)"></div>
+          </div>
+        </div>
+        
+        <!-- Sub: Accept pending invite -->
+        <div id="acceptArea" style="display:none">
+          <button onclick="acceptInviteFromSettings()" class="settings-save-btn" style="margin-top:4px">
+            <span class="material-symbols-rounded">link</span>
+            Accept Pending Invite &amp; Link Accounts
+          </button>
+          <div id="acceptMsg" style="font-size:11px;margin-top:8px;color:var(--cream-mute);text-align:center"></div>
+        </div>
+      </div>
+
+      <!-- THEME ENGINE -->
+      <div class="settings-group">
+        <span class="settings-group-label">Theme Engine</span>
+        <div class="theme-options" id="themeOptions">
+          <!-- Themes populated by JS -->
+          <div class="theme-option selected" data-theme="midnight" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#051024,#0a1b3f)"></div>
+            <div class="theme-name">Midnight Gold</div>
+          </div>
+          <div class="theme-option" data-theme="rose" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#2a0815,#4a0f25)"></div>
+            <div class="theme-name">Deep Rose</div>
+          </div>
+          <div class="theme-option" data-theme="obsidian" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#0a0a0a,#1a1a1a)"></div>
+            <div class="theme-name">Obsidian</div>
+          </div>
+          <div class="theme-option" data-theme="light" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#f5ede0,#e8d5b8)"></div>
+            <div class="theme-name">Parchment</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="settings-group">
+        <span class="settings-group-label">Hard Limits</span>
+        <div class="limits-input-row">
+          <input class="settings-input" id="limitInput" type="text" maxlength="40" placeholder="Add a hard limit..." onkeydown="if(event.key==='Enter') addLimit()"/>
+          <button class="limits-add-btn" onclick="addLimit()">
+            <span class="material-symbols-rounded">add</span>
+          </button>
+        </div>
+        <div class="limits-list" id="limitsList"></div>
+      </div>
+  
+      <div class="settings-group">
+        <span class="settings-group-label">Typography &amp; Display</span>
+        <div class="settings-field">
+          <label>Global Text Size</label>
+          <div style="display:flex;gap:8px;margin-top:8px;" id="fontSizePills">
+            <div class="dynamic-pill" data-size="fs-small" onclick="selectFontSize(this)">Small</div>
+            <div class="dynamic-pill selected" data-size="fs-medium" onclick="selectFontSize(this)">Medium</div>
+            <div class="dynamic-pill" data-size="fs-large" onclick="selectFontSize(this)">Large</div>
+          </div>
+        </div>
+      </div>
+      
+    <div class="settings-group">
+        <span class="settings-group-label" style="color:var(--red);">Training Roster (Sir's Eyes Only)</span>
+        <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:var(--cream-mute);margin-bottom:12px;line-height:1.5;font-style:italic;">
+          Select exactly which trainings are currently active for the sub. Locked trainings will be greyed out with a padlock to tease them.
+        </div>
+        <div class="settings-field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="trk5" class="training-toggle" value="the-5-training.html"/> The "5" Training
+          </label>
+        </div>
+        <div class="settings-field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="trkPlug" class="training-toggle" value="anal-plug-training.html"/> Anal Plug Training
+          </label>
+        </div>
+        <div class="settings-field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="trkDeep" class="training-toggle" value="deepthroat-training.html"/> Deep Throat Training
+          </label>
+        </div>
+        <div class="settings-field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="trkKegel" class="training-toggle" value="kegel-training.html"/> Kegel Training
+          </label>
+        </div>
+        <div class="settings-field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="trkPos" class="training-toggle" value="position-training.html"/> Position Training
+          </label>
+        </div>
+      </div>
+      
+      <button class="settings-save-btn" onclick="saveSettings()">
+        <span class="material-symbols-rounded">save</span>
+        Save Changes
+      </button>
+
+      <div class="settings-group" style="margin-top:28px">
+        <span class="settings-group-label">Account</span>
+        <div style="background:rgba(5,16,36,.85);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light)" id="acctName">&#x2014;</div>
+          <div style="font-size:11px;letter-spacing:1px;color:var(--gold);margin:4px 0 2px" id="acctRole">&#x2014;</div>
+          <div style="font-size:11px;color:var(--cream-mute)" id="acctEmail">&#x2014;</div>
+        </div>
+        <button class="settings-danger-btn" onclick="handleSignOut()">
+          <span class="material-symbols-rounded">logout</span>
+          Sign Out
+        </button>
+      </div>
+
+      <button class="settings-danger-btn" onclick="clearHistory()">
+        Clear All App Data
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Changes Saved</div>
+
+  <script type="module">
+    import { requireAuth, getMyProfile, logOut, dataRef, 
+             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile } from './auth.js';
+    import { getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    let settingsCache = {};
+    let currentUser = null;
+    let myProfile   = null;
+
+    async function init() {
+      currentUser = await requireAuth();
+      myProfile   = await getMyProfile();
+
+      // Show account info
+      document.getElementById('acctName').innerHTML = `<span style="font-size:11px;color:var(--cream-mute)">Username:</span> ${myProfile?.displayName || currentUser.email}`;
+      document.getElementById('acctEmail').innerHTML = `<span style="font-size:11px;color:var(--cream-mute)">Email:</span> ${currentUser.email}`;
+      document.getElementById('acctRole').innerHTML  = `<span style="font-size:11px;color:var(--cream-mute)">Role:</span> ${myProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub'}`;
+
+      await loadSettings();
+      await loadRelationship();   // NEW: load pairing status
+    }
+
+    async function getSettings() {
+      try {
+        const snap = await getDoc(dataRef('settings'));
+        settingsCache = snap.exists() ? snap.data() : {};
+      } catch { settingsCache = {}; }
+      return settingsCache;
+    }
+    
+    async function loadSettings() {
+      const s = await getSettings();
+      document.getElementById('settingName').value = s.subName || '';
+      document.getElementById('settingPartnerName').value = s.domName || '';
+      document.getElementById('settingSafeWord').value = s.safeWord || '';
+      
+      const theme = s.theme || 'midnight';
+      document.querySelectorAll('.theme-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.theme === theme);
+      });
+      
+      const size = s.fontSize || 'fs-medium';
+      document.querySelectorAll('.dynamic-pill').forEach(el => {
+        el.classList.toggle('selected', el.dataset.size === size);
+      });
+      
+      const activeTs = s.activeTrainings || ['anal-plug-training.html', 'position-training.html', 'kegel-training.html'];
+      document.querySelectorAll('.training-toggle').forEach(chk => {
+        chk.checked = activeTs.includes(chk.value);
+      });
+      
+      renderLimitsList();
+    }
+    
+    async function saveSettings() {
+      const existing = settingsCache;
+      const themeEl  = document.querySelector('.theme-option.selected');
+      const sizeEl   = document.querySelector('.dynamic-pill.selected');
+      const activeTs = Array.from(document.querySelectorAll('.training-toggle:checked')).map(c => c.value);
+
+      const s = {
+        ...existing,
+        subName:         document.getElementById('settingName').value.trim(),
+        domName:         document.getElementById('settingPartnerName').value.trim(),
+        safeWord:        document.getElementById('settingSafeWord').value.trim(),
+        theme:           themeEl ? themeEl.dataset.theme : 'midnight',
+        fontSize:        sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
+        activeTrainings: activeTs
+      };
+
+      try {
+        await setDoc(dataRef('settings'), s, { merge: true });
+        settingsCache = s;
+        showToast('Settings saved ✦');
+      } catch(ex) {
+        showToast('Save failed — check your connection');
+        console.error(ex);
       }
-    });
-  });
-}
+    }
+    
+    function selectTheme(el) {
+      document.querySelectorAll('.theme-option').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    
+    function selectFontSize(el) {
+      document.querySelectorAll('#fontSizePills .dynamic-pill').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    
+    function renderLimitsList() {
+      const list   = document.getElementById('limitsList');
+      const limits = settingsCache.limits || [];
+      if (!limits.length) {
+        list.innerHTML = '<div class="limits-empty">No hard limits active. Sir will have full creative freedom.</div>'; 
+        return; 
+      }
+      list.innerHTML = limits.map((l,i) => `
+        <div class="limits-item">
+          <span class="material-symbols-rounded" style="font-size:18px;color:rgba(244,67,54,.8);flex-shrink:0">block</span>
+          <span class="limits-item-text">${l}</span>
+          <button class="limits-item-del" onclick="removeLimit(${i})">
+            <span class="material-symbols-rounded" style="font-size:20px;">close</span>
+          </button>
+        </div>`).join('');
+    }
+    
+    async function addLimit() {
+      const input = document.getElementById('limitInput');
+      const val = (input.value||'').trim();
+      if (!val) return;
+      
+      const limits = settingsCache.limits || [];
+      if (!limits.includes(val)) {
+        limits.push(val);
+        settingsCache.limits = limits;
+        await setDoc(dataRef('settings'), { limits }, { merge: true });
+      }
+      input.value = '';
+      renderLimitsList();
+    }
 
-/**
- * Returns a Promise that resolves with the Firebase User or null
- * (does NOT redirect — use this on login.html itself).
- */
-export function getCurrentUser() {
-  return new Promise((resolve) => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      unsub();
-      resolve(user);
-    });
-  });
-}
+    async function removeLimit(i) {
+      const limits = (settingsCache.limits || []);
+      limits.splice(i, 1);
+      settingsCache.limits = limits;
+      await setDoc(dataRef('settings'), { limits }, { merge: true });
+      renderLimitsList();
+    }
+    
+    async function clearHistory() {
+      if (confirm('Are you absolutely sure you want to clear ALL your Firestore data? This cannot be undone.')) {
+        await setDoc(dataRef('settings'), {});
+        settingsCache = {};
+        showToast('Settings cleared');
+        setTimeout(() => location.reload(), 1500);
+      }
+    }
 
-// ── Sign in / Sign up / Sign out ──────────────────────────────────────────────
+    // ============================================================
+    // NEW: Relationship / Pairing functions (integrated from pair.html)
+    // ============================================================
 
-export async function signIn(email, password) {
-  return signInWithEmailAndPassword(auth, email, password);
-}
+    async function loadRelationship() {
+      const card = document.getElementById('relStatusCard');
+      const inviteForm = document.getElementById('inviteForm');
+      const acceptArea = document.getElementById('acceptArea');
+      const partnerInput = document.getElementById('settingPartnerName');
+      
+      inviteForm.style.display = 'none';
+      acceptArea.style.display = 'none';
+      card.innerHTML = '<div style="text-align:center;padding:12px;color:var(--cream-mute);font-size:13px">Loading relationship status…</div>';
 
-export async function signUp(email, password, displayName, role) {
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
-  const uid  = cred.user.uid;
+      try {
+        const rel = await getRelationship();
+        const role = myProfile?.role;
 
-  // Write user profile doc
-  await setDoc(doc(db, 'users', uid), {
-    displayName,
-    role,          // 'dom' | 'sub'
-    email,
-    relationshipId: null,
-    createdAt: serverTimestamp()
-  });
+        if (rel && rel.status === 'active') {
+          // PAIRED STATE — fetch real partner info
+          const partnerUid = await getPartnerUid();
+          const partnerProfile = partnerUid ? await getUserProfile(partnerUid) : null;
+          const partnerName = partnerProfile?.displayName || 'your partner';
+          const partnerRole = partnerProfile?.role === 'dom' ? '👑 Dom' : '🌸 Sub';
 
-  return cred;
-}
+          // Auto-fill Partner Name field with real name and make readonly
+          partnerInput.value = partnerName;
+          partnerInput.readOnly = true;
+          partnerInput.style.background = 'rgba(5,16,36,.6)';
+          partnerInput.style.cursor = 'default';
 
-export async function logOut() {
-  await signOut(auth);
-  window.location.href = 'login.html';
-}
+          // Show in relationship card
+          const partnerLabel = role === 'dom' ? 'Sub' : 'Dom';
+          card.innerHTML = `
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="font-size:28px">🔗</div>
+              <div style="flex:1">
+                <div class="rel-badge active">PAIRED &amp; ACTIVE</div>
+                <div style="margin-top:6px;font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light)">
+                  \( {partnerLabel}: <strong> \){partnerName}</strong> <span style="font-size:12px;opacity:0.8">(${partnerRole})</span>
+                </div>
+                <div style="font-size:11px;color:var(--cream-mute);margin-top:2px">Connected • Relationship ID: ${rel.id.substring(0,8)}…</div>
+              </div>
+            </div>
+            <button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>
+          `;
+        } 
+        else {
+          // Not paired — allow editing Partner Name
+          partnerInput.readOnly = false;
+          partnerInput.style.background = 'rgba(5,16,36,.85)';
+          partnerInput.style.cursor = 'text';
 
-// ── Profile helpers ───────────────────────────────────────────────────────────
+          if (role === 'dom') {
+            card.innerHTML = `
+              <div style="text-align:center;padding:8px 4px">
+                <div style="font-size:13px;color:var(--cream-mute)">No Sub currently paired</div>
+                <div style="font-size:11px;margin-top:4px">Use the form below to send an invite</div>
+              </div>
+            `;
+            inviteForm.style.display = 'block';
+          } else {
+            card.innerHTML = `
+              <div style="text-align:center;padding:12px 4px">
+                <div style="font-size:13px;color:var(--cream-mute)">Not paired with a Dom yet</div>
+                <div style="font-size:11px;margin-top:4px">Ask your Dominant to send you a pairing invite from their Settings</div>
+              </div>
+            `;
+            acceptArea.style.display = 'block';
+            document.getElementById('acceptMsg').innerHTML = 'If your Dom has sent an invite, tap above to accept.';
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        card.innerHTML = `<div style="color:#e57373;font-size:12px;text-align:center;padding:8px">Error loading relationship status</div>`;
+      }
+    }
 
-/**
- * Returns the current user's Firestore profile document data.
- */
-export async function getMyProfile() {
-  const user = auth.currentUser;
-  if (!user) return null;
-  const snap = await getDoc(doc(db, 'users', user.uid));
-  return snap.exists() ? snap.data() : null;
-}
+    window.sendInviteFromSettings = async function() {
+      const emailInput = document.getElementById('inviteEmail');
+      const msg = document.getElementById('inviteMsg');
+      const btn = event.currentTarget;
+      
+      const email = (emailInput.value || '').trim();
+      if (!email) {
+        msg.style.color = '#e57373';
+        msg.textContent = 'Please enter your Sub\'s email address.';
+        return;
+      }
+      
+      msg.style.color = 'var(--cream-mute)';
+      msg.textContent = 'Sending invite…';
+      
+      try {
+        await sendPairingInvite(email);
+        msg.style.color = '#81c784';
+        msg.textContent = 'Invite sent! Ask your Sub to accept in their Settings.';
+        emailInput.value = '';
+        
+        // Refresh after short delay
+        setTimeout(() => {
+          loadRelationship();
+          showToast('Invite sent successfully ✦');
+        }, 1200);
+      } catch (ex) {
+        msg.style.color = '#e57373';
+        msg.textContent = ex.message || 'Failed to send invite.';
+        console.error(ex);
+      }
+    };
 
-/**
- * Returns the relationship document { domId, subId, status }.
- * Returns null if no relationship exists yet.
- */
-export async function getRelationship() {
-  const profile = await getMyProfile();
-  if (!profile?.relationshipId) return null;
-  const snap = await getDoc(doc(db, 'relationships', profile.relationshipId));
-  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
-}
+    window.acceptInviteFromSettings = async function() {
+      const msg = document.getElementById('acceptMsg');
+      msg.textContent = 'Linking accounts…';
+      
+      try {
+        await acceptPairingInvite();
+        msg.style.color = '#81c784';
+        msg.textContent = 'Accounts linked! Refreshing…';
+        
+        setTimeout(async () => {
+          await loadRelationship();
+          showToast('Successfully paired ✦');
+          // Also refresh partner name if empty
+          const partnerField = document.getElementById('settingPartnerName');
+          if (!partnerField.value.trim()) {
+            partnerField.value = 'Sir';
+            // Optionally auto-save
+          }
+        }, 900);
+      } catch (ex) {
+        msg.style.color = '#e57373';
+        msg.textContent = ex.message || 'No pending invite found.';
+      }
+    };
 
-/**
- * Returns the Firebase UID of the partner (Dom or Sub).
- */
-export async function getPartnerUid() {
-  const rel = await getRelationship();
-  if (!rel) return null;
-  const me = auth.currentUser.uid;
-  return rel.domId === me ? rel.subId : rel.domId;
-}
+    window.unpairFromSettings = async function() {
+      if (!confirm('Are you sure you want to unpair? This will break the connection on both sides.')) return;
+      
+      const card = document.getElementById('relStatusCard');
+      card.style.opacity = '0.6';
+      
+      try {
+        await unpair();
+        showToast('Accounts unpaired successfully');
+        setTimeout(() => {
+          loadRelationship();
+          // Clear the partner name field for cleanliness
+          document.getElementById('settingPartnerName').value = '';
+        }, 600);
+      } catch (ex) {
+        showToast(ex.message || 'Failed to unpair');
+        card.style.opacity = '1';
+      }
+    };
 
-/**
- * Returns the profile of any user by UID.
- */
-export async function getUserProfile(uid) {
-  if (!uid) return null;
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? snap.data() : null;
-}
+    window.handleSignOut = async function() {
+      if (confirm('Sign out of Dom Sub Hub?')) {
+        await logOut();
+      }
+    };
 
-/**
- * Returns 'dom' | 'sub' | null
- */
-export async function getMyRole() {
-  const profile = await getMyProfile();
-  return profile?.role ?? null;
-}
+    // Make functions globally accessible
+    window.saveSettings  = saveSettings;
+    window.selectTheme   = selectTheme;
+    window.selectFontSize = selectFontSize;
+    window.addLimit      = addLimit;
+    window.removeLimit   = removeLimit;
+    window.clearHistory  = clearHistory;
+    window.renderLimitsList = renderLimitsList;
+    window.loadRelationship = loadRelationship;
 
-// ── Relationship pairing ──────────────────────────────────────────────────────
-
-/**
- * Dom sends a pairing invite to Sub's email.
- * Creates a /relationships doc with status: 'pending'.
- */
-export async function sendPairingInvite(subEmail) {
-  const dom = auth.currentUser;
-  if (!dom) throw new Error('Not signed in');
-
-  // Look up Sub's user by email
-  const q = query(collection(db, 'users'), where('email', '==', subEmail));
-  const snap = await getDocs(q);
-  if (snap.empty) throw new Error('No account found with that email. Ask your Sub to create an account first.');
-
-  const subDoc  = snap.docs[0];
-  const subData = subDoc.data();
-
-  if (subData.role !== 'sub') throw new Error('That account is not registered as a Sub.');
-  if (subData.relationshipId) throw new Error('That Sub is already paired with someone.');
-
-  // Create relationship
-  const relRef = await addDoc(collection(db, 'relationships'), {
-    domId:     dom.uid,
-    subId:     subDoc.id,
-    status:    'pending',
-    createdAt: serverTimestamp()
-  });
-
-  // Mark Dom as pending
-  await updateDoc(doc(db, 'users', dom.uid), { relationshipId: relRef.id });
-
-  return relRef.id;
-}
-
-/**
- * Sub accepts a pending pairing invite.
- */
-export async function acceptPairingInvite() {
-  const sub     = auth.currentUser;
-  const profile = await getMyProfile();
-
-  // Find pending relationship for this sub
-  const q    = query(collection(db, 'relationships'), where('subId', '==', sub.uid), where('status', '==', 'pending'));
-  const snap = await getDocs(q);
-  if (snap.empty) throw new Error('No pending invite found.');
-
-  const relDoc = snap.docs[0];
-  await updateDoc(doc(db, 'relationships', relDoc.id), { status: 'active' });
-  await updateDoc(doc(db, 'users', sub.uid), { relationshipId: relDoc.id });
-
-  return relDoc.id;
-}
-
-/**
- * Unpairs the current user from their partner.
- * Sets the relationship status to 'inactive' and clears relationshipId
- * on both users' profiles.
- */
-export async function unpair() {
-  const me = auth.currentUser;
-  if (!me) throw new Error('Not signed in');
-
-  const profile = await getMyProfile();
-  if (!profile?.relationshipId) {
-    throw new Error('You are not currently paired with anyone.');
-  }
-
-  const relId = profile.relationshipId;
-
-  // Load the relationship to know who the partner is
-  const relSnap = await getDoc(doc(db, 'relationships', relId));
-  if (!relSnap.exists()) {
-    // Clean up orphaned reference
-    await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
-    throw new Error('Relationship record not found. Cleared stale reference.');
-  }
-
-  const relData = relSnap.data();
-  const partnerUid = relData.domId === me.uid ? relData.subId : relData.domId;
-
-  // Mark as inactive
-  await updateDoc(doc(db, 'relationships', relId), {
-    status: 'inactive',
-    unpairedAt: serverTimestamp()
-  });
-
-  // Clear relationshipId on both sides
-  await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
-  if (partnerUid) {
-    await updateDoc(doc(db, 'users', partnerUid), { relationshipId: null });
-  }
-
-  return true;
-}
-
-// ── Data path helpers ─────────────────────────────────────────────────────────
-
-/**
- * Returns a Firestore document reference for the current user's data.
- * Usage: dataRef('settings')  →  /data/{uid}/settings
- */
-export function dataRef(path) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Not authenticated');
-  return doc(db, 'data', uid, ...path.split('/'));
-}
-
-/**
- * Returns a Firestore collection reference for the current user's data.
- * Usage: dataCol('scenes')  →  /data/{uid}/scenes
- */
-export function dataCol(path) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error('Not authenticated');
-  return collection(db, 'data', uid, ...path.split('/'));
-}
-
-/**
- * Returns a Firestore document reference for the partner's data.
- */
-export async function partnerDataRef(path) {
-  const partnerUid = await getPartnerUid();
-  if (!partnerUid) throw new Error('No partner linked');
-  return doc(db, 'data', partnerUid, ...path.split('/'));
-}
-
-export async function partnerDataCol(path) {
-  const partnerUid = await getPartnerUid();
-  if (!partnerUid) throw new Error('No partner linked');
-  return collection(db, 'data', partnerUid, ...path.split('/'));
-}
-
-/**
- * Reads the settings document for a given uid.
- * Returns the settings data object, or {} if not found.
- */
-export async function getSettings(uid) {
-  const snap = await getDoc(doc(db, 'data', uid, 'settings'));
-  return snap.exists() ? snap.data() : {};
-}
+    init();
+  </script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
+</body>
+</html>
