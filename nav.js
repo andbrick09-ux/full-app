@@ -60,9 +60,8 @@
 
   var MORE_ITEMS = [
     { href: 'toy-vault.html',       icon: '🔒', label: 'Toy Vault' },
-    { href: 'assessment-menu.html', icon: '📊', label: 'Assessments &amp; Ratings' },
+    { href: 'assessment-menu.html', icon: '✅', label: 'Assessments &amp; Ratings' },
     { href: 'public-game.html',     icon: '🏛️', label: "Sir&#39;s Public Tasks" },
-    { href: 'bdsm-checklist.html',  icon: '✅', label: 'BDSM Checklists' },
     { href: 'sirs-protocol.html',   icon: '📜', label: 'Sir\u2019s Protocol' },
     { href: 'song-vault.html',      icon: '🎵', label: 'Song Vault' },
     { href: 'notes.html',           icon: '📝', label: 'Notes' },
