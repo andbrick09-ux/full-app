@@ -20,16 +20,76 @@
     .site-header p { color: var(--text-dim); margin: 2px 0 0; font-size: 0.95rem; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 16px 50px; }
     
-    .controls-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; background: var(--card); padding: 10px 14px; border-radius: 16px; border: 1px solid var(--glass-border); }
-    .search-wrap { flex: 1; min-width: 200px; position: relative; }
-    .search-wrap input { width: 100%; background: var(--deep-blue); border: 1px solid var(--glass-border); color: var(--text); padding: 8px 12px 8px 38px; border-radius: 9999px; font-size: 0.9rem; }
-    .search-wrap .material-symbols-rounded { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 18px; }
+    .controls-bar { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+      align-items: center; 
+      margin-bottom: 14px; 
+      background: var(--card); 
+      padding: 10px 14px; 
+      border-radius: 16px; 
+      border: 1px solid var(--glass-border); 
+    }
+    .search-wrap { 
+      flex: 1 1 220px; 
+      min-width: 200px; 
+      position: relative; 
+    }
+    .search-wrap input { 
+      width: 100%; 
+      background: var(--deep-blue); 
+      border: 1px solid var(--glass-border); 
+      color: var(--text); 
+      padding: 9px 12px 9px 38px; 
+      border-radius: 9999px; 
+      font-size: 0.9rem; 
+    }
+    .search-wrap .material-symbols-rounded { 
+      position: absolute; 
+      left: 12px; 
+      top: 50%; 
+      transform: translateY(-50%); 
+      color: var(--gold); 
+      font-size: 18px; 
+    }
     
-    .profile-tabs { display: flex; background: var(--deep-blue); border-radius: 9999px; padding: 3px; border: 1px solid var(--glass-border); }
-    .profile-tab { padding: 6px 18px; border-radius: 9999px; font-size: 0.85rem; cursor: pointer; transition: all .2s; border: none; background: transparent; color: var(--text-dim); font-weight: 500; }
-    .profile-tab.active { background: var(--gold); color: #11151e; font-weight: 600; }
+    .profile-tabs { 
+      display: flex; 
+      background: var(--deep-blue); 
+      border-radius: 9999px; 
+      padding: 3px; 
+      border: 1px solid var(--glass-border); 
+      flex-shrink: 0;
+    }
+    .profile-tab { 
+      padding: 7px 20px; 
+      border-radius: 9999px; 
+      font-size: 0.85rem; 
+      cursor: pointer; 
+      transition: all .2s; 
+      border: none; 
+      background: transparent; 
+      color: var(--text-dim); 
+      font-weight: 500; 
+      white-space: nowrap;
+    }
+    .profile-tab.active { 
+      background: var(--gold); 
+      color: #11151e; 
+      font-weight: 600; 
+    }
     
-    .btn { padding: 8px 16px; border-radius: 9999px; font-size: 0.85rem; cursor: pointer; transition: all .2s; border: none; font-weight: 500; }
+    .btn { 
+      padding: 8px 16px; 
+      border-radius: 9999px; 
+      font-size: 0.85rem; 
+      cursor: pointer; 
+      transition: all .2s; 
+      border: none; 
+      font-weight: 500; 
+      flex-shrink: 0;
+    }
     .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #11151e; }
     .btn-compare { background: var(--purple); color: white; display: flex; align-items: center; gap: 6px; }
     
@@ -127,7 +187,11 @@
       <div id="compareList" style="margin-top:10px; max-height:280px; overflow:auto;"></div>
     </div>
 
-    <div id="checklistContainer"></div>
+    <div id="checklistContainer">
+      <div style="padding: 40px 20px; text-align: center; color: var(--text-dim);">
+        Loading checklist...
+      </div>
+    </div>
 
     <div class="footer-note">
       Your answers stay private • Only you can edit your column • Changes sync instantly via Firestore
@@ -217,22 +281,33 @@
 
     async function init() {
       try {
+        console.log('[BDSM Checklist] Starting init...');
         currentUser = await requireAuth();
+        console.log('[BDSM Checklist] User authenticated:', currentUser.uid);
+        
         const profile = await getMyProfile();
         currentRole = profile?.role || 'sub';
+        console.log('[BDSM Checklist] Role:', currentRole);
+        
         partnerUid = await getPartnerUid();
+        console.log('[BDSM Checklist] Partner UID:', partnerUid);
         
         await loadMyResponses();
         if (partnerUid) await loadPartnerResponses();
         
+        console.log('[BDSM Checklist] Rendering checklist with', allItems.length, 'items');
         renderChecklist();
         updateStats();
         
         document.querySelectorAll('.profile-tab').forEach(t => {
           t.classList.toggle('active', t.dataset.role === currentRole);
         });
+        
+        console.log('[BDSM Checklist] Init complete!');
       } catch (e) {
-        console.error('Init error:', e);
+        console.error('[BDSM Checklist] Init error:', e);
+        document.getElementById('checklistContainer').innerHTML = 
+          '<div style="padding:40px; text-align:center; color:#f87171;">Error loading checklist. Check console for details.</div>';
       }
     }
 
@@ -240,14 +315,22 @@
       try {
         const doc = await db.collection('users').doc(currentUser.uid).collection('bdsm').doc('responses').get();
         myResponses = doc.exists ? doc.data() : {};
-      } catch (e) { myResponses = {}; }
+        console.log('[BDSM Checklist] Loaded', Object.keys(myResponses).length, 'my responses');
+      } catch (e) { 
+        console.error('[BDSM Checklist] Load my responses error:', e);
+        myResponses = {}; 
+      }
     }
 
     async function loadPartnerResponses() {
       try {
         const doc = await db.collection('users').doc(partnerUid).collection('bdsm').doc('responses').get();
         partnerResponses = doc.exists ? doc.data() : {};
-      } catch (e) { partnerResponses = {}; }
+        console.log('[BDSM Checklist] Loaded', Object.keys(partnerResponses).length, 'partner responses');
+      } catch (e) { 
+        console.error('[BDSM Checklist] Load partner responses error:', e);
+        partnerResponses = {}; 
+      }
     }
 
     async function saveResponse(itemId, field, value) {
@@ -256,7 +339,10 @@
       try {
         await db.collection('users').doc(currentUser.uid).collection('bdsm').doc('responses').set(myResponses, { merge: true });
         updateStats();
-      } catch (e) { alert('Save failed'); }
+      } catch (e) { 
+        console.error('Save failed:', e);
+        alert('Save failed'); 
+      }
     }
 
     window.switchRole = function(role) {
@@ -276,11 +362,18 @@
       const container = document.getElementById('checklistContainer');
       container.innerHTML = '';
       
+      if (!allItems || allItems.length === 0) {
+        container.innerHTML = '<div style="padding:40px; text-align:center; color:#f87171;">No items found!</div>';
+        return;
+      }
+      
       const grouped = {};
       allItems.forEach(item => {
         if (!grouped[item.category]) grouped[item.category] = [];
         grouped[item.category].push(item);
       });
+      
+      let renderedCount = 0;
       
       CATEGORY_ORDER.forEach(cat => {
         if (!grouped[cat]) return;
@@ -340,7 +433,7 @@
             </div>
           `;
           
-          // Attach click handlers for editable badges
+          // Attach click handlers
           row.querySelectorAll('.response-col:first-of-type .response-badge').forEach(badge => {
             badge.onclick = () => {
               const field = badge.dataset.field;
@@ -349,10 +442,13 @@
           });
           
           rowsEl.appendChild(row);
+          renderedCount++;
         });
         
         container.appendChild(group);
       });
+      
+      console.log('[BDSM Checklist] Rendered', renderedCount, 'items');
       
       setTimeout(() => {
         document.querySelectorAll('.cat-group').forEach((g,i) => { if (i < 3) g.classList.remove('collapsed'); });
@@ -376,10 +472,6 @@
     window.toggleCategory = function(header) {
       header.parentElement.classList.toggle('collapsed');
     };
-
-    let currentEditItem = null;
-    let currentEditField = '';
-    let currentEditBadge = null;
 
     window.editResponse = function(itemId, field, badgeEl) {
       currentEditItem = itemId;
