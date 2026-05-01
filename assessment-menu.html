@@ -227,8 +227,11 @@
       // Load data
       await loadAssessments();
 
-      // Seed if empty
-      if (!assessmentsData.protocol.cats.length) {
+      // Seed only if completely empty (keeps any existing user data)
+      const isEmpty = (!assessmentsData.protocol?.cats?.length) &&
+                      (!assessmentsData.predicament?.cats?.length) &&
+                      (!assessmentsData.publicplay?.cats?.length);
+      if (isEmpty) {
         assessmentsData = JSON.parse(JSON.stringify(SEED_DATA));
         await saveAssessments();
       }
@@ -252,6 +255,17 @@
         const pSnap = await getDoc(pRef);
         if (pSnap.exists()) partnerData = pSnap.data() || partnerData;
       }
+      ensureDataStructure();
+    }
+
+    function ensureDataStructure() {
+      const defaults = JSON.parse(JSON.stringify(SEED_DATA));
+      if (!assessmentsData.protocol?.cats) assessmentsData.protocol = defaults.protocol;
+      if (!assessmentsData.predicament?.cats) assessmentsData.predicament = defaults.predicament;
+      if (!assessmentsData.publicplay?.cats) assessmentsData.publicplay = defaults.publicplay;
+      if (!partnerData.protocol?.cats) partnerData.protocol = defaults.protocol;
+      if (!partnerData.predicament?.cats) partnerData.predicament = defaults.predicament;
+      if (!partnerData.publicplay?.cats) partnerData.publicplay = defaults.publicplay;
     }
 
     async function saveAssessments() {
