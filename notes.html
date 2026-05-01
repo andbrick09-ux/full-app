@@ -186,6 +186,7 @@
     .note-badge {
       font-size: 8px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 1px; padding: 3px 9px; border-radius: 20px;
+      display: inline-flex; align-items: center; line-height: 1; white-space: nowrap;
     }
     .badge-private  { background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.2); }
     .badge-shared   { background: rgba(100,181,246,0.1); color: #64B5F6; border: 1px solid rgba(100,181,246,0.2); }
@@ -683,13 +684,16 @@
 
     function noteCardHTML(n) {
       const date = new Date(n.created).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-      const visiBadge = n.visibility === 'private'  ? `<span class="note-badge badge-private">🔒 Private</span>`
-                      : n.visibility === 'shared'   ? `<span class="note-badge badge-shared">🔗 Shared</span>`
-                      : `<span class="note-badge badge-archived">📦 Archived</span>`;
 
-      let ownerBadge = '';
+      let badgeHTML;
       if (!n.isOwn) {
-        ownerBadge = `<span class="note-badge badge-partner">Shared by ${escHtml(partnerName)}</span>`;
+        badgeHTML = `<span class="note-badge badge-partner">🔗 Shared by ${escHtml(partnerName)}</span>`;
+      } else if (n.visibility === 'private') {
+        badgeHTML = `<span class="note-badge badge-private">🔒 Private</span>`;
+      } else if (n.visibility === 'shared') {
+        badgeHTML = `<span class="note-badge badge-shared">🔗 Shared</span>`;
+      } else {
+        badgeHTML = `<span class="note-badge badge-archived">📦 Archived</span>`;
       }
 
       const tagColors = { gold:'#D4AF37', rose:'#F44336', blue:'#64B5F6', purple:'#BA68C8', green:'#4CAF50' };
@@ -704,7 +708,7 @@
           <div class="note-accent accent-${n.accent}"></div>
           <div class="note-top">
             <div class="note-title">${escHtml(n.title)}</div>
-            <div class="note-badges">\( {visiBadge} \){ownerBadge}</div>
+            <div class="note-badges">${badgeHTML}</div>
           </div>
           <div class="note-body">${escHtml(n.body)}</div>
           <div class="note-footer">
@@ -789,11 +793,18 @@
       const tagBg = (tagColors[n.accent]||'#D4AF37') + '22';
       const tagCol = tagColors[n.accent]||'#D4AF37';
 
-      const visiBadge = n.visibility === 'private'  ? `<span class="note-badge badge-private">🔒 Private</span>`
-                      : n.visibility === 'shared'   ? `<span class="note-badge badge-shared">🔗 Shared</span>`
-                      : `<span class="note-badge badge-archived">📦 Archived</span>`;
+      let badgeHTML;
+      if (!n.isOwn) {
+        badgeHTML = `<span class="note-badge badge-partner">🔗 Shared by ${escHtml(partnerName)}</span>`;
+      } else if (n.visibility === 'private') {
+        badgeHTML = `<span class="note-badge badge-private">🔒 Private</span>`;
+      } else if (n.visibility === 'shared') {
+        badgeHTML = `<span class="note-badge badge-shared">🔗 Shared</span>`;
+      } else {
+        badgeHTML = `<span class="note-badge badge-archived">📦 Archived</span>`;
+      }
 
-      document.getElementById('view-badges').innerHTML = visiBadge;
+      document.getElementById('view-badges').innerHTML = badgeHTML;
       document.getElementById('view-title').textContent = n.title;
       document.getElementById('view-meta').textContent  = date;
       document.getElementById('view-body').textContent  = n.body;
@@ -892,6 +903,8 @@
     window.editCurrentNote   = editCurrentNote;
     window.exportNotes       = exportNotes;
     window.handleViewBackdropClick = handleViewBackdropClick;
+    window.openNewNoteModal  = openNewNoteModal;
+    window.selectAccent      = selectAccent;
     window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
     window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
