@@ -28,7 +28,18 @@
       --red: #F44336;
       --blue: #2196F3;
     }
-    body { background-color: var(--midnight); color: #f0f0f0; font-family: 'Montserrat', sans-serif; min-height: 100vh; }
+    body {
+      background-color: var(--midnight);
+      background-image:
+        linear-gradient(rgba(212,175,55,0.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(212,175,55,0.03) 1px,transparent 1px),
+        radial-gradient(ellipse at top,#0f172a 0%,transparent 80%);
+      background-size: 30px 30px,30px 30px,100% 100%;
+      color:#f0f0f0;
+      font-family:'Montserrat',sans-serif;
+      min-height:100vh;
+      overflow-x: hidden;
+    }
     .topbar { border-bottom: 1px solid var(--border); background: rgba(5,16,36,0.6); }
     .main { max-width: 1200px; margin: 0 auto; padding: 20px; }
     .role-bar {
@@ -177,13 +188,19 @@
         cats: [
           { id: 'beginner', label: 'Beginner / Low Equipment', items: [
             { id: 'p1', name: 'Coin-on-the-Wall Clit Tease', desc: 'Balance coin while teased', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } },
-            { id: 'p2', name: 'Arms-Out Book Hold', desc: 'Heavy book + nipple clamps', sub: { rating: 'MAYBE', note: '' }, dom: { rating: 'OK', note: '' } }
+            { id: 'p2', name: 'Arms-Out Book Hold', desc: 'Heavy book + nipple clamps', sub: { rating: 'MAYBE', note: '' }, dom: { rating: 'OK', note: '' } },
+            { id: 'p5', name: 'Necklace Chain Draped Over Fingers', desc: 'Fingers spread, chain tension', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } },
+            { id: 'p6', name: 'The Plug + Edge Hold', desc: 'Plug in, edge without moving', sub: { rating: 'MAYBE', note: '' }, dom: { rating: 'OK', note: '' } }
           ]},
           { id: 'pain', label: 'Pain vs Pain', items: [
-            { id: 'p3', name: 'Toes Tied to Nipple Clamps', desc: 'Tension predicament', sub: { rating: 'NO', note: '' }, dom: { rating: 'MAYBE', note: '' } }
+            { id: 'p3', name: 'Toes Tied to Nipple Clamps', desc: 'Tension predicament', sub: { rating: 'NO', note: '' }, dom: { rating: 'MAYBE', note: '' } },
+            { id: 'p7', name: 'Labia Clamps Tied to Ankles', desc: 'Spread and clamped', sub: { rating: 'MAYBE', note: '' }, dom: { rating: 'OK', note: '' } },
+            { id: 'p8', name: 'Clamp/Chain Reaction', desc: 'Pull chain to release clamps', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } }
           ]},
           { id: 'mindfuck', label: 'Mindfuck Ideas', items: [
-            { id: 'p4', name: 'Mirror Reflection', desc: 'Forced to watch self in predicament', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } }
+            { id: 'p4', name: 'Mirror Reflection', desc: 'Forced to watch self in predicament', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } },
+            { id: 'p9', name: 'Verbal Task Endurance', desc: 'Recite rules while bound', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } },
+            { id: 'p10', name: 'Frozen Object Threat', desc: 'Ice or cold on sensitive skin', sub: { rating: 'MAYBE', note: '' }, dom: { rating: 'OK', note: '' } }
           ]}
         ]
       },
@@ -191,10 +208,18 @@
         cats: [
           { id: 'foundation', label: 'Foundation Tasks', items: [
             { id: 'pp1', name: 'Commando / No Panties', desc: 'Out in public with remote toy', sub: { excitement: 'Dripping', comfort: 'G', note: '' }, dom: { rating: 'approved', note: '' } },
-            { id: 'pp2', name: 'Remote Tease at Dinner', desc: 'Sir controls vibe while eating', sub: { excitement: 'Soaked', comfort: 'Y', note: 'Tweak intensity' }, dom: { rating: 'approved', note: '' } }
+            { id: 'pp2', name: 'Remote Tease at Dinner', desc: 'Sir controls vibe while eating', sub: { excitement: 'Soaked', comfort: 'Y', note: 'Tweak intensity' }, dom: { rating: 'approved', note: '' } },
+            { id: 'pp4', name: 'Sheer Test / See-Through', desc: 'Thin top, hard nipples visible', sub: { excitement: 'Tingle', comfort: 'G', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'pp5', name: 'Eyes on Sir Only', desc: 'Maintain eye contact in public', sub: { excitement: 'Dripping', comfort: 'G', note: '' }, dom: { rating: 'approved', note: '' } }
           ]},
           { id: 'tasks', label: 'Public Tasks', items: [
-            { id: 'pp3', name: 'Panty Removal in Stall', desc: 'Leave in trash or hand to Sir', sub: { excitement: 'Tingle', comfort: 'G', note: '' }, dom: { rating: '', note: '' } }
+            { id: 'pp3', name: 'Panty Removal in Stall', desc: 'Leave in trash or hand to Sir', sub: { excitement: 'Tingle', comfort: 'G', note: '' }, dom: { rating: '', note: '' } },
+            { id: 'pp6', name: 'Subtle Grinding at Table', desc: 'Edge discreetly on chair edge', sub: { excitement: 'Soaked', comfort: 'Y', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'pp7', name: '90% Threshold Walk', desc: 'Edge to 90% then stop', sub: { excitement: 'Dripping', comfort: 'G', note: '' }, dom: { rating: 'approved', note: '' } }
+          ]},
+          { id: 'rewards', label: 'Rewards & Punishments', items: [
+            { id: 'pp8', name: 'Vibe Burst Reward', desc: 'Quick intense vibe after good behavior', sub: { excitement: 'Soaked', comfort: 'G', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'pp9', name: 'Low-Vibe Lock Punishment', desc: 'Tease but no release', sub: { excitement: 'Tingle', comfort: 'Y', note: '' }, dom: { rating: 'approved', note: '' } }
           ]}
         ]
       }
@@ -240,6 +265,16 @@
       switchTab('protocol', document.querySelector('.tab-btn'));
     }
 
+    function ensureDataStructure() {
+      const defaults = JSON.parse(JSON.stringify(SEED_DATA));
+      if (!assessmentsData.protocol?.cats || assessmentsData.protocol.cats.length === 0) assessmentsData.protocol = defaults.protocol;
+      if (!assessmentsData.predicament?.cats || assessmentsData.predicament.cats.length === 0) assessmentsData.predicament = defaults.predicament;
+      if (!assessmentsData.publicplay?.cats || assessmentsData.publicplay.cats.length === 0) assessmentsData.publicplay = defaults.publicplay;
+      if (!partnerData.protocol?.cats || partnerData.protocol.cats.length === 0) partnerData.protocol = defaults.protocol;
+      if (!partnerData.predicament?.cats || partnerData.predicament.cats.length === 0) partnerData.predicament = defaults.predicament;
+      if (!partnerData.publicplay?.cats || partnerData.publicplay.cats.length === 0) partnerData.publicplay = defaults.publicplay;
+    }
+
     async function loadAssessments() {
       if (!assessmentsRef) return;
       const snap = await getDoc(assessmentsRef);
@@ -256,16 +291,6 @@
         if (pSnap.exists()) partnerData = pSnap.data() || partnerData;
       }
       ensureDataStructure();
-    }
-
-    function ensureDataStructure() {
-      const defaults = JSON.parse(JSON.stringify(SEED_DATA));
-      if (!assessmentsData.protocol?.cats) assessmentsData.protocol = defaults.protocol;
-      if (!assessmentsData.predicament?.cats) assessmentsData.predicament = defaults.predicament;
-      if (!assessmentsData.publicplay?.cats) assessmentsData.publicplay = defaults.publicplay;
-      if (!partnerData.protocol?.cats) partnerData.protocol = defaults.protocol;
-      if (!partnerData.predicament?.cats) partnerData.predicament = defaults.predicament;
-      if (!partnerData.publicplay?.cats) partnerData.publicplay = defaults.publicplay;
     }
 
     async function saveAssessments() {
@@ -306,7 +331,7 @@
       html += `</div>`;
 
       areaData.cats.forEach((cat, catIdx) => {
-        html += `<div class="section category">
+        html += `<div class="category-section">
           <div class="category-header" onclick="toggleCategory(this)">
             <span class="category-title">${cat.label}</span>
             <div>
@@ -321,14 +346,14 @@
           const partnerResp = getPartnerResponse(pAreaData, cat.id, item.id) || {};
           const partnerRole = myRole === 'dom' ? 'sub' : 'dom';
 
-          html += `<div class="item">
+          html += `<div class="activity-item">
             <div class="item-header">
               <div>
                 <div class="item-name">${item.name}</div>
                 ${item.desc ? `<div style="font-size:10px;color:#888;margin-top:2px;">${item.desc}</div>` : ''}
               </div>
               <div class="item-actions">
-                ${myRole === 'dom' ? `<button class="pill delete-btn" onclick="deleteItem('${areaKey}', '${cat.id}', ${itemIdx})">✕</button>` : ''}
+                ${myRole === 'dom' ? `<button class="kink-pill delete-btn" onclick="deleteItem('${areaKey}', '${cat.id}', ${itemIdx})">✕</button>` : ''}
               </div>
             </div>
 
@@ -377,24 +402,24 @@
         const ratingVal = resp.rating || '';
         html += `
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <div class="pill ${triedVal === 'yes' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'yes')">✓ Tried</div>
-            <div class="pill ${triedVal === 'no-want' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'no-want')">+ Want</div>
-            <div class="pill ${triedVal === 'no-dont' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'no-dont')">✕ No</div>
+            <div class="kink-pill ${triedVal === 'yes' ? 'active-yes' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'yes')">✓ Tried</div>
+            <div class="kink-pill ${triedVal === 'no-want' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'no-want')">+ Want</div>
+            <div class="kink-pill ${triedVal === 'no-dont' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'no-dont')">✕ No</div>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
-            <div class="pill ${ratingVal === 'loved' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'loved')">★ Loved</div>
-            <div class="pill ${ratingVal === 'liked' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'liked')">♥ Liked</div>
-            <div class="pill ${ratingVal === 'meh' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'meh')">~ Meh</div>
-            <div class="pill ${ratingVal === 'fetish' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'fetish')">✦ Fetish</div>
+            <div class="kink-pill ${ratingVal === 'loved' ? 'active-loved' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'loved')">★ Loved</div>
+            <div class="kink-pill ${ratingVal === 'liked' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'liked')">♥ Liked</div>
+            <div class="kink-pill ${ratingVal === 'meh' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'meh')">~ Meh</div>
+            <div class="kink-pill ${ratingVal === 'fetish' ? 'active-loved' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'fetish')">✦ Fetish</div>
           </div>
         `;
       } else if (areaKey === 'predicament') {
         const ratingVal = resp.rating || '';
         html += `
           <div style="display:flex; gap:6px;">
-            <div class="pill ${ratingVal === 'OK' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'OK')">✓ OK</div>
-            <div class="pill ${ratingVal === 'MAYBE' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'MAYBE')">△ Maybe</div>
-            <div class="pill ${ratingVal === 'NO' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'NO')">✕ No</div>
+            <div class="kink-pill ${ratingVal === 'OK' ? 'active-yes' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'OK')">✓ OK</div>
+            <div class="kink-pill ${ratingVal === 'MAYBE' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'MAYBE')">△ Maybe</div>
+            <div class="kink-pill ${ratingVal === 'NO' ? 'active-limit' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'NO')">✕ No</div>
           </div>
         `;
       } else if (areaKey === 'publicplay') {
@@ -404,18 +429,18 @@
           <div style="margin-bottom:6px;">
             <div style="font-size:8px; color:#888; margin-bottom:3px;">Excitement</div>
             <div style="display:flex; gap:4px;">
-              <div class="pill ${excVal === 'None' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'None')">None</div>
-              <div class="pill ${excVal === 'Tingle' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Tingle')">Tingle</div>
-              <div class="pill ${excVal === 'Dripping' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Dripping')">Dripping</div>
-              <div class="pill ${excVal === 'Soaked' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Soaked')">Soaked</div>
+              <div class="kink-pill ${excVal === 'None' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'None')">None</div>
+              <div class="kink-pill ${excVal === 'Tingle' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Tingle')">Tingle</div>
+              <div class="kink-pill ${excVal === 'Dripping' ? 'active-yes' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Dripping')">Dripping</div>
+              <div class="kink-pill ${excVal === 'Soaked' ? 'active-loved' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Soaked')">Soaked</div>
             </div>
           </div>
           <div>
             <div style="font-size:8px; color:#888; margin-bottom:3px;">Comfort (to Sir)</div>
             <div style="display:flex; gap:4px;">
-              <div class="pill ${comVal === 'G' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'G')">G</div>
-              <div class="pill ${comVal === 'Y' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'Y')">Y Tweak</div>
-              <div class="pill ${comVal === 'R' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'R')">R Limit</div>
+              <div class="kink-pill ${comVal === 'G' ? 'active-yes' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'G')">G</div>
+              <div class="kink-pill ${comVal === 'Y' ? 'active-loved' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'Y')">Y Tweak</div>
+              <div class="kink-pill ${comVal === 'R' ? 'active-limit' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'R')">R Limit</div>
             </div>
           </div>
         `;
