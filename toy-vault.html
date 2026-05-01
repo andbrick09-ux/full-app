@@ -516,10 +516,16 @@
 
 <script type="module">
 // ─── FIX 1: imports added ─────────────────────────────────────────────────────
-import { requireAuth, dataCol } from './auth.js';
+import { requireAuth } from './auth.js';
 import {
-  doc, setDoc, deleteDoc, getDocs
+  doc, setDoc, deleteDoc, getDocs, collection
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { db } from './firebase-config.js';
+
+// Use uid passed in from requireAuth — avoids auth.currentUser timing race
+function dataCol(path, uid) {
+  return collection(db, 'data', uid, 'userdata', ...path.split('/'));
+}
 
 // ─── SEED ────────────────────────────────────────────────────────────────────
 const SEED = [
@@ -588,23 +594,28 @@ let collapsedCats = {};
 let toysCol;
 let wishesCol;
 
-async function loadData() {
-  toysCol   = dataCol('vault-toys');
-  wishesCol = dataCol('vault-wishes');
+async function loadData(user) {
+  try {
+    toysCol   = dataCol('vault-toys',   user.uid);
+    wishesCol = dataCol('vault-wishes', user.uid);
 
-  // ─── FIX 5: replaced onSnapshot with getDocs (no stacking listeners) ──────
-  const [toysSnap, wishesSnap] = await Promise.all([
-    getDocs(toysCol),
-    getDocs(wishesCol)
-  ]);
+    const [toysSnap, wishesSnap] = await Promise.all([
+      getDocs(toysCol),
+      getDocs(wishesCol)
+    ]);
 
-  toys   = toysSnap.docs.map(d => d.data());
-  wishes = wishesSnap.docs.map(d => d.data());
+    toys   = toysSnap.docs.map(d => d.data());
+    wishes = wishesSnap.docs.map(d => d.data());
 
-  if (!toys.length) await seedToys();
-  else renderVault();
+    if (!toys.length) await seedToys();
+    else renderVault();
 
-  renderWishlist();
+    renderWishlist();
+  } catch (e) {
+    console.error('Vault load failed:', e);
+    document.getElementById('vault-list').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">⚠</div><div class="empty-title">Failed to load vault</div><div class="empty-sub">${e.message}</div></div>`;
+  }
 }
 
 async function seedToys() {
@@ -935,7 +946,7 @@ window.toggleRow     = toggleRow;
 window.toggleCat     = toggleCat;
 
 // Init
-requireAuth().then(() => loadData());
+requireAuth().then(user => loadData(user));
 </script>
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
 <script src="nav.js"></script>
