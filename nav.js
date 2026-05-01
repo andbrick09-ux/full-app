@@ -68,7 +68,7 @@
     { href: 'calendar.html',        icon: '📅', label: 'Calendar' },
     { href: 'protocol-daily.html',  icon: '📅', label: 'Daily Protocol' },
     { href: 'help.html',            icon: '❓', label: 'Help &amp; Info' },
-    { href: 'settings.html',        icon: '⚙️', label: 'Settings' }
+    { href: 'settings.html',        icon: '⚙️', label: 'Settings' },
     { href: 'bdsm-checklist-final.html', icon: '⚙️', label: 'Test Page' }
   ];
 
