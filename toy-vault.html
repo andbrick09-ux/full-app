@@ -523,8 +523,9 @@ import {
 import { db } from './firebase-config.js';
 
 // Use uid passed in from requireAuth — avoids auth.currentUser timing race
+// Path: data/{uid}/{path} — 3 segments = valid Firestore collection reference
 function dataCol(path, uid) {
-  return collection(db, 'data', uid, 'userdata', ...path.split('/'));
+  return collection(db, 'data', uid, path);
 }
 
 // ─── SEED ────────────────────────────────────────────────────────────────────
