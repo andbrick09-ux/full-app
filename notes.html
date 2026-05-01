@@ -625,6 +625,7 @@
 
     async function init() {
       currentUser = await requireAuth();
+      // ── FIX: assign personalCol AFTER auth resolves so auth.currentUser is set ──
       personalCol = dataCol('notes');
 
       // Check if user is paired (only if the helpers are available)
@@ -683,7 +684,10 @@
     function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
     async function persist(note) {
-      // Personal note
+      // ── FIX: guard against personalCol being null/undefined ──
+      if (!personalCol) {
+        personalCol = dataCol('notes');
+      }
       const ref = doc(personalCol, note.id);
       await setDoc(ref, note);
     }
@@ -692,6 +696,10 @@
       if (source === 'shared' && sharedCol) {
         await deleteDoc(doc(sharedCol, id));
       } else {
+        // ── FIX: guard against personalCol being null/undefined ──
+        if (!personalCol) {
+          personalCol = dataCol('notes');
+        }
         await deleteDoc(doc(personalCol, id));
       }
     }
@@ -1015,6 +1023,7 @@
     window.insertAtCursor        = insertAtCursor;
     window.insertListItem        = insertListItem;
     window.renderNotes           = renderNotes;
+    window.selectAccent          = selectAccent;
     window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
     window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
