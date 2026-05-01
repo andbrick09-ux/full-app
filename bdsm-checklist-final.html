@@ -54,32 +54,6 @@
       font-size: 18px; 
     }
     
-    .profile-tabs { 
-      display: flex; 
-      background: var(--deep-blue); 
-      border-radius: 9999px; 
-      padding: 3px; 
-      border: 1px solid var(--glass-border); 
-      flex-shrink: 0;
-    }
-    .profile-tab { 
-      padding: 7px 20px; 
-      border-radius: 9999px; 
-      font-size: 0.85rem; 
-      cursor: pointer; 
-      transition: all .2s; 
-      border: none; 
-      background: transparent; 
-      color: var(--text-dim); 
-      font-weight: 500; 
-      white-space: nowrap;
-    }
-    .profile-tab.active { 
-      background: var(--gold); 
-      color: #11151e; 
-      font-weight: 600; 
-    }
-    
     .btn { 
       padding: 8px 16px; 
       border-radius: 9999px; 
@@ -156,9 +130,8 @@
         <input type="text" id="searchInput" placeholder="Search activities..." oninput="filterRows()">
       </div>
       
-      <div class="profile-tabs" id="profileTabs">
-        <button class="profile-tab active" data-role="sub" onclick="switchRole('sub')">Sub</button>
-        <button class="profile-tab" data-role="dom" onclick="switchRole('dom')">Dom</button>
+      <div style="background: var(--deep-blue); border: 1px solid var(--glass-border); border-radius: 9999px; padding: 7px 18px; font-size: 0.85rem; color: var(--text-dim); white-space: nowrap;">
+        Logged in as: <strong id="loggedInRole" style="color: var(--gold);"></strong>
       </div>
       
       <button class="btn btn-compare" onclick="showCompare()">
@@ -264,6 +237,10 @@
     </div>
   </div>
 
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="nav.js"></script>
+
   <script type="module">
     import { requireAuth, getMyProfile, getPartnerUid } from './auth.js';
     import { db } from './firebase-config.js';
@@ -287,7 +264,11 @@
         
         const profile = await getMyProfile();
         currentRole = profile?.role || 'sub';
-        console.log('[BDSM Checklist] Role:', currentRole);
+        console.log('[BDSM Checklist] Detected role from profile:', currentRole);
+        
+        // Display logged-in role
+        const roleDisplay = currentRole === 'sub' ? 'Sub (Becca)' : 'Dom (Andy)';
+        document.getElementById('loggedInRole').textContent = roleDisplay;
         
         partnerUid = await getPartnerUid();
         console.log('[BDSM Checklist] Partner UID:', partnerUid);
@@ -298,10 +279,6 @@
         console.log('[BDSM Checklist] Rendering checklist with', allItems.length, 'items');
         renderChecklist();
         updateStats();
-        
-        document.querySelectorAll('.profile-tab').forEach(t => {
-          t.classList.toggle('active', t.dataset.role === currentRole);
-        });
         
         console.log('[BDSM Checklist] Init complete!');
       } catch (e) {
@@ -345,12 +322,6 @@
       }
     }
 
-    window.switchRole = function(role) {
-      currentRole = role;
-      document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.role === role));
-      renderChecklist();
-    };
-
     window.filterRows = function() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
       document.querySelectorAll('.check-row').forEach(row => {
@@ -374,6 +345,8 @@
       });
       
       let renderedCount = 0;
+      const myLabel = currentRole === 'sub' ? 'Sub' : 'Dom';
+      const partnerLabel = currentRole === 'sub' ? 'Dom' : 'Sub';
       
       CATEGORY_ORDER.forEach(cat => {
         if (!grouped[cat]) return;
@@ -417,7 +390,7 @@
             </div>
             
             <div class="response-col">
-              <div class="response-label">My (${currentRole})</div>
+              <div class="response-label">My (${myLabel}) — Editable</div>
               <div class="response-badge ${myTried ? getBadgeClass(myTried) : ''}" data-action="edit" data-field="tried">${myTried || 'Tried?'}</div>
               <div class="response-badge ${myRating ? getBadgeClass(myRating) : ''}" data-action="edit" data-field="rating">${myRating || 'Rating'}</div>
               <div class="response-badge ${myWould ? getBadgeClass(myWould) : ''}" data-action="edit" data-field="would">${myWould || 'Again?'}</div>
@@ -425,7 +398,7 @@
             </div>
             
             <div class="response-col">
-              <div class="response-label">Partner</div>
+              <div class="response-label">Partner (${partnerLabel}) — Read Only</div>
               <div class="response-badge ${pTried ? getBadgeClass(pTried) : ''}">${pTried || '—'}</div>
               <div class="response-badge ${pRating ? getBadgeClass(pRating) : ''}">${pRating || '—'}</div>
               <div class="response-badge ${pWould ? getBadgeClass(pWould) : ''}">${pWould || '—'}</div>
@@ -433,7 +406,7 @@
             </div>
           `;
           
-          // Attach click handlers
+          // Only make "My" column editable
           row.querySelectorAll('.response-col:first-of-type .response-badge').forEach(badge => {
             badge.onclick = () => {
               const field = badge.dataset.field;
