@@ -69,6 +69,7 @@
     { href: 'protocol-daily.html',  icon: '📅', label: 'Daily Protocol' },
     { href: 'help.html',            icon: '❓', label: 'Help &amp; Info' },
     { href: 'settings.html',        icon: '⚙️', label: 'Settings' }
+    { href: 'bdsm-checklist-final.html' icon: '⚙️', label: 'Test Page' }
   ];
 
   /* ── 2. Read active page from <body data-nav="X"> ──────── */
