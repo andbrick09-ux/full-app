@@ -3337,7 +3337,11 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ── Wait for auth before doing anything ──────────────────────────
-await requireAuth();
+try {
+  await requireAuth();
+} catch (e) {
+  console.warn('[Scene Planner] Auth unavailable (demo mode):', e?.message || e);
+}
 
 // ── Firestore helpers ────────────────────────────────────────────
 
@@ -3477,6 +3481,14 @@ function goToStep(n, dir = 'forward') {
 function nextStep() {
   if (currentStep >= TOTAL - 1) return;
   goToStep(currentStep + 1, 'forward');
+}
+
+function goBack() {
+  if (currentStep === 0) {
+    window.location.href = 'index.html';
+  } else {
+    goToStep(currentStep - 1, 'back');
+  }
 }
 
 // ── Chip / Pill Selection ─────────────────────────────────────────
@@ -4847,9 +4859,13 @@ Object.assign(window, {
 });
 
 // ── Init ──────────────────────────────────────────────────────────
-await updateHistoryCount();
-await applySettings();
-await checkOnboarding();
+try {
+  await updateHistoryCount();
+  await applySettings();
+  await checkOnboarding();
+} catch (e) {
+  console.warn('[Scene Planner] Init partial failure (demo mode):', e?.message || e);
+}
 updateProgress();
 </script>
 
