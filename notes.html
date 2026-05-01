@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -33,41 +33,10 @@
     .page-wrap {
       position: relative; z-index: 1;
       max-width: 600px; margin: 0 auto;
-      padding: 20px 20px calc(120px + var(--safe-b));
+      padding: 20px 20px calc(160px + var(--safe-b));
     }
 
-    /* ── Page heading strip ── */
-    .page-hero {
-      text-align: center;
-      padding: 18px 0 10px;
-      animation: fadeUp 0.4s ease both;
-    }
-    .page-eyebrow {
-      font-size: 9px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 4px; color: var(--gold); opacity: 0.45; margin-bottom: 4px;
-    }
-    .page-title {
-      font-family: 'Great Vibes', cursive; font-size: clamp(38px,11vw,56px);
-      background: linear-gradient(135deg,#D4AF37 0%,#F5E6A3 40%,#D4AF37 70%,#c9a227 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; margin: 0; line-height: 1.1;
-      animation: shimmer 4s ease-in-out infinite;
-    }
-    @keyframes shimmer {
-      0%   { background-position: 0% center; }
-      50%  { background-position: 100% center; }
-      100% { background-position: 0% center; }
-    }
-
-    /* ── Ornament divider ── */
-    .ornament-divider {
-      display: flex; align-items: center; gap: 12px;
-      margin: 10px 0 20px;
-      animation: fadeUp 0.4s ease 0.05s both;
-    }
-    .ornament-line { flex:1; height:1px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.2), transparent); }
-    .ornament-icon { color: var(--gold); font-size: 13px; opacity: 0.4; }
+    /* (Hero + ornament styles removed for cleaner layout) */
 
     /* ── Search ── */
     .search-wrap {
@@ -214,6 +183,32 @@
       font-family: 'Playfair Display', serif; font-style: italic;
     }
 
+    /* Rendered Markdown styles (used in view modal) */
+    .note-quote {
+      border-left: 3px solid var(--gold);
+      padding-left: 14px;
+      margin: 12px 0;
+      color: #bbb;
+      font-style: italic;
+    }
+    .note-list {
+      padding-left: 22px;
+      margin: 8px 0;
+    }
+    .note-li {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+    .note-li.bullet::marker { color: var(--gold); }
+    .note-li.numbered::marker { color: #64B5F6; }
+    .note-hr {
+      border: none;
+      border-top: 1px solid rgba(212,175,55,0.3);
+      margin: 16px 0;
+    }
+    #view-body strong { color: var(--gold); font-weight: 600; }
+    #view-body em { color: #ddd; font-style: italic; }
+
     /* Stagger card animations */
     .note-card:nth-child(1) { animation-delay: 0.05s; }
     .note-card:nth-child(2) { animation-delay: 0.12s; }
@@ -245,7 +240,7 @@
 
     /* ── FAB ── */
     .fab {
-      position: fixed; bottom: calc(24px + var(--safe-b)); right: 22px;
+      position: fixed; bottom: calc(85px + var(--safe-b)); right: 22px;
       width: 58px; height: 58px; border-radius: 50%;
       background: var(--luxury-gradient); color: var(--midnight);
       border: none; font-size: 26px; font-weight: 300;
@@ -306,7 +301,49 @@
       outline: none; transition: border-color 0.2s, box-shadow 0.2s;
       margin-bottom: 18px;
     }
-    .field-textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+    .field-textarea { min-height: 220px; resize: vertical; line-height: 1.7; font-size: 14px; }
+
+    /* Rich text toolbar */
+    .rich-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .rich-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #ddd;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rich-btn:hover {
+      background: rgba(212,175,55,0.15);
+      color: var(--gold);
+    }
+    .rich-btn:active {
+      transform: scale(0.92);
+    }
+    .rich-sep {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      margin: 0 4px;
+    }
+
     .field-input:focus, .field-textarea:focus, .field-select:focus {
       border-color: rgba(212,175,55,0.4);
       box-shadow: 0 0 0 3px rgba(212,175,55,0.07);
@@ -434,18 +471,6 @@
   <!-- Main -->
   <div class="page-wrap">
 
-    <!-- Hero -->
-    <div class="page-hero">
-      <div class="page-eyebrow">Dom Sub Hub</div>
-      <h1 class="page-title">Notes</h1>
-    </div>
-
-    <div class="ornament-divider">
-      <div class="ornament-line"></div>
-      <span class="ornament-icon">❦</span>
-      <div class="ornament-line"></div>
-    </div>
-
     <!-- Search -->
     <div class="search-wrap">
       <span class="material-symbols-rounded search-icon">search</span>
@@ -504,7 +529,18 @@
       <input id="note-title-input" class="field-input" type="text" placeholder="Note heading…" />
 
       <label class="field-label">Content</label>
-      <textarea id="note-body-input" class="field-textarea" placeholder="Write your thoughts here…"></textarea>
+      <!-- Rich text toolbar -->
+      <div class="rich-toolbar">
+        <button type="button" class="rich-btn" onclick="wrapSelection('**','**')" title="Bold (Ctrl/Cmd+B)">B</button>
+        <button type="button" class="rich-btn" onclick="wrapSelection('*','*')" title="Italic (Ctrl/Cmd+I)">I</button>
+        <span class="rich-sep"></span>
+        <button type="button" class="rich-btn" onclick="insertListItem('- ')" title="Bullet list">•</button>
+        <button type="button" class="rich-btn" onclick="insertListItem('1. ')" title="Numbered list">1.</button>
+        <span class="rich-sep"></span>
+        <button type="button" class="rich-btn" onclick="wrapSelection('> ','')" title="Quote">❝</button>
+        <button type="button" class="rich-btn" onclick="insertAtCursor('---\n')" title="Horizontal rule">—</button>
+      </div>
+      <textarea id="note-body-input" class="field-textarea" placeholder="Write your thoughts here… Use **bold**, *italic*, - bullets, 1. numbered lists"></textarea>
 
       <label class="field-label">Tags (comma-separated)</label>
       <input id="note-tags-input" class="field-input" type="text" placeholder="e.g. scene, reflection, rule" />
@@ -556,16 +592,31 @@
   <script type="module">
     import { requireAuth, dataCol } from './auth.js';
     import {
-      getDocs, doc, setDoc, deleteDoc, onSnapshot
+      getDocs, doc, setDoc, deleteDoc, onSnapshot, collection
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
     import { auth } from './firebase-config.js';
 
+    // Graceful fallback for the new shared helpers (works with old or new auth.js)
+    let getMyRelationshipId = null;
+    let sharedNotesCol = null;
+    try {
+      const authMod = await import('./auth.js');
+      if (typeof authMod.getMyRelationshipId === 'function') getMyRelationshipId = authMod.getMyRelationshipId;
+      if (typeof authMod.sharedNotesCol === 'function') sharedNotesCol = authMod.sharedNotesCol;
+    } catch (e) {
+      console.warn('[Notes] Could not load shared helpers from auth.js — running in personal-only mode');
+    }
+
     /* ── Auth guard ── */
     let currentUser;
-    let notesCol;
+    let personalCol;
+    let relId = null;
+    let sharedCol = null;
 
     /* ── State ── */
-    let notes = [];
+    let notes = [];           // merged list for rendering
+    let personalNotes = [];   // raw from /data/{uid}/notes
+    let sharedNotes = [];     // raw from /relationships/{relId}/notes
     let activeFilter = 'all';
     let selectedAccent = 'gold';
     let selectedVisibility = 'private';
@@ -574,27 +625,77 @@
 
     async function init() {
       currentUser = await requireAuth();
-      notesCol = dataCol('notes');
+      personalCol = dataCol('notes');
 
-      // Real-time listener
-      onSnapshot(notesCol, snap => {
-        notes = snap.docs.map(d => d.data());
-        renderNotes();
+      // Check if user is paired (only if the helpers are available)
+      if (getMyRelationshipId && sharedNotesCol) {
+        try {
+          relId = await getMyRelationshipId();
+          if (relId) {
+            sharedCol = await sharedNotesCol();
+            console.log('[Notes] Paired — using shared notes collection for "Shared" visibility');
+          }
+        } catch (e) {
+          console.log('[Notes] No active relationship — shared notes disabled');
+          relId = null;
+          sharedCol = null;
+        }
+      } else {
+        console.log('[Notes] Running in personal-only mode (shared helpers not found in auth.js)');
+        relId = null;
+        sharedCol = null;
+      }
+
+      setupRealtimeListeners();
+    }
+
+    function setupRealtimeListeners() {
+      // 1. Personal notes (private + archived + any legacy shared)
+      onSnapshot(personalCol, snap => {
+        personalNotes = snap.docs.map(d => ({ ...d.data(), _source: 'personal' }));
+        mergeAndRender();
       });
+
+      // 2. Shared notes (only if paired)
+      if (sharedCol) {
+        onSnapshot(sharedCol, snap => {
+          sharedNotes = snap.docs.map(d => ({ ...d.data(), _source: 'shared' }));
+          mergeAndRender();
+        });
+      } else {
+        sharedNotes = [];
+        mergeAndRender();
+      }
+    }
+
+    function mergeAndRender() {
+      // Merge personal + shared, deduplicate by ID (in case of migration edge cases)
+      const all = [...personalNotes, ...sharedNotes];
+      const byId = new Map();
+      all.forEach(n => {
+        if (!byId.has(n.id)) byId.set(n.id, n);
+      });
+      notes = Array.from(byId.values());
+      renderNotes();
     }
 
     /* ── Utilities ── */
     function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
     async function persist(note) {
-      // note: pass the note object to upsert, or pass null + id to delete
-      const ref = doc(notesCol, note.id);
+      // Personal note
+      const ref = doc(personalCol, note.id);
       await setDoc(ref, note);
     }
 
-    async function deleteNote(id) {
-      await deleteDoc(doc(notesCol, id));
+    async function deleteNote(id, source = 'personal') {
+      if (source === 'shared' && sharedCol) {
+        await deleteDoc(doc(sharedCol, id));
+      } else {
+        await deleteDoc(doc(personalCol, id));
+      }
     }
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg; t.classList.add('show');
@@ -672,6 +773,77 @@
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
+    /**
+     * Lightweight Markdown renderer for note bodies.
+     * Supports: **bold**, *italic*, - bullets, 1. numbered lists, > quotes, --- hr
+     * Safe: escapes HTML first, then converts Markdown.
+     */
+    function renderMarkdown(text) {
+      if (!text) return '';
+      let html = escHtml(text);
+
+      // Horizontal rules
+      html = html.replace(/^---$/gm, '<hr class="note-hr">');
+
+      // Blockquotes
+      html = html.replace(/^>\s?(.*)$/gm, '<blockquote class="note-quote">$1</blockquote>');
+
+      // Numbered lists (simple)
+      html = html.replace(/^\d+\.\s+(.*)$/gm, '<li class="note-li numbered">$1</li>');
+      html = html.replace(/(<li class="note-li numbered">.*<\/li>\n?)+/g, '<ol class="note-list">$&</ol>');
+
+      // Bullet lists (simple)
+      html = html.replace(/^-\s+(.*)$/gm, '<li class="note-li bullet">$1</li>');
+      html = html.replace(/(<li class="note-li bullet">.*<\/li>\n?)+/g, '<ul class="note-list">$&</ul>');
+
+      // Bold **text**
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+      // Italic *text*
+      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+      // Line breaks
+      html = html.replace(/\n/g, '<br>');
+
+      return html;
+    }
+
+    /* ── Rich text helpers for body textarea ── */
+    function wrapSelection(before, after) {
+      const ta = document.getElementById('note-body-input');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = ta.value.substring(start, end);
+      const newText = before + selected + after;
+      ta.value = ta.value.substring(0, start) + newText + ta.value.substring(end);
+      ta.focus();
+      ta.setSelectionRange(start + before.length, start + before.length + selected.length);
+    }
+
+    function insertAtCursor(text) {
+      const ta = document.getElementById('note-body-input');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      ta.value = ta.value.substring(0, start) + text + ta.value.substring(start);
+      ta.focus();
+      ta.setSelectionRange(start + text.length, start + text.length);
+    }
+
+    function insertListItem(prefix) {
+      const ta = document.getElementById('note-body-input');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const before = ta.value.substring(0, start);
+      const after = ta.value.substring(start);
+      // If not at start of line, add newline first
+      const needsNewline = before.length > 0 && !before.endsWith('\n');
+      const insertText = (needsNewline ? '\n' : '') + prefix;
+      ta.value = before + insertText + after;
+      ta.focus();
+      ta.setSelectionRange(start + insertText.length, start + insertText.length);
+    }
+
     /* ── New note modal ── */
     function openNewNoteModal() {
       editingId = null;
@@ -716,20 +888,35 @@
       const tags = document.getElementById('note-tags-input').value
         .split(',').map(t => t.trim()).filter(Boolean);
 
-      if (editingId) {
-        const idx = notes.findIndex(n => n.id === editingId);
-        if (idx > -1) {
-          const updated = { ...notes[idx], title, body, tags, accent: selectedAccent, visibility: selectedVisibility };
-          await persist(updated);
+      const noteData = {
+        id: editingId || uid(),
+        title,
+        body,
+        tags,
+        accent: selectedAccent,
+        visibility: selectedVisibility,
+        created: editingId ? (notes.find(n => n.id === editingId)?.created || Date.now()) : Date.now()
+      };
+
+      try {
+        if (selectedVisibility === 'shared' && relId && sharedCol) {
+          // Save to shared relationship collection
+          const ref = doc(sharedCol, noteData.id);
+          await setDoc(ref, noteData);
+          showToast(editingId ? 'Shared note updated' : 'Shared note saved');
+        } else {
+          // Save to personal collection
+          await persist(noteData);
+          showToast(editingId ? 'Note updated' : 'Note saved');
         }
-        showToast('Note updated');
-      } else {
-        const note = { id: uid(), title, body, tags, accent: selectedAccent, visibility: selectedVisibility, created: Date.now() };
-        await persist(note);
-        showToast('Note saved');
+      } catch (err) {
+        console.error(err);
+        showToast('Error saving note: ' + err.message);
+        return;
       }
 
       closeModal();
+      editingId = null;
     }
 
     /* ── View modal ── */
@@ -750,7 +937,7 @@
       document.getElementById('view-badges').innerHTML = visiBadge;
       document.getElementById('view-title').textContent = n.title;
       document.getElementById('view-meta').textContent  = date;
-      document.getElementById('view-body').textContent  = n.body;
+      document.getElementById('view-body').innerHTML  = renderMarkdown(n.body);
       document.getElementById('view-tags').innerHTML = (n.tags||[]).map(t =>
         `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${t}</span>`
       ).join('');
@@ -785,9 +972,19 @@
 
     async function deleteCurrentNote() {
       if (!viewingId) return;
-      await deleteNote(viewingId);
-      closeViewModal();
-      showToast('Note deleted');
+      const n = notes.find(x => x.id === viewingId);
+      if (!n) return;
+
+      const source = n._source || 'personal';
+
+      try {
+        await deleteNote(viewingId, source);
+        closeViewModal();
+        showToast('Note deleted');
+      } catch (err) {
+        console.error(err);
+        showToast('Error deleting note');
+      }
     }
 
     /* ── Export ── */
@@ -812,6 +1009,12 @@
     window.editCurrentNote   = editCurrentNote;
     window.exportNotes       = exportNotes;
     window.handleViewBackdropClick = handleViewBackdropClick;
+    window.openNewNoteModal      = openNewNoteModal;
+    window.handleModalBackdropClick = handleModalBackdropClick;
+    window.wrapSelection         = wrapSelection;
+    window.insertAtCursor        = insertAtCursor;
+    window.insertListItem        = insertListItem;
+    window.renderNotes           = renderNotes;
     window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
     window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
