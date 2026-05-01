@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -515,6 +515,12 @@
 </div>
 
 <script type="module">
+// ─── FIX 1: imports added ─────────────────────────────────────────────────────
+import { requireAuth, dataCol } from './firebase-init.js';
+import {
+  doc, setDoc, deleteDoc, getDocs, addDoc
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
 // ─── SEED ────────────────────────────────────────────────────────────────────
 const SEED = [
   {name:'Wand',             cat:'Vibration',          owner:'Shared'},
@@ -575,23 +581,30 @@ let toys   = [];
 let wishes = [];
 let ownerF = 'all';
 let wishF  = 'all';
-let expandedId = null;   // which toy row is expanded
-let collapsedCats = {};  // which category groups are collapsed
+let expandedId = null;
+let collapsedCats = {};
+
+// ─── FIX 2: declare collection refs at module scope ───────────────────────────
+let toysCol;
+let wishesCol;
 
 async function loadData() {
   toysCol   = dataCol('vault-toys');
   wishesCol = dataCol('vault-wishes');
 
-  onSnapshot(toysCol, snap => {
-    toys = snap.docs.map(d => d.data());
-    if (!toys.length) seedToys();
-    else renderVault();
-  });
+  // ─── FIX 5: replaced onSnapshot with getDocs (no stacking listeners) ──────
+  const [toysSnap, wishesSnap] = await Promise.all([
+    getDocs(toysCol),
+    getDocs(wishesCol)
+  ]);
 
-  onSnapshot(wishesCol, snap => {
-    wishes = snap.docs.map(d => d.data());
-    renderWishlist();
-  });
+  toys   = toysSnap.docs.map(d => d.data());
+  wishes = wishesSnap.docs.map(d => d.data());
+
+  if (!toys.length) await seedToys();
+  else renderVault();
+
+  renderWishlist();
 }
 
 async function seedToys() {
@@ -599,11 +612,14 @@ async function seedToys() {
     id: 'seed_' + i, name: s.name, category: s.cat, owner: s.owner,
     notes: '', domRating: 0, subRating: 0, added: Date.now() - (SEED.length - i) * 500
   }));
-  for (const t of batch) await saveToys(t);
+  for (const t of batch) await writeToy(t);
+  toys = [...batch];
+  renderVault();
 }
 
-async function saveToys(toy)   { await setDoc(doc(toysCol,   toy.id),  toy); }
-async function saveWishes(wish) { await setDoc(doc(wishesCol, wish.id), wish); }
+// ─── FIX 3 & 4: renamed helpers so the arg is never accidentally omitted ─────
+async function writeToy(toy)   { await setDoc(doc(toysCol,   toy.id),  toy); }
+async function writeWish(wish) { await setDoc(doc(wishesCol, wish.id), wish); }
 
 // ─── TABS ────────────────────────────────────────────────────────────────────
 function switchTab(tab, btn) {
@@ -684,7 +700,9 @@ async function saveToy() {
     added: id ? (toys.find(t=>t.id===id)?.added||Date.now()) : Date.now()
   };
   toys = id ? toys.map(t=>t.id===id?toy:t) : [toy,...toys];
-  saveToys(); closeToyModal(); renderVault();
+  await writeToy(toy);  // FIX 3: pass toy explicitly
+  closeToyModal();
+  renderVault();
 }
 
 async function saveWish() {
@@ -700,23 +718,30 @@ async function saveWish() {
     added: id ? (wishes.find(w=>w.id===id)?.added||Date.now()) : Date.now()
   };
   wishes = id ? wishes.map(w=>w.id===id?wish:w) : [wish,...wishes];
-  saveWishes(); closeWishModal(); renderWishlist();
+  await writeWish(wish);  // FIX 4: pass wish explicitly
+  closeWishModal();
+  renderWishlist();
 }
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
 async function deleteToy(id) {
   if (!confirm('Remove this toy from the vault?')) return;
   if (expandedId === id) expandedId = null;
+  toys = toys.filter(t => t.id !== id);
   await deleteDoc(doc(toysCol, id));
+  renderVault();
 }
 async function deleteWish(id) {
+  wishes = wishes.filter(w => w.id !== id);
   await deleteDoc(doc(wishesCol, id));
+  renderWishlist();
 }
 
 // ─── ACQUIRE ──────────────────────────────────────────────────────────────────
 async function acquireWish(id) {
   const w = wishes.find(x=>x.id===id);
   if (!w) return;
+  wishes = wishes.filter(x => x.id !== id);
   await deleteDoc(doc(wishesCol, id));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -790,7 +815,7 @@ function renderVault() {
     const items = groups[cat];
     if (!items || !items.length) return;
     const collapsed = collapsedCats[cat];
-    const rowsHeight = items.length * 44; // approx px for max-height
+    const rowsHeight = items.length * 44;
 
     html += `<div class="cat-group${collapsed?' collapsed':''}" id="cg-${esc(cat)}">
       <div class="cat-header" onclick="toggleCat('${esc(cat)}')">
@@ -880,7 +905,7 @@ function renderWishlist() {
       </div>
       <div class="wish-right">
         <span class="wish-pri-badge ${badgeCls(w.priority)}">${w.priority}</span>
-        ${w.link?`<a href="${esc(w.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:0.58rem;color:var(--gold);opacity:0.6;text-decoration:none;" >↗ link</a>`:''}
+        ${w.link?`<a href="${esc(w.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:0.58rem;color:var(--gold);opacity:0.6;text-decoration:none;">↗ link</a>`:''}
       </div>
     </div>`).join('');
 }
@@ -894,20 +919,20 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
 );
 
 // Expose for inline onclick handlers
-window.switchTab    = switchTab;
-window.setOwnerF    = setOwnerF;
-window.setWishF     = setWishF;
-window.openToyModal = openToyModal;
+window.switchTab     = switchTab;
+window.setOwnerF     = setOwnerF;
+window.setWishF      = setWishF;
+window.openToyModal  = openToyModal;
 window.closeToyModal = closeToyModal;
 window.openWishModal = openWishModal;
-window.closeWishModal = closeWishModal;
-window.saveToy      = saveToy;
-window.saveWish     = saveWish;
-window.deleteToy    = deleteToy;
-window.deleteWish   = deleteWish;
-window.acquireWish  = acquireWish;
-window.toggleRow    = toggleRow;
-window.toggleCat    = toggleCat;
+window.closeWishModal= closeWishModal;
+window.saveToy       = saveToy;
+window.saveWish      = saveWish;
+window.deleteToy     = deleteToy;
+window.deleteWish    = deleteWish;
+window.acquireWish   = acquireWish;
+window.toggleRow     = toggleRow;
+window.toggleCat     = toggleCat;
 
 // Init
 requireAuth().then(() => loadData());
