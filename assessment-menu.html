@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -14,7 +14,70 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link rel="apple-touch-icon" href="icon-512.png"/>
   <link rel="stylesheet" href="styles.css"/>
-<link rel="stylesheet" href="nav.css" />
+  <link rel="stylesheet" href="nav.css" />
+  <style>
+    :root {
+      --midnight: #051024;
+      --paper-dark: #081226;
+      --gold: #d4af37;
+      --gold-dim: rgba(212,175,55,0.4);
+      --glass: rgba(5,16,36,0.85);
+      --border: rgba(212,175,55,0.35);
+      --luxury-gradient: linear-gradient(135deg,#bf953f 0%,#fcf6ba 50%,#b38728 100%);
+      --green: #4CAF50;
+      --red: #F44336;
+      --blue: #2196F3;
+    }
+    body { background-color: var(--midnight); color: #f0f0f0; font-family: 'Montserrat', sans-serif; min-height: 100vh; }
+    .topbar { border-bottom: 1px solid var(--border); background: rgba(5,16,36,0.6); }
+    .main { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .role-bar {
+      display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+      background: rgba(8,18,38,0.7); border-bottom: 1px solid var(--border);
+      font-size: 12px; color: var(--gold-dim);
+    }
+    .role-pill { background: var(--glass); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+    .tabs-nav { display: flex; gap: 8px; padding: 16px 20px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .tab-btn { flex-shrink: 0; background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--gold-dim); font-size: 11px; font-weight: 600; padding: 8px 18px; cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { background: var(--luxury-gradient); color: var(--midnight); border-color: transparent; }
+    .section { background: var(--glass); border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(212,175,55,0.05); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; background: var(--luxury-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .add-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 6px 14px; border-radius: 6px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: 700; }
+    .category { border-bottom: 1px solid rgba(212,175,55,0.1); }
+    .category-header { padding: 12px 20px; background: rgba(212,175,55,0.03); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .category-title { font-weight: 600; color: #e8e8e8; }
+    .item { padding: 14px 20px; border-bottom: 1px solid rgba(212,175,55,0.08); }
+    .item:last-child { border-bottom: none; }
+    .item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .item-name { font-weight: 600; flex: 1; }
+    .item-actions { display: flex; gap: 6px; align-items: center; }
+    .pill { background: #081226; border: 1px solid var(--border); border-radius: 6px; color: #ddd; font-size: 9px; font-weight: 600; padding: 5px 10px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+    .pill:hover { border-color: var(--gold); }
+    .pill.active { border-color: var(--gold); background: rgba(212,175,55,0.1); }
+    .pill.green { color: var(--green); border-color: rgba(76,175,80,0.4); }
+    .pill.gold { color: var(--gold); }
+    .pill.red { color: var(--red); border-color: var(--red); }
+    .partner-label { font-size: 8px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .response-box { background: rgba(5,16,36,0.5); border: 1px solid rgba(212,175,55,0.15); border-radius: 6px; padding: 8px 10px; margin-top: 6px; font-size: 11px; }
+    .note-input { width: 100%; background: transparent; border: none; border-left: 2px solid rgba(212,175,55,0.3); color: #aaa; font-size: 10px; padding-left: 8px; margin-top: 6px; outline: none; }
+    .delete-btn { color: var(--red); border-color: var(--red); padding: 3px 8px; font-size: 9px; }
+    .compare-item { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 20px; border-bottom: 1px solid rgba(212,175,55,0.08); }
+    .compare-side { font-size: 11px; }
+    .compare-side h5 { margin: 0 0 4px; color: var(--gold-dim); font-size: 9px; text-transform: uppercase; }
+    .agreement { padding: 4px 10px; border-radius: 12px; font-size: 9px; font-weight: 700; }
+    .agreement.match { background: rgba(76,175,80,0.2); color: #4CAF50; }
+    .agreement.diff { background: rgba(244,67,54,0.2); color: #F44336; }
+    .stats-bar { display: flex; gap: 12px; padding: 12px 20px; background: rgba(8,18,38,0.8); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .stat { background: var(--glass); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center; }
+    .modal-content { background: var(--paper-dark); border: 1px solid var(--gold); border-radius: 12px; padding: 24px; max-width: 420px; width: 92%; }
+    .modal-input { width: 100%; padding: 12px; margin: 12px 0; background: #051024; border: 1px solid var(--border); color: white; border-radius: 6px; }
+    .btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    .btn.red { border-color: var(--red); color: var(--red); }
+    .persistence-bar { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 10px 20px; background: rgba(8,18,38,0.7); border-bottom: 1px solid var(--border); font-size: 10px; color: var(--gold-dim); flex-wrap: wrap; }
+    .btn-mini { background: transparent; border: 1px solid var(--border); color: var(--gold); padding: 5px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-weight: 700; font-size: 9px; }
+  </style>
 </head>
 <body data-nav="more">
 
@@ -26,65 +89,602 @@
     </div>
   </div>
 
-  <div class="main">
-
-    <div class="menu-grid">
-      <a href="sub-bdsm-checklist.html" class="menu-card">
-        <span class="menu-card-icon">📖</span>
-        <span class="menu-card-title">Submissive Protocol Checklist</span>
-        <span class="menu-card-desc">Specific tasks, chores, and submissive responsibilities for review and rating from Sir.</span>
-      </a>
-
-      <a href="predicament-bondage-menu.html" class="menu-card">
-        <span class="menu-card-icon">🪢</span>
-        <span class="menu-card-title">Predicament Bondage Menu</span>
-        <span class="menu-card-desc">Review and rate complex predicament bondage scenarios and proposals for Sir.</span>
-      </a>
-
-      <a href="public-play-menu.html" class="menu-card">
-        <span class="menu-card-icon">🍽️</span>
-        <span class="menu-card-title">Public Play Menu</span>
-        <span class="menu-card-desc">Rate risks, toys, and discrete public tasks. Perfect for restaurants and outings.</span>
-      </a>
-    </div>
-
+  <div class="persistence-bar">
+    <span id="saveLabel">Ready • Shared via Relationship</span>
+    <button class="btn-mini" onclick="addCategory()">+ Category</button>
+    <button class="btn-mini" onclick="showCompareTab()">Compare All</button>
+    <button class="btn-mini" onclick="resetCurrentTab()" style="color:var(--red); border-color:var(--red);">Reset Tab</button>
   </div>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
+  <div class="role-bar" id="roleBar">
+    <span class="role-pill" id="rolePill">Loading role...</span>
+    <span id="partnerInfo">Partner: Loading...</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-nav" id="tabsNav">
+    <button class="tab-btn active" onclick="switchTab('protocol', this)">Sub Protocol</button>
+    <button class="tab-btn" onclick="switchTab('predicament', this)">Predicament Bondage</button>
+    <button class="tab-btn" onclick="switchTab('public', this)">Public Play</button>
+    <button class="tab-btn" onclick="switchTab('compare', this)">Compare</button>
+  </div>
+
+  <div class="main" id="mainContent">
+    <!-- Dynamic content rendered here by JS -->
+  </div>
+
+  <!-- Add Category Modal -->
+  <div id="addCatModal" class="modal">
+    <div class="modal-content">
+      <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;">Add New Category</h3>
+      <input type="text" id="catLabel" class="modal-input" placeholder="e.g. Advanced Bondage">
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="btn" style="flex:1" onclick="confirmAddCategory()">Add Category</button>
+        <button class="btn" style="flex:1; border-color:#555; color:#888;" onclick="closeAddCatModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div id="addItemModal" class="modal">
+    <div class="modal-content">
+      <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;">Add New Item</h3>
+      <input type="text" id="itemName" class="modal-input" placeholder="Item name e.g. Rope Suspension">
+      <textarea id="itemDesc" class="modal-input" placeholder="Optional description (setup, equipment...)" rows="2" style="resize:vertical;"></textarea>
+      <select id="itemCatSelect" class="modal-input"></select>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="btn" style="flex:1" onclick="confirmAddItem()">Add Item</button>
+        <button class="btn" style="flex:1; border-color:#555; color:#888;" onclick="closeAddItemModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, getMyRole, getPartnerUid, getUserProfile, getRelationship } from './auth.js';
+    import { doc, getDoc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { db } from './firebase-config.js';
+
+    let currentUser = null;
+    let myRole = null;
+    let partnerUid = null;
+    let partnerName = 'No partner';
+    let assessmentsRef = null;
+    let assessmentsData = { protocol: { cats: [] }, predicament: { cats: [] }, publicplay: { cats: [] } };
+    let partnerData = { protocol: { cats: [] }, predicament: { cats: [] }, publicplay: { cats: [] } };
+    let activeTab = 'protocol';
+    let currentCatIdForAdd = null;
+
+    // Initial seed data for each section (merged from original pages)
+    const SEED_DATA = {
+      protocol: {
+        cats: [
+          { id: 'bondage', label: 'Bondage', items: [
+            { id: 'b1', name: 'Anal Hook', desc: 'Classic predicament with hook and tension', sub: { tried: 'yes', rating: 'loved', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'b2', name: 'Breast Bondage', desc: 'Rope or cuffs on chest', sub: { tried: 'yes', rating: 'liked', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'b3', name: 'Chastity', desc: 'Long-term device control', sub: { tried: 'no-want', rating: '', note: '' }, dom: { rating: '', note: '' } }
+          ]},
+          { id: 'impact', label: 'Impact Play', items: [
+            { id: 'i1', name: 'Spanking — Hand', desc: 'Over the knee or standing', sub: { tried: 'yes', rating: 'loved', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'i2', name: 'Flogger', desc: 'Thuddy or stingy depending on technique', sub: { tried: 'yes', rating: 'liked', note: '' }, dom: { rating: '', note: '' } }
+          ]},
+          { id: 'service', label: 'Service & D/s', items: [
+            { id: 's1', name: 'Kneeling Protocol', desc: 'Formal positions and duration', sub: { tried: 'yes', rating: 'loved', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 's2', name: 'Task Setting', desc: 'Daily or scene tasks with reporting', sub: { tried: 'yes', rating: 'loved', note: '' }, dom: { rating: 'approved', note: '' } }
+          ]}
+        ]
+      },
+      predicament: {
+        cats: [
+          { id: 'beginner', label: 'Beginner / Low Equipment', items: [
+            { id: 'p1', name: 'Coin-on-the-Wall Clit Tease', desc: 'Balance coin while teased', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } },
+            { id: 'p2', name: 'Arms-Out Book Hold', desc: 'Heavy book + nipple clamps', sub: { rating: 'MAYBE', note: '' }, dom: { rating: 'OK', note: '' } }
+          ]},
+          { id: 'pain', label: 'Pain vs Pain', items: [
+            { id: 'p3', name: 'Toes Tied to Nipple Clamps', desc: 'Tension predicament', sub: { rating: 'NO', note: '' }, dom: { rating: 'MAYBE', note: '' } }
+          ]},
+          { id: 'mindfuck', label: 'Mindfuck Ideas', items: [
+            { id: 'p4', name: 'Mirror Reflection', desc: 'Forced to watch self in predicament', sub: { rating: 'OK', note: '' }, dom: { rating: 'OK', note: '' } }
+          ]}
+        ]
+      },
+      publicplay: {
+        cats: [
+          { id: 'foundation', label: 'Foundation Tasks', items: [
+            { id: 'pp1', name: 'Commando / No Panties', desc: 'Out in public with remote toy', sub: { excitement: 'Dripping', comfort: 'G', note: '' }, dom: { rating: 'approved', note: '' } },
+            { id: 'pp2', name: 'Remote Tease at Dinner', desc: 'Sir controls vibe while eating', sub: { excitement: 'Soaked', comfort: 'Y', note: 'Tweak intensity' }, dom: { rating: 'approved', note: '' } }
+          ]},
+          { id: 'tasks', label: 'Public Tasks', items: [
+            { id: 'pp3', name: 'Panty Removal in Stall', desc: 'Leave in trash or hand to Sir', sub: { excitement: 'Tingle', comfort: 'G', note: '' }, dom: { rating: '', note: '' } }
+          ]}
+        ]
+      }
+    };
+
+    async function init() {
+      currentUser = await requireAuth();
+      myRole = await getMyRole();
+      partnerUid = await getPartnerUid();
+
+      // Setup shared reference via relationship if possible
+      const rel = await getRelationship();
+      if (rel && rel.id) {
+        assessmentsRef = doc(db, 'relationships', rel.id, 'assessments', 'main');
+      } else {
+        // Fallback to per-user (less ideal for sharing)
+        assessmentsRef = doc(db, 'users', currentUser.uid, 'assessments');
+      }
+
+      // Load partner name
+      if (partnerUid) {
+        const pProfile = await getUserProfile(partnerUid);
+        partnerName = pProfile?.displayName || 'Partner';
+      }
+
+      // Update UI
+      document.getElementById('rolePill').innerHTML = `${myRole === 'dom' ? '👑 DOM' : '🖤 SUB'} <span style="font-size:9px;opacity:0.7;">(${currentUser.email.split('@')[0]})</span>`;
+      document.getElementById('partnerInfo').innerHTML = `Partner: <strong>${partnerName}</strong> ${partnerUid ? '✓ Paired' : '⚠ Not paired'}`;
+
+      // Load data
+      await loadAssessments();
+
+      // Seed if empty
+      if (!assessmentsData.protocol.cats.length) {
+        assessmentsData = JSON.parse(JSON.stringify(SEED_DATA));
+        await saveAssessments();
+      }
+
+      // Initial render
+      switchTab('protocol', document.querySelector('.tab-btn'));
+    }
+
+    async function loadAssessments() {
+      if (!assessmentsRef) return;
+      const snap = await getDoc(assessmentsRef);
+      if (snap.exists()) {
+        assessmentsData = snap.data() || assessmentsData;
+      }
+      // Load partner data if different ref
+      if (partnerUid && assessmentsRef.path.includes('relationships')) {
+        // Same ref, partner sees same data
+        partnerData = JSON.parse(JSON.stringify(assessmentsData));
+      } else if (partnerUid) {
+        const pRef = doc(db, 'users', partnerUid, 'assessments');
+        const pSnap = await getDoc(pRef);
+        if (pSnap.exists()) partnerData = pSnap.data() || partnerData;
+      }
+    }
+
+    async function saveAssessments() {
+      if (!assessmentsRef) return;
+      await setDoc(assessmentsRef, assessmentsData, { merge: true });
+      document.getElementById('saveLabel').textContent = 'Saved • ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      setTimeout(() => {
+        if (document.getElementById('saveLabel')) document.getElementById('saveLabel').textContent = 'Ready • Shared via Relationship';
+      }, 2500);
+    }
+
+    function switchTab(tab, btn) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      render();
+    }
+
+    function render() {
+      const container = document.getElementById('mainContent');
+      container.innerHTML = '';
+
+      if (activeTab === 'compare') {
+        renderCompare(container);
+        return;
+      }
+
+      const areaKey = activeTab === 'protocol' ? 'protocol' : activeTab === 'predicament' ? 'predicament' : 'publicplay';
+      const areaData = assessmentsData[areaKey] || { cats: [] };
+      const pAreaData = partnerData[areaKey] || { cats: [] };
+
+      let html = `<div class="stats-bar">`;
+      // Simple stats
+      let totalItems = 0, rated = 0;
+      areaData.cats.forEach(c => totalItems += c.items.length);
+      html += `<div class="stat"><span>📋</span> <span>${areaData.cats.length} Categories • ${totalItems} Items</span></div>`;
+      html += `<div class="stat"><span>👥</span> <span>Shared • ${myRole} view</span></div>`;
+      html += `</div>`;
+
+      areaData.cats.forEach((cat, catIdx) => {
+        html += `<div class="section category">
+          <div class="category-header" onclick="toggleCategory(this)">
+            <span class="category-title">${cat.label}</span>
+            <div>
+              <button class="add-btn" onclick="event.stopImmediatePropagation(); addItemToCategory('${areaKey}', '${cat.id}')">+ Item</button>
+              ${myRole === 'dom' ? `<button class="add-btn delete-btn" onclick="event.stopImmediatePropagation(); deleteCategory('${areaKey}', ${catIdx})">Delete Cat</button>` : ''}
+            </div>
+          </div>
+          <div class="category-body">`;
+
+        cat.items.forEach((item, itemIdx) => {
+          const myResp = item[myRole] || {};
+          const partnerResp = getPartnerResponse(pAreaData, cat.id, item.id) || {};
+          const partnerRole = myRole === 'dom' ? 'sub' : 'dom';
+
+          html += `<div class="item">
+            <div class="item-header">
+              <div>
+                <div class="item-name">${item.name}</div>
+                ${item.desc ? `<div style="font-size:10px;color:#888;margin-top:2px;">${item.desc}</div>` : ''}
+              </div>
+              <div class="item-actions">
+                ${myRole === 'dom' ? `<button class="pill delete-btn" onclick="deleteItem('${areaKey}', '${cat.id}', ${itemIdx})">✕</button>` : ''}
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+              <!-- My Input -->
+              <div>
+                <div class="partner-label">YOUR INPUT (${myRole.toUpperCase()})</div>
+                ${renderResponseControls(areaKey, cat.id, item.id, itemIdx, myRole, myResp)}
+              </div>
+              <!-- Partner Input -->
+              <div>
+                <div class="partner-label">PARTNER'S INPUT (${partnerRole.toUpperCase()})</div>
+                ${renderPartnerResponse(partnerResp, areaKey)}
+              </div>
+            </div>
+
+            ${item.note ? `<div class="note-input" style="margin-top:8px; color:#888;">Shared note: ${item.note}</div>` : ''}
+          </div>`;
+        });
+
+        html += `</div></div>`;
+      });
+
+      if (areaData.cats.length === 0) {
+        html += `<div class="section" style="padding:40px; text-align:center; color:#888;">No categories yet. Click "+ Category" above to start.</div>`;
+      }
+
+      container.innerHTML = html;
+
+      // Attach note listeners after render
+      attachNoteListeners(areaKey);
+    }
+
+    function getPartnerResponse(pAreaData, catId, itemId) {
+      if (!pAreaData || !pAreaData.cats) return null;
+      const cat = pAreaData.cats.find(c => c.id === catId);
+      if (!cat) return null;
+      const item = cat.items.find(i => i.id === itemId);
+      return item ? (item[myRole === 'dom' ? 'sub' : 'dom'] || {}) : null;
+    }
+
+    function renderResponseControls(areaKey, catId, itemId, itemIdx, role, resp) {
+      let html = '';
+      if (areaKey === 'protocol') {
+        const triedVal = resp.tried || '';
+        const ratingVal = resp.rating || '';
+        html += `
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div class="pill ${triedVal === 'yes' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'yes')">✓ Tried</div>
+            <div class="pill ${triedVal === 'no-want' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'no-want')">+ Want</div>
+            <div class="pill ${triedVal === 'no-dont' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'tried', 'no-dont')">✕ No</div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+            <div class="pill ${ratingVal === 'loved' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'loved')">★ Loved</div>
+            <div class="pill ${ratingVal === 'liked' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'liked')">♥ Liked</div>
+            <div class="pill ${ratingVal === 'meh' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'meh')">~ Meh</div>
+            <div class="pill ${ratingVal === 'fetish' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'fetish')">✦ Fetish</div>
+          </div>
+        `;
+      } else if (areaKey === 'predicament') {
+        const ratingVal = resp.rating || '';
+        html += `
+          <div style="display:flex; gap:6px;">
+            <div class="pill ${ratingVal === 'OK' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'OK')">✓ OK</div>
+            <div class="pill ${ratingVal === 'MAYBE' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'MAYBE')">△ Maybe</div>
+            <div class="pill ${ratingVal === 'NO' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'rating', 'NO')">✕ No</div>
+          </div>
+        `;
+      } else if (areaKey === 'publicplay') {
+        const excVal = resp.excitement || '';
+        const comVal = resp.comfort || '';
+        html += `
+          <div style="margin-bottom:6px;">
+            <div style="font-size:8px; color:#888; margin-bottom:3px;">Excitement</div>
+            <div style="display:flex; gap:4px;">
+              <div class="pill ${excVal === 'None' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'None')">None</div>
+              <div class="pill ${excVal === 'Tingle' ? 'active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Tingle')">Tingle</div>
+              <div class="pill ${excVal === 'Dripping' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Dripping')">Dripping</div>
+              <div class="pill ${excVal === 'Soaked' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'excitement', 'Soaked')">Soaked</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:3px;">Comfort (to Sir)</div>
+            <div style="display:flex; gap:4px;">
+              <div class="pill ${comVal === 'G' ? 'green active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'G')">G</div>
+              <div class="pill ${comVal === 'Y' ? 'gold active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'Y')">Y Tweak</div>
+              <div class="pill ${comVal === 'R' ? 'red active' : ''}" onclick="updateItemResponse('${areaKey}', '${catId}', ${itemIdx}, 'comfort', 'R')">R Limit</div>
+            </div>
+          </div>
+        `;
+      }
+      // Common note
+      html += `<input type="text" class="note-input" placeholder="Private note..." value="${resp.note || ''}" data-area="${areaKey}" data-cat="${catId}" data-item-idx="${itemIdx}" data-field="note">`;
+      return html;
+    }
+
+    function renderPartnerResponse(resp, areaKey) {
+      if (!resp || Object.keys(resp).length === 0) {
+        return `<div style="color:#666; font-style:italic; font-size:10px;">No input yet from partner.</div>`;
+      }
+      let html = '';
+      if (areaKey === 'protocol') {
+        html += `<div style="display:flex; gap:6px; flex-wrap:wrap;">`;
+        if (resp.tried) html += `<span class="pill ${resp.tried === 'yes' ? 'green' : resp.tried === 'no-want' ? 'gold' : 'red'}">${resp.tried === 'yes' ? '✓ Tried' : resp.tried === 'no-want' ? '+ Want' : '✕ No'}</span>`;
+        if (resp.rating) html += `<span class="pill ${resp.rating === 'loved' || resp.rating === 'fetish' ? 'gold' : 'green'}">${resp.rating}</span>`;
+        html += `</div>`;
+      } else if (areaKey === 'predicament') {
+        html += `<span class="pill ${resp.rating === 'OK' ? 'green' : resp.rating === 'MAYBE' ? 'gold' : 'red'}">${resp.rating || '—'}</span>`;
+      } else if (areaKey === 'publicplay') {
+        html += `<div style="display:flex; gap:4px; flex-wrap:wrap;">`;
+        if (resp.excitement) html += `<span class="pill">${resp.excitement}</span>`;
+        if (resp.comfort) html += `<span class="pill ${resp.comfort === 'G' ? 'green' : resp.comfort === 'Y' ? 'gold' : 'red'}">${resp.comfort}</span>`;
+        html += `</div>`;
+      }
+      if (resp.note) html += `<div style="margin-top:4px; font-size:9px; color:#aaa;">“${resp.note}”</div>`;
+      return html;
+    }
+
+    function attachNoteListeners(areaKey) {
+      document.querySelectorAll('.note-input').forEach(input => {
+        input.onchange = async () => {
+          const catId = input.dataset.cat;
+          const itemIdx = parseInt(input.dataset.itemIdx);
+          const field = input.dataset.field || 'note';
+          const areaData = assessmentsData[areaKey];
+          const cat = areaData.cats.find(c => c.id === catId);
+          if (!cat || !cat.items[itemIdx]) return;
+          if (!cat.items[itemIdx][myRole]) cat.items[itemIdx][myRole] = {};
+          cat.items[itemIdx][myRole][field] = input.value;
+          await saveAssessments();
+          // Re-render to update partner view if needed, but since note is private, maybe not necessary
+        };
       });
     }
+
+    async function updateItemResponse(areaKey, catId, itemIdx, field, value) {
+      const areaData = assessmentsData[areaKey];
+      const cat = areaData.cats.find(c => c.id === catId);
+      if (!cat || !cat.items[itemIdx]) return;
+      if (!cat.items[itemIdx][myRole]) cat.items[itemIdx][myRole] = {};
+      cat.items[itemIdx][myRole][field] = value;
+      await saveAssessments();
+      render(); // Refresh to show changes
+    }
+
+    function toggleCategory(el) {
+      const body = el.nextElementSibling;
+      if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+    }
+
+    async function addCategory() {
+      document.getElementById('addCatModal').style.display = 'flex';
+      document.getElementById('catLabel').focus();
+    }
+
+    function closeAddCatModal() {
+      document.getElementById('addCatModal').style.display = 'none';
+    }
+
+    async function confirmAddCategory() {
+      const label = document.getElementById('catLabel').value.trim();
+      if (!label) return alert('Category name required');
+      const areaKey = activeTab === 'compare' ? 'protocol' : activeTab; // default to protocol if on compare
+      const areaData = assessmentsData[areaKey];
+      const newCat = {
+        id: 'cat_' + Date.now(),
+        label: label,
+        items: []
+      };
+      areaData.cats.push(newCat);
+      await saveAssessments();
+      closeAddCatModal();
+      render();
+    }
+
+    function addItemToCategory(areaKey, catId) {
+      currentCatIdForAdd = catId;
+      const areaData = assessmentsData[areaKey];
+      const select = document.getElementById('itemCatSelect');
+      select.innerHTML = '';
+      areaData.cats.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.label;
+        if (c.id === catId) opt.selected = true;
+        select.appendChild(opt);
+      });
+      document.getElementById('addItemModal').style.display = 'flex';
+      document.getElementById('itemName').focus();
+    }
+
+    function closeAddItemModal() {
+      document.getElementById('addItemModal').style.display = 'none';
+    }
+
+    async function confirmAddItem() {
+      const name = document.getElementById('itemName').value.trim();
+      const desc = document.getElementById('itemDesc').value.trim();
+      const catId = document.getElementById('itemCatSelect').value;
+      if (!name) return alert('Item name required');
+
+      const areaKey = activeTab;
+      const areaData = assessmentsData[areaKey];
+      const cat = areaData.cats.find(c => c.id === catId);
+      if (!cat) return;
+
+      const newItem = {
+        id: 'item_' + Date.now(),
+        name: name,
+        desc: desc || undefined,
+        sub: { rating: '', note: '' },
+        dom: { rating: '', note: '' }
+      };
+
+      // Add area-specific defaults
+      if (areaKey === 'protocol') {
+        newItem.sub.tried = '';
+        newItem.sub.rating = '';
+      } else if (areaKey === 'predicament') {
+        newItem.sub.rating = '';
+      } else if (areaKey === 'publicplay') {
+        newItem.sub.excitement = '';
+        newItem.sub.comfort = '';
+      }
+
+      cat.items.push(newItem);
+      await saveAssessments();
+      closeAddItemModal();
+      render();
+    }
+
+    async function deleteItem(areaKey, catId, itemIdx) {
+      if (myRole !== 'dom') return alert('Only Dom can delete items.');
+      if (!confirm('Delete this item permanently?')) return;
+      const areaData = assessmentsData[areaKey];
+      const cat = areaData.cats.find(c => c.id === catId);
+      if (cat) {
+        cat.items.splice(itemIdx, 1);
+        await saveAssessments();
+        render();
+      }
+    }
+
+    async function deleteCategory(areaKey, catIdx) {
+      if (myRole !== 'dom') return alert('Only Dom can delete categories.');
+      if (!confirm('Delete entire category and all its items?')) return;
+      assessmentsData[areaKey].cats.splice(catIdx, 1);
+      await saveAssessments();
+      render();
+    }
+
+    function renderCompare(container) {
+      let html = `<div class="stats-bar">
+        <div class="stat"><span>🔄</span> <span>Side-by-side Comparison</span></div>
+        <div class="stat"><span>📊</span> <span>Agreement across all assessments</span></div>
+      </div>`;
+
+      let totalCompared = 0;
+      let agreements = 0;
+
+      ['protocol', 'predicament', 'publicplay'].forEach(areaKey => {
+        const areaLabel = areaKey === 'protocol' ? 'Sub Protocol' : areaKey === 'predicament' ? 'Predicament Bondage' : 'Public Play';
+        const myArea = assessmentsData[areaKey] || { cats: [] };
+        const pArea = partnerData[areaKey] || { cats: [] };
+
+        html += `<div class="section"><div class="category-header"><span class="category-title">${areaLabel}</span></div><div class="category-body">`;
+
+        myArea.cats.forEach(myCat => {
+          const pCat = pArea.cats.find(c => c.id === myCat.id) || { items: [] };
+          myCat.items.forEach(myItem => {
+            const pItem = pCat.items.find(i => i.id === myItem.id) || {};
+            const myResp = myItem[myRole] || {};
+            const pResp = pItem[myRole === 'dom' ? 'sub' : 'dom'] || {};
+
+            let agree = false;
+            let myVal = '', pVal = '';
+
+            if (areaKey === 'protocol') {
+              myVal = (myResp.rating || myResp.tried || '').toString();
+              pVal = (pResp.rating || pResp.tried || '').toString();
+              agree = myVal && pVal && myVal === pVal;
+            } else if (areaKey === 'predicament' || areaKey === 'publicplay') {
+              myVal = (myResp.rating || myResp.excitement || myResp.comfort || '').toString();
+              pVal = (pResp.rating || pResp.excitement || pResp.comfort || '').toString();
+              agree = myVal && pVal && myVal === pVal;
+            }
+
+            if (myVal || pVal) totalCompared++;
+            if (agree) agreements++;
+
+            const agreeClass = agree ? 'match' : (myVal && pVal ? 'diff' : '');
+
+            html += `<div class="compare-item">
+              <div class="compare-side">
+                <h5>YOU (${myRole}) — ${myCat.label}</h5>
+                <div><strong>${myItem.name}</strong></div>
+                <div style="margin-top:4px;">${myVal ? myVal : '<em style="color:#666;">No rating</em>'}</div>
+                ${myResp.note ? `<div style="font-size:9px;color:#888;margin-top:3px;">“${myResp.note}”</div>` : ''}
+              </div>
+              <div class="compare-side">
+                <h5>PARTNER (${myRole === 'dom' ? 'sub' : 'dom'})</h5>
+                <div><strong>${myItem.name}</strong></div>
+                <div style="margin-top:4px;">${pVal ? pVal : '<em style="color:#666;">No rating</em>'}</div>
+                ${pResp.note ? `<div style="font-size:9px;color:#888;margin-top:3px;">“${pResp.note}”</div>` : ''}
+                <div style="margin-top:6px;"><span class="agreement ${agreeClass}">${agree ? '✓ AGREE' : (myVal && pVal ? '✗ DIFFER' : '—')}</span></div>
+              </div>
+            </div>`;
+          });
+        });
+
+        html += `</div></div>`;
+      });
+
+      const pct = totalCompared > 0 ? Math.round((agreements / totalCompared) * 100) : 0;
+      html = `<div class="stats-bar"><div class="stat"><span>🎯</span> <span>Overall Agreement: <strong>${pct}%</strong> (${agreements}/${totalCompared} rated items)</span></div></div>` + html;
+
+      container.innerHTML = html;
+    }
+
+    async function resetCurrentTab() {
+      if (!confirm('Reset current tab to seed data? Your changes will be lost.')) return;
+      const areaKey = activeTab === 'compare' ? 'protocol' : activeTab;
+      assessmentsData[areaKey] = JSON.parse(JSON.stringify(SEED_DATA[areaKey]));
+      await saveAssessments();
+      render();
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+      }
+    });
+
+    // Boot
+    init().catch(console.error);
+
+    // Service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(console.error));
+    }
   </script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
+
+  <!-- Global Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="global-sidebar" id="globalSidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">Dom Sub Hub</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+      <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+      <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+      <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
+      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
+      <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
+      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
+    </div>
   </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
-</script>
-<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
-<script src="nav.js"></script>
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebarOverlay').classList.add('open');
+      document.getElementById('globalSidebar').classList.add('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebarOverlay').classList.remove('open');
+      document.getElementById('globalSidebar').classList.remove('open');
+    }
+  </script>
+  <script src="nav.js"></script>
 </body>
 </html>
