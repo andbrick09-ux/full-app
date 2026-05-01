@@ -531,10 +531,28 @@
       container.innerHTML = '<div style="padding:40px; text-align:center; color:#fbbf24;">Loading original data...</div>';
       
       try {
-        // Fetch the original data
-        const response = await fetch('original-checklist-data.json');
-        if (!response.ok) {
-          throw new Error('Could not load original data file');
+        // Try multiple possible paths
+        let response = null;
+        const paths = [
+          'original-checklist-data.json',
+          './original-checklist-data.json',
+          '/original-checklist-data.json'
+        ];
+        
+        for (const path of paths) {
+          try {
+            response = await fetch(path);
+            if (response.ok) {
+              console.log('[BDSM Checklist] ✅ Loaded data from:', path);
+              break;
+            }
+          } catch (e) {
+            console.log('[BDSM Checklist] Path failed:', path, e.message);
+          }
+        }
+        
+        if (!response || !response.ok) {
+          throw new Error('Could not find original-checklist-data.json. Make sure the file is in the same folder as this HTML file.');
         }
         
         const originalData = await response.json();
@@ -551,15 +569,28 @@
         myResponses = seedData;
         
         console.log('[BDSM Checklist] ✅ Seeded', Object.keys(seedData).length, 'responses from original file');
-        alert('Original data loaded successfully! ' + Object.keys(seedData).length + ' responses imported.');
+        alert('✅ Original data loaded successfully! ' + Object.keys(seedData).length + ' responses imported.');
         
         renderChecklist();
         updateStats();
         
       } catch (e) {
         console.error('[BDSM Checklist] Seed error:', e);
-        alert('Failed to load original data: ' + e.message + '\n\nPlease make sure "original-checklist-data.json" is in your repo root.');
-        renderChecklist();
+        container.innerHTML = `
+          <div style="padding:40px; text-align:center; color:#f87171;">
+            <h3>❌ Failed to Load Original Data</h3>
+            <p><strong>Error:</strong> ${e.message}</p>
+            <p style="margin-top:16px; font-size:0.9rem; color:#888;">
+              <strong>How to fix:</strong><br>
+              1. Make sure <code>original-checklist-data.json</code> is in the same folder as this HTML file<br>
+              2. Both files must be committed to your GitHub repo<br>
+              3. Try opening the page from your GitHub Pages URL (not localhost/file://)
+            </p>
+            <button onclick="location.reload()" style="margin-top:16px; padding:8px 16px; background:#c9a84c; color:#11151e; border:none; border-radius:8px; cursor:pointer;">
+              Try Again
+            </button>
+          </div>
+        `;
       }
     };
 
