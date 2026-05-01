@@ -26,6 +26,7 @@
     .btn { padding: 8px 16px; border-radius: 9999px; font-size: 0.85rem; cursor: pointer; transition: all .2s; border: none; font-weight: 500; flex-shrink: 0; }
     .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #11151e; }
     .btn-compare { background: var(--purple); color: white; display: flex; align-items: center; gap: 6px; }
+    .btn-seed { background: #059669; color: white; }
     .stats-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
     .stat-pill { background: var(--card); padding: 5px 12px; border-radius: 9999px; font-size: 0.8rem; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 5px; }
     .stat-pill .num { color: var(--gold-light); font-weight: 600; }
@@ -66,7 +67,8 @@
     .compare-item.match { border-left: 3px solid var(--green); }
     .compare-item.diff { border-left: 3px solid var(--red); }
     .footer-note { text-align: center; color: var(--text-dim); font-size: 0.75rem; margin-top: 24px; }
-    .error-box { background: #3f1f1f; border: 1px solid #f87171; border-radius: 12px; padding: 20px; margin: 20px 0; color: #f87171; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+    .empty-state h3 { color: var(--gold); margin-bottom: 12px; }
   </style>
 </head>
 <body data-nav="more">
@@ -94,6 +96,10 @@
       </button>
       
       <button class="btn btn-primary" onclick="showAddNote()">+ Note</button>
+      
+      <button class="btn btn-seed" onclick="seedOriginalData()" style="background:#059669; color:white;">
+        📥 Load Original Data
+      </button>
     </div>
 
     <div class="stats-bar">
@@ -115,8 +121,10 @@
     </div>
 
     <div id="checklistContainer">
-      <div style="padding: 40px 20px; text-align: center; color: var(--text-dim);">
-        Loading checklist...
+      <div class="empty-state">
+        <h3>📋 Ready to Load</h3>
+        <p>Click <strong>"📥 Load Original Data"</strong> to import all responses from the original checklist file.</p>
+        <p style="margin-top: 8px; font-size: 0.85rem;">Or start fresh and fill in responses manually.</p>
       </div>
     </div>
 
@@ -211,18 +219,11 @@
     const CATEGORY_ORDER = ["Bondage", "Bodily Fluid", "Dominance/submission", "Edge Play", "Humiliation", "Impact Play", "Role Play", "Sensation Play", "Sexual Play", "Toys", "Voyeurism/Exhibitionism", "Service and Restrictive Behaviour", "Kinks"];
 
     async function init() {
-      const container = document.getElementById('checklistContainer');
-      
       try {
         console.log('[BDSM Checklist] Starting init...');
-        
-        // Step 1: Check authentication
-        console.log('[BDSM Checklist] Step 1: Checking authentication...');
         currentUser = await requireAuth();
         console.log('[BDSM Checklist] ✅ User authenticated:', currentUser.uid);
         
-        // Step 2: Get profile
-        console.log('[BDSM Checklist] Step 2: Getting profile...');
         const profile = await getMyProfile();
         currentRole = profile?.role || 'sub';
         console.log('[BDSM Checklist] ✅ Role detected:', currentRole);
@@ -230,48 +231,21 @@
         const roleDisplay = currentRole === 'sub' ? 'Sub (Becca)' : 'Dom (Andy)';
         document.getElementById('loggedInRole').textContent = roleDisplay;
         
-        // Step 3: Get partner
-        console.log('[BDSM Checklist] Step 3: Getting partner...');
         partnerUid = await getPartnerUid();
-        console.log('[BDSM Checklist] ✅ Partner UID:', partnerUid || 'None');
+        console.log('[BDSM Checklist] ✅ Partner UID:', partnerUid || 'None (not paired)');
         
-        // Step 4: Load responses
-        console.log('[BDSM Checklist] Step 4: Loading responses...');
         await loadMyResponses();
         if (partnerUid) await loadPartnerResponses();
         
-        // Step 5: Seed if needed
-        if (Object.keys(myResponses).length === 0) {
-          console.log('[BDSM Checklist] Step 5: No responses found - showing empty state');
-          console.log('[BDSM Checklist] ℹ️ This is normal for first-time users. You can start adding responses.');
-        } else {
-          console.log('[BDSM Checklist] ✅ Loaded', Object.keys(myResponses).length, 'existing responses');
-        }
-        
-        // Step 6: Render
-        console.log('[BDSM Checklist] Step 6: Rendering UI...');
+        console.log('[BDSM Checklist] Rendering checklist with', allItems.length, 'items');
         renderChecklist();
         updateStats();
         
-        console.log('[BDSM Checklist] ✅ Init complete! Everything working.');
-        
+        console.log('[BDSM Checklist] ✅ Init complete!');
       } catch (e) {
         console.error('[BDSM Checklist] ❌ ERROR:', e);
-        console.error('[BDSM Checklist] Error stack:', e.stack);
-        
-        container.innerHTML = `
-          <div class="error-box">
-            <h3 style="margin:0 0 12px; color:#f87171;">Error Loading Checklist</h3>
-            <p style="margin:0 0 12px;"><strong>Error:</strong> ${e.message}</p>
-            <p style="margin:0; font-size:0.85rem; color:#888;">Check the browser console (F12) for more details. Common causes:</p>
-            <ul style="margin:8px 0 0; padding-left:20px; font-size:0.85rem; color:#888;">
-              <li>Not logged in or session expired</li>
-              <li>Firebase permissions issue</li>
-              <li>Partner not paired yet</li>
-              <li>Network/firewall blocking Firebase</li>
-            </ul>
-          </div>
-        `;
+        document.getElementById('checklistContainer').innerHTML = 
+          '<div style="padding:40px; text-align:center; color:#f87171;">Error: ' + e.message + '</div>';
       }
     }
 
@@ -279,6 +253,7 @@
       try {
         const doc = await db.collection('users').doc(currentUser.uid).collection('bdsm').doc('responses').get();
         myResponses = doc.exists ? doc.data() : {};
+        console.log('[BDSM Checklist] Loaded', Object.keys(myResponses).length, 'my responses');
       } catch (e) { 
         console.error('[BDSM Checklist] Load my responses error:', e);
         myResponses = {}; 
@@ -289,6 +264,7 @@
       try {
         const doc = await db.collection('users').doc(partnerUid).collection('bdsm').doc('responses').get();
         partnerResponses = doc.exists ? doc.data() : {};
+        console.log('[BDSM Checklist] Loaded', Object.keys(partnerResponses).length, 'partner responses');
       } catch (e) { 
         console.error('[BDSM Checklist] Load partner responses error:', e);
         partnerResponses = {}; 
@@ -543,6 +519,48 @@
     window.showAddNote = function() {
       const q = prompt('Quick private note:');
       if (q) alert('Note saved (demo)');
+    };
+
+    // NEW: Load original data from attached file
+    window.seedOriginalData = async function() {
+      if (!confirm('Load original responses from the attached checklist file? This will overwrite any existing answers.')) {
+        return;
+      }
+      
+      const container = document.getElementById('checklistContainer');
+      container.innerHTML = '<div style="padding:40px; text-align:center; color:#fbbf24;">Loading original data...</div>';
+      
+      try {
+        // Fetch the original data
+        const response = await fetch('original-checklist-data.json');
+        if (!response.ok) {
+          throw new Error('Could not load original data file');
+        }
+        
+        const originalData = await response.json();
+        const seedData = originalData[currentRole] || {};
+        
+        if (Object.keys(seedData).length === 0) {
+          alert('No original data found for your role (' + currentRole + ')');
+          renderChecklist();
+          return;
+        }
+        
+        // Save to Firestore
+        await db.collection('users').doc(currentUser.uid).collection('bdsm').doc('responses').set(seedData);
+        myResponses = seedData;
+        
+        console.log('[BDSM Checklist] ✅ Seeded', Object.keys(seedData).length, 'responses from original file');
+        alert('Original data loaded successfully! ' + Object.keys(seedData).length + ' responses imported.');
+        
+        renderChecklist();
+        updateStats();
+        
+      } catch (e) {
+        console.error('[BDSM Checklist] Seed error:', e);
+        alert('Failed to load original data: ' + e.message + '\n\nPlease make sure "original-checklist-data.json" is in your repo root.');
+        renderChecklist();
+      }
     };
 
     document.addEventListener('keydown', function(e) {
