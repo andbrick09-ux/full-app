@@ -105,7 +105,7 @@
   <div class="tabs-nav" id="tabsNav">
     <button class="tab-btn active" onclick="switchTab('protocol', this)">Sub Protocol</button>
     <button class="tab-btn" onclick="switchTab('predicament', this)">Predicament Bondage</button>
-    <button class="tab-btn" onclick="switchTab('public', this)">Public Play</button>
+    <button class="tab-btn" onclick="switchTab('publicplay', this)">Public Play</button>
     <button class="tab-btn" onclick="switchTab('compare', this)">Compare</button>
   </div>
 
@@ -637,10 +637,34 @@
     async function resetCurrentTab() {
       if (!confirm('Reset current tab to seed data? Your changes will be lost.')) return;
       const areaKey = activeTab === 'compare' ? 'protocol' : activeTab;
+      if (!SEED_DATA[areaKey]) {
+        alert('Cannot reset this tab.');
+        return;
+      }
       assessmentsData[areaKey] = JSON.parse(JSON.stringify(SEED_DATA[areaKey]));
       await saveAssessments();
       render();
     }
+
+    function showCompareTab() {
+      const compareBtn = document.querySelector('#tabsNav .tab-btn:last-child');
+      switchTab('compare', compareBtn);
+    }
+
+    // Expose functions to global scope so inline onclick handlers work (module script limitation)
+    window.switchTab = switchTab;
+    window.addCategory = addCategory;
+    window.confirmAddCategory = confirmAddCategory;
+    window.closeAddCatModal = closeAddCatModal;
+    window.addItemToCategory = addItemToCategory;
+    window.confirmAddItem = confirmAddItem;
+    window.closeAddItemModal = closeAddItemModal;
+    window.updateItemResponse = updateItemResponse;
+    window.deleteItem = deleteItem;
+    window.deleteCategory = deleteCategory;
+    window.resetCurrentTab = resetCurrentTab;
+    window.showCompareTab = showCompareTab;
+    window.toggleCategory = toggleCategory;
 
     // Keyboard support
     document.addEventListener('keydown', function(e) {
