@@ -135,7 +135,7 @@
 
   <!-- Tabs -->
   <div class="tabs-nav" id="tabsNav">
-    <button class="tab-btn active" onclick="switchTab('protocol', this)">Sub Protocol</button>
+    <button class="tab-btn active" onclick="switchTab('protocol', this)">BDSM Checklist</button>
     <button class="tab-btn" onclick="switchTab('predicament', this)">Predicament Bondage</button>
     <button class="tab-btn" onclick="switchTab('publicplay', this)">Public Play</button>
     <button class="tab-btn" onclick="switchTab('compare', this)">Compare</button>
@@ -636,7 +636,7 @@
       let agreements = 0;
 
       ['protocol', 'predicament', 'publicplay'].forEach(areaKey => {
-        const areaLabel = areaKey === 'protocol' ? 'Sub Protocol' : areaKey === 'predicament' ? 'Predicament Bondage' : 'Public Play';
+        const areaLabel = areaKey === 'protocol' ? 'BDSM Checklist' : areaKey === 'predicament' ? 'Predicament Bondage' : 'Public Play';
         const myArea = assessmentsData[areaKey] || { cats: [] };
         const pArea = partnerData[areaKey] || { cats: [] };
 
