@@ -3728,6 +3728,7 @@ const MODES = {
 function startMode(mode) {
   appMode = mode;
   applyMode();
+  updateProgress();  // ensure step sub + CTA reflect current step after mode switch
   dismissIntro();
 }
 
