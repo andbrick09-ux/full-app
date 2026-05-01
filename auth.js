@@ -233,31 +233,34 @@ export async function unpair() {
 
 /**
  * Returns a Firestore document reference for the current user's data.
- * Path structure: /data/{uid}/userdata/{path}
  *
- * FIX: Previously used doc(db, 'data', uid, ...path.split('/')) which produced
- * an invalid path ending on a subcollection (even number of segments).
- * Now inserts 'userdata' as the subcollection name so every call lands on
- * a valid document: /data/{uid}/userdata/settings, etc.
+ * FIX: Previously used /data/{uid}/userdata/{path} which produced 4 segments —
+ * an even number — making it a document path that Firestore rejected as a
+ * collection reference. Now uses /users/{uid}/{path} giving 3 segments (odd),
+ * which is a valid collection reference.
  *
- * Usage: dataRef('settings')  →  /data/{uid}/userdata/settings
+ * Usage: dataRef('settings')  →  /users/{uid}/settings
  */
 export function dataRef(path) {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error('Not authenticated');
-  return doc(db, 'data', uid, 'userdata', ...path.split('/'));
+  return doc(db, 'users', uid, ...path.split('/'));
 }
 
 /**
  * Returns a Firestore collection reference for the current user's data.
- * Path structure: /data/{uid}/userdata/{path}
  *
- * Usage: dataCol('scenes')  →  /data/{uid}/userdata/scenes
+ * FIX: Previously used /data/{uid}/userdata/{path} which produced 4 segments —
+ * an even number — making Firestore reject it as an invalid collection reference.
+ * Now uses /users/{uid}/{path} giving 3 segments (odd), which is valid.
+ *
+ * Usage: dataCol('notes')   →  /users/{uid}/notes
+ *        dataCol('scenes')  →  /users/{uid}/scenes
  */
 export function dataCol(path) {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error('Not authenticated');
-  return collection(db, 'data', uid, 'userdata', ...path.split('/'));
+  return collection(db, 'users', uid, ...path.split('/'));
 }
 
 /**
@@ -266,13 +269,13 @@ export function dataCol(path) {
 export async function partnerDataRef(path) {
   const partnerUid = await getPartnerUid();
   if (!partnerUid) throw new Error('No partner linked');
-  return doc(db, 'data', partnerUid, 'userdata', ...path.split('/'));
+  return doc(db, 'users', partnerUid, ...path.split('/'));
 }
 
 export async function partnerDataCol(path) {
   const partnerUid = await getPartnerUid();
   if (!partnerUid) throw new Error('No partner linked');
-  return collection(db, 'data', partnerUid, 'userdata', ...path.split('/'));
+  return collection(db, 'users', partnerUid, ...path.split('/'));
 }
 
 /**
@@ -280,6 +283,6 @@ export async function partnerDataCol(path) {
  * Returns the settings data object, or {} if not found.
  */
 export async function getSettings(uid) {
-  const snap = await getDoc(doc(db, 'data', uid, 'userdata', 'settings'));
+  const snap = await getDoc(doc(db, 'users', uid, 'settings'));
   return snap.exists() ? snap.data() : {};
 }
