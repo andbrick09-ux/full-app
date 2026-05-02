@@ -294,6 +294,92 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
 
 .dsh-more-sheet:not(.open) .dsh-sheet-handle { display: none; }
 
+/* ── SEGMENTED CONTROL (Tried It?) ── */
+.seg-control { display: flex; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 8px; overflow: hidden; }
+.seg-btn { flex: 1; background: none; border: none; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.3px; padding: 7px 4px; cursor: pointer; transition: all 0.18s ease; text-align: center; line-height: 1.2; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--glass-border); }
+.seg-btn:active { opacity: 0.7; }
+.seg-btn.active-yes { background: var(--success-dim); color: var(--success); }
+.seg-btn.active-want { background: var(--gold-dim); color: var(--gold); }
+.seg-btn.active-no { background: var(--danger-dim); color: #e74c3c; }
+
+/* ── RATING ICONS ── */
+.rating-row { display: flex; gap: 5px; }
+.rating-opt { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 8px; padding: 7px 3px; cursor: pointer; transition: all 0.18s ease; -webkit-tap-highlight-color: transparent; }
+.rating-opt .r-icon { font-size: 16px; transition: transform 0.18s ease; line-height: 1; }
+.rating-opt .r-lbl { font-size: 9px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.2px; text-align: center; line-height: 1.2; transition: color 0.18s; }
+.rating-opt.active-loved { background: var(--success-dim); border-color: rgba(39,174,96,0.35); }
+.rating-opt.active-loved .r-icon { transform: scale(1.25); filter: drop-shadow(0 0 6px rgba(39,174,96,0.5)); }
+.rating-opt.active-loved .r-lbl { color: var(--success); }
+.rating-opt.active-liked { background: var(--blue-dim); border-color: var(--blue-border); }
+.rating-opt.active-liked .r-icon { transform: scale(1.2); filter: drop-shadow(0 0 5px rgba(93,173,226,0.5)); }
+.rating-opt.active-liked .r-lbl { color: var(--blue); }
+.rating-opt.active-meh { background: rgba(149,165,166,0.08); border-color: rgba(149,165,166,0.2); }
+.rating-opt.active-meh .r-icon { transform: scale(1.1); }
+.rating-opt.active-meh .r-lbl { color: #95a5a6; }
+.rating-opt.active-na { background: rgba(127,140,141,0.06); border-color: rgba(127,140,141,0.15); }
+.rating-opt.active-na .r-lbl { color: #7f8c8d; }
+
+/* ── SMART BADGE (Do Again?) ── */
+.smart-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; cursor: pointer; transition: all 0.18s ease; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.04); color: var(--text-muted); user-select: none; -webkit-tap-highlight-color: transparent; }
+.smart-badge:hover { border-color: var(--gold-border); }
+.smart-badge .sb-arrow { font-size: 9px; opacity: 0.6; }
+.smart-badge.sb-fetish { background: var(--purple-dim); border-color: var(--purple-border); color: var(--purple); }
+.smart-badge.sb-yes { background: var(--success-dim); border-color: rgba(39,174,96,0.3); color: var(--success); }
+.smart-badge.sb-maybe { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+.smart-badge.sb-soft { background: var(--warn-dim); border-color: rgba(230,126,34,0.3); color: var(--warn); }
+.smart-badge.sb-hard { background: var(--danger-dim); border-color: rgba(192,57,43,0.35); color: #e74c3c; }
+.smart-badge.sb-na { background: rgba(127,140,141,0.08); border-color: rgba(127,140,141,0.15); color: #7f8c8d; }
+
+/* ── AGAIN BOTTOM SHEET ── */
+.again-sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 860; backdrop-filter: blur(4px); align-items: flex-end; justify-content: center; }
+.again-sheet-overlay.open { display: flex; }
+.again-sheet { background: var(--midnight-mid); border: 1px solid var(--gold-border); border-radius: 20px 20px 0 0; padding: 14px 16px 36px; width: 100%; max-width: 560px; }
+.again-sheet-handle { width: 36px; height: 4px; background: var(--gold-border); border-radius: 2px; margin: 0 auto 14px; }
+.again-sheet-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); text-align: center; margin-bottom: 14px; }
+.again-option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; cursor: pointer; transition: opacity 0.15s; margin-bottom: 6px; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
+.again-option:active { opacity: 0.75; }
+.again-option:last-child { margin-bottom: 0; }
+.again-option .ao-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.again-option .ao-label { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 600; flex: 1; }
+.again-option .ao-desc { font-size: 10px; color: var(--text-muted); }
+.again-option.ao-fetish { background: var(--purple-dim); border-color: var(--purple-border); }
+.again-option.ao-fetish .ao-dot { background: var(--purple); }
+.again-option.ao-fetish .ao-label { color: var(--purple); }
+.again-option.ao-yes { background: var(--success-dim); border-color: rgba(39,174,96,0.2); }
+.again-option.ao-yes .ao-dot { background: var(--success); }
+.again-option.ao-yes .ao-label { color: var(--success); }
+.again-option.ao-maybe { background: var(--gold-dim); border-color: rgba(212,175,55,0.15); }
+.again-option.ao-maybe .ao-dot { background: var(--gold); }
+.again-option.ao-maybe .ao-label { color: var(--gold); }
+.again-option.ao-soft { background: var(--warn-dim); border-color: rgba(230,126,34,0.2); }
+.again-option.ao-soft .ao-dot { background: var(--warn); }
+.again-option.ao-soft .ao-label { color: var(--warn); }
+.again-option.ao-hard { background: var(--danger-dim); border-color: rgba(192,57,43,0.2); }
+.again-option.ao-hard .ao-dot { background: #e74c3c; }
+.again-option.ao-hard .ao-label { color: #e74c3c; }
+.again-option.ao-na { background: rgba(127,140,141,0.06); border-color: rgba(127,140,141,0.1); }
+.again-option.ao-na .ao-dot { background: #7f8c8d; }
+.again-option.ao-na .ao-label { color: #7f8c8d; }
+.again-option.ao-clear { background: rgba(255,255,255,0.02); border-color: var(--glass-border); }
+.again-option.ao-clear .ao-dot { background: var(--text-muted); }
+.again-option.ao-clear .ao-label { color: var(--text-muted); }
+
+/* ── TAB GRID MODAL ── */
+.tab-grid-btn { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--text-muted); font-size: 14px; padding: 5px 10px; cursor: pointer; flex-shrink: 0; transition: var(--transition); }
+.tab-grid-btn:hover { border-color: var(--gold-border); color: var(--gold); }
+.tab-grid-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 850; backdrop-filter: blur(4px); align-items: flex-end; justify-content: center; }
+.tab-grid-overlay.open { display: flex; }
+.tab-grid-sheet { background: var(--midnight-mid); border: 1px solid var(--gold-border); border-radius: 20px 20px 0 0; padding: 14px 16px 36px; width: 100%; max-width: 600px; max-height: 70vh; overflow-y: auto; }
+.tab-grid-handle { width: 36px; height: 4px; background: var(--gold-border); border-radius: 2px; margin: 0 auto 14px; }
+.tab-grid-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); text-align: center; margin-bottom: 14px; }
+.tab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tab-grid-item { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 8px; cursor: pointer; text-align: center; transition: var(--transition); -webkit-tap-highlight-color: transparent; }
+.tab-grid-item:hover { border-color: var(--gold-border); background: var(--gold-dim); }
+.tgi-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); line-height: 1.3; }
+.tgi-prog { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.tgi-prog.full { color: var(--success); }
+
 @media (max-width: 500px) {
   .response-grid { grid-template-columns: 1fr; }
   .pub-grid { grid-template-columns: 1fr; }
@@ -364,7 +450,8 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
   <div class="search-results-panel" id="searchResultsPanel"></div>
 
   <!-- Tabs -->
-  <div class="tab-bar" id="tabBar">
+  <div style="display:flex;align-items:flex-start;gap:6px;">
+  <div class="tab-bar" id="tabBar" style="flex:1;">
     <button class="tab-btn active" data-tab="special" onclick="showTab('special',this)">⭐ Special</button>
     <button class="tab-btn" data-tab="Bondage" onclick="showTab('Bondage',this)">Bondage</button>
     <button class="tab-btn" data-tab="Bodily Fluid" onclick="showTab('Bodily Fluid',this)">Bodily Fluid</button>
@@ -379,6 +466,8 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
     <button class="tab-btn" data-tab="Voyeurism/Exhibitionism" onclick="showTab('Voyeurism/Exhibitionism',this)">Voyeur/Exhib</button>
     <button class="tab-btn" data-tab="Service and Restrictive Behaviour" onclick="showTab('Service and Restrictive Behaviour',this)">Service</button>
     <button class="tab-btn" data-tab="Kinks" onclick="showTab('Kinks',this)">Kinks</button>
+  </div>
+  <button class="tab-grid-btn" onclick="openTabGrid()" title="All categories" style="margin-top:8px;flex-shrink:0;">⊞</button>
   </div>
 
   <!-- Special panel -->
@@ -448,6 +537,24 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
   <div class="swipe-nav">
     <button class="swipe-nav-btn prev" id="swipePrev" onclick="swipeMove(-1)">← Prev</button>
     <button class="swipe-nav-btn next" id="swipeNext" onclick="swipeMove(1)">Next →</button>
+  </div>
+</div>
+
+<!-- Again Bottom Sheet -->
+<div class="again-sheet-overlay" id="againSheetOverlay" onclick="closeAgainSheet(event)">
+  <div class="again-sheet">
+    <div class="again-sheet-handle"></div>
+    <div class="again-sheet-title">Do Again?</div>
+    <div id="againSheetOptions"></div>
+  </div>
+</div>
+
+<!-- Tab Grid Modal -->
+<div class="tab-grid-overlay" id="tabGridOverlay" onclick="closeTabGrid(event)">
+  <div class="tab-grid-sheet">
+    <div class="tab-grid-handle"></div>
+    <div class="tab-grid-title">All Categories</div>
+    <div class="tab-grid" id="tabGridContent"></div>
   </div>
 </div>
 
@@ -528,8 +635,8 @@ window.schedSave = function(){
   saveTimer=setTimeout(doSave,450);
 };
 async function doSave(){
-  // Sync all tagged elements into myData
-  document.querySelectorAll('[data-sk]').forEach(el=>{
+  // Sync textarea values tagged data-sk into myData
+  document.querySelectorAll('textarea[data-sk]').forEach(el=>{
     myData[el.dataset.sk]=el.value;
   });
   try{
@@ -618,7 +725,6 @@ function buildCard(cat,item,isCustom=false){
   const sBadge=myData[key+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
   const delBtn=isCustom?`<button class="del-btn" onclick="event.stopPropagation();delCustom('${item.id}')" title="Remove">✕</button>`:'';
   const flagged=myData[key+'.flagged']?'flagged':'';
-
   const meCls=`mine ${myRole}-me`;
   const thCls=`theirs ${pPfx}-partner`;
 
@@ -637,14 +743,17 @@ function buildCard(cat,item,isCustom=false){
       <div class="response-grid">
         <div class="response-col ${meCls}">
           <div class="col-title">${myName} (you)</div>
-          <div class="field-row"><div class="field-label">Tried it?</div>
-            <select class="field-select" data-sk="${key}.t" onchange="onFC(this,'${key}.t')">${trOpts(myT)}</select>
+          <div class="field-row">
+            <div class="field-label">Tried it?</div>
+            ${segControl(key+'.t', myT)}
           </div>
-          <div class="field-row"><div class="field-label">Rating</div>
-            <select class="field-select" data-sk="${key}.r" onchange="onFC(this,'${key}.r')">${rtOpts(myR)}</select>
+          <div class="field-row">
+            <div class="field-label">Rating</div>
+            ${ratingIcons(key+'.r', myR)}
           </div>
-          <div class="field-row"><div class="field-label">Do again?</div>
-            <select class="field-select" data-sk="${key}.a" onchange="onFC(this,'${key}.a')">${agOpts(myA)}</select>
+          <div class="field-row">
+            <div class="field-label">Do again?</div>
+            ${smartBadgeHtml(key+'.a', myA)}
           </div>
           <div class="field-row" style="margin-top:6px;">
             <div class="private-note-label"><span class="lock">🔒</span> Private note (only you)</div>
@@ -668,6 +777,50 @@ function buildCard(cat,item,isCustom=false){
 </div>`;
 }
 
+// ── Segmented control for Tried It? ──
+function segControl(sk, val){
+  const isYes=val==='Yes', isWant=val==='No but I want to', isNo=val==="No and I don't want to";
+  return `<div class="seg-control">
+    <button class="seg-btn${isYes?' active-yes':''}" onclick="setSeg(this,'${sk}','Yes')" data-sk-seg="${sk}">Yes</button>
+    <button class="seg-btn${isWant?' active-want':''}" onclick="setSeg(this,'${sk}','No but I want to')" data-sk-seg="${sk}">Want to</button>
+    <button class="seg-btn${isNo?' active-no':''}" onclick="setSeg(this,'${sk}',${"\"No and I don't want to\""})" data-sk-seg="${sk}">No</button>
+  </div>`;
+}
+
+// ── Rating icon row ──
+const RATING_OPTS=[
+  {val:'Loved it',icon:'❤️',lbl:'Loved',cls:'active-loved'},
+  {val:'Liked it',icon:'👍',lbl:'Liked',cls:'active-liked'},
+  {val:'Take it or leave it',icon:'😐',lbl:'Neutral',cls:'active-meh'},
+  {val:'Not Applicable',icon:'—',lbl:'N/A',cls:'active-na'},
+];
+function ratingIcons(sk,val){
+  return `<div class="rating-row">${RATING_OPTS.map(o=>`
+    <div class="rating-opt${val===o.val?' '+o.cls:''}" onclick="setRating(this,'${sk}','${o.val}')" data-sk-rating="${sk}">
+      <span class="r-icon">${o.icon}</span>
+      <span class="r-lbl">${o.lbl}</span>
+    </div>`).join('')}</div>`;
+}
+
+// ── Smart badge for Do Again? ──
+const AGAIN_OPTS=[
+  {val:'Fetish/Need',cls:'sb-fetish',label:'⚡ Fetish/Need'},
+  {val:'Yes',cls:'sb-yes',label:'✓ Yes'},
+  {val:'Maybe',cls:'sb-maybe',label:'~ Maybe'},
+  {val:'Unlikely. Soft Limit',cls:'sb-soft',label:'⚠ Soft Limit'},
+  {val:'Never. Hard Limit',cls:'sb-hard',label:'✕ Hard Limit'},
+  {val:'Not Applicable',cls:'sb-na',label:'— N/A'},
+];
+function smartBadgeHtml(sk,val){
+  const opt=AGAIN_OPTS.find(o=>o.val===val);
+  const label=opt?opt.label:'Tap to set…';
+  const cls=opt?opt.cls:'';
+  return `<div class="smart-badge ${cls}" onclick="openAgainSheet('${sk}')" data-sk-again="${sk}">
+    <span class="sb-label">${label}</span>
+    <span class="sb-arrow">▾</span>
+  </div>`;
+}
+
 function getAccent(myA,pA,myR,pR,isCustom,flagged){
   if(isCustom)return'custom-item';
   if(flagged)return'scene-flagged';
@@ -678,53 +831,114 @@ function getAccent(myA,pA,myR,pR,isCustom,flagged){
 }
 
 function updateAllCardAccents(){
+  const pPfx=myRole==='dom'?'sub':'dom';
   document.querySelectorAll('.activity-card[data-cat]').forEach(card=>{
     const cat=card.dataset.cat,act=card.dataset.act;
     const key=ik(cat,act);
-    const pPfx=myRole==='dom'?'sub':'dom';
-    const myA=myData[key+'.a']??'',pA=partnerData[key+'.a']??'';
-    const myR=myData[key+'.r']??'',pR=partnerData[key+'.r']??'';
+    const item=BASE[cat]?.find(i=>i.a===act);
+    const myA=myData[key+'.a']??(item?bv(item,myRole,'A'):'')??'';
+    const pA=partnerData[key+'.a']??(item?bv(item,pPfx,'A'):'')??'';
+    const myR=myData[key+'.r']??(item?bv(item,myRole,'R'):'')??'';
+    const pR=partnerData[key+'.r']??(item?bv(item,pPfx,'R'):'')??'';
     const isCustom=card.classList.contains('custom-item');
-    const flagged=myData[key+'.flagged'];
     card.classList.remove('hard-limit','fetish-flag','loved-both','scene-flagged','custom-item');
-    const accent=getAccent(myA,pA,myR,pR,isCustom,flagged);
+    const accent=getAccent(myA,pA,myR,pR,isCustom,myData[key+'.flagged']);
     if(accent)card.classList.add(accent);
-    // Update badge-row
+    if(isCustom)card.classList.add('custom-item');
+    // Update badge row
     const br=card.querySelector('.badge-row');
     if(br){
       const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
       const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
+      const sBadge=myData[key+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
       const cBadge=isCustom?`<span class="badge custom">Custom</span>`:'';
-      const sBadge=flagged?`<span class="badge scene">⚑ Scene</span>`:'';
       br.innerHTML=myBadge+pBadge+cBadge+sBadge;
     }
-    // Update partner col values
-    card.querySelectorAll('.partner-val').forEach((el,i)=>{
-      const vals=[pT,pR,pA];
-      function getPVals(){
-        const pT2=partnerData[key+'.t']??bv({},pPfx,'T')??'';
-        const pR2=partnerData[key+'.r']??bv({},pPfx,'R')??'';
-        const pA2=partnerData[key+'.a']??bv({},pPfx,'A')??'';
-        return[pT2,pR2,pA2];
-      }
-      const pv=getPVals();
-      el.textContent=v(pv[i])||'—';el.className='partner-val'+(v(pv[i])?'':' empty');
-    });
+    // Update partner column read-only values
+    const pT=partnerData[key+'.t']??(item?bv(item,pPfx,'T'):'')??'';
+    const pNs=partnerData[key+'.ns']??'';
+    const theirCol=card.querySelector('.theirs');
+    if(theirCol){
+      const vals=theirCol.querySelectorAll('.partner-val');
+      const pData=[pT,pR,pA];
+      vals.forEach((el,i)=>{el.textContent=v(pData[i])||'—';el.className='partner-val'+(v(pData[i])?'':' empty');});
+      const existNote=theirCol.querySelector('.partner-note');
+      if(existNote)existNote.textContent=pNs;
+    }
   });
   applyFilters();
 }
 
-// ═══ SELECT OPTIONS ═══
-function o(val,lbl,sel){return`<option value="${val}"${sel===val?' selected':''}>${lbl}</option>`;}
-function trOpts(s){return[o('','— not set —',s),o('Yes','Yes',s),o('No but I want to','No but I want to',s),o("No and I don't want to","No and I don't want to",s)].join('');}
-function rtOpts(s){return[o('','— not set —',s),o('Loved it','Loved it',s),o('Liked it','Liked it',s),o('Take it or leave it','Take it or leave it',s),o('Not Applicable','Not Applicable',s)].join('');}
-function agOpts(s){return[o('','— not set —',s),o('Fetish/Need','Fetish/Need',s),o('Yes','Yes',s),o('Maybe','Maybe',s),o('Unlikely. Soft Limit','Unlikely (Soft Limit)',s),o('Never. Hard Limit','Never (Hard Limit)',s),o('Not Applicable','Not Applicable',s)].join('');}
+// ═══ CONTROL HANDLERS ═══
 
-// ═══ FIELD CHANGE ═══
-window.onFC=function(el,key){
-  myData[key]=el.value;
-  schedSave();
-  const sid=key.replace(/\.[tran]s?$/,'').replace(/[^a-z0-9]/gi,'_');
+// Segmented control
+window.setSeg=function(btn,sk,val){
+  myData[sk]=val; schedSave();
+  const group=btn.closest('.seg-control');
+  group.querySelectorAll('.seg-btn').forEach(b=>b.className='seg-btn');
+  if(val==='Yes')btn.className='seg-btn active-yes';
+  else if(val==='No but I want to')btn.className='seg-btn active-want';
+  else btn.className='seg-btn active-no';
+  onFCKey(sk);
+};
+
+// Rating icons
+window.setRating=function(el,sk,val){
+  myData[sk]=val; schedSave();
+  const row=el.closest('.rating-row');
+  row.querySelectorAll('.rating-opt').forEach(o=>{
+    o.classList.remove('active-loved','active-liked','active-meh','active-na');
+  });
+  const cls=RATING_OPTS.find(o=>o.val===val)?.cls;
+  if(cls)el.classList.add(cls);
+  onFCKey(sk);
+};
+
+// Smart badge / Again sheet
+let againSheetKey=null;
+window.openAgainSheet=function(sk){
+  againSheetKey=sk;
+  const current=myData[sk]??'';
+  const SHEET_OPTS=[
+    {val:'Fetish/Need',cls:'ao-fetish',label:'⚡ Fetish/Need',desc:'Can\'t stop thinking about it'},
+    {val:'Yes',cls:'ao-yes',label:'✓ Yes',desc:'Happy to do again'},
+    {val:'Maybe',cls:'ao-maybe',label:'~ Maybe',desc:'Open to it with discussion'},
+    {val:'Unlikely. Soft Limit',cls:'ao-soft',label:'⚠ Soft Limit',desc:'Unlikely but negotiable'},
+    {val:'Never. Hard Limit',cls:'ao-hard',label:'✕ Hard Limit',desc:'This is a firm boundary'},
+    {val:'Not Applicable',cls:'ao-na',label:'— Not Applicable',desc:'Doesn\'t apply'},
+    {val:'',cls:'ao-clear',label:'Clear / Not set',desc:''},
+  ];
+  document.getElementById('againSheetOptions').innerHTML=SHEET_OPTS.map(o=>`
+    <div class="again-option ${o.cls}${current===o.val?' selected':''}" onclick="pickAgain('${o.val}')">
+      <div class="ao-dot"></div>
+      <div class="ao-label">${o.label}</div>
+      ${o.desc?`<div class="ao-desc">${o.desc}</div>`:''}
+    </div>`).join('');
+  document.getElementById('againSheetOverlay').classList.add('open');
+};
+window.closeAgainSheet=function(e){
+  if(!e||e.target===document.getElementById('againSheetOverlay'))
+    document.getElementById('againSheetOverlay').classList.remove('open');
+};
+window.pickAgain=function(val){
+  if(!againSheetKey)return;
+  myData[againSheetKey]=val; schedSave();
+  // Update the smart badge in the card
+  const badge=document.querySelector(`[data-sk-again="${againSheetKey}"]`);
+  if(badge){
+    const opt=AGAIN_OPTS.find(o=>o.val===val);
+    badge.className='smart-badge '+(opt?opt.cls:'');
+    badge.querySelector('.sb-label').textContent=opt?opt.label:'Tap to set…';
+  }
+  onFCKey(againSheetKey);
+  document.getElementById('againSheetOverlay').classList.remove('open');
+};
+
+// Common post-change update (takes the storage key, works out the card key)
+function onFCKey(sk){
+  // sk format: "Cat||Activity.field" — strip the .field suffix
+  const cardKey=sk.replace(/\.[a-z]{1,3}$/,'');
+  const sid=cardKey.replace(/[^a-z0-9]/gi,'_');
   const card=document.getElementById('c_'+sid);
   if(card){
     const cat=card.dataset.cat,act=card.dataset.act;
@@ -735,8 +949,53 @@ window.onFC=function(el,key){
     card.classList.remove('hard-limit','fetish-flag','loved-both','scene-flagged');
     const accent=getAccent(myA,pA,myR,pR,false,myData[k+'.flagged']);
     if(accent)card.classList.add(accent);
+    // Update badge row
+    const br=card.querySelector('.badge-row');
+    if(br){
+      const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
+      const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
+      const sBadge=myData[k+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
+      const cBadge=card.classList.contains('custom-item')?`<span class="badge custom">Custom</span>`:'';
+      br.innerHTML=myBadge+pBadge+cBadge+sBadge;
+    }
   }
   buildStats();buildSharedFetishes();updateTabProgress();buildCompat();applyFilters();
+}
+
+// Tab Grid Modal
+window.openTabGrid=function(){
+  const grid=document.getElementById('tabGridContent');
+  const pPfx=myRole==='dom'?'sub':'dom';
+  const cats=['special',...ALL_CATS,...[...new Set(customItems.map(i=>i.category).filter(c=>!ALL_CATS.includes(c)))]];
+  grid.innerHTML=cats.map(cat=>{
+    const items=BASE[cat];
+    let prog='',progCls='';
+    if(items){
+      let responded=0;
+      items.forEach(item=>{
+        const key=ik(cat,item.a);
+        if(myData[key+'.t']||myData[key+'.r']||myData[key+'.a']||bv(item,myRole,'T')||bv(item,myRole,'R')||bv(item,myRole,'A'))responded++;
+      });
+      const full=responded===items.length;
+      prog=`${responded}/${items.length}`;
+      progCls=full?' full':'';
+    }
+    const label=cat==='special'?'⭐ Special':cat==='Dominance/submission'?'D/s':cat==='Voyeurism/Exhibitionism'?'Voyeur/Exhib':cat==='Service and Restrictive Behaviour'?'Service':cat;
+    return `<div class="tab-grid-item" onclick="pickTabFromGrid('${esc(cat)}')">
+      <div class="tgi-name">${label}</div>
+      ${prog?`<div class="tgi-prog${progCls}">${prog}</div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('tabGridOverlay').classList.add('open');
+};
+window.closeTabGrid=function(e){
+  if(!e||e.target===document.getElementById('tabGridOverlay'))
+    document.getElementById('tabGridOverlay').classList.remove('open');
+};
+window.pickTabFromGrid=function(cat){
+  const btn=document.querySelector(`.tab-btn[data-tab="${cat}"]`);
+  if(btn)showTab(cat,btn);
+  document.getElementById('tabGridOverlay').classList.remove('open');
 };
 
 // ═══ FLAG FOR SCENE ═══
@@ -749,17 +1008,18 @@ window.toggleFlag=function(key){
     const flagged=myData[key+'.flagged'];
     const btn=card.querySelector('.flag-btn');
     if(btn)btn.classList.toggle('flagged',flagged);
-    card.classList.remove('hard-limit','fetish-flag','loved-both','scene-flagged','custom-item');
     const cat=card.dataset.cat,act=card.dataset.act;
     const k=ik(cat,act);
-    const pPfx=myRole==='dom'?'sub':'dom';
     const myA=myData[k+'.a']??'',pA=partnerData[k+'.a']??'';
     const myR=myData[k+'.r']??'',pR=partnerData[k+'.r']??'';
+    card.classList.remove('hard-limit','fetish-flag','loved-both','scene-flagged','custom-item');
     const accent=getAccent(myA,pA,myR,pR,false,flagged);
     if(accent)card.classList.add(accent);
     const br=card.querySelector('.badge-row');
-    if(br&&flagged)br.insertAdjacentHTML('beforeend','<span class="badge scene">⚑ Scene</span>');
-    else if(br){br.querySelectorAll('.badge.scene').forEach(b=>b.remove());}
+    if(br){
+      if(flagged)br.insertAdjacentHTML('beforeend','<span class="badge scene">⚑ Scene</span>');
+      else br.querySelectorAll('.badge.scene').forEach(b=>b.remove());
+    }
   }
   toast(myData[key+'.flagged']?'⚑ Flagged for scene':'Flag removed');
   applyFilters();
