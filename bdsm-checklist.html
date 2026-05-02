@@ -169,7 +169,7 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
 
 /* CARD BODY — animated */
 .card-body { max-height: 0; overflow: hidden; transition: max-height 0.28s ease; border-top: 0px solid var(--glass-border); }
-.activity-card.open .card-body { max-height: 800px; border-top: 1px solid var(--glass-border); }
+.activity-card.open .card-body { max-height: 1200px; border-top: 1px solid var(--glass-border); }
 .card-body-inner { padding: 0 13px 13px; }
 
 /* RESPONSE GRID */
@@ -797,14 +797,21 @@ function buildCard(cat,item,isCustom=false){
 </div>`;
 }
 
+// ── Switch role row ──
+const SWITCH_OPTS=['Giving','Receiving','Both','Wearing','Others Wearing'];
+function switchRow(sk,val){
+  return `<div class="switch-row">${SWITCH_OPTS.map(o=>`<div class="switch-opt${val===o?' active-sw':''}" onclick="setSwitchOpt(this,'${sk}','${o}')" data-sk-sw="${sk}">${o}</div>`).join('')}</div>`;
+}
+
 // ── Segmented control for Tried It? ──
+const SEG_NO = "No and I don't want to";
 function segControl(sk, val){
-  const isYes=val==='Yes', isWant=val==='No but I want to', isNo=val==="No and I don't want to";
-  return `<div class="seg-control">
-    <button class="seg-btn${isYes?' active-yes':''}" onclick="setSeg(this,'${sk}','Yes')" data-sk-seg="${sk}">Yes</button>
-    <button class="seg-btn${isWant?' active-want':''}" onclick="setSeg(this,'${sk}','No but I want to')" data-sk-seg="${sk}">Want to</button>
-    <button class="seg-btn${isNo?' active-no':''}" onclick="setSeg(this,'${sk}',${"\"No and I don't want to\""})" data-sk-seg="${sk}">No</button>
-  </div>`;
+  const isYes=val==='Yes', isWant=val==='No but I want to', isNo=val===SEG_NO;
+  return '<div class="seg-control">' +
+    `<button class="seg-btn${isYes?' active-yes':''}" onclick="setSeg(this,'${sk}','Yes')" data-sk-seg="${sk}">Yes</button>` +
+    `<button class="seg-btn${isWant?' active-want':''}" onclick="setSeg(this,'${sk}','No but I want to')" data-sk-seg="${sk}">Want to</button>` +
+    `<button class="seg-btn${isNo?' active-no':''}" onclick="setSeg(this,'${sk}',SEG_NO)" data-sk-seg="${sk}">No</button>` +
+    '</div>';
 }
 
 // ── Rating icon row ──
@@ -889,14 +896,16 @@ function updateAllCardAccents(){
   applyFilters();
 }
 
-// ── Switch role row ──
-const SWITCH_OPTS=['Giving','Receiving','Both','Wearing','Others Wearing'];
-function switchRow(sk,val){
-  return `<div class="switch-row">${SWITCH_OPTS.map(o=>`
-    <div class="switch-opt${val===o?' active-sw':''}" onclick="setSwitchOpt(this,'${sk}','${o}')" data-sk-sw="${sk}">${o}</div>`).join('')}
-  </div>`;
-}
+// ═══ CONTROL HANDLERS ═══
+
 window.setSwitchOpt=function(el,sk,val){
+  const isActive=el.classList.contains('active-sw');
+  const newVal=isActive?'':val;
+  myData[sk]=newVal; schedSave();
+  const row=el.closest('.switch-row');
+  row.querySelectorAll('.switch-opt').forEach(o=>o.classList.remove('active-sw'));
+  if(!isActive)el.classList.add('active-sw');
+};
   // Toggle off if already selected
   const isActive=el.classList.contains('active-sw');
   const newVal=isActive?'':val;
