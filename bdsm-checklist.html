@@ -294,6 +294,12 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
 
 .dsh-more-sheet:not(.open) .dsh-sheet-handle { display: none; }
 
+/* ── SWITCH ROLE ── */
+.switch-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.switch-opt { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 7px; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.3px; padding: 5px 9px; cursor: pointer; transition: all 0.18s ease; -webkit-tap-highlight-color: transparent; }
+.switch-opt:active { opacity: 0.7; }
+.switch-opt.active-sw { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+
 /* ── SEGMENTED CONTROL (Tried It?) ── */
 .seg-control { display: flex; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 8px; overflow: hidden; }
 .seg-btn { flex: 1; background: none; border: none; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.3px; padding: 7px 4px; cursor: pointer; transition: all 0.18s ease; text-align: center; line-height: 1.2; }
@@ -617,7 +623,12 @@ function bCls(x){
   if(l.includes('no and'))return'no';return'';
 }
 function ik(cat,act){ return `${cat}||${act}`; }
-function bv(item,role,f){ const k=(role==='dom'?'d':'s')+f; return item[k]??''; }
+function bv(item,role,f){
+  // f is T, R, A, or S (Switch)
+  const prefix=role==='dom'?'d':'s';
+  if(f==='S') return item[prefix+'Switch']??item[prefix+'switch']??'';
+  return item[prefix+f]??'';
+}
 function toast(msg,err){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast'+(err?' err':'')+' show';
@@ -711,11 +722,13 @@ function buildCard(cat,item,isCustom=false){
   const myT=myData[key+'.t']??bv(item,myRole,'T')??'';
   const myR=myData[key+'.r']??bv(item,myRole,'R')??'';
   const myA=myData[key+'.a']??bv(item,myRole,'A')??'';
+  const mySw=myData[key+'.sw']??bv(item,myRole,'S')??'';
   const myN=myData[key+'.n']??'';
   const myNs=myData[key+'.ns']??'';
   const pT=partnerData[key+'.t']??bv(item,pPfx,'T')??'';
   const pR=partnerData[key+'.r']??bv(item,pPfx,'R')??'';
   const pA=partnerData[key+'.a']??bv(item,pPfx,'A')??'';
+  const pSw=partnerData[key+'.sw']??bv(item,pPfx,'S')??'';
   const pNs=partnerData[key+'.ns']??'';
 
   const accent=getAccent(myA,pA,myR,pR,isCustom,myData[key+'.flagged']);
@@ -755,6 +768,10 @@ function buildCard(cat,item,isCustom=false){
             <div class="field-label">Do again?</div>
             ${smartBadgeHtml(key+'.a', myA)}
           </div>
+          <div class="field-row">
+            <div class="field-label">My role</div>
+            ${switchRow(key+'.sw', mySw)}
+          </div>
           <div class="field-row" style="margin-top:6px;">
             <div class="private-note-label"><span class="lock">🔒</span> Private note (only you)</div>
             <textarea class="notes-area" rows="2" placeholder="Your private thoughts…" data-sk="${key}.n" oninput="schedSave()">${myN}</textarea>
@@ -769,6 +786,7 @@ function buildCard(cat,item,isCustom=false){
           <div class="field-row"><div class="field-label">Tried it?</div><div class="partner-val ${!v(pT)?'empty':''}">${v(pT)||'—'}</div></div>
           <div class="field-row"><div class="field-label">Rating</div><div class="partner-val ${!v(pR)?'empty':''}">${v(pR)||'—'}</div></div>
           <div class="field-row"><div class="field-label">Do again?</div><div class="partner-val ${!v(pA)?'empty':''}">${v(pA)||'—'}</div></div>
+          <div class="field-row"><div class="field-label">Their role</div><div class="partner-val ${!v(pSw)?'empty':''}">${v(pSw)||'—'}</div></div>
           ${v(pNs)?`<div class="field-row" style="margin-top:6px;"><div class="field-label">💬 Their note to you</div><div class="partner-note">${pNs}</div></div>`:''}
         </div>
       </div>
@@ -869,7 +887,22 @@ function updateAllCardAccents(){
   applyFilters();
 }
 
-// ═══ CONTROL HANDLERS ═══
+// ── Switch role row ──
+const SWITCH_OPTS=['Giving','Receiving','Both','Wearing'];
+function switchRow(sk,val){
+  return `<div class="switch-row">${SWITCH_OPTS.map(o=>`
+    <div class="switch-opt${val===o?' active-sw':''}" onclick="setSwitchOpt(this,'${sk}','${o}')" data-sk-sw="${sk}">${o}</div>`).join('')}
+  </div>`;
+}
+window.setSwitchOpt=function(el,sk,val){
+  // Toggle off if already selected
+  const isActive=el.classList.contains('active-sw');
+  const newVal=isActive?'':val;
+  myData[sk]=newVal; schedSave();
+  const row=el.closest('.switch-row');
+  row.querySelectorAll('.switch-opt').forEach(o=>o.classList.remove('active-sw'));
+  if(!isActive)el.classList.add('active-sw');
+};
 
 // Segmented control
 window.setSeg=function(btn,sk,val){
