@@ -26,32 +26,11 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 @keyframes spin{to{transform:rotate(360deg)}}
 .glow-orb{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.06) 0%,transparent 70%);top:-150px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite;}
 
-/* ── Login ── */
-#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
-.login-logo{font-family:'Great Vibes',cursive;font-size:52px;background:var(--luxury);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s ease-in-out infinite;margin-bottom:4px;}
-.login-sub{font-size:9px;text-transform:uppercase;letter-spacing:4px;color:rgba(212,175,55,.4);margin-bottom:40px;}
-.role-title{font-family:'Playfair Display',serif;font-size:13px;color:var(--mid);margin-bottom:16px;}
-.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:320px;margin-bottom:28px;}
-.role-card{border:1px solid var(--gold-b);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--surface);}
-.role-card:active{transform:scale(.97);}
-.role-card.selected{border-color:var(--gold);background:rgba(212,175,55,.08);}
-.role-card-icon{font-size:28px;margin-bottom:8px;}
-.role-card-name{font-family:'Playfair Display',serif;font-size:13px;color:var(--text);}
-.role-card-sub{font-size:9px;color:var(--dim);margin-top:3px;}
-.pin-section{width:100%;max-width:320px;margin-bottom:20px;}
-.pin-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px;text-align:center;}
-.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:16px;}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--gold-b);transition:all .2s;}
-.pin-dot.filled{background:var(--gold);border-color:var(--gold);}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.pin-btn{background:var(--surface);border:1px solid var(--gold-b);border-radius:12px;padding:14px;font-family:'Montserrat',sans-serif;font-size:18px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;}
-.pin-btn:active{background:var(--gold-dim);border-color:var(--gold);transform:scale(.95);}
-.pin-btn.del{font-size:14px;color:var(--dim);}
-.pin-spacer{visibility:hidden;}
-.login-btn{width:100%;max-width:320px;padding:16px;background:var(--luxury);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:opacity .2s;}
-.login-btn:disabled{opacity:.3;cursor:default;}
-.login-error{font-size:11px;color:var(--rose);text-align:center;margin-top:10px;min-height:16px;}
-.login-note{font-size:10px;color:var(--dim);text-align:center;margin-top:12px;line-height:1.5;}
+/* ── Auth loading screen ── */
+#authLoading{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.auth-logo{font-family:'Great Vibes',cursive;font-size:52px;background:var(--luxury);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s ease-in-out infinite;}
+.auth-sub{font-size:9px;text-transform:uppercase;letter-spacing:4px;color:rgba(212,175,55,.4);}
+.auth-spinner{width:22px;height:22px;border:2px solid var(--gold-b);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-top:8px;}
 
 /* ── Custom Confirm ── */
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:900;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s;}
@@ -395,6 +374,13 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 <div class="glow-orb"></div>
 <div id="toast" class="toast"></div>
 
+<!-- ═══════════════ Auth Loading ═══════════════ -->
+<div id="authLoading">
+  <div class="auth-logo">Tasks</div>
+  <div class="auth-sub">Dom Sub Hub</div>
+  <div class="auth-spinner"></div>
+</div>
+
 <!-- ═══════════════ Custom Confirm Dialog ═══════════════ -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-card">
@@ -406,49 +392,6 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
       <button class="confirm-btn confirm" id="confirmOkBtn">Confirm</button>
     </div>
   </div>
-</div>
-
-<!-- ═══════════════ LOGIN ═══════════════ -->
-<div id="loginScreen">
-  <div class="login-logo">Tasks</div>
-  <div class="login-sub">Dom Sub Hub</div>
-  <div class="role-title">I am the…</div>
-  <div class="role-cards">
-    <div class="role-card" id="roleCardDom" onclick="selectRole('dom')">
-      <div class="role-card-icon">👑</div>
-      <div class="role-card-name">Dominant</div>
-      <div class="role-card-sub">Sir</div>
-    </div>
-    <div class="role-card" id="roleCardSub" onclick="selectRole('sub')">
-      <div class="role-card-icon">🌸</div>
-      <div class="role-card-name">Submissive</div>
-      <div class="role-card-sub">Becca</div>
-    </div>
-  </div>
-  <div class="pin-section" id="pinSection" style="display:none;">
-    <div class="pin-label" id="pinLabel">Enter PIN</div>
-    <div class="pin-dots" id="pinDots">
-      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-btn" onclick="pinPress('1')">1</button>
-      <button class="pin-btn" onclick="pinPress('2')">2</button>
-      <button class="pin-btn" onclick="pinPress('3')">3</button>
-      <button class="pin-btn" onclick="pinPress('4')">4</button>
-      <button class="pin-btn" onclick="pinPress('5')">5</button>
-      <button class="pin-btn" onclick="pinPress('6')">6</button>
-      <button class="pin-btn" onclick="pinPress('7')">7</button>
-      <button class="pin-btn" onclick="pinPress('8')">8</button>
-      <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <div class="pin-btn pin-spacer" aria-hidden="true"></div>
-      <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn del" onclick="pinDel()">⌫</button>
-    </div>
-    <div class="login-error" id="pinError"></div>
-    <div class="login-note" id="pinNote"></div>
-  </div>
-  <button class="login-btn" id="loginBtn" disabled onclick="doLogin()">Enter</button>
 </div>
 
 <!-- ═══════════════ APP SHELL ═══════════════ -->
@@ -534,7 +477,6 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 
     <!-- DASHBOARD TAB -->
     <div id="view-dashboard" class="hidden">
-      <!-- Sir's Dashboard -->
       <div id="sirDashboard" class="hidden">
         <div class="dash-section-lbl">Overview</div>
         <div class="dash-grid" id="dashGrid">
@@ -553,7 +495,6 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
         <div class="dash-section-lbl">Alerts</div>
         <div style="padding:0 16px 14px;" id="dashAlerts"></div>
       </div>
-      <!-- Becca's Dashboard (sub view) -->
       <div id="subDashboard" class="hidden">
         <div class="dash-section-lbl">Your Status</div>
         <div class="dash-grid" id="subDashGrid">
@@ -588,7 +529,6 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
     <span class="material-symbols-rounded">add</span>
   </button>
 
-  <!-- Bottom Nav (only shown when logged in) -->
   <nav class="bottom-nav"></nav>
 
 </div><!-- /appShell -->
@@ -677,7 +617,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Photo Proof Sheet (sub submits) -->
+<!-- Photo Proof Sheet -->
 <div class="sheet" id="proofSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header"><div class="sheet-title">Submit Proof</div><div class="sheet-sub" id="proofSheetSub">Sir requires photo proof</div></div>
@@ -695,7 +635,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Proof Review Sheet (Sir reviews) -->
+<!-- Proof Review Sheet -->
 <div class="sheet" id="proofReviewSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header"><div class="sheet-title">Review Proof</div><div class="sheet-sub" id="proofReviewSub">Becca submitted photo proof</div></div>
@@ -711,7 +651,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Redemption Task Sheet (Sir assigns) -->
+<!-- Redemption Task Sheet -->
 <div class="sheet" id="redemptionSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header"><div class="sheet-title">Assign Redemption Task</div><div class="sheet-sub" id="redemptionSheetSub">Allow Becca to earn forgiveness</div></div>
@@ -725,7 +665,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Consequence Picker Sheet (Sir picks escalated punishment) -->
+<!-- Consequence Picker Sheet -->
 <div class="sheet" id="consequenceSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
@@ -744,11 +684,11 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Mood / Headspace Check-in (sub) -->
+<!-- Mood / Headspace Check-in -->
 <div class="checkin-overlay" id="checkinOverlay">
   <div class="checkin-panel">
     <div class="checkin-handle"></div>
-    <div class="checkin-title">Good to see you, Becca</div>
+    <div class="checkin-title" id="checkinGreeting">Good to see you</div>
     <div class="checkin-sub">How are you feeling right now?</div>
     <div class="mood-grid" id="moodGrid">
       <div class="mood-btn" data-mood="playful" onclick="pickMood(this)"><div class="mood-btn-emoji">😈</div><div class="mood-btn-label">Playful</div></div>
@@ -775,7 +715,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Sub Task Request Sheet -->
+<!-- Sub Task Request Review Sheet -->
 <div class="sheet" id="taskRequestReviewSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header"><div class="sheet-title">Task Request</div><div class="sheet-sub" id="taskRequestReviewSub">Becca is requesting a task</div></div>
@@ -793,14 +733,13 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 
 <!-- ═══════════════ FIREBASE JS ═══════════════ -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { requireAuth, getMyProfile, logOut } from './auth.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, get, push, onValue, update, remove }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { getStorage, ref as sRef, uploadString, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
-// NOTE: tasks.html uses Firebase Realtime Database for live task sync.
-// It connects to the dom-sub-hub-3e530 project.
 const firebaseConfig = {
   apiKey:"AIzaSyAV7Tmfw06rgKEY5LVOmR8bSmH0UrjB314",
   authDomain:"dom-sub-hub-3e530.firebaseapp.com",
@@ -810,23 +749,20 @@ const firebaseConfig = {
   appId:"1:672279944225:web:18acb9fb8158a1f14b1760",
   databaseURL:"https://dom-sub-hub-3e530-default-rtdb.firebaseio.com"
 };
-const app = initializeApp(firebaseConfig);
+
+// Re-use existing app if auth.js already initialised it, otherwise create one.
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 let storage = null;
 try { storage = getStorage(app); } catch(e) { console.warn('Firebase Storage not available:', e); }
 
-// NOTE: PIN-based auth handles access. Firebase Anonymous Auth is not required for RTDB
-// reads/writes here as long as your security rules allow it. If you re-enable Firebase
-// Auth later, gate it on its own page rather than auto-redirecting from this one.
-
 // ── State ──
-let role=null, pin='', settingUp=false, pendingPin='';
+let role = null;
 let curTab='tasks', filterState='all';
 let tasks={}, rewards={}, punishments={}, queue={};
 let pts={balance:0,earned:0,lost:0};
 let failId=null, proofTaskId=null, reviewQId=null, redemptionQId=null;
 let proofDataUrl=null, requireProof=false;
-const DPIN='dsh_dom_pin', SPIN='dsh_sub_pin', SESS='dsh_session_role';
 const RESET_KEY='dsh_last_reset', CHECKIN_KEY='dsh_last_checkin';
 
 // ── Custom confirm helper ──
@@ -853,7 +789,6 @@ document.getElementById('confirmCancelBtn').addEventListener('click', () => {
 
 // ── Expose to inline handlers ──
 const W = window;
-W.selectRole=selectRole; W.pinPress=pinPress; W.pinDel=pinDel; W.doLogin=doLogin; W.logout=logout;
 W.switchTab=switchTab; W.openCreateSheet=openCreateSheet; W.closeAllSheets=closeAllSheets;
 W.pickChip=pickChip; W.toggleProof=toggleProof; W.cycleFilter=cycleFilter;
 W.saveTask=saveTask; W.completeTask=completeTask; W.openFailSheet=openFailSheet;
@@ -866,94 +801,48 @@ W.savePunishment=savePunishment; W.assignPunishment=assignPunishment; W.deletePu
 W.approveQueueItem=approveQueueItem; W.denyQueueItem=denyQueueItem;
 W.openRedemptionSheet=openRedemptionSheet; W.saveRedemptionTask=saveRedemptionTask;
 W.dismissPunishment=dismissPunishment;
-
-// ── Session restore ──
-const saved = sessionStorage.getItem(SESS);
-if (saved) { role = saved; showApp(); }
+W.pickMood=pickMood; W.submitCheckin=submitCheckin; W.skipCheckin=skipCheckin;
+W.sendTaskRequest=sendTaskRequest; W.openTaskRequestReview=openTaskRequestReview;
+W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
 
 // ─────────────────────────────────────────────
-// LOGIN
+// BOOT — resolve auth then derive role from profile
 // ─────────────────────────────────────────────
-function selectRole(r) {
-  role = r;
-  document.getElementById('roleCardDom').classList.toggle('selected', r==='dom');
-  document.getElementById('roleCardSub').classList.toggle('selected', r==='sub');
-  document.getElementById('pinSection').style.display = 'block';
-  pin = ''; pendingPin = ''; updateDots();
-  // PINs persist across sessions via localStorage; fall back to sessionStorage if older value exists.
-  const stored = localStorage.getItem(r==='dom' ? DPIN : SPIN) || sessionStorage.getItem(r==='dom' ? DPIN : SPIN);
-  settingUp = !stored;
-  document.getElementById('pinLabel').textContent = stored ? (r==='dom' ? "Sir's PIN" : 'Your PIN') : 'Create a 4-digit PIN';
-  document.getElementById('pinNote').textContent = stored ? '' : 'First time? Create a PIN to protect this role.';
-  document.getElementById('loginBtn').disabled = true;
-  document.getElementById('pinError').textContent = '';
-}
+(async () => {
+  // requireAuth() redirects to login.html if not signed in, otherwise resolves with user
+  const user = await requireAuth();
+  const profile = await getMyProfile();
+  role = profile?.role ?? null;
 
-function pinPress(d) {
-  if (!role || pin.length >= 4) return;
-  if (!d) return; // ignore empty / spacer presses
-  pin += d; updateDots();
-  if (pin.length === 4) { document.getElementById('loginBtn').disabled = false; setTimeout(doLogin, 200); }
-}
-function pinDel() { pin = pin.slice(0,-1); updateDots(); document.getElementById('loginBtn').disabled = pin.length < 4; }
-function updateDots() { for (let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled', i < pin.length); }
-
-function doLogin() {
-  if (!role || pin.length < 4) return;
-  const key = role==='dom' ? DPIN : SPIN;
-  const stored = localStorage.getItem(key) || sessionStorage.getItem(key);
-  if (settingUp) {
-    if (!pendingPin) {
-      pendingPin = pin; pin = ''; updateDots();
-      document.getElementById('loginBtn').disabled = true;
-      document.getElementById('pinLabel').textContent = 'Confirm PIN';
-      document.getElementById('pinNote').textContent = 'Enter the same PIN again.';
-      return;
-    }
-    if (pin !== pendingPin) {
-      document.getElementById('pinError').textContent = "PINs don't match. Try again.";
-      pin = ''; pendingPin = ''; updateDots();
-      document.getElementById('loginBtn').disabled = true;
-      document.getElementById('pinLabel').textContent = 'Create a 4-digit PIN';
-      return;
-    }
-    localStorage.setItem(key, pin); pendingPin = ''; settingUp = false;
-  } else {
-    if (pin !== stored) {
-      document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
-      pin = ''; updateDots(); document.getElementById('loginBtn').disabled = true; return;
-    }
+  if (!role) {
+    // Profile missing or role not set — send back to login/onboarding
+    window.location.href = 'login.html';
+    return;
   }
-  sessionStorage.setItem(SESS, role); showApp();
-}
 
-function logout() {
-  sessionStorage.removeItem(SESS); role = null; pin = ''; pendingPin = '';
-  document.getElementById('appShell').classList.remove('visible');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('roleCardDom').classList.remove('selected');
-  document.getElementById('roleCardSub').classList.remove('selected');
-  document.getElementById('pinSection').style.display = 'none';
-  updateDots();
-}
-
-// ─────────────────────────────────────────────
-// APP INIT
-// ─────────────────────────────────────────────
-function showApp() {
-  document.getElementById('loginScreen').style.display = 'none';
+  // Hide loading screen, show app
+  document.getElementById('authLoading').style.display = 'none';
   document.getElementById('appShell').classList.add('visible');
+
   const isDom = role === 'dom';
-  document.getElementById('headerBadge').textContent = isDom ? '👑 Sir' : '🌸 Becca';
-  document.getElementById('appShell').className = 'visible ' + (isDom ? 'role-dom' : 'role-sub');
-  document.getElementById('headerSub').textContent = isDom ? 'Dominant View' : 'Submissive View';
-  document.getElementById('fabBtn').style.display = isDom ? 'flex' : 'none';
+  const displayName = profile?.displayName || (isDom ? 'Sir' : 'Becca');
+
+  document.getElementById('headerBadge').textContent  = isDom ? '👑 Sir' : '🌸 ' + displayName;
+  document.getElementById('appShell').className       = 'visible ' + (isDom ? 'role-dom' : 'role-sub');
+  document.getElementById('headerSub').textContent    = isDom ? 'Dominant View' : 'Submissive View';
+  document.getElementById('fabBtn').style.display     = isDom ? 'flex' : 'none';
+
+  // Personalise the check-in greeting with the sub's display name
+  if (!isDom) {
+    document.getElementById('checkinGreeting').textContent = 'Good to see you, ' + displayName;
+  }
+
   listenPoints(); listenTasks(); listenRewards(); listenPunishments(); listenQueue(); listenHistory();
   listenCheckin(); listenTaskRequests();
   setTimeout(checkDailyReset, 1500);
   setTimeout(renderAchievements, 2000);
   setTimeout(maybeShowCheckin, 1000);
-}
+})();
 
 // ─────────────────────────────────────────────
 // POINTS
@@ -1010,20 +899,16 @@ function renderTasks() {
     const multMap     = {simple:'×1',standard:'×1.5',demanding:'×2',extreme:'×3'};
     const multClass   = {simple:'mult-x1',standard:'mult-x15',demanding:'mult-x2',extreme:'mult-x3'};
     const multBadge   = `<span class="mult-badge ${multClass[t.difficulty||'simple']}">${multMap[t.difficulty||'simple']}</span>`;
-
-    const dueLine = t.due
+    const dueLine     = t.due
       ? `<div class="task-due${overdue?' overdue':''}">${overdue?'⚠ Overdue — ':''}Due ${fmtDate(t.due)}</div>` : '';
-
     const proofBadge      = t.requireProof ? `<span class="badge badge-proof">📷${proofPend?' Pending':' Req.'}</span>` : '';
     const redemptionBadge = t.isRedemption ? `<span class="badge badge-redemption">🌿 Redemption</span>` : '';
-
-    const streakHtml = streak > 0
+    const streakHtml  = streak > 0
       ? `<div class="task-streak">
            <span class="streak-pill${streak>=7?' fire':''}">${streak>=7?'🔥':'⚡'} ${streak}-day streak</span>
            ${best > streak ? `<span class="streak-best">Best: ${best}</span>` : ''}
          </div>` : '';
 
-    // Action buttons
     let actions = '';
     if (role==='sub' && !done) {
       if (t.requireProof && !proofPend) {
@@ -1085,7 +970,6 @@ async function completeTask(id) {
   await addPts(earned, 'Completed: ' + t.title);
   await push(ref(db,'history'), { type:'task_completed', taskTitle:t.title, points:earned, streak:newStreak, ts:Date.now() });
   if (t.schedule==='once') await update(ref(db,'tasks/'+id), {archived:true});
-  // If this was a redemption task, resolve its parent queue item
   if (t.isRedemption && t.redemptionFor) await update(ref(db,'queue/'+t.redemptionFor), {resolved:true, redeemed:true});
   showToast('✅ +' + earned + ' pts! Streak: ' + newStreak + (newStreak>=7 ? ' 🔥' : ''));
 }
@@ -1144,7 +1028,6 @@ async function saveTask() {
   showToast('✅ Task assigned');
 }
 
-// Proof toggle UI
 function toggleProof() { requireProof = !requireProof; setProofToggle(requireProof); }
 function setProofToggle(on) {
   document.getElementById('proofTrack').className = 'toggle-track' + (on ? ' on' : '');
@@ -1185,7 +1068,7 @@ async function submitProof() {
       await uploadString(sr, proofDataUrl, 'data_url');
       proofUrl = await getDownloadURL(sr);
     }
-  } catch(e) { /* storage unavailable — keep base64 URL in queue */ }
+  } catch(e) { /* storage unavailable — keep base64 URL */ }
   await update(ref(db,'tasks/'+proofTaskId), { proofPending:true });
   await push(ref(db,'queue'), {
     type:'proof_submission', taskId:proofTaskId, taskTitle:t.title,
@@ -1196,7 +1079,6 @@ async function submitProof() {
   showToast("📷 Proof submitted! Awaiting Sir's approval");
 }
 
-// Sir reviews proof
 function openProofReview(qId) {
   reviewQId = qId;
   const item = queue[qId]; if (!item) return;
@@ -1231,7 +1113,7 @@ async function denyProof() {
   await update(ref(db,'queue/'+reviewQId), { resolved:true });
   await push(ref(db,'history'), { type:'proof_denied', taskTitle:item.taskTitle, ts:Date.now() });
   closeAllSheets(); reviewQId = null;
-  showToast('Proof rejected — Becca must resubmit');
+  showToast('Proof rejected — must resubmit');
 }
 
 // ─────────────────────────────────────────────
@@ -1294,11 +1176,10 @@ function renderQueue() {
     }
   });
 
-  // Append task requests section for Sir
   if (role === 'dom') {
     const reqs = Object.entries(taskRequests).filter(([,r]) => !r.resolved && !r.denied);
     if (reqs.length) {
-      html += `<div style="margin-top:12px;"><div class="section-lbl" style="padding:0 0 8px;">🌸 Task Requests from Becca</div>`;
+      html += `<div style="margin-top:12px;"><div class="section-lbl" style="padding:0 0 8px;">🌸 Task Requests</div>`;
       reqs.forEach(([id,r]) => {
         html += `<div class="task-request-card fade-up">
           <div class="task-request-icon">🌸</div>
@@ -1315,7 +1196,6 @@ function renderQueue() {
       html += '</div>';
     }
   }
-
   list.innerHTML = html || emptyState('✅', 'All clear', 'Nothing needs your attention right now.');
 }
 
@@ -1337,7 +1217,6 @@ async function denyQueueItem(id) {
   showToast('Dismissed');
 }
 
-// ── Active Punishment Banner ──
 function renderPunishBanner() {
   const banner = document.getElementById('punishBanner');
   const failures = Object.entries(queue).filter(([,v]) => !v.resolved && v.type==='failure_report' && v.punishLink);
@@ -1613,14 +1492,12 @@ function switchTab(t) {
   if (t==='history')     renderHistory();
   if (t==='queue')       renderQueue();
   if (t==='dashboard')   renderDashboard(window._checkinData);
-  // FAB: only on dom tabs that support creation
   const fabVisible = role==='dom' && ['tasks','rewards','punishments'].includes(t);
   document.getElementById('fabBtn').style.display = fabVisible ? 'flex' : 'none';
 }
 
 function openCreateSheet() {
   if (curTab==='tasks') {
-    // reset task-sheet state every time it opens so requireProof doesn't carry over
     requireProof = false;
     setProofToggle(false);
     document.getElementById('taskTitle').value = '';
@@ -1695,27 +1572,27 @@ function showToast(msg) {
 }
 
 // ─────────────────────────────────────────────
-// PHASE 3 — DEMERITS, ACHIEVEMENTS, CONSEQUENCE PICKER
+// DEMERITS, ACHIEVEMENTS, CONSEQUENCE PICKER
 // ─────────────────────────────────────────────
+const TIER = [
+  {min:0, max:0,  label:null},
+  {min:1, max:2,  label:'Minor',       cls:'tier-1', icon:'⚠️', desc:'1–2 unresolved failures. Minor correction expected.'},
+  {min:3, max:4,  label:'Moderate',    cls:'tier-2', icon:'🔴', desc:'3–4 failures. Moderate escalation. Sir\'s attention required.'},
+  {min:5, max:99, label:'Significant', cls:'tier-3', icon:'💀', desc:'5+ failures. Significant consequences in effect.'}
+];
 
-// Demerit tier thresholds
-const TIER = [ {min:0,max:0,label:null}, {min:1,max:2,label:'Minor',cls:'tier-1',icon:'⚠️',desc:'1–2 unresolved failures. Minor correction expected.'},
-  {min:3,max:4,label:'Moderate',cls:'tier-2',icon:'🔴',desc:'3–4 failures. Moderate escalation. Sir\'s attention required.'},
-  {min:5,max:99,label:'Significant',cls:'tier-3',icon:'💀',desc:'5+ failures. Significant consequences in effect.'} ];
-
-// Consequence pool — filtered by tier
 const CONSEQUENCES = [
-  {emoji:'📝',title:'Devotion Letter',desc:'Write a 300-word letter of apology and devotion.',tier:1,pts:5},
-  {emoji:'🙇',title:'Kneeling Meditation',desc:'Hold the Ready position for 20 minutes with photo proof.',tier:1,pts:10},
-  {emoji:'🚫',title:'Privilege Loss',desc:'Forfeit the Get Dreamy ritual or a favourite scent for 48 hours.',tier:1,pts:10},
-  {emoji:'📵',title:'Device Silence',desc:'3 hours of total silence — no social media except messages to Sir.',tier:1,pts:5},
-  {emoji:'🛁',title:'Ritual Reset',desc:'Full grooming ritual completed and documented with photos.',tier:2,pts:15},
-  {emoji:'🔒',title:'24hr Abstinence',desc:'24 hours of total sexual abstinence — no touching, no content.',tier:2,pts:20},
-  {emoji:'🏠',title:'Double Domestic',desc:'Two extra domestic service tasks assigned by Sir on the spot.',tier:2,pts:15},
-  {emoji:'⏳',title:'Extended Edge',desc:'30 minutes of edging — bring to the brink, stop, repeat every 5 min.',tier:2,pts:20},
-  {emoji:'🌑',title:'Total Reset Protocol',desc:'48 hours of withdrawal — no privileges, no play, service only.',tier:3,pts:30},
-  {emoji:'📋',title:'Full Rule Recital',desc:'Write out every rule and expectation from scratch. Submit for review.',tier:3,pts:25},
-  {emoji:'🎭',title:'Public Submission',desc:'A structured humility task defined entirely by Sir\'s discretion.',tier:3,pts:35},
+  {emoji:'📝', title:'Devotion Letter',     desc:'Write a 300-word letter of apology and devotion.',                    tier:1, pts:5},
+  {emoji:'🙇', title:'Kneeling Meditation', desc:'Hold the Ready position for 20 minutes with photo proof.',            tier:1, pts:10},
+  {emoji:'🚫', title:'Privilege Loss',      desc:'Forfeit the Get Dreamy ritual or a favourite scent for 48 hours.',   tier:1, pts:10},
+  {emoji:'📵', title:'Device Silence',      desc:'3 hours of total silence — no social media except messages to Sir.', tier:1, pts:5},
+  {emoji:'🛁', title:'Ritual Reset',        desc:'Full grooming ritual completed and documented with photos.',          tier:2, pts:15},
+  {emoji:'🔒', title:'24hr Abstinence',     desc:'24 hours of total sexual abstinence — no touching, no content.',     tier:2, pts:20},
+  {emoji:'🏠', title:'Double Domestic',     desc:'Two extra domestic service tasks assigned by Sir on the spot.',      tier:2, pts:15},
+  {emoji:'⏳', title:'Extended Edge',       desc:'30 minutes of edging — bring to the brink, stop, repeat every 5 min.', tier:2, pts:20},
+  {emoji:'🌑', title:'Total Reset Protocol',desc:'48 hours of withdrawal — no privileges, no play, service only.',    tier:3, pts:30},
+  {emoji:'📋', title:'Full Rule Recital',   desc:'Write out every rule and expectation from scratch. Submit for review.', tier:3, pts:25},
+  {emoji:'🎭', title:'Public Submission',   desc:'A structured humility task defined entirely by Sir\'s discretion.',  tier:3, pts:35},
 ];
 
 let currentConsequenceTaskId = null;
@@ -1728,7 +1605,6 @@ W.openConsequencePicker = openConsequencePicker;
 function getDemeritCount() {
   return Object.values(queue).filter(i => !i.resolved && i.type === 'failure_report').length;
 }
-
 function getTier(count) {
   return TIER.find(t => count >= t.min && count <= t.max) || TIER[0];
 }
@@ -1818,26 +1694,23 @@ async function applyConsequence() {
 
 // ── Achievement Badges ──
 const ACHIEVEMENTS = [
-  {id:'first_complete', emoji:'🌟', name:'First Step',    desc:'Complete your first task',           check: (t,h) => Object.values(h).some(e=>e.type==='task_completed')},
-  {id:'streak_3',       emoji:'⚡', name:'On a Roll',     desc:'3-day streak on any task',           check: (t,h) => Object.values(t).some(x=>x.streak>=3)},
-  {id:'streak_7',       emoji:'🔥', name:'Fire Streak',   desc:'7-day streak on any task',           check: (t,h) => Object.values(t).some(x=>x.streak>=7)},
-  {id:'streak_30',      emoji:'💎', name:'Diamond',       desc:'30-day streak on any task',          check: (t,h) => Object.values(t).some(x=>x.streak>=30)},
-  {id:'pts_100',        emoji:'⭐', name:'Century',       desc:'Earn 100 points total',              check: (t,h,p) => (p.earned||0) >= 100},
-  {id:'pts_500',        emoji:'🏆', name:'Gold Standard', desc:'Earn 500 points total',              check: (t,h,p) => (p.earned||0) >= 500},
-  {id:'no_fails_7',     emoji:'🕊️', name:'Perfect Week',  desc:'7 days with no failures reported',  check: (t,h) => {
+  {id:'first_complete', emoji:'🌟', name:'First Step',    check: (t,h)   => Object.values(h).some(e=>e.type==='task_completed')},
+  {id:'streak_3',       emoji:'⚡', name:'On a Roll',     check: (t,h)   => Object.values(t).some(x=>x.streak>=3)},
+  {id:'streak_7',       emoji:'🔥', name:'Fire Streak',   check: (t,h)   => Object.values(t).some(x=>x.streak>=7)},
+  {id:'streak_30',      emoji:'💎', name:'Diamond',       check: (t,h)   => Object.values(t).some(x=>x.streak>=30)},
+  {id:'pts_100',        emoji:'⭐', name:'Century',       check: (t,h,p) => (p.earned||0) >= 100},
+  {id:'pts_500',        emoji:'🏆', name:'Gold Standard', check: (t,h,p) => (p.earned||0) >= 500},
+  {id:'no_fails_7',     emoji:'🕊️', name:'Perfect Week',  check: (t,h)   => {
     const now = Date.now(), week = 7*86400000;
     return !Object.values(h).some(e=>e.type==='task_failed' && now-e.ts < week);
   }},
-  {id:'redeemed',       emoji:'🌿', name:'Redeemed',      desc:'Complete a redemption task',         check: (t,h) => Object.values(h).some(e=>e.type==='task_completed' && Object.values(t).some(x=>x.isRedemption&&x.completedToday))},
-  {id:'tasks_10',       emoji:'📋', name:'Dedicated',     desc:'Complete 10 tasks total',            check: (t,h) => Object.values(h).filter(e=>e.type==='task_completed').length >= 10},
-  {id:'tasks_50',       emoji:'👑', name:'Devoted',       desc:'Complete 50 tasks total',            check: (t,h) => Object.values(h).filter(e=>e.type==='task_completed').length >= 50},
+  {id:'redeemed',       emoji:'🌿', name:'Redeemed',      check: (t,h)   => Object.values(h).some(e=>e.type==='task_completed' && Object.values(t).some(x=>x.isRedemption&&x.completedToday))},
+  {id:'tasks_10',       emoji:'📋', name:'Dedicated',     check: (t,h)   => Object.values(h).filter(e=>e.type==='task_completed').length >= 10},
+  {id:'tasks_50',       emoji:'👑', name:'Devoted',       check: (t,h)   => Object.values(h).filter(e=>e.type==='task_completed').length >= 50},
 ];
 
 function computeAchievements() {
-  return ACHIEVEMENTS.map(a => ({
-    ...a,
-    earned: a.check(tasks, histData || {}, pts)
-  }));
+  return ACHIEVEMENTS.map(a => ({ ...a, earned: a.check(tasks, histData || {}, pts) }));
 }
 
 function renderAchievements() {
@@ -1845,26 +1718,17 @@ function renderAchievements() {
   const list  = document.getElementById('achievementsList');
   if (role !== 'sub') { strip.classList.add('hidden'); return; }
   const all = computeAchievements();
-  const earnedAny = all.some(a => a.earned);
-  strip.classList.toggle('hidden', !earnedAny);
-  let html = '';
-  all.filter(a => a.earned).forEach(a => {
-    html += `<div class="achievement-pill earned" title="${a.desc}">
+  strip.classList.toggle('hidden', !all.some(a => a.earned));
+  list.innerHTML = all.filter(a => a.earned).map(a =>
+    `<div class="achievement-pill earned" title="${a.name}">
       <span class="achievement-emoji">${a.emoji}</span>
       <span class="achievement-name">${a.name}</span>
-    </div>`;
-  });
-  list.innerHTML = html;
+    </div>`).join('');
 }
 
 // ─────────────────────────────────────────────
-// PHASE 4 — DASHBOARD, MOOD CHECK-IN, CHART, TASK REQUESTS
+// DASHBOARD, MOOD CHECK-IN, CHART, TASK REQUESTS
 // ─────────────────────────────────────────────
-
-W.pickMood=pickMood; W.submitCheckin=submitCheckin; W.skipCheckin=skipCheckin;
-W.sendTaskRequest=sendTaskRequest; W.openTaskRequestReview=openTaskRequestReview;
-W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
-
 let selectedMood = null;
 let reviewTaskReqId = null;
 let taskRequests = {};
@@ -1872,12 +1736,8 @@ let taskRequests = {};
 function maybeShowCheckin() {
   if (role !== 'sub') return;
   const today = new Date().toDateString();
-  // Use localStorage so check-in throttling persists across sessions
-  const lastCheckin = localStorage.getItem(CHECKIN_KEY);
-  if (lastCheckin === today) return;
-  setTimeout(() => {
-    document.getElementById('checkinOverlay').classList.add('open');
-  }, 800);
+  if (localStorage.getItem(CHECKIN_KEY) === today) return;
+  setTimeout(() => document.getElementById('checkinOverlay').classList.add('open'), 800);
 }
 
 function pickMood(el) {
@@ -1963,11 +1823,11 @@ function renderDashboard(checkin) {
 }
 
 function renderSirDashboard(checkin) {
-  const activeTasks   = Object.values(tasks).filter(t => !t.archived && !t.completedToday).length;
-  const doneTasks     = Object.values(tasks).filter(t => t.completedToday).length;
-  const queuePending  = Object.values(queue).filter(i => !i.resolved).length;
-  const demerits      = getDemeritCount();
-  const mm            = checkin ? MOOD_META[checkin.mood] || MOOD_META.other : null;
+  const activeTasks  = Object.values(tasks).filter(t => !t.archived && !t.completedToday).length;
+  const doneTasks    = Object.values(tasks).filter(t => t.completedToday).length;
+  const queuePending = Object.values(queue).filter(i => !i.resolved).length;
+  const demerits     = getDemeritCount();
+  const mm           = checkin ? MOOD_META[checkin.mood] || MOOD_META.other : null;
 
   document.getElementById('dashGrid').innerHTML = `
     <div class="dash-card">
@@ -2021,11 +1881,11 @@ function renderSirDashboard(checkin) {
 function renderDashAlerts(demerits, queuePending, activeTasks, checkin) {
   const alerts = document.getElementById('dashAlerts');
   let html = '';
-  if (demerits >= 3) html += `<div class="dash-alert warn"><div class="dash-alert-icon">⚡</div><div class="dash-alert-text"><strong>Demerit Escalation</strong>${demerits} unresolved failures — ${getTier(demerits).label} tier active</div></div>`;
-  if (queuePending > 0) html += `<div class="dash-alert warn"><div class="dash-alert-icon">📋</div><div class="dash-alert-text"><strong>${queuePending} Queue Item${queuePending>1?'s':''}</strong>Switch to Queue to review</div></div>`;
-  if (checkin && checkin.mood === 'anxious') html += `<div class="dash-alert info"><div class="dash-alert-icon">💭</div><div class="dash-alert-text"><strong>Becca seems anxious</strong>Consider checking in before assigning heavy tasks</div></div>`;
-  if (checkin && checkin.mood === 'resistant') html += `<div class="dash-alert warn"><div class="dash-alert-icon">😤</div><div class="dash-alert-text"><strong>Becca is feeling resistant</strong>May need Sir's direct attention today</div></div>`;
-  if (checkin && checkin.energy <= 3) html += `<div class="dash-alert info"><div class="dash-alert-icon">😴</div><div class="dash-alert-text"><strong>Low energy today (${checkin.energy}/10)</strong>Consider lighter tasks</div></div>`;
+  if (demerits >= 3)          html += `<div class="dash-alert warn"><div class="dash-alert-icon">⚡</div><div class="dash-alert-text"><strong>Demerit Escalation</strong>${demerits} unresolved failures — ${getTier(demerits).label} tier active</div></div>`;
+  if (queuePending > 0)       html += `<div class="dash-alert warn"><div class="dash-alert-icon">📋</div><div class="dash-alert-text"><strong>${queuePending} Queue Item${queuePending>1?'s':''}</strong>Switch to Queue to review</div></div>`;
+  if (checkin?.mood==='anxious')   html += `<div class="dash-alert info"><div class="dash-alert-icon">💭</div><div class="dash-alert-text"><strong>Becca seems anxious</strong>Consider checking in before assigning heavy tasks</div></div>`;
+  if (checkin?.mood==='resistant') html += `<div class="dash-alert warn"><div class="dash-alert-icon">😤</div><div class="dash-alert-text"><strong>Becca is feeling resistant</strong>May need Sir's direct attention today</div></div>`;
+  if (checkin?.energy <= 3)        html += `<div class="dash-alert info"><div class="dash-alert-icon">😴</div><div class="dash-alert-text"><strong>Low energy today (${checkin.energy}/10)</strong>Consider lighter tasks</div></div>`;
   if (!html) html = `<div class="dash-alert ok"><div class="dash-alert-icon">✅</div><div class="dash-alert-text"><strong>All clear</strong>No alerts at this time</div></div>`;
   alerts.innerHTML = html;
 }
@@ -2069,12 +1929,10 @@ function renderSubDashboard() {
     : `<div style="font-size:10px;color:var(--dim);padding:8px 0;">No pending requests.</div>`;
 }
 
-// ── Point Economy Chart ──
 function renderPointsChart() {
   const canvas = document.getElementById('pointsChart');
   if (!canvas) return;
-  const now = Date.now();
-  const days = 7;
+  const now = Date.now(), days = 7;
   const labels = [], earned = [], lost = [];
   for (let i = days-1; i >= 0; i--) {
     const d = new Date(now - i*86400000);
@@ -2088,17 +1946,15 @@ function renderPointsChart() {
     if (e.type === 'points_earned' && e.amount) earned[idx] += e.amount;
     if (e.type === 'points_lost'   && e.amount) lost[idx]  += Math.abs(e.amount);
   });
-
   const ctx = canvas.getContext('2d');
   const W = canvas.offsetWidth || 300, H = 120;
   canvas.width = W * 2; canvas.height = H * 2;
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scaling so re-renders don't compound
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(2, 2);
   const maxVal = Math.max(10, ...earned, ...lost);
   const padL=28, padR=8, padT=10, padB=24;
   const chartW = W-padL-padR, chartH = H-padT-padB;
   const barW = chartW / (days*2+days-1);
-
   ctx.clearRect(0,0,W,H);
   ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
   for (let i=0;i<=4;i++) {
@@ -2165,7 +2021,7 @@ async function denyTaskRequest() {
 }
 
 // ─────────────────────────────────────────────
-// DAILY RESET (uses localStorage so it survives full app restarts)
+// DAILY RESET
 // ─────────────────────────────────────────────
 function checkDailyReset() {
   const today = new Date().toDateString();
