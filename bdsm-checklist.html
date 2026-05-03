@@ -735,20 +735,20 @@ function buildCard(cat,item,isCustom=false){
   const myR=myData[key+'.r']??bv(item,myRole,'R')??'';
   const myA=myData[key+'.a']??bv(item,myRole,'A')??'';
   const mySw=myData[key+'.sw']??bv(item,myRole,'S')??'';
-  const mySwVal = mySw==='Not Applicable' ? '' : mySw;
+  const pSw=partnerData[key+'.sw']??bv(item,pPfx,'S')??'';
   const myN=myData[key+'.n']??'';
   const myNs=myData[key+'.ns']??'';
   const pT=partnerData[key+'.t']??bv(item,pPfx,'T')??'';
   const pR=partnerData[key+'.r']??bv(item,pPfx,'R')??'';
   const pA=partnerData[key+'.a']??bv(item,pPfx,'A')??'';
-  const pSw=partnerData[key+'.sw']??bv(item,pPfx,'S')??'';
   const pSwDisplay = pSw==='Not Applicable' ? '' : pSw;
   const pNs=partnerData[key+'.ns']??'';
 
   const accent=getAccent(myA,pA,myR,pR,isCustom,myData[key+'.flagged']);
   const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
   const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
-  const mySwBadge=mySwVal?`<span class="badge ${bCls(mySwVal)}">${mySwVal}</span>`:'';
+  const mySwDisp=mySw==='Not Applicable'?'':mySw;
+  const mySwBadge=mySwDisp?`<span class="badge ${bCls(mySwDisp)}">${mySwDisp}</span>`:'';
   const pSwBadge=pSwDisplay?`<span class="badge ${bCls(pSwDisplay)}">${pSwDisplay}</span>`:'';
   const cBadge=isCustom?`<span class="badge custom">Custom</span>`:'';
   const sBadge=myData[key+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
@@ -774,7 +774,7 @@ function buildCard(cat,item,isCustom=false){
           <div class="col-title">${myName} (you)</div>
           <div class="field-row">
             <div class="field-label">My role</div>
-            ${switchRow(key+'.sw', mySwVal)}
+            ${switchRow(key+'.sw', mySw)}
           </div>
           <div class="field-row">
             <div class="field-label">Tried it?</div>
@@ -916,11 +916,11 @@ function updateAllCardAccents(){
     }
     // Update my role buttons in case they changed in background
     const mySw=myData[key+'.sw']??(item?bv(item,myRole,'S'):'')??'';
-    const mySwVal=mySw==='Not Applicable'?'':mySw;
+    const mySwDisp=mySw==='Not Applicable'?'':mySw;
     const myRow=card.querySelector('.switch-row');
     if(myRow){
       myRow.querySelectorAll('.switch-opt').forEach(opt=>{
-        opt.classList.toggle('active-sw', opt.textContent===mySwVal);
+        opt.classList.toggle('active-sw', opt.textContent===mySw);
       });
     }
   });
