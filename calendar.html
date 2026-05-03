@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -484,7 +484,7 @@
       background: rgba(5,16,36,0.98); backdrop-filter: blur(24px);
       border: 1px solid var(--border); border-radius: 28px 28px 0 0;
       width: 100%; max-width: 600px;
-      padding: 0 22px calc(28px + var(--safe-b));
+      padding: 0 22px calc(100px + var(--safe-b));
       transform: translateY(100%);
       transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
       max-height: 90vh; overflow-y: auto;
@@ -870,7 +870,7 @@
 
   <!-- ══ DELETE SCOPE MODAL ══ -->
   <div id="delete-modal" class="modal-back" onclick="handleModalClick(event,'delete-modal')">
-    <div class="modal-sheet" style="padding-bottom:calc(20px + var(--safe-b));">
+    <div class="modal-sheet" style="padding-bottom:calc(100px + var(--safe-b));">
       <div class="modal-handle"></div>
       <div class="modal-heading" style="font-size:24px;">Remove Event</div>
       <div class="modal-subheading">Choose what to delete</div>
@@ -936,38 +936,38 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-import { requireAuth, dataRef } from './auth.js';
+import { auth, db } from './firebase-config.js';
+import { requireAuth, getMyProfile, getRelationship, dataRef } from './auth.js';
 import { doc, setDoc, getDoc, onSnapshot }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
   /* ══════════════════════════════════════════════════════
      DATA & STORAGE
   ══════════════════════════════════════════════════════ */
-    // Firestore-backed state
   let events       = [];
   let recurTasks   = [];
   let reflections  = [];
   let profiles     = { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
   let activeProfile = 'dom';
+  let myUid = null;
+  let myRole = 'dom';
+  let relId = null;
+  let myName = 'User';
+  let partnerName = 'Partner';
 
   async function persist() {
-    const calRef = dataRef('calendar');
-    await setDoc(calRef, { events, recurTasks, reflections, profiles, activeProfile }, { merge: true });
+    if (!relId || !myUid) return;
+    
+    // Shared data (Events, Tasks, Profiles)
+    const relCalRef = doc(db, 'relationships', relId, 'calendar', 'data');
+    await setDoc(relCalRef, { events, recurTasks, profiles }, { merge: true });
+
+    // Private data (Reflections)
+    const userCalRef = dataRef('calendar');
+    await setDoc(userCalRef, { reflections }, { merge: true });
   }
 
-  async function loadCalendarData() {
-    const snap = await getDoc(dataRef('calendar'));
-    if (snap.exists()) {
-      const d = snap.data();
-      events        = d.events       || [];
-      recurTasks    = d.recurTasks   || [];
-      reflections   = d.reflections  || [];
-      profiles      = d.profiles     || { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
-      activeProfile = d.activeProfile || 'dom';
-    }
-  }
-
-  /* Seed demo data */
-  if (!events.length) {
+  function seedDemoData() {
     const today = dateStr(new Date());
     const d = new Date(); d.setDate(d.getDate()+5);
     const future = dateStr(d);
@@ -1371,7 +1371,7 @@ import { doc, setDoc, getDoc, onSnapshot }
       if (isSurprise) {
         html += `<div class="scene-card-surprise">
           <span class="surprise-ornament">✦</span>
-          <span class="surprise-script">Sir has something planned</span>
+          <span class="surprise-script">${profiles.dom.name} has something planned</span>
           <span class="surprise-tagline">Be ready</span>
           ${scene.dressCode ? `<div class="surprise-prep">🪞 ${escHtml(scene.dressCode)}</div>` : ''}
         </div>`;
@@ -1423,7 +1423,7 @@ import { doc, setDoc, getDoc, onSnapshot }
       html += `<div class="task-section">
         <div class="task-section-header">
           <span class="task-section-icon">♛</span>
-          <span class="task-section-title">Sir's Tasks</span>
+          <span class="task-section-title">${profiles.dom.name}'s Tasks</span>
           <span class="task-count-badge">${domTasks.length}</span>
         </div>`;
       domTasks.forEach(t => { html += taskItemHTML(t, currentDayStr); });
@@ -1434,7 +1434,7 @@ import { doc, setDoc, getDoc, onSnapshot }
       html += `<div class="task-section">
         <div class="task-section-header">
           <span class="task-section-icon">✦</span>
-          <span class="task-section-title">Your Tasks</span>
+          <span class="task-section-title">${profiles.sub.name}'s Tasks</span>
           <span class="task-count-badge">${subTasks.length}</span>
         </div>`;
       subTasks.forEach(t => { html += taskItemHTML(t, currentDayStr); });
@@ -1854,8 +1854,65 @@ import { doc, setDoc, getDoc, onSnapshot }
   /* ══════════════════════════════════════════════════════
      INIT
   ══════════════════════════════════════════════════════ */
-  updateProfilePill();
-  renderMonth();
+  async function init() {
+    const user = await requireAuth();
+    myUid = user.uid;
+    
+    const profile = await getMyProfile();
+    myRole = profile?.role || 'dom';
+    activeProfile = myRole; // Default to user's role
+    myName = profile?.displayName || (myRole === 'dom' ? 'Dom' : 'Sub');
+
+    const rel = await getRelationship();
+    if (rel) {
+      relId = rel.id;
+      // Get partner name
+      const partnerUid = rel.domId === myUid ? rel.subId : rel.domId;
+      const pSnap = await getDoc(doc(db, 'users', partnerUid));
+      if (pSnap.exists()) {
+        partnerName = pSnap.data().displayName || (myRole === 'dom' ? 'Sub' : 'Dom');
+      }
+
+      // Listen for shared calendar data
+      onSnapshot(doc(db, 'relationships', relId, 'calendar', 'data'), snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          events = d.events || [];
+          recurTasks = d.recurTasks || [];
+          profiles = d.profiles || { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
+          
+          // Inject dynamic names into profiles if they are default
+          if (profiles.dom.name === 'Dom') profiles.dom.name = (myRole === 'dom' ? myName : partnerName);
+          if (profiles.sub.name === 'Sub') profiles.sub.name = (myRole === 'sub' ? myName : partnerName);
+        } else {
+          // Initialize relationship calendar if missing
+          seedDemoData();
+        }
+        refreshAll();
+      });
+    }
+
+    // Listen for private reflections
+    onSnapshot(dataRef('calendar'), snap => {
+      if (snap.exists()) {
+        reflections = snap.data().reflections || [];
+      }
+      refreshAll();
+    });
+
+    updateProfilePill();
+    renderMonth();
+  }
+
+  function refreshAll() {
+    updateProfilePill();
+    renderMonth();
+    if (document.getElementById('day-modal') && document.getElementById('day-modal').style.display === 'flex') {
+      renderDayModal(document.getElementById('day-modal').dataset.date);
+    }
+  }
+
+  init().catch(console.error);
   </script>
 <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
 <script src="nav.js"></script>
