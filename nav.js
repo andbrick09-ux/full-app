@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ============================================================
  * DOM SUB HUB — nav.js
  * Injects the bottom nav, overlay, and More sheet into every
@@ -61,7 +61,7 @@
   var MORE_ITEMS = [
     { href: 'toy-vault.html', icon: '🔒', label: 'Toy Vault' },
     { href: 'bdsm-checklist.html', icon: '✅', label: 'Assessments &amp; Ratings' },
-    { href: 'sirs-protocol.html', icon: '📜', label: 'Sir\u2019s Protocol' },
+    { href: 'sirs-protocol.html', icon: '📜', label: 'Dom\u2019s Protocol' },
     { href: 'song-vault.html', icon: '🎵', label: 'Song Vault' },
     { href: 'notes.html', icon: '📝', label: 'Notes' },
     { href: 'calendar.html', icon: '📅', label: 'Calendar' },
