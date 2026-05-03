@@ -13,653 +13,205 @@
   <link rel="stylesheet" href="styles.css"/>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-
     :root {
-      --midnight:        #051024;
-      --bg:              #051024;
-      --glass:           rgba(5,16,36,0.85);
-      --glass2:          rgba(2,8,20,0.6);
-      --gold:            #D4AF37;
-      --gold-light:      #F5E6A3;
-      --gold-dim:        rgba(212,175,55,0.3);
-      --border:          rgba(212,175,55,0.15);
-      --luxury-gradient: linear-gradient(135deg, #D4AF37, #F5E6A3);
-      --red:             #F44336;
-      --green:           #4CAF50;
-      --safe-b:          env(safe-area-inset-bottom, 0px);
-      --safe-t:          env(safe-area-inset-top, 0px);
+      --midnight:#051024; --bg:#051024;
+      --glass:rgba(5,16,36,0.85); --glass2:rgba(2,8,20,0.6);
+      --gold:#D4AF37; --gold-light:#F5E6A3; --gold-dim:rgba(212,175,55,0.3);
+      --border:rgba(212,175,55,0.15);
+      --luxury-gradient:linear-gradient(135deg,#D4AF37,#F5E6A3);
+      --red:#F44336; --green:#4CAF50;
+      --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
     }
-
     html { height:100%; }
-    body {
-      min-height:100%; background:var(--midnight);
-      font-family:'Montserrat',sans-serif;
-      color:#ccc; overflow-x:hidden;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    /* ── Topbar ── */
-    .topbar {
-      position:sticky; top:0; z-index:100;
-      display:flex; align-items:center; gap:12px;
-      padding:18px 20px 14px; padding-top:calc(18px + var(--safe-t));
-      background:rgba(5,16,36,0.92); backdrop-filter:blur(25px);
-      border-bottom:1px solid var(--border); text-align:left;
-    }
-    .back-btn {
-      width:36px; height:36px; border-radius:10px; flex-shrink:0;
-      display:flex; align-items:center; justify-content:center;
-      background:rgba(212,175,55,0.08); border:1px solid var(--border);
-      text-decoration:none; cursor:pointer; transition:all .2s;
-    }
+    body { min-height:100%; background:var(--midnight); font-family:'Montserrat',sans-serif; color:#ccc; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+    .topbar { position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:12px; padding:18px 20px 14px; padding-top:calc(18px + var(--safe-t)); background:rgba(5,16,36,0.92); backdrop-filter:blur(25px); border-bottom:1px solid var(--border); }
+    .back-btn { width:36px; height:36px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(212,175,55,0.08); border:1px solid var(--border); text-decoration:none; cursor:pointer; transition:all .2s; }
     .back-btn:active { opacity:.7; transform:scale(.93); }
     .back-btn .material-symbols-rounded { font-size:20px; color:var(--gold); }
     .topbar-center { flex:1; min-width:0; }
-    .topbar-title {
-      font-family:'Great Vibes',cursive; font-size:28px;
-      background:var(--luxury-gradient);
-      -webkit-background-clip:text; background-clip:text;
-      -webkit-text-fill-color:transparent; margin:0; line-height:1.1;
-    }
-    .topbar-sub {
-      font-family:'Playfair Display',serif; color:var(--gold);
-      font-size:11px; text-transform:uppercase; letter-spacing:3px;
-      margin-top:3px; opacity:0.7;
-    }
-
-    /* ── Progress dots ── */
-    .progress-dots-wrap {
-      background:var(--glass2); border-bottom:1px solid var(--border);
-      padding:12px 20px 8px;
-    }
-    .progress-dots {
-      display:flex; justify-content:center; gap:8px; margin-bottom:6px;
-    }
-    .week-dot {
-      width:50px; height:5px; border-radius:3px;
-      background:rgba(255,255,255,0.08);
-      cursor:pointer; transition:all .4s ease;
-    }
+    .topbar-title { font-family:'Great Vibes',cursive; font-size:28px; background:var(--luxury-gradient); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; margin:0; line-height:1.1; }
+    .topbar-sub { font-family:'Playfair Display',serif; color:var(--gold); font-size:11px; text-transform:uppercase; letter-spacing:3px; margin-top:3px; opacity:0.7; }
+    .progress-dots-wrap { background:var(--glass2); border-bottom:1px solid var(--border); padding:12px 20px 8px; }
+    .progress-dots { display:flex; justify-content:center; gap:8px; margin-bottom:6px; }
+    .week-dot { width:50px; height:5px; border-radius:3px; background:rgba(255,255,255,0.08); cursor:pointer; transition:all .4s ease; }
     .week-dot.completed { background:var(--gold); box-shadow:0 0 8px rgba(212,175,55,0.4); }
     .week-dot.active { background:rgba(212,175,55,0.5); animation:dotPulse 2s ease-in-out infinite; }
     @keyframes dotPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
     .progress-dot-labels { display:flex; justify-content:center; gap:8px; }
-    .dot-label {
-      width:50px; text-align:center;
-      font-family:'Montserrat',sans-serif; font-size:8px; font-weight:600; letter-spacing:1px;
-      color:#444; text-transform:uppercase; cursor:pointer; transition:color .3s;
-    }
+    .dot-label { width:50px; text-align:center; font-family:'Montserrat',sans-serif; font-size:8px; font-weight:600; letter-spacing:1px; color:#444; text-transform:uppercase; cursor:pointer; transition:color .3s; }
     .dot-label.active { color:var(--gold); }
     .dot-label.completed { color:rgba(76,175,80,0.7); }
-
-    /* ── Main ── */
     .main { max-width:600px; margin:0 auto; padding:25px 20px calc(100px + var(--safe-b)); }
-
-    /* ── Stats ── */
     .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:25px; }
-    .stat-card {
-      background:var(--glass); border:1px solid var(--border);
-      border-radius:14px; padding:14px 10px; text-align:center;
-      backdrop-filter:blur(12px);
-    }
-    .stat-val {
-      font-family:'Playfair Display',serif; font-size:22px; font-weight:700;
-      color:var(--gold);
-    }
-    .stat-lbl {
-      font-size:8px; text-transform:uppercase; letter-spacing:1.5px;
-      color:#777; margin-top:4px; font-weight:600;
-    }
-
-    /* ── Reference drawer button ── */
-    .ref-drawer-btn {
-      display:flex; align-items:center; gap:10px;
-      width:100%; padding:10px 18px; border-radius:25px;
-      background:transparent; border:1px solid var(--border);
-      color:rgba(212,175,55,0.6); font-size:10px; font-weight:600;
-      letter-spacing:1.5px; text-transform:uppercase;
-      cursor:pointer; margin-bottom:25px; transition:all .3s;
-      -webkit-tap-highlight-color:transparent;
-    }
+    .stat-card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:14px 10px; text-align:center; backdrop-filter:blur(12px); }
+    .stat-val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--gold); }
+    .stat-lbl { font-size:8px; text-transform:uppercase; letter-spacing:1.5px; color:#777; margin-top:4px; font-weight:600; }
+    .ref-drawer-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 18px; border-radius:25px; background:transparent; border:1px solid var(--border); color:rgba(212,175,55,0.6); font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; margin-bottom:25px; transition:all .3s; }
     .ref-drawer-btn:active { border-color:var(--gold); color:var(--gold); }
     .ref-drawer-btn .material-symbols-rounded { font-size:16px; }
-
-    /* ── Reference bottom sheet ── */
-    .ref-back {
-      position:fixed; inset:0; z-index:200;
-      background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
-      display:flex; align-items:flex-end; justify-content:center;
-      opacity:0; pointer-events:none; transition:opacity .25s;
-    }
+    .ref-back { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
     .ref-back.open { opacity:1; pointer-events:all; }
-    .ref-sheet {
-      background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border);
-      border-radius:24px 24px 0 0;
-      width:100%; max-width:600px; max-height:88dvh;
-      overflow-y:auto; scrollbar-width:none;
-      padding:8px 20px calc(32px + var(--safe-b));
-      transform:translateY(100%);
-      transition:transform .3s cubic-bezier(.22,.68,0,1.2);
-    }
+    .ref-sheet { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:600px; max-height:88dvh; overflow-y:auto; scrollbar-width:none; padding:8px 20px calc(32px + var(--safe-b)); transform:translateY(100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2); }
     .ref-sheet::-webkit-scrollbar { display:none; }
     .ref-back.open .ref-sheet { transform:translateY(0); }
-    .ref-sheet-handle {
-      width:36px; height:4px; border-radius:2px;
-      background:rgba(255,255,255,.12); margin:12px auto 16px;
-    }
-    .ref-sheet-head {
-      display:flex; align-items:center; justify-content:space-between;
-      padding-bottom:12px; border-bottom:1px solid var(--border); margin-bottom:16px;
-    }
-    .ref-sheet-title {
-      font-family:'Playfair Display',serif; font-size:16px; font-weight:600;
-      color:var(--gold); text-transform:uppercase; letter-spacing:2px;
-    }
-    .ref-sheet-close {
-      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600;
-      letter-spacing:1.5px; color:#666; text-transform:uppercase;
-      background:transparent; border:none; cursor:pointer; padding:4px 8px;
-    }
-
-    /* ── Accordion ── */
+    .ref-sheet-handle { width:36px; height:4px; border-radius:2px; background:rgba(255,255,255,.12); margin:12px auto 16px; }
+    .ref-sheet-head { display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+    .ref-sheet-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:2px; }
+    .ref-sheet-close { font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600; letter-spacing:1.5px; color:#666; text-transform:uppercase; background:transparent; border:none; cursor:pointer; padding:4px 8px; }
     .acc-item { border-bottom:1px solid rgba(255,255,255,0.04); }
     .acc-item:last-child { border-bottom:none; }
-    .acc-header {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:16px 0; cursor:pointer; -webkit-tap-highlight-color:transparent;
-    }
-    .acc-title {
-      font-family:'Playfair Display',serif; font-size:15px; font-weight:600;
-      color:#ddd; text-transform:uppercase; letter-spacing:1.5px;
-    }
+    .acc-header { display:flex; align-items:center; justify-content:space-between; padding:16px 0; cursor:pointer; }
+    .acc-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#ddd; text-transform:uppercase; letter-spacing:1.5px; }
     .acc-chevron { font-size:20px; color:#555; transition:transform .25s; }
     .acc-item.open .acc-chevron { transform:rotate(180deg); color:var(--gold); }
-    .acc-body {
-      max-height:0; overflow:hidden;
-      transition:max-height .35s cubic-bezier(.4,0,.2,1);
-    }
+    .acc-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); }
     .acc-item.open .acc-body { max-height:2000px; padding-bottom:16px; }
-
-    /* ── Philosophy card ── */
-    .philosophy-card {
-      background:var(--glass); border:1.5px solid var(--border);
-      border-radius:20px; padding:28px 22px; margin-bottom:20px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.5); backdrop-filter:blur(12px);
-    }
-    .philosophy-title {
-      font-family:'Playfair Display',serif; font-size:18px; font-weight:600;
-      color:var(--gold); text-transform:uppercase; letter-spacing:2px;
-      margin-bottom:16px; padding-bottom:10px;
-      border-bottom:1px solid rgba(212,175,55,0.15);
-    }
-    .prose {
-      font-size:13px; font-weight:300; color:#ccc; line-height:1.8; margin-bottom:14px;
-    }
+    .philosophy-card { background:var(--glass); border:1.5px solid var(--border); border-radius:20px; padding:28px 22px; margin-bottom:20px; box-shadow:0 10px 30px rgba(0,0,0,0.5); backdrop-filter:blur(12px); }
+    .philosophy-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.15); }
+    .prose { font-size:13px; font-weight:300; color:#ccc; line-height:1.8; margin-bottom:14px; }
     .prose em { color:var(--gold); font-style:normal; font-weight:600; }
-    .prose-accent {
-      font-family:'Playfair Display',serif; font-size:14px; font-style:italic;
-      color:var(--gold); text-align:center; padding:16px;
-      margin-top:10px; border-top:1px solid rgba(212,175,55,0.1);
-      opacity:.85; line-height:1.6;
-    }
-
-    /* ── Tool items ── */
-    .tool-item {
-      display:flex; gap:14px; padding:14px 0;
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
+    .prose-accent { font-family:'Playfair Display',serif; font-size:14px; font-style:italic; color:var(--gold); text-align:center; padding:16px; margin-top:10px; border-top:1px solid rgba(212,175,55,0.1); opacity:.85; line-height:1.6; }
+    .tool-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
     .tool-item:last-child { border-bottom:none; }
     .tool-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
     .tool-name { font-size:13px; font-weight:600; color:#ddd; margin-bottom:3px; }
     .tool-desc { font-size:11px; color:#888; line-height:1.5; }
-
-    /* ── Safety alert ── */
-    .safety-alert {
-      background:rgba(244,67,54,0.06); border:1px solid rgba(244,67,54,0.25);
-      border-radius:12px; padding:16px; margin-top:15px;
-    }
-    .safety-label {
-      font-size:10px; font-weight:700; text-transform:uppercase;
-      letter-spacing:1.5px; color:#F44336; margin-bottom:6px;
-    }
+    .safety-alert { background:rgba(244,67,54,0.06); border:1px solid rgba(244,67,54,0.25); border-radius:12px; padding:16px; margin-top:15px; }
+    .safety-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:#F44336; margin-bottom:6px; }
     .safety-text { font-size:12px; color:#ccc; line-height:1.6; }
     .safety-text strong { color:#F44336; }
-
-    /* ── Group label ── */
-    .group-label, .task-group-label {
-      font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px;
-      color:var(--gold); margin:18px 0 12px; padding-bottom:6px;
-      border-bottom:1px solid rgba(212,175,55,0.15);
-    }
-
-    /* ── Guideline items ── */
+    .group-label, .task-group-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin:18px 0 12px; padding-bottom:6px; border-bottom:1px solid rgba(212,175,55,0.15); }
     .guideline-item { margin-bottom:18px; }
     .guideline-name { font-family:'Playfair Display',serif; font-size:14px; color:#ddd; margin-bottom:5px; }
     .guideline-desc { font-size:12px; color:#999; line-height:1.6; }
-    .guideline-sub {
-      padding:8px 12px; margin:6px 0;
-      border-left:2px solid rgba(212,175,55,0.15);
-      border-radius:0 6px 6px 0;
-    }
+    .guideline-sub { padding:8px 12px; margin:6px 0; border-left:2px solid rgba(212,175,55,0.15); border-radius:0 6px 6px 0; }
     .guideline-sub strong { color:#ddd; }
-
-    /* ── Trouble card ── */
-    .trouble-card {
-      background:var(--glass); border:1px solid var(--border);
-      border-radius:14px; padding:18px; margin-bottom:12px;
-      backdrop-filter:blur(12px);
-    }
-    .trouble-q {
-      font-family:'Playfair Display',serif; font-size:13px; font-weight:600;
-      font-style:italic; color:#ddd; margin-bottom:8px;
-    }
+    .trouble-card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:12px; backdrop-filter:blur(12px); }
+    .trouble-q { font-family:'Playfair Display',serif; font-size:13px; font-weight:600; font-style:italic; color:#ddd; margin-bottom:8px; }
     .trouble-a { font-size:12px; color:#aaa; line-height:1.6; }
     .trouble-a strong { color:var(--gold); font-weight:600; }
-
-    /* ── Submission card ── */
-    .submission-card {
-      background:rgba(212,175,55,0.03); border:1.5px solid rgba(212,175,55,0.2);
-      border-radius:16px; padding:22px; margin-top:15px;
-    }
-    .submission-title {
-      font-family:'Playfair Display',serif; font-size:14px; color:var(--gold);
-      text-transform:uppercase; letter-spacing:2px; margin-bottom:12px;
-    }
-    .submission-rule {
-      font-size:12px; color:#bbb; line-height:1.6; margin-bottom:10px;
-      padding-left:16px; border-left:2px solid rgba(212,175,55,0.2);
-    }
+    .submission-card { background:rgba(212,175,55,0.03); border:1.5px solid rgba(212,175,55,0.2); border-radius:16px; padding:22px; margin-top:15px; }
+    .submission-title { font-family:'Playfair Display',serif; font-size:14px; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; }
+    .submission-rule { font-size:12px; color:#bbb; line-height:1.6; margin-bottom:10px; padding-left:16px; border-left:2px solid rgba(212,175,55,0.2); }
     .submission-rule:last-child { margin-bottom:0; }
     .submission-rule strong { color:var(--gold); }
-
-    /* ── Reference link ── */
-    .ref-link {
-      color:var(--gold); text-decoration:none;
-      border-bottom:1px solid rgba(212,175,55,0.3); font-size:12px;
-    }
-
-    /* ── Week card ── */
-    .week-card {
-      background:var(--glass); border:1.5px solid var(--border);
-      border-radius:20px; margin-bottom:20px; overflow:hidden;
-      box-shadow:0 10px 30px rgba(0,0,0,0.5); transition:all .4s ease;
-      backdrop-filter:blur(12px);
-    }
+    .ref-link { color:var(--gold); text-decoration:none; border-bottom:1px solid rgba(212,175,55,0.3); font-size:12px; }
+    .week-card { background:var(--glass); border:1.5px solid var(--border); border-radius:20px; margin-bottom:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.5); transition:all .4s ease; backdrop-filter:blur(12px); }
     .week-card.locked { opacity:0.4; pointer-events:none; filter:grayscale(0.5); }
     .week-card.completed-card { border-color:rgba(76,175,80,0.4); }
-    .week-header {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:20px; cursor:pointer; transition:background .3s;
-    }
+    .week-header { display:flex; justify-content:space-between; align-items:center; padding:20px; cursor:pointer; transition:background .3s; }
     .week-header:active { background:rgba(255,255,255,0.02); }
     .week-info { flex:1; min-width:0; }
-    .week-badge {
-      font-size:9px; font-weight:700; text-transform:uppercase;
-      letter-spacing:2px; color:var(--gold); margin-bottom:4px;
-    }
-    .week-name {
-      font-family:'Playfair Display',serif; font-size:18px;
-      color:#eee; margin-bottom:4px; font-style:italic;
-    }
-    .week-obj {
-      font-size:11px; color:#888; line-height:1.5;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .week-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin-bottom:4px; }
+    .week-name { font-family:'Playfair Display',serif; font-size:18px; color:#eee; margin-bottom:4px; font-style:italic; }
+    .week-obj { font-size:11px; color:#888; line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .week-status { font-size:1.5rem; margin-left:15px; flex-shrink:0; }
-    .week-body {
-      display:none; padding:0 20px 20px;
-      border-top:1px solid rgba(212,175,55,0.1);
-    }
+    .week-body { display:none; padding:0 20px 20px; border-top:1px solid rgba(212,175,55,0.1); }
     .week-body.open { display:block; animation:fadeSlideIn .4s ease; }
     @keyframes fadeSlideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-
-    /* ── Task items ── */
-    .task-group-label {
-      font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px;
-      color:var(--gold); margin:18px 0 12px; padding-bottom:6px;
-      border-bottom:1px solid rgba(212,175,55,0.15);
-    }
-    .task-item {
-      display:flex; align-items:flex-start; gap:14px;
-      padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.04);
-    }
+    .task-item { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
     .task-item:last-child { border-bottom:none; }
-    .task-check {
-      width:22px; height:22px; border-radius:6px; flex-shrink:0;
-      border:1.5px solid var(--border); background:rgba(255,255,255,0.03);
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; margin-top:2px; transition:all .25s ease;
-      font-size:12px; color:transparent;
-    }
+    .task-check { width:22px; height:22px; border-radius:6px; flex-shrink:0; border:1.5px solid var(--border); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:2px; transition:all .25s ease; font-size:12px; color:transparent; }
     .task-check.checked { background:var(--gold); border-color:var(--gold); color:var(--midnight); }
     .task-text { flex:1; }
     .task-name { font-size:13px; font-weight:600; color:#ddd; margin-bottom:3px; }
     .task-name.done { text-decoration:line-through; opacity:.5; }
     .task-detail { font-size:11px; color:#888; line-height:1.6; }
-    .task-why {
-      font-size:11px; color:rgba(212,175,55,0.7);
-      line-height:1.5; margin-top:6px; font-style:italic;
-    }
-
-    /* ── Depth tracker ── */
-    .depth-tracker {
-      margin-top:20px; padding:16px 18px;
-      background:rgba(212,175,55,0.04); border:1px solid rgba(212,175,55,0.15);
-      border-radius:14px;
-    }
-    .depth-tracker-title {
-      font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;
-      color:var(--gold); margin-bottom:14px;
-    }
+    .task-why { font-size:11px; color:rgba(212,175,55,0.7); line-height:1.5; margin-top:6px; font-style:italic; }
+    .depth-tracker { margin-top:20px; padding:16px 18px; background:rgba(212,175,55,0.04); border:1px solid rgba(212,175,55,0.15); border-radius:14px; }
+    .depth-tracker-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:14px; }
     .depth-inputs { display:flex; gap:10px; }
     .depth-field { flex:1; }
-    .depth-label {
-      font-size:8px; font-weight:600; letter-spacing:1.5px;
-      color:#777; text-transform:uppercase; display:block; margin-bottom:6px;
-    }
-    .depth-input {
-      width:100%; padding:10px 12px; border-radius:8px;
-      background:rgba(255,255,255,0.03); border:1px solid var(--border);
-      color:#ddd; font-family:'Montserrat',sans-serif; font-size:15px;
-      font-weight:600; outline:none; -webkit-appearance:none;
-      transition:border-color .2s; text-align:center;
-    }
+    .depth-label { font-size:8px; font-weight:600; letter-spacing:1.5px; color:#777; text-transform:uppercase; display:block; margin-bottom:6px; }
+    .depth-input { width:100%; padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border); color:#ddd; font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; outline:none; -webkit-appearance:none; transition:border-color .2s; text-align:center; }
     .depth-input:focus { border-color:var(--gold); }
     .depth-input::placeholder { color:#444; font-weight:400; font-size:11px; }
-    .depth-save-btn {
-      width:100%; margin-top:12px; padding:11px;
-      border-radius:25px; border:1px solid var(--border); cursor:pointer;
-      font-size:10px; font-weight:600; letter-spacing:2px;
-      text-transform:uppercase; transition:all .3s;
-      background:transparent; color:rgba(212,175,55,0.7);
-    }
+    .depth-save-btn { width:100%; margin-top:12px; padding:11px; border-radius:25px; border:1px solid var(--border); cursor:pointer; font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; transition:all .3s; background:transparent; color:rgba(212,175,55,0.7); }
     .depth-save-btn:active { border-color:var(--gold); color:var(--gold); }
-
-    /* ── Timer ── */
     .timer-section { margin-top:20px; text-align:center; }
-    .timer-label {
-      font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px;
-      color:var(--gold); border:none; text-align:center; margin-bottom:15px;
-      border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:6px;
-    }
-    .timer-start-btn {
-      display:inline-block; padding:12px 30px; background:var(--luxury-gradient);
-      color:var(--midnight); border:none; border-radius:25px;
-      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
-      text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s ease;
-    }
+    .timer-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); text-align:center; margin-bottom:15px; border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:6px; }
+    .timer-start-btn { display:inline-block; padding:12px 30px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:25px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s ease; }
     .timer-start-btn:active { transform:scale(.95); }
     .timer-ring-wrap { display:none; flex-direction:column; align-items:center; gap:10px; }
     .timer-track { fill:none; stroke:rgba(212,175,55,0.1); stroke-width:5; }
-    .timer-fill {
-      fill:none; stroke:var(--gold); stroke-width:5; stroke-linecap:round;
-      stroke-dasharray:377; stroke-dashoffset:0; transition:stroke .5s;
-    }
-    .timer-display {
-      font-family:'Playfair Display',serif; font-size:1.3rem;
-      fill:var(--gold); dominant-baseline:middle; text-anchor:middle;
-    }
-    .timer-reset-btn {
-      display:inline-block; padding:10px 22px;
-      background:transparent; color:var(--gold); border:1px solid var(--border);
-      border-radius:25px; font-family:'Montserrat',sans-serif; font-size:10px;
-      font-weight:700; text-transform:uppercase; letter-spacing:2px;
-      cursor:pointer; transition:.2s;
-    }
-    .timer-done-msg {
-      display:none; color:#4CAF50; font-size:11px; text-transform:uppercase;
-      letter-spacing:2px; font-weight:700; margin-top:10px;
-      animation:fadeSlideIn .4s ease;
-    }
-
-    /* ── Sir's Tip card ── */
-    .tip-card {
-      background:rgba(212,175,55,0.04); border:1px solid rgba(212,175,55,0.15);
-      border-radius:12px; padding:16px; margin-top:15px;
-      position:relative; overflow:hidden;
-    }
-    .tip-card::before {
-      content:'"'; position:absolute; top:-10px; left:10px;
-      font-family:'Playfair Display',serif; font-size:64px;
-      color:rgba(212,175,55,0.12); line-height:1; pointer-events:none;
-    }
-    .tip-label {
-      font-size:9px; font-weight:700; text-transform:uppercase;
-      letter-spacing:1.5px; color:var(--gold); margin-bottom:8px;
-    }
-    .tip-text {
-      font-family:'Playfair Display',serif; font-size:13px;
-      font-style:italic; color:#bbb; line-height:1.7;
-    }
-
-    /* ── Complete button ── */
-    .complete-btn {
-      display:block; width:100%; padding:16px; margin-top:20px;
-      background:var(--luxury-gradient); color:var(--midnight); border:none;
-      border-radius:14px; font-family:'Montserrat',sans-serif; font-size:11px;
-      font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer;
-      transition:.2s ease; box-shadow:0 6px 20px rgba(212,175,55,0.25);
-    }
+    .timer-fill { fill:none; stroke:var(--gold); stroke-width:5; stroke-linecap:round; stroke-dasharray:377; stroke-dashoffset:0; transition:stroke .5s; }
+    .timer-display { font-family:'Playfair Display',serif; font-size:1.3rem; fill:var(--gold); dominant-baseline:middle; text-anchor:middle; }
+    .timer-reset-btn { display:inline-block; padding:10px 22px; background:transparent; color:var(--gold); border:1px solid var(--border); border-radius:25px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s; }
+    .timer-done-msg { display:none; color:#4CAF50; font-size:11px; text-transform:uppercase; letter-spacing:2px; font-weight:700; margin-top:10px; animation:fadeSlideIn .4s ease; }
+    .tip-card { background:rgba(212,175,55,0.04); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:16px; margin-top:15px; position:relative; overflow:hidden; }
+    .tip-card::before { content:'"'; position:absolute; top:-10px; left:10px; font-family:'Playfair Display',serif; font-size:64px; color:rgba(212,175,55,0.12); line-height:1; pointer-events:none; }
+    .tip-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:8px; }
+    .tip-text { font-family:'Playfair Display',serif; font-size:13px; font-style:italic; color:#bbb; line-height:1.7; }
+    .complete-btn { display:block; width:100%; padding:16px; margin-top:20px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:14px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s ease; box-shadow:0 6px 20px rgba(212,175,55,0.25); }
     .complete-btn:active { transform:scale(.97); }
-    .complete-btn.done {
-      background:rgba(76,175,80,0.1); color:#4CAF50;
-      border:1px solid rgba(76,175,80,0.3); pointer-events:none;
-      box-shadow:none;
-    }
-
-    /* ── Session log ── */
-    .log-toggle {
-      display:flex; align-items:center; gap:12px;
-      width:100%; padding:14px 18px; border-radius:16px;
-      background:var(--glass); border:1px solid var(--border);
-      cursor:pointer; margin-top:20px; transition:all .3s;
-      -webkit-tap-highlight-color:transparent;
-      backdrop-filter:blur(12px);
-    }
+    .complete-btn.done { background:rgba(76,175,80,0.1); color:#4CAF50; border:1px solid rgba(76,175,80,0.3); pointer-events:none; box-shadow:none; }
+    .log-toggle { display:flex; align-items:center; gap:12px; width:100%; padding:14px 18px; border-radius:16px; background:var(--glass); border:1px solid var(--border); cursor:pointer; margin-top:20px; transition:all .3s; backdrop-filter:blur(12px); }
     .log-toggle:active { border-color:var(--gold); }
     .log-toggle .material-symbols-rounded { font-size:18px; color:var(--gold); }
-    .log-toggle-label {
-      flex:1; font-size:10px; font-weight:600; letter-spacing:1.5px;
-      text-transform:uppercase; color:#aaa;
-    }
+    .log-toggle-label { flex:1; font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:#aaa; }
     .log-toggle-chevron { font-size:20px; color:#555; transition:transform .25s; }
     .log-open .log-toggle-chevron { transform:rotate(180deg); color:var(--gold); }
-    .log-body {
-      max-height:0; overflow:hidden;
-      transition:max-height .3s cubic-bezier(.4,0,.2,1);
-    }
+    .log-body { max-height:0; overflow:hidden; transition:max-height .3s cubic-bezier(.4,0,.2,1); }
     .log-open .log-body { max-height:600px; }
-    .log-inner {
-      background:var(--glass); border:1px solid var(--border);
-      border-top:none; border-radius:0 0 16px 16px;
-      padding:16px 20px; backdrop-filter:blur(12px);
-    }
-    .log-title {
-      font-family:'Playfair Display',serif; font-size:16px; font-weight:600;
-      color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:15px;
-    }
-    .log-entry {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px;
-    }
+    .log-inner { background:var(--glass); border:1px solid var(--border); border-top:none; border-radius:0 0 16px 16px; padding:16px 20px; backdrop-filter:blur(12px); }
+    .log-entry { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; }
     .log-entry:last-child { border-bottom:none; }
     .log-level { color:var(--gold); font-weight:600; font-size:10px; text-transform:uppercase; letter-spacing:1px; }
     .log-note { color:#aaa; font-style:italic; font-size:11px; flex:1; margin:0 12px; }
     .log-date { color:#555; font-size:10px; }
     .log-empty { color:#555; font-style:italic; font-size:12px; text-align:center; padding:20px 0; }
-
-    /* ── Reset button ── */
-    .reset-btn {
-      display:block; width:100%; margin-top:15px; padding:14px;
-      background:transparent; border:1px solid rgba(244,67,54,0.3);
-      border-radius:12px; color:#F44336; font-size:10px; font-weight:600;
-      text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.3s;
-    }
+    .reset-btn { display:block; width:100%; margin-top:15px; padding:14px; background:transparent; border:1px solid rgba(244,67,54,0.3); border-radius:12px; color:#F44336; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.3s; }
     .reset-btn:active { border-color:#F44336; background:rgba(244,67,54,0.05); }
-
-    /* ── Celebration overlay ── */
-    .celebration-overlay {
-      position:fixed; inset:0; z-index:500;
-      display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,0.88); backdrop-filter:blur(12px);
-      opacity:0; pointer-events:none; transition:opacity .3s;
-    }
+    .celebration-overlay { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); backdrop-filter:blur(12px); opacity:0; pointer-events:none; transition:opacity .3s; }
     .celebration-overlay.show { opacity:1; pointer-events:all; }
-    .celebration-card {
-      background:var(--glass); border:1.5px solid var(--border); backdrop-filter:blur(12px);
-      border-radius:24px; padding:36px 28px; max-width:320px; width:90%;
-      text-align:center;
-      transform:scale(.85); transition:transform .4s cubic-bezier(.22,.68,0,1.3);
-    }
+    .celebration-card { background:var(--glass); border:1.5px solid var(--border); backdrop-filter:blur(12px); border-radius:24px; padding:36px 28px; max-width:320px; width:90%; text-align:center; transform:scale(.85); transition:transform .4s cubic-bezier(.22,.68,0,1.3); }
     .celebration-overlay.show .celebration-card { transform:scale(1); }
-    .celebration-orb {
-      width:72px; height:72px; border-radius:50%; margin:0 auto 20px;
-      background:var(--luxury-gradient);
-      display:flex; align-items:center; justify-content:center;
-      font-size:32px; animation:celebPulse 1.8s ease-in-out infinite;
-    }
+    .celebration-orb { width:72px; height:72px; border-radius:50%; margin:0 auto 20px; background:var(--luxury-gradient); display:flex; align-items:center; justify-content:center; font-size:32px; animation:celebPulse 1.8s ease-in-out infinite; }
     @keyframes celebPulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0.5)} 50%{box-shadow:0 0 0 16px rgba(212,175,55,0)} }
-    .celebration-title {
-      font-family:'Playfair Display',serif; font-size:18px; font-weight:600;
-      color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px;
-    }
-    .celebration-sub {
-      font-family:'Playfair Display',serif; font-size:14px; font-style:italic;
-      color:#aaa; line-height:1.6; margin-bottom:24px;
-    }
-    .celebration-btn {
-      padding:12px 30px; background:var(--luxury-gradient);
-      color:var(--midnight); border:none; border-radius:25px;
-      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
-      text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s;
-    }
-    .celebration-btn:active { transform:scale(.95); }
-
-    /* ── Reset modal ── */
-    .modal-back {
-      position:fixed; inset:0; z-index:300;
-      background:rgba(0,0,0,0.8); backdrop-filter:blur(8px);
-      display:flex; align-items:flex-end; justify-content:center;
-      opacity:0; pointer-events:none; transition:opacity .25s;
-    }
+    .celebration-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+    .celebration-sub { font-family:'Playfair Display',serif; font-size:14px; font-style:italic; color:#aaa; line-height:1.6; margin-bottom:24px; }
+    .celebration-btn { padding:12px 30px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:25px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s; }
+    .modal-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
     .modal-back.open { opacity:1; pointer-events:all; }
-    .modal-sheet {
-      background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border);
-      border-radius:24px 24px 0 0; width:100%; max-width:600px;
-      padding:8px 24px calc(28px + var(--safe-b));
-      transform:translateY(100%);
-      transition:transform .3s cubic-bezier(.22,.68,0,1.2);
-    }
+    .modal-sheet { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:600px; padding:8px 24px calc(28px + var(--safe-b)); transform:translateY(100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2); }
     .modal-back.open .modal-sheet { transform:translateY(0); }
-    .modal-handle {
-      width:36px; height:4px; border-radius:2px;
-      background:rgba(255,255,255,0.12); margin:12px auto 16px;
-    }
-    .modal-title {
-      font-family:'Playfair Display',serif; font-size:18px; font-weight:600;
-      color:#ddd; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px;
-    }
-    .modal-body {
-      font-size:13px; font-weight:300; color:#aaa; line-height:1.6; margin-bottom:20px;
-    }
+    .modal-handle { width:36px; height:4px; border-radius:2px; background:rgba(255,255,255,0.12); margin:12px auto 16px; }
+    .modal-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#ddd; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+    .modal-body { font-size:13px; font-weight:300; color:#aaa; line-height:1.6; margin-bottom:20px; }
     .modal-row { display:flex; gap:10px; }
-    .modal-btn {
-      flex:1; padding:14px; border-radius:14px; border:none; cursor:pointer;
-      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
-      letter-spacing:1.5px; text-transform:uppercase; transition:.2s;
-    }
+    .modal-btn { flex:1; padding:14px; border-radius:14px; border:none; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; transition:.2s; }
     .modal-btn:active { transform:scale(.97); }
     .modal-btn-cancel { background:rgba(255,255,255,0.05); color:#888; border:1px solid rgba(255,255,255,0.08); }
     .modal-btn-confirm { background:rgba(244,67,54,0.12); color:#F44336; border:1px solid rgba(244,67,54,0.3); }
-    /* ── Per-task inline timer ── */
     .task-timer-wrap { margin-top:10px; }
-    .task-timer-btn {
-      display:inline-flex; align-items:center; gap:6px;
-      padding:7px 14px; border-radius:20px; cursor:pointer;
-      font-family:'Montserrat',sans-serif; font-size:9px; font-weight:700;
-      letter-spacing:1.5px; text-transform:uppercase; transition:all .2s;
-      background:transparent; border:1px solid var(--border);
-      color:rgba(212,175,55,0.7);
-      -webkit-tap-highlight-color:transparent;
-    }
+    .task-timer-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:20px; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; transition:all .2s; background:transparent; border:1px solid var(--border); color:rgba(212,175,55,0.7); }
     .task-timer-btn:active { transform:scale(.95); border-color:var(--gold); }
     .task-timer-running { display:none; align-items:center; gap:10px; margin-top:6px; }
     .task-timer-running.show { display:flex; }
     .task-timer-bar-wrap { flex:1; height:4px; background:rgba(212,175,55,0.12); border-radius:2px; overflow:hidden; }
     .task-timer-bar { height:100%; background:var(--luxury-gradient); border-radius:2px; width:100%; transition:width 1s linear; }
     .task-timer-bar.done { background:linear-gradient(90deg,#4CAF50,#81C784); }
-    .task-timer-count {
-      font-family:'Playfair Display',serif; font-size:14px;
-      color:var(--gold); min-width:36px; text-align:right;
-    }
+    .task-timer-count { font-family:'Playfair Display',serif; font-size:14px; color:var(--gold); min-width:36px; text-align:right; }
     .task-timer-count.done { color:#4CAF50; }
-    .task-timer-reset {
-      font-size:11px; color:#555; cursor:pointer; padding:2px;
-      background:transparent; border:none; letter-spacing:1px;
-    }
-    /* ── Submission task card ── */
-    .submission-task {
-      margin-top:20px; padding:18px;
-      background:rgba(212,175,55,0.04);
-      border:1.5px solid rgba(212,175,55,0.25);
-      border-radius:14px;
-    }
-    .submission-task-label {
-      font-size:9px; font-weight:700; text-transform:uppercase;
-      letter-spacing:2px; color:var(--gold); margin-bottom:8px;
-      display:flex; align-items:center; gap:8px;
-    }
-    .submission-task-name {
-      font-family:'Playfair Display',serif; font-size:15px; font-style:italic;
-      color:#ddd; margin-bottom:12px;
-    }
-    .submission-check-row {
-      display:flex; align-items:center; gap:12px; margin-bottom:14px;
-    }
-    .submission-check-label {
-      font-size:12px; font-weight:600; color:#aaa;
-    }
-    .submission-msg {
-      background:rgba(5,16,36,0.6); border:1px solid var(--border);
-      border-radius:10px; padding:12px 14px;
-      font-family:'Montserrat',sans-serif; font-size:11px; font-weight:300;
-      color:#aaa; line-height:1.75; margin-bottom:12px;
-    }
-    .submission-copy-btn {
-      display:flex; align-items:center; justify-content:center; gap:7px;
-      width:100%; padding:12px; border-radius:25px; border:none; cursor:pointer;
-      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
-      letter-spacing:1.5px; text-transform:uppercase; transition:all .25s;
-      background:var(--luxury-gradient); color:var(--midnight);
-    }
+    .task-timer-reset { font-size:11px; color:#555; cursor:pointer; padding:2px; background:transparent; border:none; letter-spacing:1px; }
+    .submission-task { margin-top:20px; padding:18px; background:rgba(212,175,55,0.04); border:1.5px solid rgba(212,175,55,0.25); border-radius:14px; }
+    .submission-task-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .submission-task-name { font-family:'Playfair Display',serif; font-size:15px; font-style:italic; color:#ddd; margin-bottom:12px; }
+    .submission-check-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .submission-check-label { font-size:12px; font-weight:600; color:#aaa; }
+    .submission-msg { background:rgba(5,16,36,0.6); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:300; color:#aaa; line-height:1.75; margin-bottom:12px; white-space:pre-line; }
+    .submission-copy-btn { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:12px; border-radius:25px; border:none; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; transition:all .25s; background:var(--luxury-gradient); color:var(--midnight); }
     .submission-copy-btn:active { transform:scale(.97); }
-    .submission-copy-btn.copied {
-      background:rgba(76,175,80,0.15); color:#4CAF50;
-      border:1px solid rgba(76,175,80,0.3);
-    }
+    .submission-copy-btn.copied { background:rgba(76,175,80,0.15); color:#4CAF50; border:1px solid rgba(76,175,80,0.3); }
     .submission-copy-btn .material-symbols-rounded { font-size:15px; }
-
-    /* ── Prep stack card ── */
-    .prep-stack {
-      background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.15);
-      border-radius:12px; padding:16px; margin-bottom:14px;
-    }
-    .prep-stack-title {
-      font-size:9px; font-weight:700; text-transform:uppercase;
-      letter-spacing:1.5px; color:var(--gold); margin-bottom:12px;
-    }
-    .prep-note {
-      font-family:'Playfair Display',serif; font-size:13px; font-style:italic;
-      color:var(--gold); text-align:center; padding-top:14px;
-      margin-top:14px; border-top:1px solid rgba(212,175,55,0.1);
-      line-height:1.6; opacity:.85;
-    }
+    .prep-stack { background:rgba(212,175,55,0.03); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:16px; margin-bottom:14px; }
+    .prep-stack-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:12px; }
+    .prep-note { font-family:'Playfair Display',serif; font-size:13px; font-style:italic; color:var(--gold); text-align:center; padding-top:14px; margin-top:14px; border-top:1px solid rgba(212,175,55,0.1); line-height:1.6; opacity:.85; }
   </style>
-<link rel="stylesheet" href="nav.css" />
+  <link rel="stylesheet" href="nav.css"/>
 </head>
 <body data-nav="training">
 
-  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-center">
       <div class="topbar-title">Deep Throat Training</div>
@@ -667,37 +219,25 @@
     </div>
   </div>
 
-  <!-- Progress dots -->
   <div class="progress-dots-wrap">
     <div class="progress-dots" id="progressDots"></div>
     <div class="progress-dot-labels" id="progressLabels"></div>
   </div>
 
   <div class="main">
-
-    <!-- Stats -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-val" id="stat-week">1</div>
-        <div class="stat-lbl">Current Week</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="stat-sessions">0</div>
-        <div class="stat-lbl">Tasks Done</div>
-      </div>
+      <div class="stat-card"><div class="stat-val" id="stat-week">1</div><div class="stat-lbl">Current Week</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-sessions">0</div><div class="stat-lbl">Tasks Done</div></div>
     </div>
 
-    <!-- Reference drawer button -->
     <button class="ref-drawer-btn" onclick="openRefDrawer()">
       <span class="material-symbols-rounded">menu_book</span>
-      <span class="ref-drawer-btn-label">Reference & Notes</span>
+      <span>Reference &amp; Notes</span>
       <span class="material-symbols-rounded" style="font-size:16px;color:#666">chevron_right</span>
     </button>
 
-    <!-- Protocol weeks (always visible) -->
     <div id="weeksContainer"></div>
 
-    <!-- Session Log - collapsible -->
     <div id="logWrap">
       <button class="log-toggle" onclick="toggleLog()" id="logToggleBtn">
         <span class="material-symbols-rounded">history</span>
@@ -710,181 +250,128 @@
     </div>
 
     <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
+  </div>
 
-  </div><!-- /main -->
-
-<!-- Reference Drawer -->
-<div class="ref-back" id="refBack" onclick="if(event.target===this)closeRefDrawer()">
-  <div class="ref-sheet">
-    <div class="ref-sheet-handle"></div>
-    <div class="ref-sheet-head">
-      <span class="ref-sheet-title">Reference & Notes</span>
-      <button class="ref-sheet-close" onclick="closeRefDrawer()">Close ✕</button>
-    </div>
-
-    <!-- Philosophy -->
-    <div class="acc-item" id="acc-philosophy">
-      <div class="acc-header" onclick="toggleAcc('philosophy')">
-        <span class="acc-title">I. Philosophy & Objective</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
+  <!-- Reference Drawer -->
+  <div class="ref-back" id="refBack" onclick="if(event.target===this)closeRefDrawer()">
+    <div class="ref-sheet">
+      <div class="ref-sheet-handle"></div>
+      <div class="ref-sheet-head">
+        <span class="ref-sheet-title">Reference &amp; Notes</span>
+        <button class="ref-sheet-close" onclick="closeRefDrawer()">Close ✕</button>
       </div>
-      <div class="acc-body">
-        <p class="prose">This protocol is not merely about physical depth; it is about <em>psychological surrender</em> and raw, primal service. The gag reflex is a defense mechanism. To suppress it is to trust your Dominant more than your own biological instinct to reject intrusion.</p>
-        <p class="prose"><em>The Aesthetic of Service:</em> True deep throating is not a sterile act. It is wet, chaotic, and visceral. We do not wipe away the evidence of your effort; we wear it.</p>
-        <div class="prose-accent">"To accept full depth with enthusiastic surrender, allowing the fluids to flow freely, maintaining eye contact, and transforming a service act into a mutual exchange of power and pleasure."</div>
-      </div>
-    </div>
-
-    <!-- Tools & Safety -->
-    <div class="acc-item" id="acc-tools">
-      <div class="acc-header" onclick="toggleAcc('tools')">
-        <span class="acc-title">II. Tools & Safety</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
-      </div>
-      <div class="acc-body">
-        <div class="group-label">Required Tools</div>
-        <div class="tool-item"><div class="tool-icon">🔩</div><div><div class="tool-name">Flexible Suction Cup Dildo</div><div class="tool-desc">Mount to a wall, headboard, or floor. Forces you to move your head and throat over the object.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">🔧</div><div><div class="tool-name">Flexible Hand-Held Dildo</div><div class="tool-desc">Trains your capacity (Depth). You must use your hand to push past your biological limits.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">💧</div><div><div class="tool-name">Lubrication</div><div class="tool-desc">High-quality water-based lubricant. A dry mouth is a painful mouth.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">🥤</div><div><div class="tool-name">White Gatorade + Sugar-Free Sour Mints</div><div class="tool-desc">Boosts thick, slippery saliva production for natural lube and the perfect messy glaze.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">🪞</div><div><div class="tool-name">Mirror</div><div class="tool-desc">For self-correction during solo drills.</div></div></div>
-        <div class="safety-alert" style="margin-top:12px">
-          <div class="safety-label">🛑 The "Red" Signal</div>
-          <div class="safety-text">Use a <strong>Double Tap</strong> on your thigh (or Sir's). This signals: <em>"Airway blocked. Stop."</em></div>
+      <div class="acc-item" id="acc-philosophy">
+        <div class="acc-header" onclick="toggleAcc('philosophy')"><span class="acc-title">I. Philosophy &amp; Objective</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <p class="prose">This protocol is not merely about physical depth; it is about <em>psychological surrender</em> and raw, primal service. The gag reflex is a defense mechanism. To suppress it is to trust your Dominant more than your own biological instinct to reject intrusion.</p>
+          <p class="prose"><em>The Aesthetic of Service:</em> True deep throating is not a sterile act. It is wet, chaotic, and visceral. We do not wipe away the evidence of your effort; we wear it.</p>
+          <div class="prose-accent">"To accept full depth with enthusiastic surrender, allowing the fluids to flow freely, maintaining eye contact, and transforming a service act into a mutual exchange of power and pleasure."</div>
         </div>
       </div>
-    </div>
-
-    <!-- Pre-Session Preparation -->
-    <div class="acc-item" id="acc-prep">
-      <div class="acc-header" onclick="toggleAcc('prep')">
-        <span class="acc-title">III. Pre-Session Preparation</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
-      </div>
-      <div class="acc-body">
-        <p class="prose">Complete these steps every time before training to maximize saliva, reduce nausea, and prepare your throat for deep, sloppy service.</p>
-
-        <div class="prep-stack">
-          <div class="prep-stack-title">Saliva Maximizer Stack</div>
-          <div class="tool-item"><div class="tool-icon">🥤</div><div><div class="tool-name">White Gatorade</div><div class="tool-desc">Drink 20–30 minutes before and sip during. Creates thicker, slicker saliva for natural lube and keeps the messy glaze clean — no colored stains.</div></div></div>
-          <div class="tool-item"><div class="tool-icon">💧</div><div><div class="tool-name">Sugar-free gum or mints</div><div class="tool-desc">Chew or suck for 5–10 minutes right before, then spit out. Extra saliva volume boost.</div></div></div>
-          <div class="tool-item"><div class="tool-icon">🍋</div><div><div class="tool-name">Sugar-free sour candies or lemon drops</div><div class="tool-desc">Use for 5–10 minutes right before. Sour taste triggers even more saliva on top of the stack.</div></div></div>
-          <div class="prep-note">More saliva = thicker glaze and louder, wetter sounds — exactly what your Dominant wants.</div>
-        </div>
-
-        <div class="tool-item"><div class="tool-icon">🍽️</div><div><div class="tool-name">Light stomach or fast</div><div class="tool-desc">Eat lightly 1–2 hours ahead to reduce nausea risk.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">🫧</div><div><div class="tool-name">Brush teeth and back of tongue</div><div class="tool-desc">Desensitizes the gag reflex and keeps everything fresh.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">🧘</div><div><div class="tool-name">Mental & physical warm-up</div><div class="tool-desc">Warm shower, deep breathing, light stretching, and get aroused first — arousal naturally relaxes the throat.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">🛑</div><div><div class="tool-name">Confirm safety signal</div><div class="tool-desc">Double-tap thigh = slow down and stop immediately. Confirm before every session.</div></div></div>
-      </div>
-    </div>
-
-    <!-- The Aesthetic -->
-    <div class="acc-item" id="acc-aesthetic">
-      <div class="acc-header" onclick="toggleAcc('aesthetic')">
-        <span class="acc-title">IV. The Messy Aesthetic</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
-      </div>
-      <div class="acc-body">
-        <div class="guideline-item"><div class="guideline-name">The "Glaze"</div><div class="guideline-desc">You are <strong style="color:var(--gold)">prohibited from wiping your face</strong> during the act. The visual of saliva connecting your mouth to the base is desired.</div></div>
-        <div class="guideline-item"><div class="guideline-name">Audio Feedback</div>
-          <div class="guideline-sub"><strong>The Hollow Sound:</strong> Shape your mouth to create a "gawk gawk" vacuum sound.</div>
-          <div class="guideline-sub"><strong>The Wet Gag:</strong> Let the throat spasm while you moan through it.</div>
-        </div>
-        <div class="guideline-item"><div class="guideline-name">The Aftermath</div><div class="guideline-desc">When you pull off, keep your mouth open, tongue out, displaying the mess you have made.</div></div>
-      </div>
-    </div>
-
-    <!-- Troubleshooting -->
-    <div class="acc-item" id="acc-troubleshooting">
-      <div class="acc-header" onclick="toggleAcc('troubleshooting')">
-        <span class="acc-title">VI. Troubleshooting</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
-      </div>
-      <div class="acc-body">
-        <div class="trouble-card"><div class="trouble-q">"The dildo keeps falling off the wall."</div><div class="trouble-a"><strong>Fix:</strong> Clean with rubbing alcohol. Use a tiny bit of water on the rim.</div></div>
-        <div class="trouble-card"><div class="trouble-q">"I'm choking on the fluids."</div><div class="trouble-a"><strong>Fix — The Tilt:</strong> Lean forward so fluids drain out of the mouth rather than down the windpipe.</div></div>
-        <div class="trouble-card"><div class="trouble-q">"My throat hurts/scratches."</div><div class="trouble-a"><strong>Fix — Chin Up:</strong> You are tucking your chin. Look at the ceiling to straighten the airway.</div></div>
-      </div>
-    </div>
-
-    <!-- Maintenance -->
-    <div class="acc-item" id="acc-maintenance">
-      <div class="acc-header" onclick="toggleAcc('maintenance')">
-        <span class="acc-title">VII. Maintenance Protocol</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
-      </div>
-      <div class="acc-body">
-        <div class="tool-item"><div class="tool-icon">✊</div><div><div class="tool-name">Pre-Game Ritual</div><div class="tool-desc">Left Thumb Squeeze + 3 Deep Breaths before every session.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">💆</div><div><div class="tool-name">Jaw Health</div><div class="tool-desc">Massage masseter muscles for 2 minutes post-session.</div></div></div>
-        <div class="tool-item"><div class="tool-icon">📹</div><div><div class="tool-name">Weekly Calibration</div><div class="tool-desc">Submit a 2-minute "Sloppy Bobbing" video to Sir.</div></div></div>
-      </div>
-    </div>
-
-    <!-- Submission -->
-    <div class="acc-item" id="acc-submission">
-      <div class="acc-header" onclick="toggleAcc('submission')">
-        <span class="acc-title">V. Submission Protocol</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
-      </div>
-      <div class="acc-body">
-        <p class="prose" style="opacity:.8;margin-bottom:12px">Sundays are verification day. Submit evidence of your progress to Sir.</p>
-        <div class="submission-card">
-          <div class="submission-title">Submission Rules</div>
-          <div class="submission-rule"><strong>Setup:</strong> Dildo suctioned to a surface — proves you are moving your head, not your hand.</div>
-          <div class="submission-rule"><strong>State:</strong> Messy. If clean at the end, you have not worked hard enough.</div>
-          <div class="submission-rule"><strong>The Statement:</strong> <em>"Sir, I have completed the task. Depth: [X]. Hold: [Y]s."</em></div>
+      <div class="acc-item" id="acc-tools">
+        <div class="acc-header" onclick="toggleAcc('tools')"><span class="acc-title">II. Tools &amp; Safety</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="group-label">Required Tools</div>
+          <div class="tool-item"><div class="tool-icon">🔩</div><div><div class="tool-name">Flexible Suction Cup Dildo</div><div class="tool-desc">Mount to a wall, headboard, or floor. Forces you to move your head and throat over the object.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">🔧</div><div><div class="tool-name">Flexible Hand-Held Dildo</div><div class="tool-desc">Trains your capacity (Depth). You must use your hand to push past your biological limits.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">💧</div><div><div class="tool-name">Lubrication</div><div class="tool-desc">High-quality water-based lubricant. A dry mouth is a painful mouth.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">🥤</div><div><div class="tool-name">White Gatorade + Sugar-Free Sour Mints</div><div class="tool-desc">Boosts thick, slippery saliva production for natural lube and the perfect messy glaze.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">🪞</div><div><div class="tool-name">Mirror</div><div class="tool-desc">For self-correction during solo drills.</div></div></div>
+          <div class="safety-alert" style="margin-top:12px"><div class="safety-label">🛑 The "Red" Signal</div><div class="safety-text">Use a <strong>Double Tap</strong> on your thigh (or Sir's). This signals: <em>"Airway blocked. Stop."</em></div></div>
         </div>
       </div>
-    </div>
-
-    <!-- References -->
-    <div class="acc-item" id="acc-references">
-      <div class="acc-header" onclick="toggleAcc('references')">
-        <span class="acc-title">VIII. References</span>
-        <span class="material-symbols-rounded acc-chevron">expand_more</span>
+      <div class="acc-item" id="acc-prep">
+        <div class="acc-header" onclick="toggleAcc('prep')"><span class="acc-title">III. Pre-Session Preparation</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <p class="prose">Complete these steps every time before training to maximize saliva, reduce nausea, and prepare your throat for deep, sloppy service.</p>
+          <div class="prep-stack">
+            <div class="prep-stack-title">Saliva Maximizer Stack</div>
+            <div class="tool-item"><div class="tool-icon">🥤</div><div><div class="tool-name">White Gatorade</div><div class="tool-desc">Drink 20–30 minutes before and sip during. Creates thicker, slicker saliva.</div></div></div>
+            <div class="tool-item"><div class="tool-icon">💧</div><div><div class="tool-name">Sugar-free gum or mints</div><div class="tool-desc">Chew 5–10 minutes before, then spit out.</div></div></div>
+            <div class="tool-item"><div class="tool-icon">🍋</div><div><div class="tool-name">Sugar-free sour candies</div><div class="tool-desc">Use 5–10 minutes before. Sour taste triggers extra saliva.</div></div></div>
+            <div class="prep-note">More saliva = thicker glaze and louder, wetter sounds.</div>
+          </div>
+          <div class="tool-item"><div class="tool-icon">🍽️</div><div><div class="tool-name">Light stomach or fast</div><div class="tool-desc">Eat lightly 1–2 hours ahead to reduce nausea risk.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">🫧</div><div><div class="tool-name">Brush teeth and back of tongue</div><div class="tool-desc">Desensitizes the gag reflex and keeps everything fresh.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">🧘</div><div><div class="tool-name">Mental &amp; physical warm-up</div><div class="tool-desc">Warm shower, deep breathing, light stretching, get aroused first.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">🛑</div><div><div class="tool-name">Confirm safety signal</div><div class="tool-desc">Double-tap thigh = slow down and stop immediately.</div></div></div>
+        </div>
       </div>
-      <div class="acc-body">
-        <div class="tool-item"><div class="tool-icon">📖</div><div><div class="tool-name">School of Squirt</div><div class="tool-desc"><a href="https://www.schoolofsquirt.com/face-fuck/" target="_blank" rel="noopener" class="ref-link">schoolofsquirt.com/face-fuck</a></div></div></div>
-        <div class="tool-item"><div class="tool-icon">📖</div><div><div class="tool-name">Brandon The Dom</div><div class="tool-desc"><a href="https://www.brandonthedom.com/advice/face-fucking" target="_blank" rel="noopener" class="ref-link">brandonthedom.com/advice/face-fucking</a></div></div></div>
-        <div class="tool-item"><div class="tool-icon">📖</div><div><div class="tool-name">Sofia Gray</div><div class="tool-desc"><a href="https://sofiagray.com/blog/the-ultimate-guide-to-facefucking/" target="_blank" rel="noopener" class="ref-link">sofiagray.com/blog/the-ultimate-guide-to-facefucking</a></div></div></div>
+      <div class="acc-item" id="acc-aesthetic">
+        <div class="acc-header" onclick="toggleAcc('aesthetic')"><span class="acc-title">IV. The Messy Aesthetic</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="guideline-item"><div class="guideline-name">The "Glaze"</div><div class="guideline-desc">You are <strong style="color:var(--gold)">prohibited from wiping your face</strong> during the act. The visual of saliva connecting your mouth to the base is desired.</div></div>
+          <div class="guideline-item"><div class="guideline-name">Audio Feedback</div><div class="guideline-sub"><strong>The Hollow Sound:</strong> Shape your mouth to create a "gawk gawk" vacuum sound.</div><div class="guideline-sub"><strong>The Wet Gag:</strong> Let the throat spasm while you moan through it.</div></div>
+          <div class="guideline-item"><div class="guideline-name">The Aftermath</div><div class="guideline-desc">When you pull off, keep your mouth open, tongue out, displaying the mess you have made.</div></div>
+        </div>
+      </div>
+      <div class="acc-item" id="acc-troubleshooting">
+        <div class="acc-header" onclick="toggleAcc('troubleshooting')"><span class="acc-title">VI. Troubleshooting</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="trouble-card"><div class="trouble-q">"The dildo keeps falling off the wall."</div><div class="trouble-a"><strong>Fix:</strong> Clean with rubbing alcohol. Use a tiny bit of water on the rim.</div></div>
+          <div class="trouble-card"><div class="trouble-q">"I'm choking on the fluids."</div><div class="trouble-a"><strong>Fix — The Tilt:</strong> Lean forward so fluids drain out of the mouth rather than down the windpipe.</div></div>
+          <div class="trouble-card"><div class="trouble-q">"My throat hurts/scratches."</div><div class="trouble-a"><strong>Fix — Chin Up:</strong> You are tucking your chin. Look at the ceiling to straighten the airway.</div></div>
+        </div>
+      </div>
+      <div class="acc-item" id="acc-maintenance">
+        <div class="acc-header" onclick="toggleAcc('maintenance')"><span class="acc-title">VII. Maintenance Protocol</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="tool-item"><div class="tool-icon">✊</div><div><div class="tool-name">Pre-Game Ritual</div><div class="tool-desc">Left Thumb Squeeze + 3 Deep Breaths before every session.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">💆</div><div><div class="tool-name">Jaw Health</div><div class="tool-desc">Massage masseter muscles for 2 minutes post-session.</div></div></div>
+          <div class="tool-item"><div class="tool-icon">📹</div><div><div class="tool-name">Weekly Calibration</div><div class="tool-desc">Submit a 2-minute "Sloppy Bobbing" video to Sir.</div></div></div>
+        </div>
+      </div>
+      <div class="acc-item" id="acc-submission">
+        <div class="acc-header" onclick="toggleAcc('submission')"><span class="acc-title">V. Submission Protocol</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <p class="prose" style="opacity:.8;margin-bottom:12px">Sundays are verification day. Submit evidence of your progress to Sir.</p>
+          <div class="submission-card">
+            <div class="submission-title">Submission Rules</div>
+            <div class="submission-rule"><strong>Setup:</strong> Dildo suctioned to a surface — proves you are moving your head, not your hand.</div>
+            <div class="submission-rule"><strong>State:</strong> Messy. If clean at the end, you have not worked hard enough.</div>
+            <div class="submission-rule"><strong>The Statement:</strong> <em>"Sir, I have completed the task. Depth: [X]. Hold: [Y]s."</em></div>
+          </div>
+        </div>
+      </div>
+      <div class="acc-item" id="acc-references">
+        <div class="acc-header" onclick="toggleAcc('references')"><span class="acc-title">VIII. References</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="tool-item"><div class="tool-icon">📖</div><div><div class="tool-name">School of Squirt</div><div class="tool-desc"><a href="https://www.schoolofsquirt.com/face-fuck/" target="_blank" rel="noopener" class="ref-link">schoolofsquirt.com/face-fuck</a></div></div></div>
+          <div class="tool-item"><div class="tool-icon">📖</div><div><div class="tool-name">Brandon The Dom</div><div class="tool-desc"><a href="https://www.brandonthedom.com/advice/face-fucking" target="_blank" rel="noopener" class="ref-link">brandonthedom.com/advice/face-fucking</a></div></div></div>
+          <div class="tool-item"><div class="tool-icon">📖</div><div><div class="tool-name">Sofia Gray</div><div class="tool-desc"><a href="https://sofiagray.com/blog/the-ultimate-guide-to-facefucking/" target="_blank" rel="noopener" class="ref-link">sofiagray.com/blog/the-ultimate-guide-to-facefucking</a></div></div></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Celebration Overlay -->
-<div class="celebration-overlay" id="celebrationOverlay">
-  <div class="celebration-card">
-    <div class="celebration-orb" id="celebOrb">🏆</div>
-    <div class="celebration-title" id="celebTitle">Week Complete</div>
-    <div class="celebration-sub" id="celebSub">You have completed this phase of Dom Sub Hub.</div>
-    <button class="celebration-btn" onclick="closeCelebration()">Continue</button>
-  </div>
-</div>
-
-<!-- Reset Confirm Modal -->
-<div class="modal-back" id="resetModal" onclick="if(event.target===this)closeResetModal()">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Reset All Progress?</div>
-    <div class="modal-body">Every completed task and week will be permanently erased. This cannot be undone.</div>
-    <div class="modal-row">
-      <button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">Keep It</button>
-      <button class="modal-btn modal-btn-confirm" onclick="doReset()">Yes, Reset</button>
+  <!-- Celebration Overlay -->
+  <div class="celebration-overlay" id="celebrationOverlay">
+    <div class="celebration-card">
+      <div class="celebration-orb" id="celebOrb">🏆</div>
+      <div class="celebration-title" id="celebTitle">Week Complete</div>
+      <div class="celebration-sub" id="celebSub">You have completed this phase.</div>
+      <button class="celebration-btn" onclick="closeCelebration()">Continue</button>
     </div>
   </div>
-</div>
 
-    <script type="module">
-import { requireAuth, dataRef } from './auth.js';
-import { doc, setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  <!-- Reset Confirm Modal -->
+  <div class="modal-back" id="resetModal" onclick="if(event.target===this)closeResetModal()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Reset All Progress?</div>
+      <div class="modal-body">Every completed task and week will be permanently erased. This cannot be undone.</div>
+      <div class="modal-row">
+        <button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">Keep It</button>
+        <button class="modal-btn modal-btn-confirm" onclick="doReset()">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
 
-let dbRef;
+  <script type="module">
+    import { requireAuth, dataRef } from './auth.js';
+    import { setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    // ════════════════════════════════════
-    // TRAINING DATA
-    // ════════════════════════════════════
+    // ── Training data ─────────────────────────────────────────
     const WEEKS = [
       {
         id:'week1', badge:'Week 1', name:'The Awakening',
@@ -896,7 +383,7 @@ let dbRef;
           { id:'diaphragm', schedule:'Daily — Evening', name:'Diaphragmatic Anchoring', detail:'Lie back. Place hand on stomach. Inhale through nose, exhale through mouth saying "Haaa." Visualize the throat opening like a tunnel. 2 minutes.', why:null, taskDuration:120 },
           { id:'static-hold', schedule:'Weekly Submission', name:'The Static Hold', detail:'Stick the dildo to a flat surface. Lower your mouth onto it to your "edge." Hold motionless for 60 seconds.', why:'Panic causes movement; submission requires stillness. This trains composure at depth.', taskDuration:60 }
         ],
-        submission:{ id:'submit1', message:`Sir, I have completed Week 1 of the protocol.\n\nTask: The Static Hold\nDepth: ___ inches\nHold: ___ seconds\n\nI am ready to advance.` }
+        submission:{ message:'Sir, I have completed Week 1 of the protocol.\n\nTask: The Static Hold\nDepth: ___ inches\nHold: ___ seconds\n\nI am ready to advance.' }
       },
       {
         id:'week2', badge:'Week 2', name:'The Acceptance',
@@ -908,7 +395,7 @@ let dbRef;
           { id:'thumb-squeeze', schedule:'Daily — Evening', name:'The Left Thumb Squeeze', detail:'Squeeze your left thumb inside your fist during depth work. This "neural gating" technique distracts the brain from the throat sensation.', why:null, taskDuration:null },
           { id:'humming-test', schedule:'Weekly Submission', name:'The Humming Test', detail:'Take the dildo deep and hum a song. You cannot hum if you are not breathing — your airway is clear at depth.', why:'If you can hum, you are breathing. If you are breathing, you are safe.', taskDuration:null }
         ],
-        submission:{ id:'submit2', message:`Sir, I have completed Week 2 of the protocol.\n\nTask: The Humming Test\nDepth reached: ___ inches\nHold: ___ seconds\nHumming confirmed: Yes\n\nI am ready to advance.` }
+        submission:{ message:'Sir, I have completed Week 2 of the protocol.\n\nTask: The Humming Test\nDepth reached: ___ inches\nHold: ___ seconds\nHumming confirmed: Yes\n\nI am ready to advance.' }
       },
       {
         id:'week3', badge:'Week 3', name:'The Glutton',
@@ -920,58 +407,51 @@ let dbRef;
           { id:'wet-gag', schedule:'Daily — Evening', name:'The Wet Gag', detail:'Push deeply to trigger a gag intentionally, but do not pull out. Let the throat spasm around the dildo while you moan through it.', why:'Turning the sound of gagging into a sound of pleasure. This transforms your reflex.', taskDuration:null },
           { id:'facefuck-sim', schedule:'Weekly Submission', name:'The Face-Fucking Sim', detail:'Suction cup dildo firmly attached to headboard or wall. Move your head onto it. Rhythm: 1 stroke per second for 2 full minutes.', why:'You may not wipe your face. By the end, your chin and neck should be "glazed."', taskDuration:120 }
         ],
-        submission:{ id:'submit3', message:`Sir, I have completed Week 3 of the protocol.\n\nTask: The Face-Fucking Sim\nDepth: ___ inches\nDuration: 2 minutes completed\nState at finish: Glazed ✓\n\nProtocol complete. Awaiting Sir's assessment.` }
+        submission:{ message:'Sir, I have completed Week 3 of the protocol.\n\nTask: The Face-Fucking Sim\nDepth: ___ inches\nDuration: 2 minutes completed\nState at finish: Glazed \u2713\n\nProtocol complete. Awaiting Sir\'s assessment.' }
       }
     ];
 
-    // ════════════════════════════════════
-    // STATE
-    // ════════════════════════════════════
-    // ════════════════════════════════════
-    // STATE
-    // ════════════════════════════════════
+    // ── State ─────────────────────────────────────────────────
+    let dbRef = null;
     let state = getDefaultState();
     let openWeekId = null;
 
     function getDefaultState() {
       return { tasks:{}, completedWeeks:[], sessions:0, log:[], depthLog:[] };
     }
-    
-    async function saveState() { 
-      if(dbRef) await setDoc(dbRef, state); 
-    }
 
-    async function init() {
-      const user = await requireAuth();
-      dbRef = dataRef('training/deepthroat-training');
-      
-      onSnapshot(dbRef, (snap) => {
-        if (snap.exists()) {
-          state = snap.data();
-        } else {
-          state = getDefaultState();
-          saveState();
-        }
-        render();
-      });
+    // saveState: writes every field explicitly so no field can silently wipe another
+    async function saveState() {
+      if (!dbRef) return;
+      try {
+        await setDoc(dbRef, {
+          tasks:          state.tasks          || {},
+          completedWeeks: state.completedWeeks || [],
+          sessions:       state.sessions       || 0,
+          log:            state.log            || [],
+          depthLog:       state.depthLog       || [],
+        });
+      } catch(e) {
+        console.error('saveState error:', e);
+      }
     }
 
     function getCurrentWeek() {
-      for (let i=0;i<WEEKS.length;i++) { if (!state.completedWeeks.includes(WEEKS[i].id)) return i; }
-      return WEEKS.length-1;
+      for (let i = 0; i < WEEKS.length; i++) {
+        if (!state.completedWeeks.includes(WEEKS[i].id)) return i;
+      }
+      return WEEKS.length - 1;
     }
-    function isWeekUnlocked(i) { return i===0 || state.completedWeeks.includes(WEEKS[i-1].id); }
+    function isWeekUnlocked(i) { return i === 0 || state.completedWeeks.includes(WEEKS[i-1].id); }
     function isWeekCompleted(i) { return state.completedWeeks.includes(WEEKS[i].id); }
     function areAllTasksDone(weekId) {
-      const w = WEEKS.find(w=>w.id===weekId);
-      const tasksDone = w.tasks.every(t=>state.tasks[`${weekId}_${t.id}`]);
-      const subDone = w.submission ? !!state.tasks[`${weekId}_submission`] : true;
+      const w = WEEKS.find(w => w.id === weekId);
+      const tasksDone = w.tasks.every(t => state.tasks[weekId + '_' + t.id]);
+      const subDone = w.submission ? !!state.tasks[weekId + '_submission'] : true;
       return tasksDone && subDone;
     }
 
-    // ════════════════════════════════════
-    // REFERENCE DRAWER
-    // ════════════════════════════════════
+    // ── Reference drawer ──────────────────────────────────────
     function openRefDrawer() {
       document.getElementById('refBack').classList.add('open');
       if (navigator.vibrate) navigator.vibrate(6);
@@ -979,55 +459,37 @@ let dbRef;
     function closeRefDrawer() {
       document.getElementById('refBack').classList.remove('open');
     }
-    // refBack click-outside handled in openRefDrawer
     function toggleAcc(id) {
       const item = document.getElementById('acc-' + id);
       const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.acc-item').forEach(i=>i.classList.remove('open'));
+      document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('open'));
       if (!isOpen) item.classList.add('open');
       if (navigator.vibrate) navigator.vibrate(5);
     }
 
-    // ════════════════════════════════════
-    // LOG COLLAPSE
-    // ════════════════════════════════════
+    // ── Log collapse ──────────────────────────────────────────
     let logOpen = false;
     function toggleLog() {
       logOpen = !logOpen;
       const wrap = document.getElementById('logWrap');
-      const chevron = document.getElementById('logChevron');
-      if (logOpen) {
-        wrap.classList.add('log-open');
-        chevron.textContent = 'expand_less';
-      } else {
-        wrap.classList.remove('log-open');
-        chevron.textContent = 'expand_more';
-      }
+      document.getElementById('logChevron').textContent = logOpen ? 'expand_less' : 'expand_more';
+      logOpen ? wrap.classList.add('log-open') : wrap.classList.remove('log-open');
       if (navigator.vibrate) navigator.vibrate(5);
     }
 
-    // ════════════════════════════════════
-    // RESET MODAL
-    // ════════════════════════════════════
-    function confirmReset() {
-      document.getElementById('resetModal').classList.add('open');
-    }
-    function closeResetModal() {
-      document.getElementById('resetModal').classList.remove('open');
-    }
-    function doReset() {
-      if(dbRef) deleteDoc(dbRef);
+    // ── Reset modal ───────────────────────────────────────────
+    function confirmReset() { document.getElementById('resetModal').classList.add('open'); }
+    function closeResetModal() { document.getElementById('resetModal').classList.remove('open'); }
+    async function doReset() {
+      if (dbRef) await deleteDoc(dbRef);
       state = getDefaultState();
-      openWeekId = null;
+      openWeekId = WEEKS[0].id; // FIX 8: open week1 explicitly after reset
       closeResetModal();
       render();
       if (navigator.vibrate) navigator.vibrate([20,10,20]);
     }
-    // resetModal click-outside handled via onclick
 
-    // ════════════════════════════════════
-    // CELEBRATION
-    // ════════════════════════════════════
+    // ── Celebration ───────────────────────────────────────────
     function showCelebration(title, sub, orb) {
       document.getElementById('celebTitle').textContent = title;
       document.getElementById('celebSub').textContent = sub;
@@ -1039,153 +501,121 @@ let dbRef;
       document.getElementById('celebrationOverlay').classList.remove('show');
     }
 
-    // ════════════════════════════════════
-    // TIMER
-    // ════════════════════════════════════
+    // ── Session timer ─────────────────────────────────────────
     let activeTimer = null, timerInterval = null;
     const RING = 377;
 
     function startTimer(weekId, dur) {
       stopTimer();
       activeTimer = { weekId, total:dur, remaining:dur };
-      document.getElementById(`ts-${weekId}`).style.display = 'none';
-      document.getElementById(`tr-${weekId}`).style.display = 'flex';
-      document.getElementById(`td-${weekId}`).style.display = 'none';
-      renderTimer(weekId);
-      timerInterval = setInterval(()=>{
+      document.getElementById('ts-' + weekId).style.display = 'none';
+      document.getElementById('tr-' + weekId).style.display = 'flex';
+      document.getElementById('td-' + weekId).style.display = 'none';
+      renderTimerFrame(weekId);
+      timerInterval = setInterval(() => {
         activeTimer.remaining--;
-        renderTimer(weekId);
+        renderTimerFrame(weekId);
         if (activeTimer.remaining <= 0) {
           clearInterval(timerInterval);
-          const fill = document.getElementById(`tf-${weekId}`);
-          const txt  = document.getElementById(`tt-${weekId}`);
-          fill.style.stroke = 'var(--green)'; txt.style.fill = 'var(--green)'; txt.textContent = '✓';
-          document.getElementById(`td-${weekId}`).style.display = 'block';
+          document.getElementById('tf-' + weekId).style.stroke = 'var(--green)';
+          const tt = document.getElementById('tt-' + weekId);
+          tt.style.fill = 'var(--green)'; tt.textContent = '\u2713';
+          document.getElementById('td-' + weekId).style.display = 'block';
           if (navigator.vibrate) navigator.vibrate([200,100,200]);
         }
       }, 1000);
     }
 
-    function renderTimer(weekId) {
-      const fill = document.getElementById(`tf-${weekId}`);
-      const txt  = document.getElementById(`tt-${weekId}`);
-      const pct  = activeTimer.remaining / activeTimer.total;
-      fill.style.strokeDashoffset = RING * (1-pct);
-      const m=Math.floor(activeTimer.remaining/60), s=activeTimer.remaining%60;
-      txt.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    function renderTimerFrame(weekId) {
+      const pct = activeTimer.remaining / activeTimer.total;
+      document.getElementById('tf-' + weekId).style.strokeDashoffset = RING * (1 - pct);
+      const m = Math.floor(activeTimer.remaining / 60), s = activeTimer.remaining % 60;
+      document.getElementById('tt-' + weekId).textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
 
-    function stopTimer() { if (timerInterval) clearInterval(timerInterval); activeTimer=null; }
+    function stopTimer() { if (timerInterval) clearInterval(timerInterval); activeTimer = null; }
 
     function resetTimerUI(weekId) {
       stopTimer();
-      document.getElementById(`ts-${weekId}`).style.display = 'inline-block';
-      document.getElementById(`tr-${weekId}`).style.display = 'none';
-      document.getElementById(`td-${weekId}`).style.display = 'none';
+      document.getElementById('ts-' + weekId).style.display = 'inline-block';
+      document.getElementById('tr-' + weekId).style.display = 'none';
+      document.getElementById('td-' + weekId).style.display = 'none';
     }
 
-    // ════════════════════════════════════
-    // PER-TASK TIMERS
-    // ════════════════════════════════════
-    const taskTimers = {}; // tid → { interval, remaining, total }
+    // ── Per-task timers ───────────────────────────────────────
+    const taskTimers = {};
 
     function startTaskTimer(tid, duration) {
-      // Stop any existing timer for this task
-      if (taskTimers[tid]) {
-        clearInterval(taskTimers[tid].interval);
-      }
-      taskTimers[tid] = { remaining: duration, total: duration, interval: null };
-
-      const btn  = document.getElementById(`tb-${tid}`);
-      const run  = document.getElementById(`tr-${tid}`);
-      const bar  = document.getElementById(`bar-${tid}`);
-      const cnt  = document.getElementById(`tc-${tid}`);
-      if (!btn || !run || !bar || !cnt) return;
-
+      if (taskTimers[tid]) clearInterval(taskTimers[tid].interval);
+      taskTimers[tid] = { remaining:duration, total:duration, interval:null };
+      const btn = document.getElementById('tb-' + tid);
+      const run = document.getElementById('tr-' + tid);
+      const bar = document.getElementById('bar-' + tid);
+      const cnt = document.getElementById('tc-' + tid);
+      if (!btn || !run) return;
       btn.style.display = 'none';
       run.classList.add('show');
-      bar.classList.remove('done');
-      cnt.classList.remove('done');
+      bar.classList.remove('done'); cnt.classList.remove('done');
 
-      function tick() {
+      taskTimers[tid].interval = setInterval(() => {
         const t = taskTimers[tid];
         if (!t) return;
         t.remaining--;
-        const pct = (t.remaining / t.total) * 100;
-        bar.style.width = pct + '%';
-        const m = Math.floor(t.remaining / 60);
-        const s = t.remaining % 60;
-        cnt.textContent = m > 0 ? `${m}:${String(s).padStart(2,'0')}` : `0:${String(s).padStart(2,'0')}`;
-
+        bar.style.width = (t.remaining / t.total * 100) + '%';
+        const m = Math.floor(t.remaining / 60), s = t.remaining % 60;
+        cnt.textContent = m > 0 ? m + ':' + String(s).padStart(2,'0') : '0:' + String(s).padStart(2,'0');
         if (t.remaining <= 0) {
           clearInterval(t.interval);
-          bar.classList.add('done');
-          cnt.classList.add('done');
-          cnt.textContent = '✓';
-          bar.style.width = '100%';
+          bar.classList.add('done'); cnt.classList.add('done');
+          cnt.textContent = '\u2713'; bar.style.width = '100%';
           if (navigator.vibrate) navigator.vibrate([100,50,100]);
         }
-      }
-
-      taskTimers[tid].interval = setInterval(tick, 1000);
+      }, 1000);
       if (navigator.vibrate) navigator.vibrate(8);
     }
 
     function resetTaskTimer(tid, duration) {
-      if (taskTimers[tid]) {
-        clearInterval(taskTimers[tid].interval);
-        delete taskTimers[tid];
-      }
-      const btn = document.getElementById(`tb-${tid}`);
-      const run = document.getElementById(`tr-${tid}`);
-      const bar = document.getElementById(`bar-${tid}`);
-      const cnt = document.getElementById(`tc-${tid}`);
-      if (!btn || !run) return;
-      btn.style.display = 'inline-flex';
-      run.classList.remove('show');
+      if (taskTimers[tid]) { clearInterval(taskTimers[tid].interval); delete taskTimers[tid]; }
+      const btn = document.getElementById('tb-' + tid);
+      const run = document.getElementById('tr-' + tid);
+      const bar = document.getElementById('bar-' + tid);
+      const cnt = document.getElementById('tc-' + tid);
+      if (btn) btn.style.display = 'inline-flex';
+      if (run) run.classList.remove('show');
       if (bar) { bar.style.width = '100%'; bar.classList.remove('done'); }
-      if (cnt) { cnt.classList.remove('done'); }
+      if (cnt) cnt.classList.remove('done');
     }
 
-    // ════════════════════════════════════
-    // SUBMISSION COPY
-    // ════════════════════════════════════
+    // ── Submission copy ───────────────────────────────────────
     function copySubmission(weekId) {
-      const week = WEEKS.find(w=>w.id===weekId);
+      const week = WEEKS.find(w => w.id === weekId);
       if (!week?.submission) return;
-      const btn = document.getElementById(`copy-${weekId}`);
-      const text = week.submission.message.replace(/\\n/g, '\n');
-      navigator.clipboard.writeText(text).then(()=>{
+      const btn = document.getElementById('copy-' + weekId);
+      // FIX 5: message already uses real \n — no replace needed
+      const text = week.submission.message;
+      navigator.clipboard.writeText(text).then(() => {
         if (btn) {
           btn.classList.add('copied');
           btn.innerHTML = '<span class="material-symbols-rounded">check</span> Copied';
-          setTimeout(()=>{
+          setTimeout(() => {
             btn.classList.remove('copied');
             btn.innerHTML = '<span class="material-symbols-rounded">content_copy</span> Copy Message';
           }, 2500);
         }
         if (navigator.vibrate) navigator.vibrate([5,5,5]);
-      }).catch(()=>{
-        // Fallback for older browsers
+      }).catch(() => {
         const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select(); document.execCommand('copy');
-        document.body.removeChild(ta);
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
         if (btn) {
           btn.classList.add('copied');
           btn.innerHTML = '<span class="material-symbols-rounded">check</span> Copied';
-          setTimeout(()=>{
-            btn.classList.remove('copied');
-            btn.innerHTML = '<span class="material-symbols-rounded">content_copy</span> Copy Message';
-          }, 2500);
+          setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '<span class="material-symbols-rounded">content_copy</span> Copy Message'; }, 2500);
         }
       });
     }
 
-    // ════════════════════════════════════
-    // RENDER
-    // ════════════════════════════════════
+    // ── Render ────────────────────────────────────────────────
     function render() {
       renderDots();
       renderStats();
@@ -1195,301 +625,320 @@ let dbRef;
 
     function renderDots() {
       const cw = getCurrentWeek();
-      document.getElementById('progressDots').innerHTML = WEEKS.map((w,i)=>{
-        let cls='week-dot';
-        if (isWeekCompleted(i)) cls+=' completed';
-        else if (i===cw) cls+=' active';
-        return `<div class="${cls}" onclick="scrollToWeek(${i})" title="${w.name}"></div>`;
+      document.getElementById('progressDots').innerHTML = WEEKS.map((w,i) => {
+        let cls = 'week-dot' + (isWeekCompleted(i) ? ' completed' : i === cw ? ' active' : '');
+        return '<div class="' + cls + '" onclick="scrollToWeek(' + i + ')" title="' + w.name + '"></div>';
       }).join('');
-      document.getElementById('progressLabels').innerHTML = WEEKS.map((w,i)=>{
-        let cls='dot-label';
-        if (isWeekCompleted(i)) cls+=' completed';
-        else if (i===cw) cls+=' active';
-        return `<div class="${cls}" onclick="scrollToWeek(${i})">${w.badge}</div>`;
+      document.getElementById('progressLabels').innerHTML = WEEKS.map((w,i) => {
+        let cls = 'dot-label' + (isWeekCompleted(i) ? ' completed' : i === cw ? ' active' : '');
+        return '<div class="' + cls + '" onclick="scrollToWeek(' + i + ')">' + w.badge + '</div>';
       }).join('');
     }
 
     function renderStats() {
       const cw = getCurrentWeek();
-      document.getElementById('stat-week').textContent = isWeekCompleted(WEEKS.length-1)?'✓':(cw+1);
+      document.getElementById('stat-week').textContent = isWeekCompleted(WEEKS.length-1) ? '\u2713' : (cw+1);
       document.getElementById('stat-sessions').textContent = state.sessions;
     }
 
     function renderWeeks() {
-      // Remember which week is open before re-render
       if (!openWeekId) openWeekId = WEEKS[getCurrentWeek()].id;
-
-      document.getElementById('weeksContainer').innerHTML = WEEKS.map((week,i)=>{
+      document.getElementById('weeksContainer').innerHTML = WEEKS.map((week, i) => {
         const unlocked  = isWeekUnlocked(i);
         const completed = isWeekCompleted(i);
-        const isCurrent = i===getCurrentWeek();
+        const isCurrent = i === getCurrentWeek();
         const allDone   = areAllTasksDone(week.id);
-        let statusIcon  = '🔒';
-        if (completed) statusIcon='✅';
-        else if (unlocked) statusIcon = isCurrent?'🔥':'⬜';
-        let cls = 'week-card';
-        if (!unlocked) cls+=' locked';
-        if (completed) cls+=' completed-card';
+        const statusIcon = completed ? '\u2705' : !unlocked ? '\uD83D\uDD12' : isCurrent ? '\uD83D\uDD25' : '\u2B1C';
+        let cls = 'week-card' + (!unlocked ? ' locked' : '') + (completed ? ' completed-card' : '');
 
-        // Depth log for this week
-        const weekDepth = (state.depthLog||[]).filter(d=>d.weekId===week.id).slice(-3);
-        const depthHtml = weekDepth.length ? weekDepth.map(d=>
-          `<div style="font-family:'Montserrat',sans-serif;font-size:11px;color:#666;padding:3px 0;display:flex;justify-content:space-between;">
-            <span style="color:#aaa">${d.date}</span>
-            <span style="color:var(--gold)">Depth ${d.depth}" · Hold ${d.hold}s</span>
-          </div>`).join('') : '';
+        const weekDepth = (state.depthLog || []).filter(d => d.weekId === week.id).slice(-3);
+        const depthHtml = weekDepth.map(d =>
+          '<div style="font-size:11px;color:#666;padding:3px 0;display:flex;justify-content:space-between;">' +
+            '<span style="color:#aaa">' + d.date + '</span>' +
+            '<span style="color:var(--gold)">Depth ' + d.depth + '" \u00B7 Hold ' + d.hold + 's</span>' +
+          '</div>'
+        ).join('');
 
-        return `
-          <div class="${cls}" id="week-card-${i}">
-            <div class="week-header" onclick="toggleWeek('${week.id}')">
-              <div class="week-info">
-                <div class="week-badge">${week.badge}</div>
-                <div class="week-name">${week.name}</div>
-                <div class="week-obj">${week.objective}</div>
-              </div>
-              <div class="week-status">${statusIcon}</div>
-            </div>
-            <div class="week-body" id="body-${week.id}">
-              ${week.tasks.map(task=>{
-                const key  = `${week.id}_${task.id}`;
-                const done = !!state.tasks[key];
-                const tid  = `tt-${week.id}-${task.id}`;
-                const timerHtml = task.taskDuration ? `
-                  <div class="task-timer-wrap">
-                    <button class="task-timer-btn" id="tb-${tid}" onclick="startTaskTimer('${tid}',${task.taskDuration})">
-                      ▶ ${task.taskDuration >= 60 ? Math.floor(task.taskDuration/60)+'m' : task.taskDuration+'s'}
-                    </button>
-                    <div class="task-timer-running" id="tr-${tid}">
-                      <div class="task-timer-bar-wrap"><div class="task-timer-bar" id="bar-${tid}"></div></div>
-                      <span class="task-timer-count" id="tc-${tid}">${task.taskDuration >= 60 ? Math.floor(task.taskDuration/60)+':00' : '0:'+String(task.taskDuration).padStart(2,'0')}</span>
-                      <button class="task-timer-reset" onclick="resetTaskTimer('${tid}',${task.taskDuration})">↺</button>
-                    </div>
-                  </div>` : '';
-                return `
-                  <div class="task-group-label">${task.schedule}</div>
-                  <div class="task-item">
-                    <div class="task-check ${done?'checked':''}" onclick="toggleTask('${week.id}','${task.id}')">
-                      ${done?'✓':''}
-                    </div>
-                    <div class="task-text">
-                      <div class="task-name${done?' done':''}">${task.name}</div>
-                      <div class="task-detail">${task.detail}</div>
-                      ${task.why?`<div class="task-why">↳ ${task.why}</div>`:''}
-                      ${timerHtml}
-                    </div>
-                  </div>`;
-              }).join('')}
+        const tasksHtml = week.tasks.map(task => {
+          const key  = week.id + '_' + task.id;
+          const done = !!state.tasks[key];
+          // FIX 9: cleaner timer IDs — no double prefix
+          const tid  = week.id + '-' + task.id;
+          const timerHtml = task.taskDuration ? (
+            '<div class="task-timer-wrap">' +
+              '<button class="task-timer-btn" id="tb-' + tid + '" onclick="startTaskTimer(\'' + tid + '\',' + task.taskDuration + ')">' +
+                '\u25B6 ' + (task.taskDuration >= 60 ? Math.floor(task.taskDuration/60) + 'm' : task.taskDuration + 's') +
+              '</button>' +
+              '<div class="task-timer-running" id="tr-' + tid + '">' +
+                '<div class="task-timer-bar-wrap"><div class="task-timer-bar" id="bar-' + tid + '"></div></div>' +
+                '<span class="task-timer-count" id="tc-' + tid + '">' + (task.taskDuration >= 60 ? Math.floor(task.taskDuration/60) + ':00' : '0:' + String(task.taskDuration).padStart(2,'0')) + '</span>' +
+                '<button class="task-timer-reset" onclick="resetTaskTimer(\'' + tid + '\',' + task.taskDuration + ')">\u21BA</button>' +
+              '</div>' +
+            '</div>'
+          ) : '';
 
-              <!-- Submission task -->
-              ${week.submission ? (() => {
-                const subKey = `${week.id}_submission`;
-                const subDone = !!state.tasks[subKey];
-                return `<div class="submission-task">
-                  <div class="submission-task-label">📱 Sunday — Send to Sir</div>
-                  <div class="submission-task-name">Weekly Submission</div>
-                  <div class="submission-check-row">
-                    <div class="task-check ${subDone?'checked':''}" onclick="toggleTask('${week.id}','submission')">
-                      ${subDone?'✓':''}
-                    </div>
-                    <span class="submission-check-label">Mark as sent to Sir</span>
-                  </div>
-                  <div class="submission-msg">${week.submission.message.replace(/\\n/g,'<br>')}</div>
-                  <button class="submission-copy-btn" id="copy-${week.id}" onclick="copySubmission('${week.id}')">
-                    <span class="material-symbols-rounded">content_copy</span>
-                    Copy Message
-                  </button>
-                </div>`;
-              })() : ''}
+          return (
+            '<div class="task-group-label">' + task.schedule + '</div>' +
+            '<div class="task-item">' +
+              '<div class="task-check ' + (done ? 'checked' : '') + '" onclick="toggleTask(\'' + week.id + '\',\'' + task.id + '\')">' + (done ? '\u2713' : '') + '</div>' +
+              '<div class="task-text">' +
+                '<div class="task-name' + (done ? ' done' : '') + '">' + task.name + '</div>' +
+                '<div class="task-detail">' + task.detail + '</div>' +
+                (task.why ? '<div class="task-why">\u21B3 ' + task.why + '</div>' : '') +
+                timerHtml +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
 
-              <!-- Depth Tracker -->
-              <div class="depth-tracker">
-                <div class="depth-tracker-title">Log Depth & Hold</div>
-                <div class="depth-inputs">
-                  <div class="depth-field">
-                    <label class="depth-label">Depth (inches)</label>
-                    <input class="depth-input" id="depth-${week.id}" type="number" min="0" max="12" step="0.5" placeholder="e.g. 4.5"/>
-                  </div>
-                  <div class="depth-field">
-                    <label class="depth-label">Hold (seconds)</label>
-                    <input class="depth-input" id="hold-${week.id}" type="number" min="0" max="120" step="1" placeholder="e.g. 30"/>
-                  </div>
-                </div>
-                ${depthHtml ? `<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">${depthHtml}</div>` : ''}
-                <button class="depth-save-btn" onclick="saveDepth('${week.id}')">Save Entry</button>
-              </div>
+        // FIX 5: submission message uses white-space:pre-line on .submission-msg so \n renders correctly
+        const subKey  = week.id + '_submission';
+        const subDone = !!state.tasks[subKey];
+        const subHtml = week.submission ? (
+          '<div class="submission-task">' +
+            '<div class="submission-task-label">\uD83D\uDCF1 Sunday \u2014 Send to Sir</div>' +
+            '<div class="submission-task-name">Weekly Submission</div>' +
+            '<div class="submission-check-row">' +
+              '<div class="task-check ' + (subDone ? 'checked' : '') + '" onclick="toggleTask(\'' + week.id + '\',\'submission\')">' + (subDone ? '\u2713' : '') + '</div>' +
+              '<span class="submission-check-label">Mark as sent to Sir</span>' +
+            '</div>' +
+            '<div class="submission-msg">' + week.submission.message + '</div>' +
+            '<button class="submission-copy-btn" id="copy-' + week.id + '" onclick="copySubmission(\'' + week.id + '\')">' +
+              '<span class="material-symbols-rounded">content_copy</span> Copy Message' +
+            '</button>' +
+          '</div>'
+        ) : '';
 
-              <!-- Timer -->
-              <div class="timer-section">
-                <div class="timer-label">Session Timer — ${Math.floor(week.timerDuration/60)} min</div>
-                <button class="timer-start-btn" id="ts-${week.id}" onclick="startTimer('${week.id}',${week.timerDuration})">
-                  Start Session
-                </button>
-                <div id="tr-${week.id}" class="timer-ring-wrap">
-                  <svg width="130" height="130" viewBox="0 0 130 130" style="transform:rotate(-90deg)">
-                    <circle class="timer-track" cx="65" cy="65" r="60"/>
-                    <circle class="timer-fill" id="tf-${week.id}" cx="65" cy="65" r="60"/>
-                    <text class="timer-display" id="tt-${week.id}" x="65" y="65" transform="rotate(90,65,65)">--:--</text>
-                  </svg>
-                  <button class="timer-reset-btn" onclick="resetTimerUI('${week.id}')">Reset</button>
-                </div>
-                <div class="timer-done-msg" id="td-${week.id}">✓ Session Complete</div>
-              </div>
+        const completeHtml = !completed && allDone
+          ? '<button class="complete-btn" onclick="completeWeek(\'' + week.id + '\')">Mark Week Complete</button>'
+          : completed
+          ? '<button class="complete-btn done">\u2713 Week Completed</button>'
+          : '';
 
-              <!-- Sir's Tip -->
-              <div class="tip-card">
-                <div class="tip-label">Sir's Tip</div>
-                <div class="tip-text">${week.tip}</div>
-              </div>
-
-              <!-- Complete button — only shown when all tasks done and not yet complete -->
-              ${!completed && allDone ? `
-              <button class="complete-btn" onclick="completeWeek('${week.id}')">
-                Mark Week Complete
-              </button>` : completed ? `
-              <button class="complete-btn done">✓ Week Completed</button>` : ''}
-            </div>
-          </div>`;
+        return (
+          '<div class="' + cls + '" id="week-card-' + i + '">' +
+            '<div class="week-header" onclick="toggleWeek(\'' + week.id + '\')">' +
+              '<div class="week-info">' +
+                '<div class="week-badge">' + week.badge + '</div>' +
+                '<div class="week-name">' + week.name + '</div>' +
+                '<div class="week-obj">' + week.objective + '</div>' +
+              '</div>' +
+              '<div class="week-status">' + statusIcon + '</div>' +
+            '</div>' +
+            '<div class="week-body" id="body-' + week.id + '">' +
+              tasksHtml + subHtml +
+              '<div class="depth-tracker">' +
+                '<div class="depth-tracker-title">Log Depth &amp; Hold</div>' +
+                '<div class="depth-inputs">' +
+                  '<div class="depth-field"><label class="depth-label">Depth (inches)</label><input class="depth-input" id="depth-' + week.id + '" type="number" min="0" max="12" step="0.5" placeholder="e.g. 4.5"/></div>' +
+                  '<div class="depth-field"><label class="depth-label">Hold (seconds)</label><input class="depth-input" id="hold-' + week.id + '" type="number" min="0" max="120" step="1" placeholder="e.g. 30"/></div>' +
+                '</div>' +
+                (weekDepth.length ? '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">' + depthHtml + '</div>' : '') +
+                '<button class="depth-save-btn" onclick="saveDepth(\'' + week.id + '\')">Save Entry</button>' +
+              '</div>' +
+              '<div class="timer-section">' +
+                '<div class="timer-label">Session Timer \u2014 ' + Math.floor(week.timerDuration/60) + ' min</div>' +
+                '<button class="timer-start-btn" id="ts-' + week.id + '" onclick="startTimer(\'' + week.id + '\',' + week.timerDuration + ')">Start Session</button>' +
+                '<div id="tr-' + week.id + '" class="timer-ring-wrap">' +
+                  '<svg width="130" height="130" viewBox="0 0 130 130" style="transform:rotate(-90deg)">' +
+                    '<circle class="timer-track" cx="65" cy="65" r="60"/>' +
+                    '<circle class="timer-fill" id="tf-' + week.id + '" cx="65" cy="65" r="60"/>' +
+                    '<text class="timer-display" id="tt-' + week.id + '" x="65" y="65" transform="rotate(90,65,65)">--:--</text>' +
+                  '</svg>' +
+                  '<button class="timer-reset-btn" onclick="resetTimerUI(\'' + week.id + '\')">Reset</button>' +
+                '</div>' +
+                '<div class="timer-done-msg" id="td-' + week.id + '">\u2713 Session Complete</div>' +
+              '</div>' +
+              '<div class="tip-card"><div class="tip-label">Sir\'s Tip</div><div class="tip-text">' + week.tip + '</div></div>' +
+              completeHtml +
+            '</div>' +
+          '</div>'
+        );
       }).join('');
 
-      // Re-open the correct week without collapsing
-      const bodyEl = document.getElementById(`body-${openWeekId}`);
+      // Re-open correct week
+      const bodyEl = document.getElementById('body-' + openWeekId);
       if (bodyEl) bodyEl.classList.add('open');
     }
 
     function renderLog() {
       const c = document.getElementById('logEntries');
-      if (!state.log.length) {
-        c.innerHTML = '<div class="log-empty">No sessions recorded yet.</div>'; return;
-      }
-      c.innerHTML = state.log.slice(0,20).map(e=>`
-        <div class="log-entry">
-          <span class="log-level">${e.level}</span>
-          <span class="log-note">${e.note}</span>
-          <span class="log-date">${e.date}</span>
-        </div>`).join('');
+      if (!state.log.length) { c.innerHTML = '<div class="log-empty">No sessions recorded yet.</div>'; return; }
+      c.innerHTML = state.log.slice(0,20).map(e =>
+        '<div class="log-entry">' +
+          '<span class="log-level">' + e.level + '</span>' +
+          '<span class="log-note">' + e.note + '</span>' +
+          '<span class="log-date">' + e.date + '</span>' +
+        '</div>'
+      ).join('');
     }
 
-    // ════════════════════════════════════
-    // INTERACTIONS
-    // ════════════════════════════════════
+    // ── Interactions ──────────────────────────────────────────
     function toggleWeek(weekId) {
-      const body = document.getElementById(`body-${weekId}`);
+      const body = document.getElementById('body-' + weekId);
       if (body.classList.contains('open')) {
         body.classList.remove('open');
         openWeekId = null;
       } else {
-        document.querySelectorAll('.week-body').forEach(b=>b.classList.remove('open'));
+        document.querySelectorAll('.week-body').forEach(b => b.classList.remove('open'));
         body.classList.add('open');
         openWeekId = weekId;
       }
       if (navigator.vibrate) navigator.vibrate(6);
     }
 
-    function toggleTask(weekId, taskId) {
-      const key = `${weekId}_${taskId}`;
-      // Remember open week
+    // FIX 4 & 6: toggleTask handles submission separately, no double-save, no crash
+    async function toggleTask(weekId, taskId) {
+      const key = weekId + '_' + taskId;
       openWeekId = weekId;
       state.tasks[key] = !state.tasks[key];
+
       if (state.tasks[key]) {
-        const week = WEEKS.find(w=>w.id===weekId);
-        const task = week.tasks.find(t=>t.id===taskId);
         state.sessions++;
-        addLog(week.badge, `Completed: ${task.name}`);
-        // Check if all tasks now done
+        // FIX 6: handle submission task name safely
+        const taskName = taskId === 'submission'
+          ? 'Weekly Submission sent'
+          : (WEEKS.find(w => w.id === weekId)?.tasks.find(t => t.id === taskId)?.name || taskId);
+        const week = WEEKS.find(w => w.id === weekId);
+        addLogEntry(week.badge, 'Completed: ' + taskName);
+
         if (areAllTasksDone(weekId)) {
-          setTimeout(()=>showCelebration(
-            'All Tasks Done',
-            `Every task in ${week.name} is complete. Mark the week when you are ready.`,
-            '⭐'
-          ), 400);
+          setTimeout(() => showCelebration('All Tasks Done', 'Every task in ' + week.name + ' is complete. Mark the week when you are ready.', '\u2B50'), 400);
         }
       }
-      saveState(); render();
-      if (navigator.vibrate) navigator.vibrate(state.tasks[key]?[10,5,10]:5);
+
+      // FIX 4: single save, addLogEntry does NOT save
+      await saveState();
+      render();
+      if (navigator.vibrate) navigator.vibrate(state.tasks[key] ? [10,5,10] : 5);
     }
 
-    function completeWeek(weekId) {
-      if (!areAllTasksDone(weekId)||state.completedWeeks.includes(weekId)) return;
+    async function completeWeek(weekId) {
+      if (!areAllTasksDone(weekId) || state.completedWeeks.includes(weekId)) return;
       openWeekId = weekId;
       state.completedWeeks.push(weekId);
-      const week = WEEKS.find(w=>w.id===weekId);
-      addLog(week.badge, `✓ ${week.name} completed!`);
-      saveState(); render();
-      setTimeout(()=>showCelebration(
-        `${week.badge} Complete`,
-        `${week.name} — protocol phase complete. Sir is pleased.`,
-        '🏆'
-      ), 200);
+      const week = WEEKS.find(w => w.id === weekId);
+      addLogEntry(week.badge, '\u2713 ' + week.name + ' completed!');
+      await saveState();
+      render();
+      setTimeout(() => showCelebration(week.badge + ' Complete', week.name + ' \u2014 protocol phase complete. Sir is pleased.', '\uD83C\uDFC6'), 200);
     }
 
-    function saveDepth(weekId) {
-      const depthVal = parseFloat(document.getElementById(`depth-${weekId}`)?.value);
-      const holdVal  = parseInt(document.getElementById(`hold-${weekId}`)?.value);
+    async function saveDepth(weekId) {
+      const depthEl = document.getElementById('depth-' + weekId);
+      const holdEl  = document.getElementById('hold-' + weekId);
+      const depthVal = parseFloat(depthEl?.value);
+      const holdVal  = parseInt(holdEl?.value);
       if (isNaN(depthVal) && isNaN(holdVal)) return;
       if (!state.depthLog) state.depthLog = [];
       const now = new Date();
-      const date = `${now.getMonth()+1}/${now.getDate()}`;
       state.depthLog.push({
-        weekId, date,
-        depth: isNaN(depthVal) ? '—' : depthVal,
-        hold:  isNaN(holdVal)  ? '—' : holdVal,
+        weekId, date: (now.getMonth()+1) + '/' + now.getDate(),
+        depth: isNaN(depthVal) ? '\u2014' : depthVal,
+        hold:  isNaN(holdVal)  ? '\u2014' : holdVal,
       });
-      const week = WEEKS.find(w=>w.id===weekId);
-      addLog(week.badge, `Logged: ${depthVal}" depth · ${holdVal}s hold`);
+      const week = WEEKS.find(w => w.id === weekId);
+      addLogEntry(week.badge, 'Logged: ' + depthVal + '" depth \u00B7 ' + holdVal + 's hold');
+      // FIX 7: clear inputs after saving
+      if (depthEl) depthEl.value = '';
+      if (holdEl)  holdEl.value  = '';
       openWeekId = weekId;
-      saveState(); render();
+      await saveState();
+      render();
       if (navigator.vibrate) navigator.vibrate([5,5,5]);
     }
 
-    function addLog(level, note) {
+    // FIX 4: addLogEntry does NOT call saveState — caller is responsible
+    function addLogEntry(level, note) {
       const now = new Date();
-      const d = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const d = (now.getMonth()+1) + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
       state.log.unshift({ level, note, date:d });
-      saveState();
     }
 
     function scrollToWeek(idx) {
       openWeekId = WEEKS[idx].id;
       render();
-      setTimeout(()=>{
-        const c = document.getElementById(`week-card-${idx}`);
+      setTimeout(() => {
+        const c = document.getElementById('week-card-' + idx);
         if (c) c.scrollIntoView({ behavior:'smooth', block:'start' });
       }, 100);
     }
 
-    // ════════════════════════════════════
-    // INIT
-    // ════════════════════════════════════
-    init();
-</script>
-<!-- Global Sidebar Menu -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="global-sidebar" id="globalSidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">Dom Sub Hub</div>
+    // Expose ALL functions to window so onclick= attributes work
+    window.openRefDrawer    = openRefDrawer;
+    window.closeRefDrawer   = closeRefDrawer;
+    window.toggleAcc        = toggleAcc;
+    window.toggleLog        = toggleLog;
+    window.confirmReset     = confirmReset;
+    window.closeResetModal  = closeResetModal;
+    window.doReset          = doReset;
+    window.closeCelebration = closeCelebration;
+    window.startTimer       = startTimer;
+    window.resetTimerUI     = resetTimerUI;
+    window.startTaskTimer   = startTaskTimer;
+    window.resetTaskTimer   = resetTaskTimer;
+    window.copySubmission   = copySubmission;
+    window.toggleWeek       = toggleWeek;
+    window.toggleTask       = toggleTask;
+    window.completeWeek     = completeWeek;
+    window.saveDepth        = saveDepth;
+    window.scrollToWeek     = scrollToWeek;
+
+    // Show a loading placeholder so weeks container is never blank
+    function showLoadingState() {
+      document.getElementById('weeksContainer').innerHTML =
+        '<div style="text-align:center;padding:40px 20px;color:rgba(212,175,55,0.4);font-family:\'Playfair Display\',serif;font-size:14px;font-style:italic;letter-spacing:1px;">' +
+        'Loading protocol\u2026</div>';
+    }
+
+    // Merge loaded data safely — never lose tasks if a field is missing
+    function mergeLoadedState(data) {
+      return {
+        tasks:          data.tasks          || {},
+        completedWeeks: data.completedWeeks || [],
+        sessions:       data.sessions       || 0,
+        log:            data.log            || [],
+        depthLog:       data.depthLog       || [],
+      };
+    }
+
+    // Init — render loading placeholder immediately, then load from Firestore
+    showLoadingState();
+
+    (async function init() {
+      try {
+        const user = await requireAuth();
+        dbRef = dataRef('training/deepthroat-training');
+        const snap = await getDoc(dbRef);
+        if (snap.exists()) {
+          state = mergeLoadedState(snap.data());
+        }
+      } catch(e) {
+        console.error('Init error:', e);
+        // Still render with default state so the page is usable
+      }
+      render();
+    })();
+  </script>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="global-sidebar" id="globalSidebar">
+    <div class="sidebar-header"><div class="sidebar-brand">Dom Sub Hub</div></div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
+      <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
+      <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
+      <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments &amp; Ratings</a>
+      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
+      <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
+      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help &amp; Info</a>
+      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
+    </div>
   </div>
-  <div class="sidebar-nav">
-    <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-    <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-    <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-    <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-    <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-    <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-    <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-    <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-  </div>
-</div>
-<script>
-  function openSidebar() {
-    document.getElementById('sidebarOverlay').classList.add('open');
-    document.getElementById('globalSidebar').classList.add('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebarOverlay').classList.remove('open');
-    document.getElementById('globalSidebar').classList.remove('open');
-  }
-</script>
-<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
-<script src="nav.js"></script>
+  <script>
+    function openSidebar() { document.getElementById('sidebarOverlay').classList.add('open'); document.getElementById('globalSidebar').classList.add('open'); }
+    function closeSidebar() { document.getElementById('sidebarOverlay').classList.remove('open'); document.getElementById('globalSidebar').classList.remove('open'); }
+  </script>
+  <script src="nav.js"></script>
 </body>
 </html>

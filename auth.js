@@ -117,6 +117,15 @@ export async function getPartnerUid() {
 }
 
 /**
+ * Returns the profile of any user by UID.
+ */
+export async function getUserProfile(uid) {
+  if (!uid) return null;
+  const snap = await getDoc(doc(db, 'users', uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+/**
  * Returns 'dom' | 'sub' | null
  */
 export async function getMyRole() {
@@ -178,26 +187,80 @@ export async function acceptPairingInvite() {
   return relDoc.id;
 }
 
+/**
+ * Unpairs the current user from their partner.
+ * Sets the relationship status to 'inactive' and clears relationshipId
+ * on both users' profiles.
+ */
+export async function unpair() {
+  const me = auth.currentUser;
+  if (!me) throw new Error('Not signed in');
+
+  const profile = await getMyProfile();
+  if (!profile?.relationshipId) {
+    throw new Error('You are not currently paired with anyone.');
+  }
+
+  const relId = profile.relationshipId;
+
+  // Load the relationship to know who the partner is
+  const relSnap = await getDoc(doc(db, 'relationships', relId));
+  if (!relSnap.exists()) {
+    // Clean up orphaned reference
+    await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
+    throw new Error('Relationship record not found. Cleared stale reference.');
+  }
+
+  const relData = relSnap.data();
+  const partnerUid = relData.domId === me.uid ? relData.subId : relData.domId;
+
+  // Mark as inactive
+  await updateDoc(doc(db, 'relationships', relId), {
+    status: 'inactive',
+    unpairedAt: serverTimestamp()
+  });
+
+  // Clear relationshipId on both sides
+  await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
+  if (partnerUid) {
+    await updateDoc(doc(db, 'users', partnerUid), { relationshipId: null });
+  }
+
+  return true;
+}
+
 // ── Data path helpers ─────────────────────────────────────────────────────────
 
 /**
  * Returns a Firestore document reference for the current user's data.
- * Usage: dataRef('settings')  →  /data/{uid}/settings
+ *
+ * FIX: Previously used /data/{uid}/userdata/{path} which produced 4 segments —
+ * an even number — making it a document path that Firestore rejected as a
+ * collection reference. Now uses /users/{uid}/{path} giving 3 segments (odd),
+ * which is a valid collection reference.
+ *
+ * Usage: dataRef('settings')  →  /users/{uid}/settings
  */
 export function dataRef(path) {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error('Not authenticated');
-  return doc(db, 'data', uid, ...path.split('/'));
+  return doc(db, 'users', uid, ...path.split('/'));
 }
 
 /**
  * Returns a Firestore collection reference for the current user's data.
- * Usage: dataCol('scenes')  →  /data/{uid}/scenes
+ *
+ * FIX: Previously used /data/{uid}/userdata/{path} which produced 4 segments —
+ * an even number — making Firestore reject it as an invalid collection reference.
+ * Now uses /users/{uid}/{path} giving 3 segments (odd), which is valid.
+ *
+ * Usage: dataCol('notes')   →  /users/{uid}/notes
+ *        dataCol('scenes')  →  /users/{uid}/scenes
  */
 export function dataCol(path) {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error('Not authenticated');
-  return collection(db, 'data', uid, ...path.split('/'));
+  return collection(db, 'users', uid, ...path.split('/'));
 }
 
 /**
@@ -206,13 +269,13 @@ export function dataCol(path) {
 export async function partnerDataRef(path) {
   const partnerUid = await getPartnerUid();
   if (!partnerUid) throw new Error('No partner linked');
-  return doc(db, 'data', partnerUid, ...path.split('/'));
+  return doc(db, 'users', partnerUid, ...path.split('/'));
 }
 
 export async function partnerDataCol(path) {
   const partnerUid = await getPartnerUid();
   if (!partnerUid) throw new Error('No partner linked');
-  return collection(db, 'data', partnerUid, ...path.split('/'));
+  return collection(db, 'users', partnerUid, ...path.split('/'));
 }
 
 /**
@@ -220,6 +283,6 @@ export async function partnerDataCol(path) {
  * Returns the settings data object, or {} if not found.
  */
 export async function getSettings(uid) {
-  const snap = await getDoc(doc(db, 'data', uid, 'settings'));
+  const snap = await getDoc(doc(db, 'users', uid, 'settings'));
   return snap.exists() ? snap.data() : {};
 }

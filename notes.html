@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -186,10 +186,12 @@
     .note-badge {
       font-size: 8px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 1px; padding: 3px 9px; border-radius: 20px;
+      display: inline-flex; align-items: center; line-height: 1; white-space: nowrap;
     }
     .badge-private  { background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.2); }
     .badge-shared   { background: rgba(100,181,246,0.1); color: #64B5F6; border: 1px solid rgba(100,181,246,0.2); }
     .badge-archived { background: rgba(255,255,255,0.06); color: #666; border: 1px solid rgba(255,255,255,0.08); }
+    .badge-partner  { background: rgba(76,175,80,0.1); color: #4CAF50; border: 1px solid rgba(76,175,80,0.2); }
 
     /* Body text */
     .note-body {
@@ -434,18 +436,6 @@
   <!-- Main -->
   <div class="page-wrap">
 
-    <!-- Hero -->
-    <div class="page-hero">
-      <div class="page-eyebrow">Dom Sub Hub</div>
-      <h1 class="page-title">Notes</h1>
-    </div>
-
-    <div class="ornament-divider">
-      <div class="ornament-line"></div>
-      <span class="ornament-icon">❦</span>
-      <div class="ornament-line"></div>
-    </div>
-
     <!-- Search -->
     <div class="search-wrap">
       <span class="material-symbols-rounded search-icon">search</span>
@@ -554,7 +544,7 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { requireAuth, dataCol } from './auth.js';
+    import { requireAuth, dataCol, getPartnerUid, partnerDataCol, getUserProfile } from './auth.js';
     import {
       getDocs, doc, setDoc, deleteDoc, onSnapshot
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -563,9 +553,14 @@
     /* ── Auth guard ── */
     let currentUser;
     let notesCol;
+    let partnerUid = null;
+    let partnerNotesCol = null;
+    let partnerName = 'Partner';
 
     /* ── State ── */
     let notes = [];
+    let ownNotes = [];
+    let partnerSharedNotes = [];
     let activeFilter = 'all';
     let selectedAccent = 'gold';
     let selectedVisibility = 'private';
@@ -576,18 +571,51 @@
       currentUser = await requireAuth();
       notesCol = dataCol('notes');
 
-      // Real-time listener
+      // Check for partner
+      partnerUid = await getPartnerUid();
+      if (partnerUid) {
+        partnerNotesCol = await partnerDataCol('notes');
+        const partnerProfile = await getUserProfile(partnerUid);
+        if (partnerProfile?.displayName) partnerName = partnerProfile.displayName;
+      }
+
+      // Real-time listener for YOUR notes
       onSnapshot(notesCol, snap => {
-        notes = snap.docs.map(d => d.data());
-        renderNotes();
+        ownNotes = snap.docs.map(d => ({
+          ...d.data(),
+          isOwn: true,
+          ownerUid: currentUser.uid
+        }));
+        combineNotes();
       });
+
+      // Real-time listener for PARTNER'S shared notes (if paired)
+      if (partnerNotesCol) {
+        onSnapshot(partnerNotesCol, snap => {
+          partnerSharedNotes = snap.docs
+            .map(d => d.data())
+            .filter(n => n.visibility === 'shared')
+            .map(n => ({
+              ...n,
+              isOwn: false,
+              ownerUid: partnerUid
+            }));
+          combineNotes();
+        });
+      } else {
+        combineNotes(); // no partner → just render your own
+      }
+    }
+
+    function combineNotes() {
+      notes = [...ownNotes, ...partnerSharedNotes];
+      renderNotes();
     }
 
     /* ── Utilities ── */
     function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
     async function persist(note) {
-      // note: pass the note object to upsert, or pass null + id to delete
       const ref = doc(notesCol, note.id);
       await setDoc(ref, note);
     }
@@ -595,6 +623,7 @@
     async function deleteNote(id) {
       await deleteDoc(doc(notesCol, id));
     }
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg; t.classList.add('show');
@@ -643,14 +672,23 @@
 
     function noteCardHTML(n) {
       const date = new Date(n.created).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-      const visiBadge = n.visibility === 'private'  ? `<span class="note-badge badge-private">🔒 Private</span>`
-                      : n.visibility === 'shared'   ? `<span class="note-badge badge-shared">🔗 Shared</span>`
-                      : `<span class="note-badge badge-archived">📦 Archived</span>`;
+
+      let badgeHTML;
+      if (!n.isOwn) {
+        badgeHTML = `<span class="note-badge badge-partner">🔗 Shared by ${escHtml(partnerName)}</span>`;
+      } else if (n.visibility === 'private') {
+        badgeHTML = `<span class="note-badge badge-private">🔒 Private</span>`;
+      } else if (n.visibility === 'shared') {
+        badgeHTML = `<span class="note-badge badge-shared">🔗 Shared</span>`;
+      } else {
+        badgeHTML = `<span class="note-badge badge-archived">📦 Archived</span>`;
+      }
+
       const tagColors = { gold:'#D4AF37', rose:'#F44336', blue:'#64B5F6', purple:'#BA68C8', green:'#4CAF50' };
       const tagBg     = (tagColors[n.accent] || '#D4AF37') + '22';
       const tagCol    = tagColors[n.accent] || '#D4AF37';
       const tagHTML   = (n.tags||[]).map(t =>
-        `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${t}</span>`
+        `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
       ).join('');
 
       return `
@@ -658,7 +696,7 @@
           <div class="note-accent accent-${n.accent}"></div>
           <div class="note-top">
             <div class="note-title">${escHtml(n.title)}</div>
-            <div class="note-badges">${visiBadge}</div>
+            <div class="note-badges">${badgeHTML}</div>
           </div>
           <div class="note-body">${escHtml(n.body)}</div>
           <div class="note-footer">
@@ -743,22 +781,54 @@
       const tagBg = (tagColors[n.accent]||'#D4AF37') + '22';
       const tagCol = tagColors[n.accent]||'#D4AF37';
 
-      const visiBadge = n.visibility === 'private'  ? `<span class="note-badge badge-private">🔒 Private</span>`
-                      : n.visibility === 'shared'   ? `<span class="note-badge badge-shared">🔗 Shared</span>`
-                      : `<span class="note-badge badge-archived">📦 Archived</span>`;
+      let badgeHTML;
+      if (!n.isOwn) {
+        badgeHTML = `<span class="note-badge badge-partner">🔗 Shared by ${escHtml(partnerName)}</span>`;
+      } else if (n.visibility === 'private') {
+        badgeHTML = `<span class="note-badge badge-private">🔒 Private</span>`;
+      } else if (n.visibility === 'shared') {
+        badgeHTML = `<span class="note-badge badge-shared">🔗 Shared</span>`;
+      } else {
+        badgeHTML = `<span class="note-badge badge-archived">📦 Archived</span>`;
+      }
 
-      document.getElementById('view-badges').innerHTML = visiBadge;
+      document.getElementById('view-badges').innerHTML = badgeHTML;
       document.getElementById('view-title').textContent = n.title;
       document.getElementById('view-meta').textContent  = date;
       document.getElementById('view-body').textContent  = n.body;
       document.getElementById('view-tags').innerHTML = (n.tags||[]).map(t =>
-        `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${t}</span>`
+        `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
       ).join('');
+
+      // Read-only handling for partner's notes
+      const editBtn = document.querySelector('.view-edit-btn');
+      const deleteBtn = document.querySelector('.view-delete-btn');
+
+      if (n.isOwn) {
+        editBtn.style.display = '';
+        deleteBtn.style.display = '';
+        editBtn.disabled = false;
+        deleteBtn.disabled = false;
+      } else {
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        // Add read-only notice
+        const existingNotice = document.getElementById('readonly-notice');
+        if (existingNotice) existingNotice.remove();
+        const notice = document.createElement('div');
+        notice.id = 'readonly-notice';
+        notice.style.cssText = 'font-size:9px;color:#4CAF50;margin-top:12px;text-align:center;';
+        notice.textContent = `🔗 Shared by ${partnerName} — read only`;
+        document.getElementById('view-tags').after(notice);
+      }
 
       document.getElementById('view-modal').classList.add('open');
     }
 
     function closeViewModal() {
+      // clean up notice
+      const notice = document.getElementById('readonly-notice');
+      if (notice) notice.remove();
       document.getElementById('view-modal').classList.remove('open');
       viewingId = null;
     }
@@ -768,8 +838,12 @@
     }
 
     function editCurrentNote() {
-      const n = notes.find(n => n.id === viewingId);
-      if (!n) return;
+      if (!viewingId) return;
+      const n = notes.find(nn => nn.id === viewingId);
+      if (!n || !n.isOwn) {
+        showToast("You can only edit your own notes");
+        return;
+      }
       closeViewModal();
       editingId = n.id;
       document.getElementById('modal-heading').textContent    = 'Edit Note';
@@ -785,6 +859,11 @@
 
     async function deleteCurrentNote() {
       if (!viewingId) return;
+      const n = notes.find(nn => nn.id === viewingId);
+      if (!n || !n.isOwn) {
+        showToast("You can only delete your own notes");
+        return;
+      }
       await deleteNote(viewingId);
       closeViewModal();
       showToast('Note deleted');
@@ -812,6 +891,8 @@
     window.editCurrentNote   = editCurrentNote;
     window.exportNotes       = exportNotes;
     window.handleViewBackdropClick = handleViewBackdropClick;
+    window.openNewNoteModal  = openNewNoteModal;
+    window.selectAccent      = selectAccent;
     window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
     window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
