@@ -1280,7 +1280,7 @@ function cardMatchesFilters(card){
   if(activeSearch&&!act.toLowerCase().includes(activeSearch))return false;
 
   for(const f of activeFilters){
-    if(f==='unset'&&(myData[key+'.t']||myData[key+'.r']||myData[key+'.a']||myData[key+'.sw']))return false;
+    if(f==='unset'&&myData[key+'.t'])return false;
     if(f==='both-tried'&&!(mT==='Yes'&&pT==='Yes'))return false;
     if(f==='my-fetish'&&!mA.includes('Fetish'))return false;
     if(f==='hard-limits'&&!mA.includes('Hard Limit')&&!pA.includes('Hard Limit'))return false;
@@ -1354,7 +1354,7 @@ function buildSwipeList(){
       const pA=partnerData[key+'.a']??bv(item,pPfx,'A')??'';
       const mSw=myData[key+'.sw']??bv(item,myRole,'S')??'';
       const pSw=partnerData[key+'.sw']??bv(item,pPfx,'S')??'';
-      if(swipeFilter==='unset'&&(myData[key+'.t']||myData[key+'.r']||myData[key+'.a']||myData[key+'.sw']))continue;
+      if(swipeFilter==='unset'&&myData[key+'.t'])continue;
       if(swipeFilter==='disagree'){
         const disagree=(mA.includes('Hard Limit')&&!pA.includes('Hard Limit'))||(!mA.includes('Hard Limit')&&pA.includes('Hard Limit'))||(mR.includes('Loved')&&(pT.includes('want')||!pT))||(mT.includes('want')&&pA.includes('Hard Limit'));
         if(!disagree)continue;
