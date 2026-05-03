@@ -411,7 +411,7 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
 <!-- HEADER -->
 <header class="app-header">
   <div class="user-pill" id="userPill"><div class="role-dot"></div><span id="userPillName">…</span></div>
-  <div class="header-title">Checklist <span style="font-size:9px;opacity:0.4;">v1.2</span></div>
+  <div class="header-title">Checklist</div>
   <button class="swipe-btn" onclick="openSwipe()" title="Swipe mode">⇄</button>
   <div class="save-status" id="saveStatus">—</div>
 </header>
@@ -675,10 +675,8 @@ async function doSave(){
 // ═══ INIT ═══
 async function init(){
   const user=await requireAuth(); myUid=user.uid;
-  console.log('Checklist Init v1.2', myUid);
   const [prof,rel]=await Promise.all([getMyProfile(),getRelationship()]);
   myRole=prof?.role??'sub'; myName=prof?.displayName??myRole; relId=rel?.id??null;
-  console.log('Profile loaded:', myRole, myName);
   partnerUid=await getPartnerUid();
   if(partnerUid){const pp=await getUserProfile(partnerUid);partnerName=pp?.displayName??(myRole==='dom'?'Sub':'Sir');}
   setupIdentity();
