@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="theme-color" content="#0a0e1a"/>
+  <meta name="theme-color" content="#051024"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -13,310 +13,429 @@
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="nav.css"/>
   <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
     :root {
-      --midnight:#0a0e1a; --navy:#111827; --navy-card:#151d2e; --navy-light:#1e2a3d;
-      --gold:#c9a84c; --gold-light:#e2c97e; --gold-dim:#8a6f2e;
-      --crimson:#8b1a1a; --text:#e8e0d0; --text-muted:#8a9ab5; --text-dim:#556070;
-      --border:rgba(201,168,76,0.15); --border-strong:rgba(201,168,76,0.35);
+      --midnight:#051024; --bg:#051024;
+      --glass:rgba(5,16,36,0.85); --glass2:rgba(2,8,20,0.6);
+      --gold:#D4AF37; --gold-light:#F5E6A3; --gold-dim:rgba(212,175,55,0.3);
+      --border:rgba(212,175,55,0.15);
+      --luxury-gradient:linear-gradient(135deg,#D4AF37,#F5E6A3);
+      --red:#F44336; --green:#4CAF50;
+      --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--midnight);color:var(--text);font-family:'Montserrat',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,26,26,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(201,168,76,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
-    .app-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 0 100px}
-    .app-header{text-align:center;padding:40px 24px 28px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(139,26,26,.08) 0%,transparent 100%)}
-    .app-header .script{font-family:'Great Vibes',cursive;color:var(--gold);font-size:1.4rem;opacity:.85;display:block;margin-bottom:4px}
-    .app-header h1{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text);letter-spacing:.04em}
-    .app-header .subtitle{margin-top:8px;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted)}
-    .phase-banner{margin:20px 16px 0;background:linear-gradient(135deg,rgba(139,26,26,.3),rgba(201,168,76,.1));border:1px solid var(--border-strong);border-radius:10px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .phase-banner .phase-label{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold-light);font-size:1rem}
-    .phase-banner .phase-detail{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);text-align:right}
-    .phase-banner .phase-days{font-size:1.4rem;font-family:'Playfair Display',serif;color:var(--gold);font-weight:600}
-    .nav-tabs{display:flex;margin:20px 16px 0;background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:4px;gap:4px}
-    .nav-tab{flex:1;padding:10px 8px;background:none;border:none;color:var(--text-muted);font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:7px;transition:all .2s ease}
-    .nav-tab.active{background:linear-gradient(135deg,rgba(139,26,26,.6),rgba(201,168,76,.15));color:var(--gold-light);border:1px solid var(--border-strong)}
-    .panel{display:none;padding:20px 16px 0}
-    .panel.active{display:block}
-    .card{background:var(--navy-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
-    .card-title{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--gold);letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-    .card-title::before{content:'';display:block;width:3px;height:14px;background:var(--crimson);border-radius:2px;flex-shrink:0}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-    .form-row.single{grid-template-columns:1fr}
-    label{display:block;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
-    input[type="date"],input[type="number"],input[type="text"],select,textarea{width:100%;background:rgba(10,14,26,.7);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:.85rem;padding:10px 12px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
-    input:focus,select:focus,textarea:focus{border-color:var(--gold-dim)}
-    textarea{resize:vertical;min-height:80px;line-height:1.5}
-    select option{background:var(--navy)}
-    .rating-row{display:flex;gap:6px;margin-top:4px}
-    .rating-btn{flex:1;padding:8px 0;background:rgba(10,14,26,.7);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:'Montserrat',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s}
-    .rating-btn.selected{background:linear-gradient(135deg,rgba(139,26,26,.5),rgba(201,168,76,.15));border-color:var(--gold-dim);color:var(--gold-light)}
-    .chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-    .chip{padding:6px 12px;background:rgba(10,14,26,.7);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-size:.72rem;letter-spacing:.06em;cursor:pointer;transition:all .15s;font-family:'Montserrat',sans-serif}
-    .chip.selected{background:rgba(139,26,26,.35);border-color:var(--crimson);color:var(--text)}
-    .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--crimson),#6b1414);border:1px solid rgba(201,168,76,.3);border-radius:8px;color:var(--gold-light);font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:4px}
-    .btn-primary:active{transform:scale(.98);opacity:.9}
-    .btn-ghost{background:none;border:1px solid var(--border);border-radius:7px;color:var(--text-muted);font-family:'Montserrat',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:all .2s}
-    .btn-ghost:active{border-color:var(--gold-dim);color:var(--gold)}
-    .log-entry{background:rgba(10,14,26,.5);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px}
-    .log-entry-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-    .log-date{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--gold)}
-    .log-meta{display:flex;gap:8px;align-items:center}
-    .log-badge{font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(139,26,26,.3);border:1px solid rgba(139,26,26,.5);color:#c97;padding:3px 8px;border-radius:10px}
-    .log-rating{font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(201,168,76,.1);border:1px solid var(--border);color:var(--gold);padding:3px 8px;border-radius:10px}
-    .log-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-    .log-chip{font-size:.63rem;padding:3px 8px;border-radius:10px;background:rgba(30,42,61,.8);border:1px solid var(--border);color:var(--text-muted)}
-    .log-notes{font-size:.8rem;color:var(--text-muted);font-style:italic;line-height:1.5;border-top:1px solid var(--border);padding-top:8px;margin-top:4px}
-    .empty-state{text-align:center;padding:40px 20px;color:var(--text-dim);font-style:italic;font-family:'Playfair Display',serif;font-size:.95rem}
-    .phase-card{background:var(--navy-card);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
-    .phase-card-header{padding:14px 18px;background:linear-gradient(135deg,rgba(139,26,26,.2),rgba(201,168,76,.05));border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-    .phase-card-header h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-light)}
-    .phase-card-header .phase-weeks{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}
-    .phase-card-body{padding:16px 18px}
-    .phase-spec{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
-    .spec-item{text-align:center;background:rgba(10,14,26,.5);border:1px solid var(--border);border-radius:8px;padding:10px 6px}
-    .spec-val{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;display:block}
-    .spec-lbl{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-top:3px;display:block}
-    .day-row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.07);font-size:.8rem}
-    .day-row:last-child{border-bottom:none}
-    .day-name{font-weight:500;color:var(--gold-dim);min-width:80px;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding-top:1px}
-    .day-desc{color:var(--text-muted);line-height:1.4}
-    .ref-section{margin-bottom:16px}
-    .ref-section h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:.95rem;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-    .ref-list{list-style:none}
-    .ref-list li{padding:6px 0;font-size:.8rem;color:var(--text-muted);line-height:1.5;display:flex;gap:10px;border-bottom:1px solid rgba(201,168,76,.05)}
-    .ref-list li:last-child{border-bottom:none}
-    .ref-num{color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;min-width:18px;flex-shrink:0}
-    .trouble-item{margin-bottom:12px;padding:12px 14px;background:rgba(10,14,26,.4);border:1px solid var(--border);border-radius:8px}
-    .trouble-prob{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--crimson);margin-bottom:5px;font-weight:500}
-    .trouble-sol{font-size:.8rem;color:var(--text-muted);line-height:1.5}
-    .start-date-row{display:flex;gap:10px;align-items:flex-end}
-    .start-date-row>div:first-child{flex:1}
-    .divider{text-align:center;margin:10px 0 18px;position:relative}
-    .divider span{font-family:'Great Vibes',cursive;color:var(--gold-dim);font-size:1.1rem;background:var(--midnight);padding:0 10px;position:relative;z-index:1}
-    .divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,var(--crimson),#6b1414);border:1px solid rgba(201,168,76,.3);color:var(--gold-light);font-family:'Montserrat',sans-serif;font-size:.75rem;letter-spacing:.1em;padding:12px 24px;border-radius:30px;z-index:999;transition:transform .3s ease;white-space:nowrap}
-    .toast.show{transform:translateX(-50%) translateY(0)}
-    .btn-delete{background:none;border:none;color:var(--text-dim);font-size:.7rem;cursor:pointer;padding:2px 6px;transition:color .2s}
-    .btn-delete:active{color:var(--crimson)}
-    .current-phase-indicator{display:inline-block;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;background:rgba(139,26,26,.4);border:1px solid var(--crimson);color:#c97;padding:3px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+    html { height:100%; }
+    body { min-height:100%; background:var(--midnight); font-family:'Montserrat',sans-serif; color:#ccc; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+
+    /* ── Topbar ── */
+    .topbar { position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:12px; padding:18px 20px 14px; padding-top:calc(18px + var(--safe-t)); background:rgba(5,16,36,0.92); backdrop-filter:blur(25px); border-bottom:1px solid var(--border); }
+    .topbar-center { flex:1; min-width:0; }
+    .topbar-title { font-family:'Great Vibes',cursive; font-size:28px; background:var(--luxury-gradient); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; margin:0; line-height:1.1; }
+    .topbar-sub { font-family:'Playfair Display',serif; color:var(--gold); font-size:11px; text-transform:uppercase; letter-spacing:3px; margin-top:3px; opacity:0.7; }
+
+    /* ── Progress dots ── */
+    .progress-dots-wrap { background:var(--glass2); border-bottom:1px solid var(--border); padding:12px 20px 8px; }
+    .progress-dots { display:flex; justify-content:center; gap:8px; margin-bottom:6px; }
+    .phase-dot { width:70px; height:5px; border-radius:3px; background:rgba(255,255,255,0.08); cursor:pointer; transition:all .4s ease; }
+    .phase-dot.completed { background:var(--gold); box-shadow:0 0 8px rgba(212,175,55,0.4); }
+    .phase-dot.active { background:rgba(212,175,55,0.5); animation:dotPulse 2s ease-in-out infinite; }
+    @keyframes dotPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+    .progress-dot-labels { display:flex; justify-content:center; gap:8px; }
+    .dot-label { width:70px; text-align:center; font-family:'Montserrat',sans-serif; font-size:8px; font-weight:600; letter-spacing:1px; color:#444; text-transform:uppercase; cursor:pointer; transition:color .3s; }
+    .dot-label.active { color:var(--gold); }
+    .dot-label.completed { color:rgba(76,175,80,0.7); }
+
+    /* ── Main ── */
+    .main { max-width:600px; margin:0 auto; padding:25px 20px calc(100px + var(--safe-b)); }
+
+    /* ── Stats grid ── */
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:25px; }
+    .stat-card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:14px 10px; text-align:center; backdrop-filter:blur(12px); }
+    .stat-val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--gold); }
+    .stat-lbl { font-size:8px; text-transform:uppercase; letter-spacing:1.5px; color:#777; margin-top:4px; font-weight:600; }
+
+    /* ── Reference drawer button ── */
+    .ref-drawer-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 18px; border-radius:25px; background:transparent; border:1px solid var(--border); color:rgba(212,175,55,0.6); font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; margin-bottom:25px; transition:all .3s; }
+    .ref-drawer-btn:active { border-color:var(--gold); color:var(--gold); }
+    .ref-drawer-btn .material-symbols-rounded { font-size:16px; }
+
+    /* ── Reference bottom sheet ── */
+    .ref-back { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .ref-back.open { opacity:1; pointer-events:all; }
+    .ref-sheet { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:600px; max-height:88dvh; overflow-y:auto; scrollbar-width:none; padding:8px 20px calc(32px + var(--safe-b)); transform:translateY(100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2); }
+    .ref-sheet::-webkit-scrollbar { display:none; }
+    .ref-back.open .ref-sheet { transform:translateY(0); }
+    .ref-sheet-handle { width:36px; height:4px; border-radius:2px; background:rgba(255,255,255,.12); margin:12px auto 16px; }
+    .ref-sheet-head { display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+    .ref-sheet-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:2px; }
+    .ref-sheet-close { font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600; letter-spacing:1.5px; color:#666; text-transform:uppercase; background:transparent; border:none; cursor:pointer; padding:4px 8px; }
+
+    /* ── Accordion ── */
+    .acc-item { border-bottom:1px solid rgba(255,255,255,0.04); }
+    .acc-item:last-child { border-bottom:none; }
+    .acc-header { display:flex; align-items:center; justify-content:space-between; padding:16px 0; cursor:pointer; }
+    .acc-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#ddd; text-transform:uppercase; letter-spacing:1.5px; }
+    .acc-chevron { font-size:20px; color:#555; transition:transform .25s; }
+    .acc-item.open .acc-chevron { transform:rotate(180deg); color:var(--gold); }
+    .acc-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); }
+    .acc-item.open .acc-body { max-height:3000px; padding-bottom:16px; }
+
+    /* ── Ref content helpers ── */
+    .prose { font-size:13px; font-weight:300; color:#ccc; line-height:1.8; margin-bottom:14px; }
+    .group-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin:18px 0 12px; padding-bottom:6px; border-bottom:1px solid rgba(212,175,55,0.15); }
+    .ref-item { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .ref-item:last-child { border-bottom:none; }
+    .ref-num { font-family:'Playfair Display',serif; font-style:italic; color:var(--gold); min-width:20px; flex-shrink:0; font-size:14px; }
+    .ref-text { font-size:12px; color:#aaa; line-height:1.6; }
+    .ref-text strong { color:#ddd; }
+    .trouble-card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:12px; backdrop-filter:blur(12px); }
+    .trouble-q { font-family:'Playfair Display',serif; font-size:13px; font-weight:600; font-style:italic; color:#ddd; margin-bottom:8px; }
+    .trouble-a { font-size:12px; color:#aaa; line-height:1.6; }
+    .trouble-a strong { color:var(--gold); font-weight:600; }
+    .safety-alert { background:rgba(244,67,54,0.06); border:1px solid rgba(244,67,54,0.25); border-radius:12px; padding:16px; margin-top:15px; }
+    .safety-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:#F44336; margin-bottom:6px; }
+    .safety-text { font-size:12px; color:#ccc; line-height:1.6; }
+
+    /* ── Phase / Week cards ── */
+    .phase-card { background:var(--glass); border:1.5px solid var(--border); border-radius:20px; margin-bottom:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.5); transition:all .4s ease; backdrop-filter:blur(12px); }
+    .phase-card.locked { opacity:0.4; pointer-events:none; filter:grayscale(0.5); }
+    .phase-card.completed-card { border-color:rgba(76,175,80,0.4); }
+    .phase-header { display:flex; justify-content:space-between; align-items:center; padding:20px; cursor:pointer; transition:background .3s; }
+    .phase-header:active { background:rgba(255,255,255,0.02); }
+    .phase-info { flex:1; min-width:0; }
+    .phase-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin-bottom:4px; }
+    .phase-name { font-family:'Playfair Display',serif; font-size:18px; color:#eee; margin-bottom:4px; font-style:italic; }
+    .phase-obj { font-size:11px; color:#888; line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .phase-status { font-size:1.5rem; margin-left:15px; flex-shrink:0; }
+    .phase-body { display:none; padding:0 20px 20px; border-top:1px solid rgba(212,175,55,0.1); }
+    .phase-body.open { display:block; animation:fadeSlideIn .4s ease; }
+    @keyframes fadeSlideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Phase specs ── */
+    .phase-spec { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:16px 0; }
+    .spec-item { text-align:center; background:rgba(212,175,55,0.04); border:1px solid var(--border); border-radius:10px; padding:12px 6px; }
+    .spec-val { font-family:'Playfair Display',serif; color:var(--gold); font-size:15px; display:block; font-weight:600; }
+    .spec-lbl { font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:#666; margin-top:4px; display:block; font-weight:600; }
+
+    /* ── Weekly schedule ── */
+    .task-group-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin:18px 0 12px; padding-bottom:6px; border-bottom:1px solid rgba(212,175,55,0.15); }
+    .day-row { display:flex; align-items:flex-start; gap:14px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .day-row:last-child { border-bottom:none; }
+    .day-name { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(212,175,55,0.7); min-width:72px; flex-shrink:0; padding-top:2px; }
+    .day-desc { font-size:12px; color:#888; line-height:1.5; }
+
+    /* ── Session log form ── */
+    .log-form-card { background:var(--glass); border:1.5px solid var(--border); border-radius:20px; padding:22px; margin-bottom:20px; backdrop-filter:blur(12px); box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+    .log-form-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.15); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+    .form-row.single { grid-template-columns:1fr; }
+    .field-label { display:block; font-size:8px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:6px; }
+    input[type="date"],input[type="number"],input[type="text"],select,textarea {
+      width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px;
+      color:#ddd; font-family:'Montserrat',sans-serif; font-size:13px; padding:10px 12px;
+      outline:none; transition:border-color .2s; -webkit-appearance:none; appearance:none;
+    }
+    input:focus,select:focus,textarea:focus { border-color:var(--gold); }
+    textarea { resize:vertical; min-height:72px; line-height:1.5; }
+    select option { background:var(--midnight); }
+    .rating-row { display:flex; gap:5px; margin-top:4px; flex-wrap:wrap; }
+    .rating-btn { flex:1; min-width:calc(10% - 5px); padding:8px 0; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:6px; color:#666; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
+    .rating-btn.selected { background:var(--luxury-gradient); border-color:var(--gold); color:var(--midnight); }
+    .chip-grid { display:flex; flex-wrap:wrap; gap:7px; margin-top:4px; }
+    .chip { padding:6px 12px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:20px; color:#666; font-size:11px; font-weight:600; letter-spacing:.5px; cursor:pointer; transition:all .15s; font-family:'Montserrat',sans-serif; }
+    .chip.selected { background:rgba(212,175,55,0.12); border-color:var(--gold); color:var(--gold); }
+    .save-btn { display:block; width:100%; padding:16px; margin-top:18px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:14px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s ease; box-shadow:0 6px 20px rgba(212,175,55,0.25); }
+    .save-btn:active { transform:scale(.97); }
+
+    /* ── Start date card ── */
+    .start-card { background:var(--glass); border:1px solid var(--border); border-radius:16px; padding:18px 20px; margin-bottom:20px; backdrop-filter:blur(12px); display:flex; align-items:flex-end; gap:12px; }
+    .start-card > div:first-child { flex:1; }
+    .start-clear-btn { padding:10px 16px; background:transparent; border:1px solid var(--border); border-radius:25px; color:#666; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+    .start-clear-btn:active { border-color:var(--gold); color:var(--gold); }
+
+    /* ── Session log toggle ── */
+    .log-toggle { display:flex; align-items:center; gap:12px; width:100%; padding:14px 18px; border-radius:16px; background:var(--glass); border:1px solid var(--border); cursor:pointer; margin-top:0; margin-bottom:20px; transition:all .3s; backdrop-filter:blur(12px); }
+    .log-toggle:active { border-color:var(--gold); }
+    .log-toggle .material-symbols-rounded { font-size:18px; color:var(--gold); }
+    .log-toggle-label { flex:1; font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:#aaa; }
+    .log-toggle-chevron { font-size:20px; color:#555; transition:transform .25s; }
+    .log-open .log-toggle-chevron { transform:rotate(180deg); color:var(--gold); }
+    .log-body { max-height:0; overflow:hidden; transition:max-height .3s cubic-bezier(.4,0,.2,1); }
+    .log-open .log-body { max-height:1000px; }
+    .log-inner { background:var(--glass); border:1px solid var(--border); border-top:none; border-radius:0 0 16px 16px; padding:16px 20px; backdrop-filter:blur(12px); }
+    .log-entry { padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; }
+    .log-entry:last-child { border-bottom:none; }
+    .log-entry-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+    .log-date-str { font-family:'Playfair Display',serif; font-size:13px; color:var(--gold); font-style:italic; }
+    .log-badges { display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+    .log-badge { font-size:10px; font-weight:600; letter-spacing:.5px; background:rgba(212,175,55,0.08); border:1px solid var(--border); color:var(--gold); padding:3px 10px; border-radius:10px; }
+    .log-chips-row { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
+    .log-chip { font-size:10px; padding:3px 8px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#666; }
+    .log-notes-text { font-size:11px; color:#777; font-style:italic; line-height:1.5; border-top:1px solid rgba(255,255,255,0.04); padding-top:6px; margin-top:4px; }
+    .log-delete-btn { background:none; border:none; color:#444; font-size:14px; cursor:pointer; padding:2px 6px; transition:color .2s; line-height:1; }
+    .log-delete-btn:active { color:var(--red); }
+    .log-empty { color:#444; font-style:italic; font-size:12px; text-align:center; padding:20px 0; font-family:'Playfair Display',serif; }
+
+    /* ── Phase complete button ── */
+    .complete-btn { display:block; width:100%; padding:16px; margin-top:20px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:14px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s ease; box-shadow:0 6px 20px rgba(212,175,55,0.25); }
+    .complete-btn:active { transform:scale(.97); }
+    .complete-btn.done { background:rgba(76,175,80,0.1); color:#4CAF50; border:1px solid rgba(76,175,80,0.3); pointer-events:none; box-shadow:none; }
+
+    /* ── Reset btn ── */
+    .reset-btn { display:block; width:100%; margin-top:10px; padding:14px; background:transparent; border:1px solid rgba(244,67,54,0.3); border-radius:12px; color:#F44336; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.3s; }
+    .reset-btn:active { border-color:#F44336; background:rgba(244,67,54,0.05); }
+
+    /* ── Celebration overlay ── */
+    .celebration-overlay { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); backdrop-filter:blur(12px); opacity:0; pointer-events:none; transition:opacity .3s; }
+    .celebration-overlay.show { opacity:1; pointer-events:all; }
+    .celebration-card { background:var(--glass); border:1.5px solid var(--border); backdrop-filter:blur(12px); border-radius:24px; padding:36px 28px; max-width:320px; width:90%; text-align:center; transform:scale(.85); transition:transform .4s cubic-bezier(.22,.68,0,1.3); }
+    .celebration-overlay.show .celebration-card { transform:scale(1); }
+    .celebration-orb { width:72px; height:72px; border-radius:50%; margin:0 auto 20px; background:var(--luxury-gradient); display:flex; align-items:center; justify-content:center; font-size:32px; animation:celebPulse 1.8s ease-in-out infinite; }
+    @keyframes celebPulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0.5)} 50%{box-shadow:0 0 0 16px rgba(212,175,55,0)} }
+    .celebration-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+    .celebration-sub { font-family:'Playfair Display',serif; font-size:14px; font-style:italic; color:#aaa; line-height:1.6; margin-bottom:24px; }
+    .celebration-btn { padding:12px 30px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:25px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s; }
+
+    /* ── Reset confirm modal ── */
+    .modal-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .modal-back.open { opacity:1; pointer-events:all; }
+    .modal-sheet { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:600px; padding:8px 24px calc(28px + var(--safe-b)); transform:translateY(100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2); }
+    .modal-back.open .modal-sheet { transform:translateY(0); }
+    .modal-handle { width:36px; height:4px; border-radius:2px; background:rgba(255,255,255,0.12); margin:12px auto 16px; }
+    .modal-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#ddd; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+    .modal-body { font-size:13px; font-weight:300; color:#aaa; line-height:1.6; margin-bottom:20px; }
+    .modal-row { display:flex; gap:10px; }
+    .modal-btn { flex:1; padding:14px; border-radius:14px; border:none; cursor:pointer; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; transition:.2s; }
+    .modal-btn:active { transform:scale(.97); }
+    .modal-btn-cancel { background:rgba(255,255,255,0.05); color:#888; border:1px solid rgba(255,255,255,0.08); }
+    .modal-btn-confirm { background:rgba(244,67,54,0.12); color:#F44336; border:1px solid rgba(244,67,54,0.3); }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:calc(90px + var(--safe-b)); left:50%; transform:translateX(-50%) translateY(20px); background:var(--luxury-gradient); color:var(--midnight); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; padding:12px 24px; border-radius:30px; z-index:999; transition:all .3s cubic-bezier(.22,.68,0,1.2); white-space:nowrap; opacity:0; pointer-events:none; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ── Tip card ── */
+    .tip-card { background:rgba(212,175,55,0.04); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:16px; margin-top:15px; position:relative; overflow:hidden; }
+    .tip-card::before { content:'"'; position:absolute; top:-10px; left:10px; font-family:'Playfair Display',serif; font-size:64px; color:rgba(212,175,55,0.12); line-height:1; pointer-events:none; }
+    .tip-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:8px; }
+    .tip-text { font-family:'Playfair Display',serif; font-size:13px; font-style:italic; color:#bbb; line-height:1.7; }
   </style>
 </head>
 <body data-nav="training">
 
-  <div class="app-wrap">
-    <header class="app-header">
-      <span class="script">Sir's Protocol</span>
-      <h1>Heel Training</h1>
-      <p class="subtitle">Grace Through Discipline</p>
-    </header>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-center">
+      <div class="topbar-title">Heel Training</div>
+      <div class="topbar-sub">Sir's Protocol — Grace Through Discipline</div>
+    </div>
+  </div>
 
-    <div class="phase-banner" id="phaseBanner">
+  <!-- Progress dots -->
+  <div class="progress-dots-wrap">
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="progress-dot-labels" id="progressLabels"></div>
+  </div>
+
+  <div class="main">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="statPhase">1</div><div class="stat-lbl">Current Phase</div></div>
+      <div class="stat-card"><div class="stat-val" id="statDays">—</div><div class="stat-lbl">Days in Training</div></div>
+    </div>
+
+    <!-- Reference drawer button -->
+    <button class="ref-drawer-btn" onclick="openRefDrawer()">
+      <span class="material-symbols-rounded">menu_book</span>
+      <span>Reference &amp; Technique Guide</span>
+      <span class="material-symbols-rounded" style="font-size:16px;color:#666">chevron_right</span>
+    </button>
+
+    <!-- Log session form -->
+    <div class="log-form-card">
+      <div class="log-form-title">Log Today's Session</div>
+      <div class="form-row">
+        <div><label class="field-label">Date</label><input type="date" id="logDate"/></div>
+        <div>
+          <label class="field-label">Heel Height</label>
+          <select id="logHeight">
+            <option value="">— select —</option>
+            <option>2.5"</option><option>3"</option><option>3.5"</option>
+            <option>4"</option><option>4.5"</option><option>5"</option><option>6"+</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label class="field-label">Duration (minutes)</label><input type="number" id="logDuration" placeholder="e.g. 30" min="1" max="480"/></div>
+        <div>
+          <label class="field-label">Posture Self-Rating</label>
+          <div class="rating-row" id="ratingRow">
+            <button class="rating-btn" onclick="setRating(1)">1</button>
+            <button class="rating-btn" onclick="setRating(2)">2</button>
+            <button class="rating-btn" onclick="setRating(3)">3</button>
+            <button class="rating-btn" onclick="setRating(4)">4</button>
+            <button class="rating-btn" onclick="setRating(5)">5</button>
+            <button class="rating-btn" onclick="setRating(6)">6</button>
+            <button class="rating-btn" onclick="setRating(7)">7</button>
+            <button class="rating-btn" onclick="setRating(8)">8</button>
+            <button class="rating-btn" onclick="setRating(9)">9</button>
+            <button class="rating-btn" onclick="setRating(10)">10</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-row single" style="margin-bottom:8px">
+        <div>
+          <label class="field-label">Activities</label>
+          <div class="chip-grid" id="activityChips">
+            <button class="chip" onclick="toggleChip(this)">Standing Drill</button>
+            <button class="chip" onclick="toggleChip(this)">Walking Drill</button>
+            <button class="chip" onclick="toggleChip(this)">Straight Line</button>
+            <button class="chip" onclick="toggleChip(this)">Figure-8</button>
+            <button class="chip" onclick="toggleChip(this)">Backward Walk</button>
+            <button class="chip" onclick="toggleChip(this)">Stairs</button>
+            <button class="chip" onclick="toggleChip(this)">Mirror Drill</button>
+            <button class="chip" onclick="toggleChip(this)">Service Tasks</button>
+            <button class="chip" onclick="toggleChip(this)">Posture Hold</button>
+            <button class="chip" onclick="toggleChip(this)">Outdoor Walk</button>
+            <button class="chip" onclick="toggleChip(this)">Presentation</button>
+            <button class="chip" onclick="toggleChip(this)">Extended Wear</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div><label class="field-label">Notes / Sensations / Wins</label><textarea id="logNotes" placeholder="How did your body feel? What made you feel most submissive? What improved?"></textarea></div>
+      </div>
+      <button class="save-btn" onclick="saveEntry()">✦ Record Session</button>
+    </div>
+
+    <!-- Training start date -->
+    <div class="start-card">
       <div>
-        <div class="phase-label" id="bannerPhase">Phase 1 &mdash; Foundation</div>
-        <div class="phase-detail" id="bannerWeek">Set your start date below</div>
+        <label class="field-label">Training Start Date</label>
+        <input type="date" id="startDate" onchange="saveStartDate()"/>
       </div>
-      <div style="text-align:right">
-        <div class="phase-days" id="bannerDays">&mdash;</div>
-        <div class="phase-detail">days in training</div>
+      <button class="start-clear-btn" onclick="clearStartDate()">Clear</button>
+    </div>
+
+    <!-- Phase cards -->
+    <div id="phasesContainer"></div>
+
+    <!-- Session log toggle -->
+    <div id="logWrap">
+      <button class="log-toggle" onclick="toggleLog()" id="logToggleBtn">
+        <span class="material-symbols-rounded">history</span>
+        <span class="log-toggle-label">Past Sessions</span>
+        <span class="material-symbols-rounded log-toggle-chevron" id="logChevron">expand_more</span>
+      </button>
+      <div class="log-body" id="logBody">
+        <div class="log-inner" id="logEntries"></div>
       </div>
     </div>
 
-    <nav class="nav-tabs">
-      <button class="nav-tab active" onclick="showTab('log',this)">Session Log</button>
-      <button class="nav-tab" onclick="showTab('program',this)">Program</button>
-      <button class="nav-tab" onclick="showTab('reference',this)">Reference</button>
-    </nav>
+    <button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>
 
-    <!-- LOG PANEL -->
-    <div class="panel active" id="tab-log">
-      <div class="card">
-        <div class="card-title">Log Today's Session</div>
-        <div class="form-row">
-          <div><label>Date</label><input type="date" id="logDate"/></div>
-          <div>
-            <label>Heel Height</label>
-            <select id="logHeight">
-              <option value="">-- select --</option>
-              <option>2.5"</option><option>3"</option><option>3.5"</option>
-              <option>4"</option><option>4.5"</option><option>5"</option><option>6"+</option>
-            </select>
-          </div>
+  </div><!-- /main -->
+
+  <!-- Reference Drawer -->
+  <div class="ref-back" id="refBack" onclick="if(event.target===this)closeRefDrawer()">
+    <div class="ref-sheet">
+      <div class="ref-sheet-handle"></div>
+      <div class="ref-sheet-head">
+        <span class="ref-sheet-title">Reference &amp; Technique</span>
+        <button class="ref-sheet-close" onclick="closeRefDrawer()">Close ✕</button>
+      </div>
+
+      <!-- I. Posture -->
+      <div class="acc-item" id="acc-posture">
+        <div class="acc-header" onclick="toggleAcc('posture')"><span class="acc-title">I. The Marionette Drill</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="ref-item"><span class="ref-num">1.</span><span class="ref-text">Stand barefoot before a mirror, feet hip-width apart.</span></div>
+          <div class="ref-item"><span class="ref-num">2.</span><span class="ref-text">Imagine a string at the crown of your head pulling you upward.</span></div>
+          <div class="ref-item"><span class="ref-num">3.</span><span class="ref-text">Roll shoulders back and down — open the chest without arching the lower back.</span></div>
+          <div class="ref-item"><span class="ref-num">4.</span><span class="ref-text">Engage the core: draw the navel gently toward the spine.</span></div>
+          <div class="ref-item"><span class="ref-num">5.</span><span class="ref-text">Neutral spine — no swayback, no flat back. Tuck pelvis slightly.</span></div>
+          <div class="ref-item"><span class="ref-num">6.</span><span class="ref-text">Shift weight forward: 60–70% on the balls of your feet, 30–40% on heels.</span></div>
+          <div class="ref-item"><span class="ref-num">7.</span><span class="ref-text">Chin parallel to the floor. Gaze soft and slightly downward.</span></div>
+          <div class="ref-item"><span class="ref-num">8.</span><span class="ref-text">Breathe deeply. Hold 2 minutes. Repeat 5× daily.</span></div>
         </div>
-        <div class="form-row">
-          <div><label>Duration (minutes)</label><input type="number" id="logDuration" placeholder="e.g. 30" min="1" max="480"/></div>
-          <div>
-            <label>Posture Self-Rating</label>
-            <div class="rating-row" id="ratingRow">
-              <button class="rating-btn" onclick="setRating(1)">1</button>
-              <button class="rating-btn" onclick="setRating(2)">2</button>
-              <button class="rating-btn" onclick="setRating(3)">3</button>
-              <button class="rating-btn" onclick="setRating(4)">4</button>
-              <button class="rating-btn" onclick="setRating(5)">5</button>
-              <button class="rating-btn" onclick="setRating(6)">6</button>
-              <button class="rating-btn" onclick="setRating(7)">7</button>
-              <button class="rating-btn" onclick="setRating(8)">8</button>
-              <button class="rating-btn" onclick="setRating(9)">9</button>
-              <button class="rating-btn" onclick="setRating(10)">10</button>
+      </div>
+
+      <!-- II. Walking -->
+      <div class="acc-item" id="acc-walking">
+        <div class="acc-header" onclick="toggleAcc('walking')"><span class="acc-title">II. Walking Technique</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="ref-item"><span class="ref-num">1.</span><span class="ref-text"><strong>Start:</strong> Feet in T or parallel, weight on the back foot.</span></div>
+          <div class="ref-item"><span class="ref-num">2.</span><span class="ref-text"><strong>Step:</strong> Heel contacts the ground first — then roll forward through the arch to the toe.</span></div>
+          <div class="ref-item"><span class="ref-num">3.</span><span class="ref-text"><strong>Stride:</strong> Short and precise — 10–12 inches maximum. Longer equals instability.</span></div>
+          <div class="ref-item"><span class="ref-num">4.</span><span class="ref-text"><strong>Line:</strong> One foot directly in front of the other. This creates the hip sway.</span></div>
+          <div class="ref-item"><span class="ref-num">5.</span><span class="ref-text"><strong>Arms:</strong> Swing naturally from the shoulder, not the elbow. Head level, no bobbing.</span></div>
+          <div class="ref-item"><span class="ref-num">6.</span><span class="ref-text"><strong>Speed:</strong> Slow and deliberate. Confidence comes with practice.</span></div>
+          <div class="ref-item"><span class="ref-num">7.</span><span class="ref-text"><strong>Turns:</strong> Pivot on the ball of the foot. Keep the upper body still.</span></div>
+        </div>
+      </div>
+
+      <!-- III. Foot care -->
+      <div class="acc-item" id="acc-footcare">
+        <div class="acc-header" onclick="toggleAcc('footcare')"><span class="acc-title">III. Daily Foot Care</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <p class="prose" style="margin-bottom:12px">Perform this 10–15 min ritual after every training session.</p>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Soak in warm water with Epsom salts or lavender oil for 5–10 minutes after removal.</span></div>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Pat dry and moisturize generously — urea cream is excellent for calluses.</span></div>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Ankle circles — 10 each direction, each foot.</span></div>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Calf stretch against wall — 30 seconds × 3 per leg.</span></div>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Toe spreads — separate toes gently with fingers, hold 20 seconds.</span></div>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Plantar fascia — roll a frozen water bottle under the arch.</span></div>
+          <div class="ref-item"><span class="ref-num">→</span><span class="ref-text">Self-massage: knead arches, balls of feet, and heels with thumbs.</span></div>
+        </div>
+      </div>
+
+      <!-- IV. Troubleshooting -->
+      <div class="acc-item" id="acc-trouble">
+        <div class="acc-header" onclick="toggleAcc('trouble')"><span class="acc-title">IV. Troubleshooting</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="trouble-card"><div class="trouble-q">"I keep wobbling and losing balance."</div><div class="trouble-a"><strong>Fix:</strong> Slow down. Shorten stride. Engage core. Practice the single-line drill. Check shoe fit — too loose means slipping.</div></div>
+          <div class="trouble-card"><div class="trouble-q">"My calves and Achilles are aching."</div><div class="trouble-a"><strong>Fix:</strong> Stretch more frequently. Reduce height temporarily. Ice after sessions. Build calf strength with seated raises in flats first.</div></div>
+          <div class="trouble-card"><div class="trouble-q">"I have lower back pain after sessions."</div><div class="trouble-a"><strong>Fix:</strong> Check pelvic position — likely over-arching. Strengthen core with planks. Ensure weight is not pitched too far forward.</div></div>
+          <div class="trouble-card"><div class="trouble-q">"Blisters and hot spots."</div><div class="trouble-a"><strong>Fix:</strong> Break in heels gradually. Use blister tape or gel pads. Ensure proper sizing. Moisture-wicking socks or foot powder.</div></div>
+          <div class="trouble-card"><div class="trouble-q">"My knees knock or lock."</div><div class="trouble-a"><strong>Fix:</strong> Maintain a micro-bend in the knees. Turn feet out slightly (5–10°). Lead with the ball rather than striking the heel hard.</div></div>
+        </div>
+      </div>
+
+      <!-- V. Stop signals -->
+      <div class="acc-item" id="acc-safety">
+        <div class="acc-header" onclick="toggleAcc('safety')"><span class="acc-title">V. When to Stop — Tell Sir</span><span class="material-symbols-rounded acc-chevron">expand_more</span></div>
+        <div class="acc-body">
+          <div class="safety-alert" style="margin-bottom:16px">
+            <div class="safety-label">🛑 Stop Immediately If:</div>
+            <div class="safety-text">
+              Pain persisting more than 48 hours · Swelling, bruising, or numbness · Inability to bear weight normally · Blisters that break or show signs of infection
             </div>
           </div>
-        </div>
-        <div class="form-row single" style="margin-bottom:8px">
-          <div>
-            <label>Activities</label>
-            <div class="chip-grid" id="activityChips">
-              <button class="chip" onclick="toggleChip(this)">Standing Drill</button>
-              <button class="chip" onclick="toggleChip(this)">Walking Drill</button>
-              <button class="chip" onclick="toggleChip(this)">Straight Line</button>
-              <button class="chip" onclick="toggleChip(this)">Figure-8</button>
-              <button class="chip" onclick="toggleChip(this)">Backward Walk</button>
-              <button class="chip" onclick="toggleChip(this)">Stairs</button>
-              <button class="chip" onclick="toggleChip(this)">Mirror Drill</button>
-              <button class="chip" onclick="toggleChip(this)">Service Tasks</button>
-              <button class="chip" onclick="toggleChip(this)">Posture Hold</button>
-              <button class="chip" onclick="toggleChip(this)">Outdoor Walk</button>
-              <button class="chip" onclick="toggleChip(this)">Presentation</button>
-              <button class="chip" onclick="toggleChip(this)">Extended Wear</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-row single">
-          <div><label>Notes / Sensations / Wins</label><textarea id="logNotes" placeholder="How did your body feel? What made you feel most submissive? What improved?"></textarea></div>
-        </div>
-        <button class="btn-primary" onclick="saveEntry()">&#10022; Record Session</button>
-      </div>
-      <div class="divider"><span>past sessions</span></div>
-      <div id="logList"></div>
-    </div>
-
-    <!-- PROGRAM PANEL -->
-    <div class="panel" id="tab-program">
-      <div class="card">
-        <div class="card-title">Training Start Date</div>
-        <div class="start-date-row">
-          <div><label>When did you begin?</label><input type="date" id="startDate" onchange="saveStartDate()"/></div>
-          <button class="btn-ghost" onclick="clearStartDate()">Clear</button>
-        </div>
-      </div>
-
-      <div class="phase-card">
-        <div class="phase-card-header">
-          <h3>Phase 1 &mdash; Foundation <span id="phase1indicator"></span></h3>
-          <div class="phase-weeks">Weeks 1&ndash;2</div>
-        </div>
-        <div class="phase-card-body">
-          <div class="phase-spec">
-            <div class="spec-item"><span class="spec-val">2.5&ndash;3.5"</span><span class="spec-lbl">Heel Height</span></div>
-            <div class="spec-item"><span class="spec-val">20&ndash;45</span><span class="spec-lbl">Min / Day</span></div>
-            <div class="spec-item"><span class="spec-val">4&ndash;6&times;</span><span class="spec-lbl">Days / Week</span></div>
-          </div>
-          <div class="day-row"><div class="day-name">Monday</div><div class="day-desc">Posture drill (marionette string) + 20 min standing + 10 min walking</div></div>
-          <div class="day-row"><div class="day-name">Tuesday</div><div class="day-desc">30&ndash;45 min walking session &mdash; straight line and figure-8 drills</div></div>
-          <div class="day-row"><div class="day-name">Wednesday</div><div class="day-desc">Active recovery &mdash; ankle circles, stretches, 15 min light wear</div></div>
-          <div class="day-row"><div class="day-name">Thursday</div><div class="day-desc">Integration &mdash; 3 simple service tasks performed in heels</div></div>
-          <div class="day-row"><div class="day-name">Friday</div><div class="day-desc">Endurance &mdash; 45+ min continuous wear + journal reflection</div></div>
-          <div class="day-row"><div class="day-name">Saturday</div><div class="day-desc">Presentation day &mdash; practice poses, mirror drill, walk for Sir</div></div>
-          <div class="day-row"><div class="day-name">Sunday</div><div class="day-desc">Rest &mdash; foot soak, massage, and reflection</div></div>
-        </div>
-      </div>
-
-      <div class="phase-card">
-        <div class="phase-card-header">
-          <h3>Phase 2 &mdash; Endurance <span id="phase2indicator"></span></h3>
-          <div class="phase-weeks">Weeks 3&ndash;4</div>
-        </div>
-        <div class="phase-card-body">
-          <div class="phase-spec">
-            <div class="spec-item"><span class="spec-val">3.5&ndash;4.5"</span><span class="spec-lbl">Heel Height</span></div>
-            <div class="spec-item"><span class="spec-val">45&ndash;90</span><span class="spec-lbl">Min / Day</span></div>
-            <div class="spec-item"><span class="spec-val">4&ndash;6&times;</span><span class="spec-lbl">Days / Week</span></div>
-          </div>
-          <div class="day-row"><div class="day-name">Monday</div><div class="day-desc">Extended walking drills + introduce ankle strap heels</div></div>
-          <div class="day-row"><div class="day-name">Tuesday</div><div class="day-desc">Stairs practice + backward walk + 60 min total wear</div></div>
-          <div class="day-row"><div class="day-name">Wednesday</div><div class="day-desc">Active recovery + foot care ritual</div></div>
-          <div class="day-row"><div class="day-name">Thursday</div><div class="day-desc">Full service session &mdash; all household tasks in heels</div></div>
-          <div class="day-row"><div class="day-name">Friday</div><div class="day-desc">Endurance &mdash; 90 min wear with posture check reminders</div></div>
-          <div class="day-row"><div class="day-name">Saturday</div><div class="day-desc">Supervised outdoor walk (one block, block heel) + presentation</div></div>
-          <div class="day-row"><div class="day-name">Sunday</div><div class="day-desc">Rest &mdash; extended foot care, journal, Sir's review</div></div>
-        </div>
-      </div>
-
-      <div class="phase-card">
-        <div class="phase-card-header">
-          <h3>Phase 3 &mdash; Mastery <span id="phase3indicator"></span></h3>
-          <div class="phase-weeks">Weeks 5&ndash;6+</div>
-        </div>
-        <div class="phase-card-body">
-          <div class="phase-spec">
-            <div class="spec-item"><span class="spec-val">5"+</span><span class="spec-lbl">Heel Height</span></div>
-            <div class="spec-item"><span class="spec-val">1&ndash;3+</span><span class="spec-lbl">Hours / Day</span></div>
-            <div class="spec-item"><span class="spec-val">Daily</span><span class="spec-lbl">Frequency</span></div>
-          </div>
-          <div class="day-row"><div class="day-name">Monday</div><div class="day-desc">Complex movement &mdash; dancing, serving full meal, combined protocols</div></div>
-          <div class="day-row"><div class="day-name">Tuesday</div><div class="day-desc">Extended wear session (2+ hours) with service integration</div></div>
-          <div class="day-row"><div class="day-name">Wednesday</div><div class="day-desc">Active recovery + foot care + conditioning work</div></div>
-          <div class="day-row"><div class="day-name">Thursday</div><div class="day-desc">Outdoor / real-world practice with supervision</div></div>
-          <div class="day-row"><div class="day-name">Friday</div><div class="day-desc">All-day wear (with scheduled breaks) &mdash; endurance test</div></div>
-          <div class="day-row"><div class="day-name">Saturday</div><div class="day-desc">Formal presentation routine &mdash; 3&ndash;5 min heel routine for Sir</div></div>
-          <div class="day-row"><div class="day-name">Sunday</div><div class="day-desc">Rest &mdash; full foot care ritual, reflection, aftercare</div></div>
+          <p class="prose" style="font-family:'Playfair Display',serif;font-style:italic;color:#888;font-size:13px;border-top:1px solid var(--border);padding-top:14px">Caring for the body that serves is itself an act of submission. Do not push through real injury.</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- REFERENCE PANEL -->
-    <div class="panel" id="tab-reference">
-      <div class="card">
-        <div class="card-title">Posture &mdash; The Marionette Drill</div>
-        <ol class="ref-list">
-          <li><span class="ref-num">1.</span>Stand barefoot before a mirror, feet hip-width apart.</li>
-          <li><span class="ref-num">2.</span>Imagine a string at the crown of your head pulling you upward.</li>
-          <li><span class="ref-num">3.</span>Roll shoulders back and down &mdash; open the chest without arching the lower back.</li>
-          <li><span class="ref-num">4.</span>Engage the core: draw the navel gently toward the spine.</li>
-          <li><span class="ref-num">5.</span>Neutral spine &mdash; no swayback, no flat back. Tuck pelvis slightly.</li>
-          <li><span class="ref-num">6.</span>Shift weight forward: 60&ndash;70% on the balls of your feet, 30&ndash;40% on heels.</li>
-          <li><span class="ref-num">7.</span>Chin parallel to the floor. Gaze soft and slightly downward.</li>
-          <li><span class="ref-num">8.</span>Breathe deeply. Hold 2 minutes. Repeat 5&times; daily.</li>
-        </ol>
-      </div>
-      <div class="card">
-        <div class="card-title">Walking Technique</div>
-        <ol class="ref-list">
-          <li><span class="ref-num">1.</span><strong style="color:var(--text)">Start:</strong> Feet in T or parallel, weight on the back foot.</li>
-          <li><span class="ref-num">2.</span><strong style="color:var(--text)">Step:</strong> Heel contacts the ground first &mdash; then roll forward through the arch to the toe.</li>
-          <li><span class="ref-num">3.</span><strong style="color:var(--text)">Stride:</strong> Short and precise &mdash; 10&ndash;12 inches maximum. Longer equals instability.</li>
-          <li><span class="ref-num">4.</span><strong style="color:var(--text)">Line:</strong> One foot directly in front of the other. This creates the hip sway.</li>
-          <li><span class="ref-num">5.</span><strong style="color:var(--text)">Arms:</strong> Swing naturally from the shoulder, not the elbow. Head level, no bobbing.</li>
-          <li><span class="ref-num">6.</span><strong style="color:var(--text)">Speed:</strong> Slow and deliberate. Confidence comes with practice.</li>
-          <li><span class="ref-num">7.</span><strong style="color:var(--text)">Turns:</strong> Pivot on the ball of the foot. Keep the upper body still.</li>
-        </ol>
-      </div>
-      <div class="card">
-        <div class="card-title">Daily Foot Care (10&ndash;15 min)</div>
-        <ul class="ref-list">
-          <li><span class="ref-num">&rarr;</span>Soak in warm water with Epsom salts or lavender oil for 5&ndash;10 minutes after removal.</li>
-          <li><span class="ref-num">&rarr;</span>Pat dry and moisturize generously &mdash; urea cream is excellent for calluses.</li>
-          <li><span class="ref-num">&rarr;</span>Ankle circles &mdash; 10 each direction, each foot.</li>
-          <li><span class="ref-num">&rarr;</span>Calf stretch against wall &mdash; 30 seconds &times; 3 per leg.</li>
-          <li><span class="ref-num">&rarr;</span>Toe spreads &mdash; separate toes gently with fingers, hold 20 seconds.</li>
-          <li><span class="ref-num">&rarr;</span>Plantar fascia &mdash; roll a frozen water bottle under the arch.</li>
-          <li><span class="ref-num">&rarr;</span>Self-massage: knead arches, balls of feet, and heels with thumbs.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-title">Troubleshooting</div>
-        <div class="trouble-item"><div class="trouble-prob">Wobbling / Loss of Balance</div><div class="trouble-sol">Slow down. Shorten stride. Engage core. Practice the single-line drill. Check shoe fit &mdash; too loose means slipping.</div></div>
-        <div class="trouble-item"><div class="trouble-prob">Calf / Achilles Pain</div><div class="trouble-sol">Stretch more frequently. Reduce height temporarily. Ice after sessions. Build calf strength with seated raises in flats first.</div></div>
-        <div class="trouble-item"><div class="trouble-prob">Lower Back Ache</div><div class="trouble-sol">Check pelvic position &mdash; likely over-arching. Strengthen core with planks (off heels). Ensure weight is not pitched too far forward.</div></div>
-        <div class="trouble-item"><div class="trouble-prob">Blisters or Hot Spots</div><div class="trouble-sol">Break in heels gradually. Use blister tape or gel pads. Ensure proper sizing. Moisture-wicking socks or foot powder.</div></div>
-        <div class="trouble-item"><div class="trouble-prob">Knees Knocking or Locking</div><div class="trouble-sol">Maintain a micro-bend in the knees. Turn feet out slightly (5&ndash;10&deg;). Focus on leading with the ball rather than striking the heel hard.</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">When to Stop &mdash; Inform Sir Immediately</div>
-        <ul class="ref-list">
-          <li><span class="ref-num">&there4;</span>Pain persisting more than 48 hours after training</li>
-          <li><span class="ref-num">&there4;</span>Swelling, bruising, or numbness</li>
-          <li><span class="ref-num">&there4;</span>Inability to bear weight normally</li>
-          <li><span class="ref-num">&there4;</span>Blisters that break or show signs of infection</li>
-        </ul>
-        <p style="margin-top:12px;font-size:.78rem;color:var(--text-muted);font-style:italic;line-height:1.5">Caring for the body that serves is itself an act of submission. Do not push through real injury.</p>
+  <!-- Celebration Overlay -->
+  <div class="celebration-overlay" id="celebrationOverlay">
+    <div class="celebration-card">
+      <div class="celebration-orb" id="celebOrb">🏆</div>
+      <div class="celebration-title" id="celebTitle">Phase Complete</div>
+      <div class="celebration-sub" id="celebSub">You have completed this phase.</div>
+      <button class="celebration-btn" onclick="closeCelebration()">Continue</button>
+    </div>
+  </div>
+
+  <!-- Reset Confirm Modal -->
+  <div class="modal-back" id="resetModal" onclick="if(event.target===this)closeResetModal()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Reset All Progress?</div>
+      <div class="modal-body">Every logged session will be permanently erased. This cannot be undone.</div>
+      <div class="modal-row">
+        <button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">Keep It</button>
+        <button class="modal-btn modal-btn-confirm" onclick="doReset()">Yes, Reset</button>
       </div>
     </div>
   </div>
@@ -325,176 +444,336 @@
 
   <script type="module">
     import { requireAuth, dataRef } from './auth.js';
-    import { setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    // ── Phase definitions ─────────────────────────────────────
+    const PHASES = [
+      {
+        id: 'phase1',
+        badge: 'Phase 1',
+        name: 'Foundation',
+        objective: 'Build postural awareness and basic walking form in lower heels.',
+        weeks: 'Weeks 1–2',
+        specs: [{ val:'2.5–3.5"', lbl:'Heel Height' }, { val:'20–45', lbl:'Min / Day' }, { val:'4–6×', lbl:'Days / Week' }],
+        schedule: [
+          { day:'Monday', desc:'Posture drill (marionette string) + 20 min standing + 10 min walking' },
+          { day:'Tuesday', desc:'30–45 min walking session — straight line and figure-8 drills' },
+          { day:'Wednesday', desc:'Active recovery — ankle circles, stretches, 15 min light wear' },
+          { day:'Thursday', desc:'Integration — 3 simple service tasks performed in heels' },
+          { day:'Friday', desc:'Endurance — 45+ min continuous wear + journal reflection' },
+          { day:'Saturday', desc:'Presentation day — practice poses, mirror drill, walk for Sir' },
+          { day:'Sunday', desc:'Rest — foot soak, massage, and reflection' },
+        ],
+        tip: 'Begin every session with the marionette drill barefoot. It rewires your weight distribution before the heel changes your centre of gravity.'
+      },
+      {
+        id: 'phase2',
+        badge: 'Phase 2',
+        name: 'Endurance',
+        objective: 'Extend wear time and introduce higher heels with complex movement.',
+        weeks: 'Weeks 3–4',
+        specs: [{ val:'3.5–4.5"', lbl:'Heel Height' }, { val:'45–90', lbl:'Min / Day' }, { val:'4–6×', lbl:'Days / Week' }],
+        schedule: [
+          { day:'Monday', desc:'Extended walking drills + introduce ankle strap heels' },
+          { day:'Tuesday', desc:'Stairs practice + backward walk + 60 min total wear' },
+          { day:'Wednesday', desc:'Active recovery + foot care ritual' },
+          { day:'Thursday', desc:'Full service session — all household tasks in heels' },
+          { day:'Friday', desc:'Endurance — 90 min wear with posture check reminders' },
+          { day:'Saturday', desc:'Supervised outdoor walk (one block, block heel) + presentation' },
+          { day:'Sunday', desc:'Rest — extended foot care, journal, Sir\'s review' },
+        ],
+        tip: 'When fatigue sets in, resist the urge to lock your knees. That micro-bend is what separates graceful wear from painful survival.'
+      },
+      {
+        id: 'phase3',
+        badge: 'Phase 3',
+        name: 'Mastery',
+        objective: 'Daily wear, complex movement, formal presentation, outdoor confidence.',
+        weeks: 'Weeks 5–6+',
+        specs: [{ val:'5"+', lbl:'Heel Height' }, { val:'1–3+', lbl:'Hours / Day' }, { val:'Daily', lbl:'Frequency' }],
+        schedule: [
+          { day:'Monday', desc:'Complex movement — dancing, serving full meal, combined protocols' },
+          { day:'Tuesday', desc:'Extended wear session (2+ hours) with service integration' },
+          { day:'Wednesday', desc:'Active recovery + foot care + conditioning work' },
+          { day:'Thursday', desc:'Outdoor / real-world practice with supervision' },
+          { day:'Friday', desc:'All-day wear (with scheduled breaks) — endurance test' },
+          { day:'Saturday', desc:'Formal presentation routine — 3–5 min heel routine for Sir' },
+          { day:'Sunday', desc:'Rest — full foot care ritual, reflection, aftercare' },
+        ],
+        tip: 'Mastery is not about the height of the heel. It is about forgetting you are wearing them. Service that flows effortlessly is the final goal.'
+      }
+    ];
 
     // ── State ─────────────────────────────────────────────────
-    let heelRef   = null;
-    let entries   = [];
+    let dbRef = null;
+    let entries = [];
     let startDate = '';
-    let selectedRating     = 0;
+    let completedPhases = [];
+    let selectedRating = 0;
     let selectedActivities = [];
+    let openPhaseId = null;
+    let logOpen = false;
 
     // ── Persist ───────────────────────────────────────────────
-    async function persistHeel() {
-      if (!heelRef) return;
-      try {
-        await setDoc(heelRef, { entries, startDate });
-      } catch(e) { console.error('persistHeel error:', e); }
+    async function persist() {
+      if (!dbRef) return;
+      try { await setDoc(dbRef, { entries, startDate, completedPhases }); }
+      catch(e) { console.error('persist error:', e); }
     }
 
-    // ── Tab nav ───────────────────────────────────────────────
-    function showTab(name, btn) {
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-      document.getElementById('tab-'+name).classList.add('active');
-      btn.classList.add('active');
+    // ── Helpers ───────────────────────────────────────────────
+    function getCurrentPhaseIdx() {
+      const days = getDaysIn();
+      if (!days || days < 1) return 0;
+      if (days <= 14) return 0;
+      if (days <= 28) return 1;
+      return 2;
     }
+    function getDaysIn() {
+      if (!startDate) return 0;
+      const start = new Date(startDate + 'T00:00:00');
+      const today = new Date(); today.setHours(0,0,0,0);
+      return Math.max(0, Math.floor((today - start) / 86400000) + 1);
+    }
+
+    // ── Reference drawer ──────────────────────────────────────
+    function openRefDrawer() { document.getElementById('refBack').classList.add('open'); }
+    function closeRefDrawer() { document.getElementById('refBack').classList.remove('open'); }
+    function toggleAcc(id) {
+      const item = document.getElementById('acc-' + id);
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── Log toggle ────────────────────────────────────────────
+    function toggleLog() {
+      logOpen = !logOpen;
+      const wrap = document.getElementById('logWrap');
+      document.getElementById('logChevron').textContent = logOpen ? 'expand_less' : 'expand_more';
+      logOpen ? wrap.classList.add('log-open') : wrap.classList.remove('log-open');
+    }
+
+    // ── Reset modal ───────────────────────────────────────────
+    function confirmReset() { document.getElementById('resetModal').classList.add('open'); }
+    function closeResetModal() { document.getElementById('resetModal').classList.remove('open'); }
+    async function doReset() {
+      if (dbRef) await deleteDoc(dbRef);
+      entries = []; startDate = ''; completedPhases = [];
+      selectedRating = 0; selectedActivities = [];
+      document.getElementById('startDate').value = '';
+      document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      openPhaseId = PHASES[0].id;
+      closeResetModal();
+      render();
+      showToast('Progress reset');
+    }
+
+    // ── Celebration ───────────────────────────────────────────
+    function showCelebration(title, sub, orb) {
+      document.getElementById('celebTitle').textContent = title;
+      document.getElementById('celebSub').textContent = sub;
+      document.getElementById('celebOrb').textContent = orb;
+      document.getElementById('celebrationOverlay').classList.add('show');
+    }
+    function closeCelebration() { document.getElementById('celebrationOverlay').classList.remove('show'); }
 
     // ── Rating ────────────────────────────────────────────────
     function setRating(val) {
       selectedRating = val;
-      document.querySelectorAll('.rating-btn').forEach((btn,i) => {
-        btn.classList.toggle('selected', i+1 === val);
-      });
+      document.querySelectorAll('.rating-btn').forEach((btn, i) => btn.classList.toggle('selected', i + 1 === val));
     }
 
-    // ── Activity chips ────────────────────────────────────────
+    // ── Chips ─────────────────────────────────────────────────
     function toggleChip(el) {
       el.classList.toggle('selected');
       const act = el.textContent.trim();
       if (el.classList.contains('selected')) {
         if (!selectedActivities.includes(act)) selectedActivities.push(act);
       } else {
-        selectedActivities = selectedActivities.filter(a=>a!==act);
+        selectedActivities = selectedActivities.filter(a => a !== act);
       }
     }
 
     // ── Save session ──────────────────────────────────────────
     async function saveEntry() {
-      const date     = document.getElementById('logDate').value;
-      const height   = document.getElementById('logHeight').value;
+      const date = document.getElementById('logDate').value;
+      const height = document.getElementById('logHeight').value;
       const duration = document.getElementById('logDuration').value;
-      const notes    = document.getElementById('logNotes').value.trim();
-
-      if (!date || !height || !duration) {
-        showToast('Please fill in date, height, and duration');
-        return;
-      }
-
+      const notes = document.getElementById('logNotes').value.trim();
+      if (!date || !height || !duration) { showToast('Please fill in date, height, and duration'); return; }
       entries.unshift({
-        id: Date.now(),
-        date, height,
+        id: Date.now(), date, height,
         duration: parseInt(duration),
         rating: selectedRating,
         activities: selectedActivities.slice(),
         notes
       });
-
-      await persistHeel();
-
-      // Reset form
-      document.getElementById('logHeight').value  = '';
+      await persist();
+      document.getElementById('logHeight').value = '';
       document.getElementById('logDuration').value = '';
-      document.getElementById('logNotes').value    = '';
-      selectedRating     = 0;
-      selectedActivities = [];
-      document.querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('selected'));
-      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
-
+      document.getElementById('logNotes').value = '';
+      selectedRating = 0; selectedActivities = [];
+      document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
       renderLog();
-      showToast('Session recorded \u2736');
+      renderStats();
+      showToast('Session recorded ✦');
     }
 
     // ── Delete entry ──────────────────────────────────────────
     async function deleteEntry(id) {
-      entries = entries.filter(e=>e.id!==id);
-      await persistHeel();
+      entries = entries.filter(e => e.id !== id);
+      await persist();
       renderLog();
     }
 
-    // ── Render log ────────────────────────────────────────────
-    function renderLog() {
-      const list = document.getElementById('logList');
-      if (!entries.length) {
-        list.innerHTML = '<div class="empty-state">No sessions logged yet.<br>Your first entry awaits.</div>';
-        return;
+    // ── Complete phase ────────────────────────────────────────
+    async function completePhase(phaseId) {
+      if (completedPhases.includes(phaseId)) return;
+      completedPhases.push(phaseId);
+      openPhaseId = phaseId;
+      await persist();
+      const phase = PHASES.find(p => p.id === phaseId);
+      render();
+      setTimeout(() => showCelebration(phase.badge + ' Complete', phase.name + ' — protocol phase mastered. Sir is pleased.', '🏆'), 200);
+    }
+
+    // ── Phase card toggle ─────────────────────────────────────
+    function togglePhase(phaseId) {
+      const body = document.getElementById('body-' + phaseId);
+      if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        openPhaseId = null;
+      } else {
+        document.querySelectorAll('.phase-body').forEach(b => b.classList.remove('open'));
+        body.classList.add('open');
+        openPhaseId = phaseId;
       }
-      list.innerHTML = entries.map(e => {
-        const d       = new Date(e.date+'T12:00:00');
-        const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric'});
-        const chips   = (e.activities&&e.activities.length)
-          ? '<div class="log-chips">'+e.activities.map(a=>'<span class="log-chip">'+a+'</span>').join('')+'</div>'
-          : '';
-        const rating  = e.rating ? '<span class="log-rating">Posture '+e.rating+'/10</span>' : '';
-        const notes   = e.notes  ? '<div class="log-notes">'+e.notes+'</div>' : '';
-        return (
-          '<div class="log-entry">'+
-            '<div class="log-entry-header">'+
-              '<div class="log-date">'+dateStr+'</div>'+
-              '<div class="log-meta">'+
-                '<span class="log-badge">'+e.height+' &middot; '+e.duration+'min</span>'+
-                rating+
-                '<button class="btn-delete" onclick="deleteEntry('+e.id+')">&#10005;</button>'+
-              '</div>'+
-            '</div>'+
-            chips+notes+
-          '</div>'
-        );
-      }).join('');
     }
 
     // ── Start date ────────────────────────────────────────────
     async function saveStartDate() {
       startDate = document.getElementById('startDate').value;
-      await persistHeel();
-      updatePhaseBanner();
+      await persist();
+      render();
     }
-
     async function clearStartDate() {
       startDate = '';
-      await persistHeel();
       document.getElementById('startDate').value = '';
-      updatePhaseBanner();
+      await persist();
+      render();
     }
 
-    // ── Phase banner ──────────────────────────────────────────
-    function getCurrentPhase(daysIn) {
-      if (daysIn < 1)  return null;
-      if (daysIn <= 14) return { num:1, name:'Foundation', weeks:'Week 1\u20132' };
-      if (daysIn <= 28) return { num:2, name:'Endurance',  weeks:'Week 3\u20134' };
-      return { num:3, name:'Mastery', weeks:'Week 5+' };
+    // ── Render ────────────────────────────────────────────────
+    function render() {
+      renderDots();
+      renderStats();
+      renderPhases();
+      renderLog();
     }
 
-    function updatePhaseBanner() {
-      const phaseLabel = document.getElementById('bannerPhase');
-      const weekLabel  = document.getElementById('bannerWeek');
-      const daysEl     = document.getElementById('bannerDays');
-      [1,2,3].forEach(n => { document.getElementById('phase'+n+'indicator').innerHTML=''; });
+    function renderDots() {
+      const cIdx = getCurrentPhaseIdx();
+      document.getElementById('progressDots').innerHTML = PHASES.map((p, i) => {
+        const completed = completedPhases.includes(p.id);
+        const active = !completed && i === cIdx;
+        let cls = 'phase-dot' + (completed ? ' completed' : active ? ' active' : '');
+        return `<div class="${cls}" onclick="scrollToPhase(${i})" title="${p.name}"></div>`;
+      }).join('');
+      document.getElementById('progressLabels').innerHTML = PHASES.map((p, i) => {
+        const completed = completedPhases.includes(p.id);
+        const active = !completed && i === cIdx;
+        let cls = 'dot-label' + (completed ? ' completed' : active ? ' active' : '');
+        return `<div class="${cls}" onclick="scrollToPhase(${i})">${p.badge}</div>`;
+      }).join('');
+    }
 
-      if (!startDate) {
-        phaseLabel.textContent = 'Phase 1 \u2014 Foundation';
-        weekLabel.textContent  = 'Set your start date in Program tab';
-        daysEl.textContent     = '\u2014';
+    function renderStats() {
+      const cIdx = getCurrentPhaseIdx();
+      const days = getDaysIn();
+      const allDone = completedPhases.length === PHASES.length;
+      document.getElementById('statPhase').textContent = allDone ? '✓' : (cIdx + 1);
+      document.getElementById('statDays').textContent = days > 0 ? days : '—';
+    }
+
+    function renderPhases() {
+      if (!openPhaseId) openPhaseId = PHASES[getCurrentPhaseIdx()].id;
+      const cIdx = getCurrentPhaseIdx();
+      document.getElementById('phasesContainer').innerHTML = PHASES.map((phase, i) => {
+        const completed = completedPhases.includes(phase.id);
+        const isCurrent = i === cIdx && !completed;
+        const statusIcon = completed ? '✅' : isCurrent ? '🔥' : '⬜';
+        let cls = 'phase-card' + (completed ? ' completed-card' : '');
+
+        const scheduleHtml = phase.schedule.map(s =>
+          `<div class="day-row"><div class="day-name">${s.day}</div><div class="day-desc">${s.desc}</div></div>`
+        ).join('');
+
+        const specsHtml = phase.specs.map(s =>
+          `<div class="spec-item"><span class="spec-val">${s.val}</span><span class="spec-lbl">${s.lbl}</span></div>`
+        ).join('');
+
+        const completeHtml = !completed
+          ? `<button class="complete-btn" onclick="completePhase('${phase.id}')">Mark Phase Complete</button>`
+          : `<button class="complete-btn done">✓ Phase Completed</button>`;
+
+        return `
+          <div class="${cls}" id="phase-card-${i}">
+            <div class="phase-header" onclick="togglePhase('${phase.id}')">
+              <div class="phase-info">
+                <div class="phase-badge">${phase.badge} · ${phase.weeks}</div>
+                <div class="phase-name">${phase.name}</div>
+                <div class="phase-obj">${phase.objective}</div>
+              </div>
+              <div class="phase-status">${statusIcon}</div>
+            </div>
+            <div class="phase-body" id="body-${phase.id}">
+              <div class="phase-spec">${specsHtml}</div>
+              <div class="task-group-label">Weekly Schedule</div>
+              ${scheduleHtml}
+              <div class="tip-card" style="margin-top:20px">
+                <div class="tip-label">Sir's Tip</div>
+                <div class="tip-text">${phase.tip}</div>
+              </div>
+              ${completeHtml}
+            </div>
+          </div>`;
+      }).join('');
+
+      // Re-open
+      const bodyEl = document.getElementById('body-' + openPhaseId);
+      if (bodyEl) bodyEl.classList.add('open');
+    }
+
+    function renderLog() {
+      const c = document.getElementById('logEntries');
+      if (!entries.length) {
+        c.innerHTML = '<div class="log-empty">No sessions logged yet.<br>Your first entry awaits.</div>';
         return;
       }
-
-      const start  = new Date(startDate+'T00:00:00');
-      const today  = new Date(); today.setHours(0,0,0,0);
-      const daysIn = Math.floor((today-start)/86400000)+1;
-
-      if (daysIn < 1) {
-        phaseLabel.textContent = 'Training begins soon';
-        weekLabel.textContent  = 'Your protocol awaits';
-        daysEl.textContent     = '\u2014';
-        return;
-      }
-
-      const phase = getCurrentPhase(daysIn);
-      daysEl.textContent    = daysIn;
-      phaseLabel.textContent= 'Phase '+phase.num+' \u2014 '+phase.name;
-      weekLabel.textContent = phase.weeks;
-      document.getElementById('phase'+phase.num+'indicator').innerHTML =
-        '<span class="current-phase-indicator">Current</span>';
+      c.innerHTML = entries.map(e => {
+        const d = new Date(e.date + 'T12:00:00');
+        const dateStr = d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' });
+        const chips = (e.activities && e.activities.length)
+          ? `<div class="log-chips-row">${e.activities.map(a => `<span class="log-chip">${a}</span>`).join('')}</div>`
+          : '';
+        const rating = e.rating ? `<span class="log-badge">Posture ${e.rating}/10</span>` : '';
+        const notes = e.notes ? `<div class="log-notes-text">${e.notes}</div>` : '';
+        return `
+          <div class="log-entry">
+            <div class="log-entry-header">
+              <div class="log-date-str">${dateStr}</div>
+              <div class="log-badges">
+                <span class="log-badge">${e.height} · ${e.duration}min</span>
+                ${rating}
+                <button class="log-delete-btn" onclick="deleteEntry(${e.id})">✕</button>
+              </div>
+            </div>
+            ${chips}${notes}
+          </div>`;
+      }).join('');
     }
 
     // ── Toast ─────────────────────────────────────────────────
@@ -502,17 +781,37 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(()=>t.classList.remove('show'), 2500);
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ── Scroll to phase ───────────────────────────────────────
+    function scrollToPhase(idx) {
+      openPhaseId = PHASES[idx].id;
+      render();
+      setTimeout(() => {
+        const c = document.getElementById('phase-card-' + idx);
+        if (c) c.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 100);
     }
 
     // ── Expose to window ──────────────────────────────────────
-    window.showTab        = showTab;
-    window.setRating      = setRating;
-    window.toggleChip     = toggleChip;
-    window.saveEntry      = saveEntry;
-    window.deleteEntry    = deleteEntry;
-    window.saveStartDate  = saveStartDate;
-    window.clearStartDate = clearStartDate;
+    window.openRefDrawer   = openRefDrawer;
+    window.closeRefDrawer  = closeRefDrawer;
+    window.toggleAcc       = toggleAcc;
+    window.toggleLog       = toggleLog;
+    window.confirmReset    = confirmReset;
+    window.closeResetModal = closeResetModal;
+    window.doReset         = doReset;
+    window.closeCelebration= closeCelebration;
+    window.setRating       = setRating;
+    window.toggleChip      = toggleChip;
+    window.saveEntry       = saveEntry;
+    window.deleteEntry     = deleteEntry;
+    window.saveStartDate   = saveStartDate;
+    window.clearStartDate  = clearStartDate;
+    window.completePhase   = completePhase;
+    window.togglePhase     = togglePhase;
+    window.scrollToPhase   = scrollToPhase;
 
     // ── Init ──────────────────────────────────────────────────
     document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
@@ -520,17 +819,17 @@
     (async function init() {
       try {
         await requireAuth();
-        heelRef = dataRef('training/heel');
-        const snap = await getDoc(heelRef);
+        dbRef = dataRef('training/heel');
+        const snap = await getDoc(dbRef);
         if (snap.exists()) {
           const data = snap.data();
-          entries   = data.entries   || [];
-          startDate = data.startDate || '';
+          entries         = data.entries         || [];
+          startDate       = data.startDate       || '';
+          completedPhases = data.completedPhases || [];
           if (startDate) document.getElementById('startDate').value = startDate;
         }
       } catch(e) { console.error('Init error:', e); }
-      renderLog();
-      updatePhaseBanner();
+      render();
     })();
   </script>
 
