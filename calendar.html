@@ -56,20 +56,7 @@
       margin-top: 1px; opacity: 0.6;
     }
 
-    /* ── Profile pill ── */
-    .profile-pill {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 12px; border-radius: 20px;
-      background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2);
-      cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-    }
-    .profile-pill:active { transform: scale(0.95); }
-    .profile-pill-icon { font-size: 14px; }
-    .profile-pill-name {
-      font-family: 'Montserrat', sans-serif; font-size: 10px;
-      font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px;
-    }
-    .profile-pill-arrow { font-size: 12px; color: rgba(212,175,55,0.5); }
+
 
     /* ── View toggle ── */
     .view-toggle {
@@ -589,54 +576,7 @@
     }
     .modal-save:active, .modal-cancel:active { transform: scale(0.97); }
 
-    /* ── PIN modal (centered) ── */
-    .pin-modal-back {
-      position: fixed; inset: 0; z-index: 400;
-      background: rgba(0,0,0,0.9); backdrop-filter: blur(14px);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s; padding: 20px;
-    }
-    .pin-modal-back.open { opacity: 1; pointer-events: all; }
-    .pin-card {
-      background: rgba(5,16,36,0.98); border: 1px solid var(--border);
-      border-radius: 28px; padding: 32px 28px; width: 100%; max-width: 340px; text-align: center;
-      transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.22,0.68,0,1.2);
-    }
-    .pin-modal-back.open .pin-card { transform: scale(1); }
-    .pin-profile-name {
-      font-family: 'Great Vibes', cursive; font-size: 36px;
-      background: var(--luxury-gradient); -webkit-background-clip: text;
-      background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
-    }
-    .pin-subtitle {
-      font-size: 9px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 3px; color: rgba(212,175,55,0.4); margin-bottom: 24px;
-    }
-    .pin-dots { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
-    .pin-dot {
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 1.5px solid rgba(212,175,55,0.3); background: transparent; transition: all 0.15s;
-    }
-    .pin-dot.filled { background: var(--gold); border-color: var(--gold); transform: scale(1.1); }
-    .pin-keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
-    .pin-key {
-      aspect-ratio: 1; border-radius: 16px; background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08); color: #ddd;
-      font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 500;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s; -webkit-tap-highlight-color: transparent;
-    }
-    .pin-key:active { background: rgba(212,175,55,0.15); transform: scale(0.92); color: var(--gold); }
-    .pin-key.del { font-size: 14px; color: #666; }
-    .pin-key.empty { background: transparent; border: none; cursor: default; }
-    .pin-error { font-size: 11px; color: #F44336; margin-top: 4px; min-height: 18px; font-family: 'Playfair Display', serif; font-style: italic; }
-    .pin-setup-note { font-size: 10px; color: #555; margin-bottom: 16px; line-height: 1.5; }
-    .pin-cancel-btn {
-      width: 100%; padding: 12px; border-radius: 12px;
-      background: transparent; border: 1px solid rgba(255,255,255,0.07);
-      color: #555; font-family: 'Montserrat', sans-serif; font-size: 9px;
-      font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
-    }
+
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -670,11 +610,7 @@
       <div class="topbar-title">Calendar</div>
       <div class="topbar-sub">Protocol Schedule</div>
     </div>
-    <div class="profile-pill" onclick="openProfileSwitch()" id="profile-pill">
-      <span class="profile-pill-icon" id="profile-icon">...</span>
-      <span class="profile-pill-name" id="profile-name">Loading</span>
-      <span class="profile-pill-arrow">⌄</span>
-    </div>
+
   </div>
 
   <!-- View toggle -->
@@ -803,8 +739,7 @@
         <label class="field-label">Description / Notes</label>
         <textarea id="ev-desc" class="field-textarea" placeholder="Mood, intentions, any details…"></textarea>
 
-        <label class="field-label">Dress Code (visible to sub)</label>
-        <input id="ev-dress" class="field-input" type="text" placeholder="e.g. Lingerie, Casual, Formal collar…" />
+
 
         <div class="toggle-row">
           <span class="toggle-label">Surprise mode (hide from sub)</span>
@@ -902,35 +837,7 @@
   </div>
 
   <!-- ══ PIN MODAL ══ -->
-  <div id="pin-modal" class="pin-modal-back">
-    <div class="pin-card">
-      <div class="pin-profile-name" id="pin-profile-label">Dom</div>
-      <div class="pin-subtitle" id="pin-subtitle">Enter PIN to switch</div>
-      <div class="pin-setup-note" id="pin-setup-note" style="display:none;"></div>
-      <div class="pin-dots" id="pin-dots">
-        <div class="pin-dot" id="pd0"></div>
-        <div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div>
-        <div class="pin-dot" id="pd3"></div>
-      </div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="pinPress('1')">1</button>
-        <button class="pin-key" onclick="pinPress('2')">2</button>
-        <button class="pin-key" onclick="pinPress('3')">3</button>
-        <button class="pin-key" onclick="pinPress('4')">4</button>
-        <button class="pin-key" onclick="pinPress('5')">5</button>
-        <button class="pin-key" onclick="pinPress('6')">6</button>
-        <button class="pin-key" onclick="pinPress('7')">7</button>
-        <button class="pin-key" onclick="pinPress('8')">8</button>
-        <button class="pin-key" onclick="pinPress('9')">9</button>
-        <button class="pin-key empty"></button>
-        <button class="pin-key" onclick="pinPress('0')">0</button>
-        <button class="pin-key del" onclick="pinDel()">⌫</button>
-      </div>
-      <div class="pin-error" id="pin-error"></div>
-      <button class="pin-cancel-btn" onclick="closePinModal()">Cancel</button>
-    </div>
-  </div>
+
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
@@ -947,8 +854,6 @@ import { doc, setDoc, getDoc, onSnapshot }
   let events       = [];
   let recurTasks   = [];
   let reflections  = [];
-  let profiles     = { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
-  let activeProfile = 'dom';
   let myUid = null;
   let myRole = 'dom';
   let relId = null;
@@ -960,7 +865,7 @@ import { doc, setDoc, getDoc, onSnapshot }
     
     // Shared data (Events, Tasks, Profiles)
     const relCalRef = doc(db, 'relationships', relId, 'calendar', 'data');
-    await setDoc(relCalRef, { events, recurTasks, profiles }, { merge: true });
+    await setDoc(relCalRef, { events, recurTasks }, { merge: true });
 
     // Private data (Reflections)
     const userCalRef = dataRef('calendar');
@@ -975,9 +880,9 @@ import { doc, setDoc, getDoc, onSnapshot }
     const future2 = dateStr(d2);
 
     events = [
-      { id: uid(), date: today, type:'scene', title:'Evening Protocol', desc:'Rope work and sensory exploration. Full aftercare planned.', dressCode:'Black lingerie, collar', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
-      { id: uid(), date: future, type:'scene', title: (profiles.dom.name || 'Dom') + '\'s Private Evening', desc:'Extended scene with restraint and edge play.', dressCode:'Be ready by 8pm', createdBy:'dom', visibility:'surprise', unlocked:false, completed:false },
-      { id: uid(), date: future2, type:'scene', title:'Weekend Retreat', desc:'Full day dynamic immersion.', dressCode:'Comfortable, Sir will direct', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
+      { id: uid(), date: today, type:'scene', title:'Evening Protocol', desc:'Rope work and sensory exploration. Full aftercare planned.', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
+      { id: uid(), date: future, type:'scene', title: 'Private Evening', desc:'Extended scene with restraint and edge play.', createdBy:'dom', visibility:'surprise', unlocked:false, completed:false },
+      { id: uid(), date: future2, type:'scene', title:'Weekend Retreat', desc:'Full day dynamic immersion.', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
     ];
 
     recurTasks = [
@@ -1003,7 +908,7 @@ import { doc, setDoc, getDoc, onSnapshot }
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  function isDOM() { return activeProfile === 'dom'; }
+  function isDOM() { return myRole === 'dom'; }
 
   const CAT_COLORS = {
     training: { bg:'rgba(100,181,246,0.18)', color:'#64B5F6', dot:'dot-training' },
@@ -1068,95 +973,7 @@ import { doc, setDoc, getDoc, onSnapshot }
   /* ══════════════════════════════════════════════════════
      PROFILE & PIN
   ══════════════════════════════════════════════════════ */
-  let pinTarget = null;
-  let pinBuffer = '';
-  let pinMode   = 'verify'; // 'verify' | 'setup'
-  let lockUntil = 0;
-  let failCount = 0;
 
-  function updateProfilePill() {
-    const icon = isDOM() ? '👑' : '🌸';
-    const name = isDOM() ? (profiles.dom.name || 'Dom') : (profiles.sub.name || 'Sub');
-    document.getElementById('profile-icon').textContent = icon;
-    document.getElementById('profile-name').textContent  = name;
-  }
-
-  function openProfileSwitch() {
-    const target = isDOM() ? 'sub' : 'dom';
-    pinTarget = target;
-    const tName = target === 'dom' ? (profiles.dom.name||'Dom') : (profiles.sub.name||'Sub');
-    document.getElementById('pin-profile-label').textContent = tName;
-
-    if (!profiles[target].pin) {
-      pinMode = 'setup';
-      document.getElementById('pin-subtitle').textContent = 'Create a 4-digit PIN';
-      document.getElementById('pin-setup-note').style.display = 'block';
-      document.getElementById('pin-setup-note').textContent = 'Set a PIN for the ' + tName + ' profile. You\'ll need it each time you switch.';
-    } else {
-      pinMode = 'verify';
-      document.getElementById('pin-subtitle').textContent = 'Enter PIN to switch profile';
-      document.getElementById('pin-setup-note').style.display = 'none';
-    }
-
-    pinBuffer = '';
-    document.getElementById('pin-error').textContent = '';
-    updatePinDots();
-    document.getElementById('pin-modal').classList.add('open');
-  }
-
-  function closePinModal() {
-    document.getElementById('pin-modal').classList.remove('open');
-    pinBuffer = ''; pinTarget = null;
-    updatePinDots();
-  }
-
-  function pinPress(n) {
-    if (Date.now() < lockUntil) {
-      const secs = Math.ceil((lockUntil - Date.now()) / 1000);
-      document.getElementById('pin-error').textContent = `Locked for ${secs}s`;
-      return;
-    }
-    if (pinBuffer.length >= 4) return;
-    pinBuffer += n;
-    updatePinDots();
-    if (pinBuffer.length === 4) setTimeout(submitPin, 120);
-  }
-
-  function pinDel() {
-    pinBuffer = pinBuffer.slice(0,-1);
-    updatePinDots();
-    document.getElementById('pin-error').textContent = '';
-  }
-
-  function updatePinDots() {
-    for (let i=0;i<4;i++) {
-      document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
-    }
-  }
-
-  function submitPin() {
-    if (pinMode === 'setup') {
-      profiles[pinTarget].pin = pinBuffer;
-      persist();
-      doSwitch();
-    } else {
-      if (pinBuffer === profiles[pinTarget].pin) {
-        failCount = 0; doSwitch();
-      } else {
-        failCount++;
-        document.getElementById('pin-error').textContent = failCount >= 3 ? 'Too many attempts. Locked 30s.' : 'Incorrect PIN';
-        if (failCount >= 3) { lockUntil = Date.now() + 30000; failCount = 0; }
-        pinBuffer = ''; updatePinDots();
-      }
-    }
-  }
-
-  function doSwitch() {
-    activeProfile = pinTarget;
-    persist(); updateProfilePill(); closePinModal();
-    showToast('Switched to ' + (isDOM() ? '👑 Dom' : '🌸 Sub'));
-    renderCurrentView();
-  }
 
   /* ══════════════════════════════════════════════════════
      VIEW MANAGEMENT
@@ -1371,9 +1188,7 @@ import { doc, setDoc, getDoc, onSnapshot }
       if (isSurprise) {
         html += `<div class="scene-card-surprise">
           <span class="surprise-ornament">✦</span>
-          <span class="surprise-script">${profiles.dom.name} has something planned</span>
           <span class="surprise-tagline">Be ready</span>
-          ${scene.dressCode ? `<div class="surprise-prep">🪞 ${escHtml(scene.dressCode)}</div>` : ''}
         </div>`;
       } else {
         const domActions = isDOM() ? `
@@ -1391,7 +1206,6 @@ import { doc, setDoc, getDoc, onSnapshot }
               <div class="scene-badge">${scene.visibility==='surprise'?'✦ Surprise':'🎭 Scene'}</div>
             </div>
           </div>
-          ${scene.dressCode ? `<div class="scene-detail-row"><span class="scene-detail-chip">🪞 ${escHtml(scene.dressCode)}</span></div>` : ''}
           ${scene.desc ? `<div class="scene-desc">${escHtml(scene.desc)}</div>` : ''}
           ${domActions}
         </div>`;
@@ -1423,7 +1237,7 @@ import { doc, setDoc, getDoc, onSnapshot }
       html += `<div class="task-section">
         <div class="task-section-header">
           <span class="task-section-icon">♛</span>
-          <span class="task-section-title">${profiles.dom.name}'s Tasks</span>
+          <span class="task-section-title">${myName}'s Tasks</span>
           <span class="task-count-badge">${domTasks.length}</span>
         </div>`;
       domTasks.forEach(t => { html += taskItemHTML(t, currentDayStr); });
@@ -1434,7 +1248,7 @@ import { doc, setDoc, getDoc, onSnapshot }
       html += `<div class="task-section">
         <div class="task-section-header">
           <span class="task-section-icon">✦</span>
-          <span class="task-section-title">${profiles.sub.name}'s Tasks</span>
+          <span class="task-section-title">${partnerName}'s Tasks</span>
           <span class="task-count-badge">${subTasks.length}</span>
         </div>`;
       subTasks.forEach(t => { html += taskItemHTML(t, currentDayStr); });
@@ -1468,7 +1282,7 @@ import { doc, setDoc, getDoc, onSnapshot }
     const comp = getCompletion(t.id, ds);
     const cat  = CAT_COLORS[t.category] || { bg:'rgba(200,200,200,0.1)', color:'#aaa' };
     const ownerBadge = t.owner === 'dom' ? '♛' : '✦';
-    const canEdit = isDOM() || t.owner === activeProfile;
+    const canEdit = isDOM() || t.owner === myRole;
     const taskActions = canEdit ? `
       <div style="display:flex;gap:6px;flex-shrink:0;margin-left:6px;">
         <button onclick="editTask('${t.id}')" style="
@@ -1622,7 +1436,6 @@ import { doc, setDoc, getDoc, onSnapshot }
       document.getElementById('ev-title').value   = ev.title || '';
       document.getElementById('ev-date').value    = ev.date  || '';
       document.getElementById('ev-desc').value    = ev.desc  || '';
-      document.getElementById('ev-dress').value   = ev.dressCode || '';
       document.getElementById('ev-shift').value   = ev.shift || '';
       document.getElementById('ev-vac-desc').value   = ev.vacDesc   || '';
       document.getElementById('ev-other-desc').value = ev.otherDesc || '';
@@ -1645,7 +1458,6 @@ import { doc, setDoc, getDoc, onSnapshot }
       document.getElementById('ev-title').value    = '';
       document.getElementById('ev-date').value     = currentDayStr || todayStr();
       document.getElementById('ev-desc').value     = '';
-      document.getElementById('ev-dress').value    = '';
       document.getElementById('ev-shift').value    = '';
       document.getElementById('ev-vac-desc').value   = '';
       document.getElementById('ev-other-desc').value = '';
@@ -1689,7 +1501,6 @@ import { doc, setDoc, getDoc, onSnapshot }
     document.getElementById('ev-title').value    = t.title || '';
     document.getElementById('ev-date').value     = t.startDate || todayStr();
     document.getElementById('ev-desc').value     = '';
-    document.getElementById('ev-dress').value    = '';
     document.getElementById('ev-shift').value    = '';
     document.getElementById('ev-vac-desc').value   = '';
     document.getElementById('ev-other-desc').value = '';
@@ -1801,7 +1612,7 @@ import { doc, setDoc, getDoc, onSnapshot }
         title, category: formState.cat,
         frequency: formState.isRecurring ? formState.freq : 'once',
         daysOfWeek: formState.isRecurring ? formState.daysOfWeek : [],
-        owner: activeProfile,
+        owner: myRole,
         startDate: date,
         endDate: formState.isRecurring ? recurEnd : date,
       };
@@ -1821,13 +1632,12 @@ import { doc, setDoc, getDoc, onSnapshot }
       id: editingEventId || uid(),
       date, type, title,
       desc:      document.getElementById('ev-desc').value.trim(),
-      dressCode: document.getElementById('ev-dress').value.trim(),
       shift:     document.getElementById('ev-shift').value.trim(),
       workDays:  formState.workDays,
       vacDesc:   document.getElementById('ev-vac-desc').value.trim(),
       otherDesc: document.getElementById('ev-other-desc').value.trim(),
       endDate:   document.getElementById('ev-enddate').value || null,
-      createdBy: activeProfile,
+      createdBy: myRole,
       visibility: formState.isSurprise ? 'surprise' : 'both',
       unlocked:   !formState.isSurprise,
       completed:  false,
@@ -1860,7 +1670,6 @@ import { doc, setDoc, getDoc, onSnapshot }
     
     const profile = await getMyProfile();
     myRole = profile?.role || 'dom';
-    activeProfile = myRole; // Default to user's role
     myName = profile?.displayName || (myRole === 'dom' ? 'Dom' : 'Sub');
 
     const rel = await getRelationship();
@@ -1879,11 +1688,8 @@ import { doc, setDoc, getDoc, onSnapshot }
           const d = snap.data();
           events = d.events || [];
           recurTasks = d.recurTasks || [];
-          profiles = d.profiles || { dom: { name:'Dom', pin:null }, sub: { name:'Sub', pin:null } };
           
           // Inject dynamic names into profiles if they are default
-          if (profiles.dom.name === 'Dom') profiles.dom.name = (myRole === 'dom' ? myName : partnerName);
-          if (profiles.sub.name === 'Sub') profiles.sub.name = (myRole === 'sub' ? myName : partnerName);
         } else {
           // Initialize relationship calendar if missing
           seedDemoData();
@@ -1900,23 +1706,20 @@ import { doc, setDoc, getDoc, onSnapshot }
       refreshAll();
     });
 
-    updateProfilePill();
     renderMonth();
   }
 
   function refreshAll() {
-    updateProfilePill();
     renderCurrentView();
   }
 
   // Expose to window for HTML onclicks
   Object.assign(window, {
-    openProfileSwitch, switchView, changeMonth, openDay, changeWeek,
+    switchView, changeMonth, openDay, changeWeek,
     changeDayView, selectMood, saveReflection, toggleTask, unlockScene,
     confirmDelete, deleteScope, deleteEvent, openAddModal, editTask,
     editEvent, closeModal, handleModalClick, setType, setCat, setFreq,
-    toggleWorkDow, toggleDow, toggleSwitch, saveEvent, pinPress, pinDel,
-    closePinModal
+    toggleWorkDow, toggleDow, toggleSwitch, saveEvent
   });
 
   init().catch(console.error);
