@@ -887,10 +887,21 @@ function updateAllCardAccents(){
     const theirCol=card.querySelector('.theirs');
     if(theirCol){
       const vals=theirCol.querySelectorAll('.partner-val');
-      const pData=[pT,pR,pA];
+      const pSw=partnerData[key+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
+      const pSwDisp=pSw==='Not Applicable'?'':pSw;
+      const pData=[pT,pR,pA,pSwDisp];
       vals.forEach((el,i)=>{el.textContent=v(pData[i])||'—';el.className='partner-val'+(v(pData[i])?'':' empty');});
       const existNote=theirCol.querySelector('.partner-note');
       if(existNote)existNote.textContent=pNs;
+    }
+    // Update my role buttons in case they changed in background
+    const mySw=myData[key+'.sw']??(item?bv(item,myRole,'S'):'')??'';
+    const mySwVal=mySw==='Not Applicable'?'':mySw;
+    const myRow=card.querySelector('.switch-row');
+    if(myRow){
+      myRow.querySelectorAll('.switch-opt').forEach(opt=>{
+        opt.classList.toggle('active-sw', opt.textContent===mySwVal);
+      });
     }
   });
   applyFilters();
@@ -906,14 +917,7 @@ window.setSwitchOpt=function(el,sk,val){
   row.querySelectorAll('.switch-opt').forEach(o=>o.classList.remove('active-sw'));
   if(!isActive)el.classList.add('active-sw');
 };
-  // Toggle off if already selected
-  const isActive=el.classList.contains('active-sw');
-  const newVal=isActive?'':val;
-  myData[sk]=newVal; schedSave();
-  const row=el.closest('.switch-row');
-  row.querySelectorAll('.switch-opt').forEach(o=>o.classList.remove('active-sw'));
-  if(!isActive)el.classList.add('active-sw');
-};
+
 
 // Segmented control
 window.setSeg=function(btn,sk,val){
