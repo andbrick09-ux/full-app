@@ -757,7 +757,7 @@ function buildCard(cat,item,isCustom=false){
 <div class="activity-card ${accent}" id="c_${sid}" data-cat="${cat}" data-act="${activity}">
   <div class="card-header" onclick="toggleCard(this)">
     <div class="activity-name">${activity}</div>
-    <div class="badge-row">${myBadge}${pBadge}${mySwBadge}${pSwBadge}${cBadge}${sBadge}</div>
+    <div class="badge-row">${myBadge}${pBadge}${cBadge}${sBadge}</div>
     ${delBtn}
     <button class="flag-btn ${flagged}" onclick="event.stopPropagation();toggleFlag('${key}')" title="Flag for scene">⚑</button>
     <span class="expand-icon">▼</span>
@@ -887,15 +887,9 @@ function updateAllCardAccents(){
     if(br){
       const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
       const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
-      const mySw=myData[key+'.sw']??(item?bv(item,myRole,'S'):'')??'';
-      const mySwDisp=mySw==='Not Applicable'?'':mySw;
-      const mySwBadge=mySwDisp?`<span class="badge ${bCls(mySwDisp)}">${mySwDisp}</span>`:'';
-      const pSw=partnerData[key+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
-      const pSwDisp=pSw==='Not Applicable'?'':pSw;
-      const pSwBadge=pSwDisp?`<span class="badge ${bCls(pSwDisp)}">${pSwDisp}</span>`:'';
       const sBadge=myData[key+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
       const cBadge=isCustom?`<span class="badge custom">Custom</span>`:'';
-      br.innerHTML=myBadge+pBadge+mySwBadge+pSwBadge+cBadge+sBadge;
+      br.innerHTML=myBadge+pBadge+cBadge+sBadge;
     }
     // Update partner column read-only values
     const pT=partnerData[key+'.t']??(item?bv(item,pPfx,'T'):'')??'';
@@ -1019,15 +1013,9 @@ function onFCKey(sk){
     if(br){
       const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
       const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
-      const mySw=myData[k+'.sw']??(item?bv(item,myRole,'S'):'')??'';
-      const mySwDisp=mySw==='Not Applicable'?'':mySw;
-      const mySwBadge=mySwDisp?`<span class="badge ${bCls(mySwDisp)}">${mySwDisp}</span>`:'';
-      const pSw=partnerData[k+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
-      const pSwDisp=pSw==='Not Applicable'?'':pSw;
-      const pSwBadge=pSwDisp?`<span class="badge ${bCls(pSwDisp)}">${pSwDisp}</span>`:'';
       const sBadge=myData[k+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
       const cBadge=card.classList.contains('custom-item')?`<span class="badge custom">Custom</span>`:'';
-      br.innerHTML=myBadge+pBadge+mySwBadge+pSwBadge+cBadge+sBadge;
+      br.innerHTML=myBadge+pBadge+cBadge+sBadge;
     }
     // Update partner values
     const theirCol=card.querySelector('.theirs');
@@ -1292,6 +1280,7 @@ function cardMatchesFilters(card){
   if(activeSearch&&!act.toLowerCase().includes(activeSearch))return false;
 
   for(const f of activeFilters){
+    if(f==='unset'&&(myData[key+'.t']||myData[key+'.r']||myData[key+'.a']||myData[key+'.sw']))return false;
     if(f==='both-tried'&&!(mT==='Yes'&&pT==='Yes'))return false;
     if(f==='my-fetish'&&!mA.includes('Fetish'))return false;
     if(f==='hard-limits'&&!mA.includes('Hard Limit')&&!pA.includes('Hard Limit'))return false;
@@ -1300,7 +1289,6 @@ function cardMatchesFilters(card){
       if(!disagree)return false;
     }
     if(f==='scene-flagged'&&!myData[key+'.flagged'])return false;
-    if(f==='unset'&&(mT||mR||mA))return false;
   }
   return true;
 }
@@ -1366,7 +1354,7 @@ function buildSwipeList(){
       const pA=partnerData[key+'.a']??bv(item,pPfx,'A')??'';
       const mSw=myData[key+'.sw']??bv(item,myRole,'S')??'';
       const pSw=partnerData[key+'.sw']??bv(item,pPfx,'S')??'';
-      if(swipeFilter==='unset'&&(mT||mR||mA))continue;
+      if(swipeFilter==='unset'&&(myData[key+'.t']||myData[key+'.r']||myData[key+'.a']||myData[key+'.sw']))continue;
       if(swipeFilter==='disagree'){
         const disagree=(mA.includes('Hard Limit')&&!pA.includes('Hard Limit'))||(!mA.includes('Hard Limit')&&pA.includes('Hard Limit'))||(mR.includes('Loved')&&(pT.includes('want')||!pT))||(mT.includes('want')&&pA.includes('Hard Limit'));
         if(!disagree)continue;
