@@ -158,6 +158,12 @@ body { background: var(--midnight); color: var(--text-primary); font-family: 'Mo
 .badge.no { background: rgba(127,140,141,0.1); color: #7f8c8d; border: 1px solid rgba(127,140,141,0.2); }
 .badge.custom { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
 .badge.scene { background: var(--purple-dim); color: var(--purple); border: 1px solid var(--purple-border); }
+.badge.giving { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
+.badge.receiving { background: var(--sub-dim); color: var(--sub-color); border: 1px solid var(--sub-border); }
+.badge.both { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.badge.wearing { background: var(--glass); color: var(--text-secondary); border: 1px solid var(--glass-border); }
+.badge.others { background: var(--glass); color: var(--text-muted); border: 1px solid var(--glass-border); }
+
 
 /* FLAG BUTTON */
 .flag-btn { background: none; border: none; font-size: 16px; cursor: pointer; padding: 2px 3px; flex-shrink: 0; opacity: 0.35; transition: opacity var(--transition), transform var(--transition); }
@@ -619,7 +625,13 @@ function bCls(x){
   if(l.includes('take it'))return'take-it';if(l.includes('no but i want'))return'want-to';
   if(l.includes('hard limit'))return'hard';if(l.includes('soft limit')||l.includes('unlikely'))return'soft';
   if(l.includes('fetish'))return'fetish';if(l==='yes')return'yes';
-  if(l.includes('no and'))return'no';return'';
+  if(l.includes('no and'))return'no';
+  if(l==='giving')return'giving';
+  if(l==='receiving')return'receiving';
+  if(l==='both')return'both';
+  if(l==='wearing')return'wearing';
+  if(l.includes('others wearing'))return'others';
+  return'';
 }
 function ik(cat,act){ return `${cat}||${act}`; }
 function bv(item,role,f){
@@ -736,6 +748,8 @@ function buildCard(cat,item,isCustom=false){
   const accent=getAccent(myA,pA,myR,pR,isCustom,myData[key+'.flagged']);
   const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
   const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
+  const mySwBadge=mySwVal?`<span class="badge ${bCls(mySwVal)}">${mySwVal}</span>`:'';
+  const pSwBadge=pSwDisplay?`<span class="badge ${bCls(pSwDisplay)}">${pSwDisplay}</span>`:'';
   const cBadge=isCustom?`<span class="badge custom">Custom</span>`:'';
   const sBadge=myData[key+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
   const delBtn=isCustom?`<button class="del-btn" onclick="event.stopPropagation();delCustom('${item.id}')" title="Remove">✕</button>`:'';
@@ -747,7 +761,7 @@ function buildCard(cat,item,isCustom=false){
 <div class="activity-card ${accent}" id="c_${sid}" data-cat="${cat}" data-act="${activity}">
   <div class="card-header" onclick="toggleCard(this)">
     <div class="activity-name">${activity}</div>
-    <div class="badge-row">${myBadge}${pBadge}${cBadge}${sBadge}</div>
+    <div class="badge-row">${myBadge}${pBadge}${mySwBadge}${pSwBadge}${cBadge}${sBadge}</div>
     ${delBtn}
     <button class="flag-btn ${flagged}" onclick="event.stopPropagation();toggleFlag('${key}')" title="Flag for scene">⚑</button>
     <span class="expand-icon">▼</span>
@@ -877,9 +891,15 @@ function updateAllCardAccents(){
     if(br){
       const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
       const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
+      const mySw=myData[key+'.sw']??(item?bv(item,myRole,'S'):'')??'';
+      const mySwDisp=mySw==='Not Applicable'?'':mySw;
+      const mySwBadge=mySwDisp?`<span class="badge ${bCls(mySwDisp)}">${mySwDisp}</span>`:'';
+      const pSw=partnerData[key+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
+      const pSwDisp=pSw==='Not Applicable'?'':pSw;
+      const pSwBadge=pSwDisp?`<span class="badge ${bCls(pSwDisp)}">${pSwDisp}</span>`:'';
       const sBadge=myData[key+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
       const cBadge=isCustom?`<span class="badge custom">Custom</span>`:'';
-      br.innerHTML=myBadge+pBadge+cBadge+sBadge;
+      br.innerHTML=myBadge+pBadge+mySwBadge+pSwBadge+cBadge+sBadge;
     }
     // Update partner column read-only values
     const pT=partnerData[key+'.t']??(item?bv(item,pPfx,'T'):'')??'';
