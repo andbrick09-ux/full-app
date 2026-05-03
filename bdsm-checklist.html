@@ -3020,18 +3020,22 @@
     function buildStats() {
       const pPfx = myRole === 'dom' ? 'sub' : 'dom';
       let total = 0, both = 0, myFetish = 0, myHard = 0;
+      
+      const countItem = (cat, item) => {
+        total++; const key = ik(cat, item.a || item.activity);
+        const mT = myData[key + '.t'] ?? bv(item, myRole, 'T') ?? '';
+        const pT = partnerData[key + '.t'] ?? bv(item, pPfx, 'T') ?? '';
+        const mA = myData[key + '.a'] ?? bv(item, myRole, 'A') ?? '';
+        if (mT === 'Yes' && pT === 'Yes') both++;
+        if (mA.includes('Fetish')) myFetish++;
+        if (mA.includes('Hard Limit')) myHard++;
+      };
+
       for (const [cat, items] of Object.entries(BASE)) {
-        for (const item of items) {
-          total++; const key = ik(cat, item.a);
-          const mT = myData[key + '.t'] ?? bv(item, myRole, 'T') ?? '';
-          const pT = partnerData[key + '.t'] ?? bv(item, pPfx, 'T') ?? '';
-          const mA = myData[key + '.a'] ?? bv(item, myRole, 'A') ?? '';
-          if (mT === 'Yes' && pT === 'Yes') both++;
-          if (mA.includes('Fetish')) myFetish++;
-          if (mA.includes('Hard Limit')) myHard++;
-        }
+        items.forEach(item => countItem(cat, item));
       }
-      total += customItems.length;
+      customItems.forEach(item => countItem(item.category, item));
+
       document.getElementById('sTotal').textContent = total;
       document.getElementById('sBoth').textContent = both;
       document.getElementById('sFetish').textContent = myFetish;
@@ -3091,8 +3095,13 @@
       const cat = card.dataset.cat, act = card.dataset.act; if (!cat) return true;
       const key = ik(cat, act);
       const pPfx = myRole === 'dom' ? 'sub' : 'dom';
-      const mT = myData[key + '.t'] ?? '', mR = myData[key + '.r'] ?? '', mA = myData[key + '.a'] ?? '';
-      const pT = partnerData[key + '.t'] ?? '', pR = partnerData[key + '.r'] ?? '', pA = partnerData[key + '.a'] ?? '';
+      const item = BASE[cat]?.find(i => i.a === act);
+      const mT = myData[key + '.t'] ?? (item ? bv(item, myRole, 'T') : '') ?? '';
+      const mR = myData[key + '.r'] ?? (item ? bv(item, myRole, 'R') : '') ?? '';
+      const mA = myData[key + '.a'] ?? (item ? bv(item, myRole, 'A') : '') ?? '';
+      const pT = partnerData[key + '.t'] ?? (item ? bv(item, pPfx, 'T') : '') ?? '';
+      const pR = partnerData[key + '.r'] ?? (item ? bv(item, pPfx, 'R') : '') ?? '';
+      const pA = partnerData[key + '.a'] ?? (item ? bv(item, pPfx, 'A') : '') ?? '';
 
       if (activeSearch && !act.toLowerCase().includes(activeSearch)) return false;
 
