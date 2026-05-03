@@ -1389,13 +1389,15 @@ function buildSwipeList(){
       const pT=partnerData[key+'.t']??bv(item,pPfx,'T')??'';
       const pR=partnerData[key+'.r']??bv(item,pPfx,'R')??'';
       const pA=partnerData[key+'.a']??bv(item,pPfx,'A')??'';
+      const mSw=myData[key+'.sw']??bv(item,myRole,'S')??'';
+      const pSw=partnerData[key+'.sw']??bv(item,pPfx,'S')??'';
       if(swipeFilter==='unset'&&(mT||mR||mA))continue;
       if(swipeFilter==='disagree'){
         const disagree=(mA.includes('Hard Limit')&&!pA.includes('Hard Limit'))||(!mA.includes('Hard Limit')&&pA.includes('Hard Limit'))||(mR.includes('Loved')&&(pT.includes('want')||!pT))||(mT.includes('want')&&pA.includes('Hard Limit'));
         if(!disagree)continue;
       }
       if(swipeFilter==='fetish'&&!mA.includes('Fetish')&&!pA.includes('Fetish'))continue;
-      all.push({cat,item,key,mT,mR,mA,pT,pR,pA});
+      all.push({cat,item,key,mT,mR,mA,mSw,pT,pR,pA,pSw});
     }
   }
   return all;
@@ -1419,11 +1421,11 @@ function renderSwipeCard(){
     return;
   }
   const idx=Math.max(0,Math.min(swipeIdx,swipeList.length-1));
-  const {cat,item,key,mT,mR,mA,pT,pR,pA}=swipeList[idx];
+  const {cat,item,key,mT,mR,mA,mSw,pT,pR,pA,pSw}=swipeList[idx];
   const verdict=getVerdict(mT,mR,mA,pT,pR,pA);
   const domFirst=myRole==='dom';
-  const col1={name:domFirst?myName:partnerName,T:domFirst?mT:pT,R:domFirst?mR:pR,A:domFirst?mA:pA,cls:domFirst?'dom-col':'sub-col'};
-  const col2={name:domFirst?partnerName:myName,T:domFirst?pT:mT,R:domFirst?pR:mR,A:domFirst?pA:mA,cls:domFirst?'sub-col':'dom-col'};
+  const col1={name:domFirst?myName:partnerName,T:domFirst?mT:pT,R:domFirst?mR:pR,A:domFirst?mA:pA,Sw:domFirst?mSw:pSw,cls:domFirst?'dom-col':'sub-col'};
+  const col2={name:domFirst?partnerName:myName,T:domFirst?pT:mT,R:domFirst?pR:mR,A:domFirst?pA:mA,Sw:domFirst?pSw:mSw,cls:domFirst?'sub-col':'dom-col'};
 
   document.getElementById('swipeCardWrap').innerHTML=`
 <div class="swipe-card">
@@ -1435,12 +1437,14 @@ function renderSwipeCard(){
       <div class="swipe-field"><div class="swipe-field-label">Tried</div><div class="swipe-field-val ${!v(col1.T)?'empty':''}">${v(col1.T)||'—'}</div></div>
       <div class="swipe-field"><div class="swipe-field-label">Rating</div><div class="swipe-field-val ${!v(col1.R)?'empty':''}">${v(col1.R)||'—'}</div></div>
       <div class="swipe-field"><div class="swipe-field-label">Again?</div><div class="swipe-field-val ${!v(col1.A)?'empty':''}">${v(col1.A)||'—'}</div></div>
+      <div class="swipe-field"><div class="swipe-field-label">Role</div><div class="swipe-field-val ${!v(col1.Sw)?'empty':''}">${v(col1.Sw)||'—'}</div></div>
     </div>
     <div class="swipe-col ${col2.cls}">
       <div class="swipe-col-name">${col2.name}</div>
       <div class="swipe-field"><div class="swipe-field-label">Tried</div><div class="swipe-field-val ${!v(col2.T)?'empty':''}">${v(col2.T)||'—'}</div></div>
       <div class="swipe-field"><div class="swipe-field-label">Rating</div><div class="swipe-field-val ${!v(col2.R)?'empty':''}">${v(col2.R)||'—'}</div></div>
       <div class="swipe-field"><div class="swipe-field-label">Again?</div><div class="swipe-field-val ${!v(col2.A)?'empty':''}">${v(col2.A)||'—'}</div></div>
+      <div class="swipe-field"><div class="swipe-field-label">Role</div><div class="swipe-field-val ${!v(col2.Sw)?'empty':''}">${v(col2.Sw)||'—'}</div></div>
     </div>
   </div>
   <div class="swipe-verdict ${verdict.cls}">${verdict.txt}</div>
