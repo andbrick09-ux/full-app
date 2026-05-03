@@ -1906,11 +1906,18 @@ import { doc, setDoc, getDoc, onSnapshot }
 
   function refreshAll() {
     updateProfilePill();
-    renderMonth();
-    if (document.getElementById('day-modal') && document.getElementById('day-modal').style.display === 'flex') {
-      renderDayModal(document.getElementById('day-modal').dataset.date);
-    }
+    renderCurrentView();
   }
+
+  // Expose to window for HTML onclicks
+  Object.assign(window, {
+    openProfileSwitch, switchView, changeMonth, openDay, changeWeek,
+    changeDayView, selectMood, saveReflection, toggleTask, unlockScene,
+    confirmDelete, deleteScope, deleteEvent, openAddModal, editTask,
+    editEvent, closeModal, handleModalClick, setType, setCat, setFreq,
+    toggleWorkDow, toggleDow, toggleSwitch, saveEvent, pinPress, pinDel,
+    closePinModal
+  });
 
   init().catch(console.error);
   </script>
