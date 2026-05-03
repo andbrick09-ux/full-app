@@ -773,6 +773,10 @@ function buildCard(cat,item,isCustom=false){
         <div class="response-col ${meCls}">
           <div class="col-title">${myName} (you)</div>
           <div class="field-row">
+            <div class="field-label">My role</div>
+            ${switchRow(key+'.sw', mySwVal)}
+          </div>
+          <div class="field-row">
             <div class="field-label">Tried it?</div>
             ${segControl(key+'.t', myT)}
           </div>
@@ -783,10 +787,6 @@ function buildCard(cat,item,isCustom=false){
           <div class="field-row">
             <div class="field-label">Do again?</div>
             ${smartBadgeHtml(key+'.a', myA)}
-          </div>
-          <div class="field-row">
-            <div class="field-label">My role</div>
-            ${switchRow(key+'.sw', mySwVal)}
           </div>
           <div class="field-row" style="margin-top:6px;">
             <div class="private-note-label"><span class="lock">🔒</span> Private note (only you)</div>
@@ -799,10 +799,10 @@ function buildCard(cat,item,isCustom=false){
         </div>
         <div class="response-col ${thCls}">
           <div class="col-title">${partnerName||'Partner'}</div>
+          <div class="field-row"><div class="field-label">Their role</div><div class="partner-val ${!v(pSwDisplay)?'empty':''}">${v(pSwDisplay)||'—'}</div></div>
           <div class="field-row"><div class="field-label">Tried it?</div><div class="partner-val ${!v(pT)?'empty':''}">${v(pT)||'—'}</div></div>
           <div class="field-row"><div class="field-label">Rating</div><div class="partner-val ${!v(pR)?'empty':''}">${v(pR)||'—'}</div></div>
           <div class="field-row"><div class="field-label">Do again?</div><div class="partner-val ${!v(pA)?'empty':''}">${v(pA)||'—'}</div></div>
-          <div class="field-row"><div class="field-label">Their role</div><div class="partner-val ${!v(pSwDisplay)?'empty':''}">${v(pSwDisplay)||'—'}</div></div>
           ${v(pNs)?`<div class="field-row" style="margin-top:6px;"><div class="field-label">💬 Their note to you</div><div class="partner-note">${pNs}</div></div>`:''}
         </div>
       </div>
@@ -812,7 +812,7 @@ function buildCard(cat,item,isCustom=false){
 }
 
 // ── Switch role row ──
-const SWITCH_OPTS=['Giving','Receiving','Both','Wearing','Others Wearing'];
+const SWITCH_OPTS=['Giving','Receiving','Both','Wearing','Others Wearing','Not Applicable'];
 function switchRow(sk,val){
   return `<div class="switch-row">${SWITCH_OPTS.map(o=>`<div class="switch-opt${val===o?' active-sw':''}" onclick="setSwitchOpt(this,'${sk}','${o}')" data-sk-sw="${sk}">${o}</div>`).join('')}</div>`;
 }
@@ -909,7 +909,7 @@ function updateAllCardAccents(){
       const vals=theirCol.querySelectorAll('.partner-val');
       const pSw=partnerData[key+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
       const pSwDisp=pSw==='Not Applicable'?'':pSw;
-      const pData=[pT,pR,pA,pSwDisp];
+      const pData=[pSwDisp,pT,pR,pA];
       vals.forEach((el,i)=>{el.textContent=v(pData[i])||'—';el.className='partner-val'+(v(pData[i])?'':' empty');});
       const existNote=theirCol.querySelector('.partner-note');
       if(existNote)existNote.textContent=pNs;
@@ -1022,9 +1022,27 @@ function onFCKey(sk){
     if(br){
       const myBadge=v(myR)?`<span class="badge ${bCls(myR)}">${v(myR)}</span>`:'';
       const pBadge=v(pR)?`<span class="badge ${bCls(pR)}">${v(pR)}</span>`:'';
+      const mySw=myData[k+'.sw']??(item?bv(item,myRole,'S'):'')??'';
+      const mySwDisp=mySw==='Not Applicable'?'':mySw;
+      const mySwBadge=mySwDisp?`<span class="badge ${bCls(mySwDisp)}">${mySwDisp}</span>`:'';
+      const pSw=partnerData[k+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
+      const pSwDisp=pSw==='Not Applicable'?'':pSw;
+      const pSwBadge=pSwDisp?`<span class="badge ${bCls(pSwDisp)}">${pSwDisp}</span>`:'';
       const sBadge=myData[k+'.flagged']?`<span class="badge scene">⚑ Scene</span>`:'';
       const cBadge=card.classList.contains('custom-item')?`<span class="badge custom">Custom</span>`:'';
-      br.innerHTML=myBadge+pBadge+cBadge+sBadge;
+      br.innerHTML=myBadge+pBadge+mySwBadge+pSwBadge+cBadge+sBadge;
+    }
+    // Update partner values
+    const theirCol=card.querySelector('.theirs');
+    if(theirCol){
+      const vals=theirCol.querySelectorAll('.partner-val');
+      const pT=partnerData[k+'.t']??(item?bv(item,pPfx,'T'):'')??'';
+      const pR=partnerData[k+'.r']??(item?bv(item,pPfx,'R'):'')??'';
+      const pA=partnerData[k+'.a']??(item?bv(item,pPfx,'A'):'')??'';
+      const pSw=partnerData[k+'.sw']??(item?bv(item,pPfx,'S'):'')??'';
+      const pSwDisp=pSw==='Not Applicable'?'':pSw;
+      const pData=[pSwDisp,pT,pR,pA];
+      vals.forEach((el,i)=>{ el.textContent=v(pData[i])||'—'; el.className='partner-val'+(v(pData[i])?'':' empty'); });
     }
   }
   buildStats();buildSharedFetishes();updateTabProgress();buildCompat();applyFilters();
