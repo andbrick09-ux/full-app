@@ -406,6 +406,62 @@
       letter-spacing: 0.3px;
     }
 
+    /* VIEW SELECTOR */
+    .view-selector {
+      display: flex;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 3px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+
+    .view-opt {
+      flex: 1;
+      padding: 7px 5px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 9px;
+      transition: var(--transition);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .view-opt:hover {
+      color: var(--text-primary);
+    }
+
+    .view-opt.active {
+      background: var(--gold-dim);
+      color: var(--gold);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* View Mode Logic */
+    body.view-me .theirs { display: none !important; }
+    body.view-partner .mine { display: none !important; }
+    body.view-me .response-grid, 
+    body.view-partner .response-grid { 
+      grid-template-columns: 1fr !important; 
+    }
+
+    /* Hide partner side of status pair in Me mode */
+    body.view-me .sp-side.them, 
+    body.view-me .sp-divider { display: none !important; }
+    
+    /* Hide my side of status pair in Partner mode */
+    body.view-partner .sp-side.me, 
+    body.view-partner .sp-divider { display: none !important; }
+
+    body.view-me .sp-side.me,
+    body.view-partner .sp-side.them {
+      border-radius: 4px !important;
+    }
+
     /* TABS */
     .tab-bar {
       display: flex;
@@ -2217,6 +2273,13 @@
     <!-- Search results panel -->
     <div class="search-results-panel" id="searchResultsPanel"></div>
 
+    <!-- View Toggle -->
+    <div class="view-selector">
+      <div class="view-opt" id="vo_me" data-view="me" onclick="setViewMode('me')">Me Only</div>
+      <div class="view-opt active" id="vo_both" data-view="both" onclick="setViewMode('both')">Both</div>
+      <div class="view-opt" id="vo_partner" data-view="partner" onclick="setViewMode('partner')">Partner</div>
+    </div>
+
     <!-- Tabs -->
     <div style="display:flex;align-items:flex-start;gap:6px;">
       <div class="tab-bar" id="tabBar" style="flex:1;">
@@ -2487,6 +2550,10 @@
       }
       buildAll();
       document.getElementById('loadingOverlay').classList.add('hidden');
+      
+      // Load view mode
+      const savedView = localStorage.getItem('checklist_view_mode') || 'both';
+      setViewMode(savedView);
     }
 
     function setupIdentity() {
@@ -3291,6 +3358,15 @@
       h.classList.toggle('open'); h.nextElementSibling.classList.toggle('open');
       const ic = h.querySelector('.expand-icon');
       if (ic) ic.style.transform = h.classList.contains('open') ? 'rotate(180deg)' : '';
+    };
+
+    window.setViewMode = function (mode) {
+      document.body.classList.remove('view-me', 'view-partner', 'view-both');
+      document.body.classList.add('view-' + mode);
+      document.querySelectorAll('.view-opt').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.view === mode);
+      });
+      localStorage.setItem('checklist_view_mode', mode);
     };
 
     init().catch(e => { console.error(e); document.getElementById('loadingOverlay').classList.add('hidden'); });
