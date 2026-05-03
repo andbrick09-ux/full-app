@@ -406,91 +406,6 @@
       letter-spacing: 0.3px;
     }
 
-    /* COMPAT SCORE */
-    .compat-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      margin-bottom: 14px;
-    }
-
-    .compat-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-
-    .compat-track {
-      flex: 1;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .compat-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold), var(--success));
-      border-radius: 3px;
-      transition: width 0.6s ease;
-    }
-
-    .compat-pct {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: var(--gold);
-      min-width: 44px;
-      text-align: right;
-    }
-
-    /* TABS */
-    .tab-bar {
-      display: flex;
-      gap: 5px;
-      padding: 8px 0 14px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .tab-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab-btn {
-      position: relative;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      color: var(--text-secondary);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      padding: 6px 13px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .tab-btn:hover {
-      background: var(--gold-dim);
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    .tab-btn.active {
-      background: var(--gold-dim);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
     /* STATS */
     .status-bar {
       display: grid;
@@ -505,6 +420,17 @@
       border-radius: var(--radius);
       padding: 10px;
       text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      background: var(--gold-dim);
+      border-color: var(--gold-border);
+    }
+
+    .stat-card:active {
+      transform: scale(0.96);
     }
 
     .stat-num {
@@ -1464,7 +1390,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 0 12px 16px;
+      padding: 0 12px 80px;
       flex-shrink: 0;
     }
 
@@ -1530,7 +1456,7 @@
       background: var(--midnight-mid);
       border: 1px solid var(--gold-border);
       border-radius: 16px 16px 0 0;
-      padding: 20px 20px 36px;
+      padding: 20px 20px 100px;
       width: 100%;
       max-width: 560px;
       max-height: 85vh;
@@ -1918,7 +1844,7 @@
       background: var(--midnight-mid);
       border: 1px solid var(--gold-border);
       border-radius: 20px 20px 0 0;
-      padding: 14px 16px 36px;
+      padding: 14px 16px 100px;
       width: 100%;
       max-width: 560px;
     }
@@ -2107,7 +2033,7 @@
       background: var(--midnight-mid);
       border: 1px solid var(--gold-border);
       border-radius: 20px 20px 0 0;
-      padding: 14px 16px 36px;
+      padding: 14px 16px 100px;
       width: 100%;
       max-width: 600px;
       max-height: 70vh;
@@ -2230,27 +2156,18 @@
       <span class="id-note">Edit your column only</span>
     </div>
 
-    <!-- Compatibility -->
-    <div class="compat-bar">
-      <span class="compat-label">Compatibility</span>
-      <div class="compat-track">
-        <div class="compat-fill" id="compatFill" style="width:0%"></div>
-      </div>
-      <span class="compat-pct" id="compatPct">—</span>
-    </div>
-
     <!-- Stats -->
     <div class="status-bar">
-      <div class="stat-card"><span class="stat-num" id="sTotal">—</span>
+      <div class="stat-card" onclick="clearAllFilters()"><span class="stat-num" id="sTotal">—</span>
         <div class="stat-lbl">Activities</div>
       </div>
-      <div class="stat-card"><span class="stat-num" id="sBoth">—</span>
+      <div class="stat-card" onclick="setStatFilter('both-tried')"><span class="stat-num" id="sBoth">—</span>
         <div class="stat-lbl">Both Tried</div>
       </div>
-      <div class="stat-card"><span class="stat-num" id="sFetish">—</span>
+      <div class="stat-card" onclick="setStatFilter('my-fetish')"><span class="stat-num" id="sFetish">—</span>
         <div class="stat-lbl">My Fetish/Need</div>
       </div>
-      <div class="stat-card"><span class="stat-num" id="sHard">—</span>
+      <div class="stat-card" onclick="setStatFilter('hard-limits')"><span class="stat-num" id="sHard">—</span>
         <div class="stat-lbl">My Hard Limits</div>
       </div>
     </div>
@@ -2545,7 +2462,7 @@
     }
 
     function refreshAll() {
-      buildStats(); buildSharedFetishes(); updateAllCardAccents(); buildCompat();
+      buildStats(); buildSharedFetishes(); updateAllCardAccents();
     }
 
     // ═══ BUILD ALL ═══
@@ -2553,7 +2470,7 @@
       buildSpecial();
       ALL_CATS.forEach(cat => buildCatPanel(cat, BASE[cat]));
       populateModalCats();
-      buildStats(); buildSharedFetishes(); buildCompat();
+      buildStats(); buildSharedFetishes();
       setSaveStatus('', '—');
     }
 
@@ -2881,7 +2798,7 @@
           vals.forEach((el, i) => { el.textContent = v(pData[i]) || '—'; el.className = 'partner-val' + (v(pData[i]) ? '' : ' empty'); });
         }
       }
-      buildStats(); buildSharedFetishes(); buildCompat(); applyFilters();
+      buildStats(); buildSharedFetishes(); applyFilters();
     }
 
     // Tab Grid Modal
@@ -3079,30 +2996,7 @@
       document.getElementById('sHard').textContent = myHard;
     }
 
-    function buildCompat() {
-      const pPfx = myRole === 'dom' ? 'sub' : 'dom';
-      let total = 0, aligned = 0;
-      for (const [cat, items] of Object.entries(BASE)) {
-        for (const item of items) {
-          const key = ik(cat, item.a);
-          const mT = myData[key + '.t'] ?? bv(item, myRole, 'T') ?? '';
-          const pT = partnerData[key + '.t'] ?? bv(item, pPfx, 'T') ?? '';
-          const mA = myData[key + '.a'] ?? bv(item, myRole, 'A') ?? '';
-          const pA = partnerData[key + '.a'] ?? bv(item, pPfx, 'A') ?? '';
-          if (!mT && !pT) continue;
-          total++;
-          const mHard = mA.includes('Hard Limit'), pHard = pA.includes('Hard Limit');
-          const mFetish = mA.includes('Fetish'), pFetish = pA.includes('Fetish');
-          const mYes = mT === 'Yes', pYes = pT === 'Yes';
-          const mWant = mT.includes('want'), pWant = pT.includes('want');
-          if (mHard && pHard) aligned++;
-          else if (!mHard && !pHard && ((mYes && pYes) || (mWant && pWant) || (mFetish && pFetish))) aligned++;
-        }
-      }
-      const pct = total ? Math.round(aligned / total * 100) : 0;
-      document.getElementById('compatFill').style.width = pct + '%';
-      document.getElementById('compatPct').textContent = pct + '%';
-    }
+
 
 
     // ═══ SEARCH & FILTER ═══
@@ -3117,6 +3011,33 @@
       document.getElementById('searchClear').className = 'search-clear';
       applyFilters();
     };
+
+    window.clearAllFilters = function () {
+      activeFilters.clear();
+      document.querySelectorAll('.filter-chips .chip').forEach(c => c.className = 'chip');
+      clearSearch();
+    };
+
+    window.setStatFilter = function (filter) {
+      const alreadyActive = activeFilters.has(filter);
+      activeFilters.clear();
+      document.querySelectorAll('.filter-chips .chip').forEach(c => c.className = 'chip');
+
+      if (!alreadyActive) {
+        activeFilters.add(filter);
+        const chip = document.querySelector(`.filter-chips .chip[data-filter="${filter}"]`);
+        if (chip) {
+          let colorClass = '';
+          if (filter === 'success-chip' || filter === 'both-tried') colorClass = 'success-chip';
+          else if (filter === 'purple-chip' || filter === 'my-fetish' || filter === 'scene-flagged') colorClass = 'purple-chip';
+          else if (filter === 'danger-chip' || filter === 'hard-limits') colorClass = 'danger-chip';
+          else if (filter === 'warn-chip' || filter === 'disagreements') colorClass = 'warn-chip';
+          chip.className = 'chip active' + (colorClass ? ' ' + colorClass : '');
+        }
+      }
+      applyFilters();
+    };
+
     window.toggleChip = function (el, colorClass) {
       const filter = el.dataset.filter;
       if (activeFilters.has(filter)) { activeFilters.delete(filter); el.className = 'chip'; }
@@ -3137,7 +3058,7 @@
         if (f === 'unset' && myData[key + '.t']) return false;
         if (f === 'both-tried' && !(mT === 'Yes' && pT === 'Yes')) return false;
         if (f === 'my-fetish' && !mA.includes('Fetish')) return false;
-        if (f === 'hard-limits' && !mA.includes('Hard Limit') && !pA.includes('Hard Limit')) return false;
+        if (f === 'hard-limits' && !mA.includes('Hard Limit')) return false;
         if (f === 'disagreements') {
           const disagree = (mA.includes('Hard Limit') && !pA.includes('Hard Limit')) || (!mA.includes('Hard Limit') && pA.includes('Hard Limit')) || (mR.includes('Loved') && (pT.includes('want') || !pT)) || (mT.includes('want') && pA.includes('Hard Limit'));
           if (!disagree) return false;
