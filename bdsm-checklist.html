@@ -351,54 +351,6 @@
       padding-right: 12px;
     }
 
-    /* IDENTITY BANNER */
-    .identity-banner {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 9px 14px;
-      margin-bottom: 14px;
-      font-size: 12px;
-    }
-
-    .id-person {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .id-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .id-dot.dom {
-      background: var(--gold);
-    }
-
-    .id-dot.sub {
-      background: var(--sub-color);
-    }
-
-    .id-name {
-      color: var(--text-secondary);
-    }
-
-    .id-you {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .id-divider {
-      color: var(--text-muted);
-      margin: 0 4px;
-    }
-
     .id-note {
       color: var(--text-muted);
       font-size: 10px;
@@ -2241,18 +2193,6 @@
 
   <!-- MAIN -->
   <main class="main">
-    <!-- Identity banner -->
-    <div class="identity-banner">
-      <div class="id-person">
-        <div class="id-dot" id="myDot"></div><span class="id-name"><span class="id-you" id="myNameSpan">—</span>
-          (you)</span>
-      </div>
-      <span class="id-divider">·</span>
-      <div class="id-person">
-        <div class="id-dot" id="partnerDot"></div><span class="id-name" id="partnerNameSpan">—</span>
-      </div>
-      <span class="id-note">Edit your column only</span>
-    </div>
 
     <!-- Stats -->
     <div class="status-bar">
@@ -2273,11 +2213,10 @@
     <!-- Search results panel -->
     <div class="search-results-panel" id="searchResultsPanel"></div>
 
-    <!-- View Toggle -->
     <div class="view-selector">
-      <div class="view-opt" id="vo_me" data-view="me" onclick="setViewMode('me')">Me Only</div>
+      <div class="view-opt" id="vo_me" data-view="me" onclick="setViewMode('me')">—</div>
       <div class="view-opt active" id="vo_both" data-view="both" onclick="setViewMode('both')">Both</div>
-      <div class="view-opt" id="vo_partner" data-view="partner" onclick="setViewMode('partner')">Partner</div>
+      <div class="view-opt" id="vo_partner" data-view="partner" onclick="setViewMode('partner')">—</div>
     </div>
 
     <!-- Tabs -->
@@ -2557,12 +2496,15 @@
     }
 
     function setupIdentity() {
-      const pill = document.getElementById('userPill'); pill.classList.add(myRole);
-      document.getElementById('userPillName').textContent = myName;
-      document.getElementById('myDot').className = 'id-dot ' + myRole;
-      document.getElementById('partnerDot').className = 'id-dot ' + (myRole === 'dom' ? 'sub' : 'dom');
-      document.getElementById('myNameSpan').textContent = myName;
-      document.getElementById('partnerNameSpan').textContent = partnerName || 'Partner';
+      const pill = document.getElementById('userPill'); 
+      if (pill) pill.classList.add(myRole);
+      const pillName = document.getElementById('userPillName');
+      if (pillName) pillName.textContent = myName;
+      
+      const voMe = document.getElementById('vo_me');
+      const voPartner = document.getElementById('vo_partner');
+      if (voMe) voMe.textContent = myName;
+      if (voPartner) voPartner.textContent = partnerName || 'Partner';
     }
 
     async function loadMyData() {
@@ -2648,10 +2590,6 @@
           <div class="field-row">
             <div class="field-label">Do again?</div>
             ${smartBadgeHtml(key + '.a', myA)}
-          </div>
-          <div class="field-row" style="margin-top:6px;">
-            <div class="private-note-label"><span class="lock">🔒</span> Private note (only you)</div>
-            <textarea class="notes-area" rows="2" placeholder="Your private thoughts…" data-sk="${key}.n" oninput="schedSave()">${myN}</textarea>
           </div>
           <div class="field-row">
             <div class="field-label">💬 Note to partner</div>
