@@ -59,17 +59,16 @@
   ];
 
   var MORE_ITEMS = [
-    { href: 'toy-vault.html',       icon: '🔒', label: 'Toy Vault' },
-    { href: 'assessment-menu.html', icon: '✅', label: 'Assessments &amp; Ratings' },
-    { href: 'public-game.html',     icon: '🏛️', label: "Sir&#39;s Public Tasks" },
-    { href: 'sirs-protocol.html',   icon: '📜', label: 'Sir\u2019s Protocol' },
-    { href: 'song-vault.html',      icon: '🎵', label: 'Song Vault' },
-    { href: 'notes.html',           icon: '📝', label: 'Notes' },
-    { href: 'calendar.html',        icon: '📅', label: 'Calendar' },
-    { href: 'protocol-daily.html',  icon: '📅', label: 'Daily Protocol' },
-    { href: 'help.html',            icon: '❓', label: 'Help &amp; Info' },
-    { href: 'settings.html',        icon: '⚙️', label: 'Settings' },
-    { href: 'bdsm-checklist.html', icon: '⚙️', label: 'Test Page' }
+    { href: 'toy-vault.html', icon: '🔒', label: 'Toy Vault' },
+    { href: 'bdsm-checklist.html', icon: '✅', label: 'Assessments &amp; Ratings' },
+    { href: 'sirs-protocol.html', icon: '📜', label: 'Sir\u2019s Protocol' },
+    { href: 'song-vault.html', icon: '🎵', label: 'Song Vault' },
+    { href: 'notes.html', icon: '📝', label: 'Notes' },
+    { href: 'calendar.html', icon: '📅', label: 'Calendar' },
+    { href: 'protocol-daily.html', icon: '📅', label: 'Daily Protocol' },
+    { href: 'help.html', icon: '❓', label: 'Help &amp; Info' },
+    { href: 'settings.html', icon: '⚙️', label: 'Settings' }
+
   ];
 
   /* ── 2. Read active page from <body data-nav="X"> ──────── */
@@ -134,7 +133,7 @@
 
   /* ── 5. Wire up More button & overlay ───────────────────── */
   var overlay = document.getElementById('dshOverlay');
-  var sheet   = document.getElementById('dshMoreSheet');
+  var sheet = document.getElementById('dshMoreSheet');
   var moreBtn = document.getElementById('dshMoreBtn');
   var allBtns = document.querySelectorAll('.dsh-nav-btn');
 
