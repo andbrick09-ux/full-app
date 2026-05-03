@@ -671,8 +671,8 @@
       <div class="topbar-sub">Protocol Schedule</div>
     </div>
     <div class="profile-pill" onclick="openProfileSwitch()" id="profile-pill">
-      <span class="profile-pill-icon" id="profile-icon">👑</span>
-      <span class="profile-pill-name" id="profile-name">Dom</span>
+      <span class="profile-pill-icon" id="profile-icon">...</span>
+      <span class="profile-pill-name" id="profile-name">Loading</span>
       <span class="profile-pill-arrow">⌄</span>
     </div>
   </div>
@@ -976,7 +976,7 @@ import { doc, setDoc, getDoc, onSnapshot }
 
     events = [
       { id: uid(), date: today, type:'scene', title:'Evening Protocol', desc:'Rope work and sensory exploration. Full aftercare planned.', dressCode:'Black lingerie, collar', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
-      { id: uid(), date: future, type:'scene', title:'Sir\'s Private Evening', desc:'Extended scene with restraint and edge play.', dressCode:'Be ready by 8pm', createdBy:'dom', visibility:'surprise', unlocked:false, completed:false },
+      { id: uid(), date: future, type:'scene', title: (profiles.dom.name || 'Dom') + '\'s Private Evening', desc:'Extended scene with restraint and edge play.', dressCode:'Be ready by 8pm', createdBy:'dom', visibility:'surprise', unlocked:false, completed:false },
       { id: uid(), date: future2, type:'scene', title:'Weekend Retreat', desc:'Full day dynamic immersion.', dressCode:'Comfortable, Sir will direct', createdBy:'dom', visibility:'both', unlocked:true, completed:false },
     ];
 
