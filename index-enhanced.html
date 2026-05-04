@@ -144,25 +144,26 @@ body[data-role="sub"] .role-badge{background:var(--gold);color:#080c14}
 </div>
 
 <script type="module">
-import { requireAuth, getMyRole, getMyProfile, dataRef, dataCol, partnerDataRef, partnerDataCol } from './auth.js';
+import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol } from './auth.js';
 import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 let currentRole = null;
 let currentProfile = null;
 let partnerUid = null;
+let partnerDisplayName = null;
 
 async function init() {
   const user = await requireAuth();
   currentRole = await getMyRole();
   currentProfile = await getMyProfile();
 
-  // Get partner UID if paired
+  // Get partner UID and display name if paired
   if (currentProfile?.relationshipId) {
     try {
-      const relDoc = await getDoc(doc(collection('relationships'), currentProfile.relationshipId));
-      if (relDoc.exists()) {
-        const rel = relDoc.data();
-        partnerUid = currentRole === 'dom' ? rel.subId : rel.domId;
+      partnerUid = await getPartnerUid();
+      if (partnerUid) {
+        const partnerProfile = await getUserProfile(partnerUid);
+        partnerDisplayName = partnerProfile?.displayName || null;
       }
     } catch (e) { console.log('No partner relationship found'); }
   }
@@ -182,7 +183,7 @@ async function init() {
 
 function renderDomDashboard() {
   const container = document.getElementById('dashboard');
-  const subName = currentProfile?.partnerName || currentProfile?.displayName || "your sub";
+  const subName = partnerDisplayName || currentProfile?.displayName || "your sub";
 
   container.innerHTML = `
     <header class="hdr">
@@ -256,7 +257,7 @@ function renderDomDashboard() {
 
 function renderSubDashboard() {
   const container = document.getElementById('dashboard');
-  const domName = currentProfile?.partnerName || "Sir";
+  const domName = partnerDisplayName || "Sir";
 
   container.innerHTML = `
     <header class="hdr">
