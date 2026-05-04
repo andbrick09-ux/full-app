@@ -58,9 +58,7 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 .hdr{text-align:center;padding-top:max(var(--safe-t),28px);padding-bottom:16px;border-bottom:1px solid var(--gold-b);margin-bottom:6px}
 .app-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--gold-l);letter-spacing:3px;text-transform:uppercase;display:block;animation:fadeD .5s ease both}
 .app-sub{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-top:3px;animation:fadeD .5s .08s ease both}
-.role-badge{display:inline-block;margin-top:8px;padding:2px 12px;border-radius:20px;font-size:10px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase}
-body[data-role="dom"] .role-badge{background:var(--crimson);color:white}
-body[data-role="sub"] .role-badge{background:var(--gold);color:#080c14}
+/* Role badge styles removed */
 
 @keyframes fadeD{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeU{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -190,7 +188,6 @@ function renderDomDashboard() {
       <span class="app-name">DOM SUB HUB v1</span>
       <div class="hdr-role">
         <span class="app-sub">Command &amp; Control</span>
-        <span class="role-badge">SIR</span>
       </div>
       <div style="margin-top:6px;font-size:12px;color:var(--muted)">Overseeing <span style="color:var(--gold-l);font-weight:600">${subName}</span></div>
     </header>
@@ -268,7 +265,6 @@ function renderSubDashboard() {
       <span class="app-name">DOM SUB HUB v1</span>
       <div class="hdr-role">
         <span class="app-sub">In Service</span>
-        <span class="role-badge">SUB</span>
       </div>
       <div style="margin-top:6px;font-size:12px;color:var(--muted)">Serving <span style="color:var(--gold-l);font-weight:600">${domName}</span></div>
     </header>
