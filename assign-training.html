@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#080c14" />
+<title>Assign Training • Dom Sub Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="nav.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c9a84c;
+  --gold-l:#e2c47a;
+  --gold-b:rgba(201,168,76,0.2);
+  --crimson:#8b2230;
+  --bg:#080c14;
+  --surface:#0e1420;
+  --text:#f0e6d2;
+  --muted:#68707f;
+}
+body{
+  min-height:100dvh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Raleway',sans-serif;
+  padding:20px 16px 40px;
+}
+.page{max-width:480px;margin:0 auto}
+.header{text-align:center;margin-bottom:24px}
+.app-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--gold-l);letter-spacing:3px;text-transform:uppercase}
+.sub-name{font-size:13px;color:var(--muted);margin-top:6px}
+.training-list{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.training-item{
+  background:var(--surface);
+  border:1px solid var(--gold-b);
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  transition:border-color .2s;
+}
+.training-item:hover{border-color:var(--gold)}
+.training-item.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.1)}
+.training-info{flex:1}
+.training-name{font-weight:600;font-size:15px;color:var(--gold-l)}
+.training-desc{font-size:11px;color:var(--muted);margin-top:2px}
+input[type="checkbox"]{width:20px;height:20px;accent-color:var(--gold)}
+.form-group{margin-bottom:18px}
+label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input,textarea,select{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--gold-b);
+  border-radius:12px;
+  padding:12px 14px;
+  color:var(--text);
+  font-size:14px;
+  font-family:'Raleway',sans-serif;
+}
+textarea{min-height:80px;resize:vertical}
+.btn{
+  width:100%;
+  background:var(--gold);
+  color:#080c14;
+  border:none;
+  padding:16px;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:1px;
+  border-radius:999px;
+  cursor:pointer;
+  margin-top:12px;
+  transition:transform .2s,box-shadow .2s;
+}
+.btn:active{transform:scale(0.98)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.success{text-align:center;color:#4ade80;font-size:14px;margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="app-name">DOM SUB HUB</div>
+    <div class="sub-name">Assign Training to <span id="subName">your sub</span></div>
+  </div>
+
+  <div class="training-list" id="trainingList">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="form-group">
+    <label>Starting Level</label>
+    <select id="startLevel">
+      <option value="1">Level 1 (Beginner)</option>
+      <option value="2">Level 2</option>
+      <option value="3" selected>Level 3</option>
+      <option value="4">Level 4</option>
+      <option value="5">Level 5 (Advanced)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Due Date (optional)</label>
+    <input type="date" id="dueDate" />
+  </div>
+
+  <div class="form-group">
+    <label>Personal Note from Sir (optional)</label>
+    <textarea id="noteFromSir" placeholder="Focus on breathing technique this week..."></textarea>
+  </div>
+
+  <button class="btn" id="assignBtn" onclick="assignTrainings()">ASSIGN TO SUB</button>
+
+  <div id="successMsg" class="success" style="display:none"></div>
+</div>
+
+<script type="module">
+import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, partnerDataRef } from './auth.js';
+import { setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const trainings = [
+  { id: 'deepthroat', name: 'Deepthroat', desc: 'Oral training & control' },
+  { id: 'heel', name: 'Heel Training', desc: 'Posture, grace & walking' },
+  { id: 'kegel', name: 'Kegel', desc: 'Pelvic floor strength' },
+  { id: 'positions', name: 'Positions', desc: 'Formal & service positions' },
+  { id: 'anal-plug', name: 'Anal Plug', desc: 'Anal training & endurance' },
+  { id: 'the-5', name: 'The 5 Training', desc: 'Core 5-step program' }
+];
+
+let selectedTrainings = new Set();
+let partnerUid = null;
+let subDisplayName = 'your sub';
+
+async function init() {
+  await requireAuth();
+  const profile = await getMyProfile();
+  partnerUid = await getPartnerUid();
+
+  if (partnerUid) {
+    const partnerProfile = await getUserProfile(partnerUid);
+    subDisplayName = partnerProfile?.displayName || 'your sub';
+  }
+
+  document.getElementById('subName').textContent = subDisplayName;
+
+  renderTrainingList();
+}
+
+function renderTrainingList() {
+  const container = document.getElementById('trainingList');
+  container.innerHTML = '';
+
+  trainings.forEach(training => {
+    const div = document.createElement('div');
+    div.className = 'training-item';
+    div.innerHTML = `
+      <input type="checkbox" id="${training.id}" />
+      <div class="training-info">
+        <div class="training-name">${training.name}</div>
+        <div class="training-desc">${training.desc}</div>
+      </div>
+    `;
+
+    const checkbox = div.querySelector('input');
+    checkbox.onchange = () => {
+      if (checkbox.checked) {
+        selectedTrainings.add(training.id);
+        div.classList.add('selected');
+      } else {
+        selectedTrainings.delete(training.id);
+        div.classList.remove('selected');
+      }
+      updateAssignButton();
+    };
+
+    // Click anywhere on the row to toggle
+    div.onclick = (e) => {
+      if (e.target.tagName !== 'INPUT') {
+        checkbox.checked = !checkbox.checked;
+        checkbox.onchange();
+      }
+    };
+
+    container.appendChild(div);
+  });
+
+  updateAssignButton();
+}
+
+function updateAssignButton() {
+  const btn = document.getElementById('assignBtn');
+  btn.disabled = selectedTrainings.size === 0;
+  btn.textContent = selectedTrainings.size > 0 
+    ? `ASSIGN ${selectedTrainings.size} TRAINING${selectedTrainings.size > 1 ? 'S' : ''}` 
+    : 'ASSIGN TO SUB';
+}
+
+async function assignTrainings() {
+  const btn = document.getElementById('assignBtn');
+  const successMsg = document.getElementById('successMsg');
+
+  btn.disabled = true;
+  btn.textContent = 'ASSIGNING...';
+
+  const level = parseInt(document.getElementById('startLevel').value);
+  const dueDate = document.getElementById('dueDate').value || null;
+  const note = document.getElementById('noteFromSir').value.trim() || null;
+
+  try {
+    for (const trainingId of selectedTrainings) {
+      const ref = partnerDataRef(`training/${trainingId}`);
+      await setDoc(ref, {
+        level: level,
+        progress: 0,
+        assignedBy: (await requireAuth()).uid,
+        assignedAt: serverTimestamp(),
+        dueDate: dueDate,
+        noteFromSir: note,
+        status: 'assigned'
+      }, { merge: true });
+    }
+
+    successMsg.style.display = 'block';
+    successMsg.innerHTML = `✅ Successfully assigned ${selectedTrainings.size} training(s) to ${subDisplayName}`;
+
+    // Reset form
+    setTimeout(() => {
+      selectedTrainings.clear();
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.training-item').forEach(el => el.classList.remove('selected'));
+      document.getElementById('noteFromSir').value = '';
+      document.getElementById('dueDate').value = '';
+      btn.textContent = 'ASSIGN TO SUB';
+      btn.disabled = true;
+      successMsg.style.display = 'none';
+    }, 2200);
+
+  } catch (error) {
+    alert('Error assigning training: ' + error.message);
+    btn.disabled = false;
+    btn.textContent = 'ASSIGN TO SUB';
+  }
+}
+
+init();
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>
