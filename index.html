@@ -259,6 +259,7 @@ function renderDomDashboard() {
 function renderSubDashboard() {
   const container = document.getElementById('dashboard');
   const domName = partnerDisplayName || "Sir";
+  window.currentUser = { uid: (window.currentUser && window.currentUser.uid) || 'sub' }; // for activity feed comparison
 
   container.innerHTML = `
     <header class="hdr">
@@ -544,70 +545,91 @@ async function loadTrainingProgress() {
   const container = document.getElementById('trainingProgress');
   if (!container) return;
 
-  const trainings = [
-    { id: 'deepthroat', name: 'Deepthroat', icon: '🍆' },
-    { id: 'heel', name: 'Heel Training', icon: '👠' },
-    { id: 'kegel', name: 'Kegel', icon: '💪' },
-    { id: 'positions', name: 'Positions', icon: '🧘' }
-  ];
-
   container.innerHTML = '';
 
-  for (const t of trainings) {
-    try {
-      const docRef = dataRef(`training/${t.id}`);
+  try {
+    // Only show trainings that actually exist (assigned by Dom)
+    const trainingIds = ['deepthroat', 'heel', 'kegel', 'positions', 'anal-plug', 'the-5'];
+    const trainingNames = {
+      'deepthroat': 'Deepthroat',
+      'heel': 'Heel Training',
+      'kegel': 'Kegel',
+      'positions': 'Positions',
+      'anal-plug': 'Anal Plug',
+      'the-5': 'The 5 Training'
+    };
+    const trainingIcons = {
+      'deepthroat': '🍆',
+      'heel': '👠',
+      'kegel': '💪',
+      'positions': '🧘',
+      'anal-plug': '🔌',
+      'the-5': '⭐'
+    };
+
+    let hasAny = false;
+
+    for (const id of trainingIds) {
+      const docRef = dataRef(`training/${id}`);
       const snap = await getDoc(docRef);
-      let level = 1, progress = 0;
-      let assignedData = {};
+
       if (snap.exists()) {
-        assignedData = snap.data();
-        level = assignedData.level || 1;
-        progress = assignedData.progress || 0;
-      }
+        hasAny = true;
+        const data = snap.data();
+        const level = data.level || 1;
+        const progress = data.progress || 0;
+        const isAssignedBySir = !!data.assignedBy;
 
-      const isAssignedBySir = !!assignedData.assignedBy;
-
-      const card = document.createElement('div');
-      card.className = 'progress-card';
-      card.innerHTML = `
-        <div class="progress-header">
-          <span class="progress-name">${t.icon} ${t.name}</span>
-          <span class="progress-level">Level ${level} • ${progress}%</span>
-        </div>
-        ${isAssignedBySir ? `
-          <div style="margin:8px 0 4px 0">
-            <span style="background:var(--crimson);color:white;font-size:9px;padding:1px 7px;border-radius:10px">ASSIGNED BY SIR</span>
-            ${assignedData.noteFromSir ? `<div style="font-size:10px;color:#e07585;margin-top:4px">“${assignedData.noteFromSir}”</div>` : ''}
+        const card = document.createElement('div');
+        card.className = 'progress-card';
+        card.innerHTML = `
+          <div class="progress-header">
+            <span class="progress-name">${trainingIcons[id]} ${trainingNames[id]}</span>
+            <span class="progress-level">Level ${level} • ${progress}%</span>
           </div>
-        ` : ''}
-        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
-      `;
-      container.appendChild(card);
-    } catch (e) {
-      console.log(`Training ${t.id} not found yet`);
+          ${isAssignedBySir ? `
+            <div style="margin:8px 0 4px 0">
+              <span style="background:var(--crimson);color:white;font-size:9px;padding:1px 7px;border-radius:10px">ASSIGNED BY SIR</span>
+              ${data.noteFromSir ? `<div style="font-size:10px;color:#e07585;margin-top:4px">“${data.noteFromSir}”</div>` : ''}
+            </div>
+          ` : ''}
+          <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+        `;
+        container.appendChild(card);
+      }
     }
+
+    if (!hasAny) {
+      container.innerHTML = `<div class="empty"><p>No trainings assigned yet.</p></div>`;
+    }
+  } catch (e) {
+    console.error('Error loading training progress:', e);
   }
 }
 
 function loadLiveActivityFeedForSub() {
   const feed = document.getElementById('activityFeed');
-  if (!feed) return;
+  if (!feed || !partnerUid) return;
 
-  const notesCol = dataCol('notes');
-  onSnapshot(query(notesCol, orderBy('timestamp', 'desc'), limit(5)), (snap) => {
+  const partnerNotesCol = partnerDataCol('notes', partnerUid);
+
+  // Only show notes from the Dom (not the sub's own notes)
+  onSnapshot(query(partnerNotesCol, orderBy('timestamp', 'desc'), limit(8)), (snap) => {
     feed.innerHTML = '';
+
     if (snap.empty) {
-      feed.innerHTML = `<div class="empty"><p>No recent devotions logged yet.</p></div>`;
+      feed.innerHTML = `<div class="empty"><p>No notes from Sir yet.</p></div>`;
       return;
     }
+
     snap.forEach(doc => {
       const n = doc.data();
       const el = document.createElement('div');
       el.className = 'arow';
       el.innerHTML = `
-        <div class="aico">✅</div>
+        <div class="aico">👑</div>
         <div style="flex:1">
-          <span class="aname">${n.content || n.text || 'Task completed'}</span>
+          <span class="aname">${n.content || n.text || 'Note from Sir'}</span>
           <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
         </div>
       `;
