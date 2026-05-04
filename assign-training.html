@@ -190,10 +190,14 @@ function renderTrainingList() {
 
 function updateAssignButton() {
   const btn = document.getElementById('assignBtn');
-  btn.disabled = selectedTrainings.size === 0;
-  btn.textContent = selectedTrainings.size > 0 
-    ? `ASSIGN \( {selectedTrainings.size} TRAINING \){selectedTrainings.size > 1 ? 'S' : ''}` 
-    : 'ASSIGN TO SUB';
+  const count = selectedTrainings.size;
+  btn.disabled = count === 0;
+  if (count > 0) {
+    const plural = count > 1 ? 'S' : '';
+    btn.textContent = `ASSIGN \( {count} TRAINING \){plural}`;
+  } else {
+    btn.textContent = 'ASSIGN TO SUB';
+  }
 }
 
 async function assignTrainings() {
