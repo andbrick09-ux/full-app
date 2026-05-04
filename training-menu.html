@@ -12,11 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
   <link rel="manifest" href="manifest.json"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <link rel="apple-touch-icon" href="icon-512.png"/>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="nav.css"/>
   <style>
-    /* Locked card styling */
     .menu-card.locked {
       opacity: 0.45;
       cursor: default;
@@ -49,37 +47,37 @@
 
   <div class="main">
     <div class="menu-grid">
-      <a href="the-5-training.html" class="menu-card" data-training="the-5-training.html">
+      <a href="the-5-training.html" class="menu-card" data-training="the-5">
         <span class="menu-card-icon">🖐️</span>
         <span class="menu-card-title">The "5" Training</span>
         <span class="menu-card-desc">Classical conditioning protocol to cum on Sir's command. 4-phase program with edging, trigger association, and maintenance.</span>
       </a>
 
-      <a href="anal-plug-training.html" class="menu-card" data-training="anal-plug-training.html">
+      <a href="anal-plug-training.html" class="menu-card" data-training="anal-plug">
         <span class="menu-card-icon">💎</span>
         <span class="menu-card-title">Anal Plug Training</span>
         <span class="menu-card-desc">Progressive size and duration training program with tracking and scheduled milestones.</span>
       </a>
 
-      <a href="deepthroat-training.html" class="menu-card" data-training="deepthroat-training.html">
+      <a href="deepthroat-training.html" class="menu-card" data-training="deepthroat">
         <span class="menu-card-icon">👄</span>
         <span class="menu-card-title">Deep Throat Training</span>
         <span class="menu-card-desc">Step-by-step depth and endurance conditioning with techniques and progress tracking.</span>
       </a>
 
-      <a href="kegel-training.html" class="menu-card" data-training="kegel-training.html">
+      <a href="kegel-training.html" class="menu-card" data-training="kegel">
         <span class="menu-card-icon">🔐</span>
         <span class="menu-card-title">Kegel Training</span>
         <span class="menu-card-desc">Pelvic floor strengthening routines with timed exercises and intensity progression.</span>
       </a>
 
-      <a href="position-training.html" class="menu-card" data-training="position-training.html">
+      <a href="position-training.html" class="menu-card" data-training="positions">
         <span class="menu-card-icon">🧎‍♀️</span>
         <span class="menu-card-title">Position Training</span>
         <span class="menu-card-desc">12 submissive positions with step-by-step form instructions, hold durations, and mastery tracking.</span>
       </a>
 
-      <a href="heel-training.html" class="menu-card" data-training="heel-training.html">
+      <a href="heel-training.html" class="menu-card" data-training="heel">
         <span class="menu-card-icon">👠</span>
         <span class="menu-card-title">Heel Training</span>
         <span class="menu-card-desc">Progressive heel height and endurance protocol with posture drills, session logging, and Sir's review.</span>
@@ -89,105 +87,46 @@
 
   <div id="toast" class="toast">Locked by Sir</div>
 
-  <!-- Service worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(e => console.error(e));
-      });
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      if (t) {
-        t.textContent = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-      }
-    }
-  </script>
-
-  <!-- Load active trainings from Firestore -->
   <script type="module">
-    import { requireAuth, getMyProfile, dataRef, partnerDataRef } from './auth.js';
+    import { requireAuth, dataRef } from './auth.js';
     import { getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-    const DEFAULT_ACTIVE = ['anal-plug-training.html', 'position-training.html', 'kegel-training.html'];
 
     async function applyTrainingLocks() {
       await requireAuth();
-      const profile = await getMyProfile();
-      const role = profile?.role;
 
-      let active = DEFAULT_ACTIVE;
-      try {
-        // Subs read the Dom's settings (the Dom sets which trainings are active).
-        // Doms read their own settings so they always see everything unlocked.
-        let settingsSnap;
-        if (role === 'sub') {
-          // partnerDataRef returns the Dom's data path
-          const ref = await partnerDataRef('settings');
-          settingsSnap = await getDoc(ref);
-        } else {
-          // Dom sees all cards unlocked — no locking needed
-          return;
-        }
+      const trainingIds = ['the-5', 'anal-plug', 'deepthroat', 'kegel', 'positions', 'heel'];
 
-        if (settingsSnap.exists()) {
-          const data = settingsSnap.data();
-          if (Array.isArray(data.activeTrainings) && data.activeTrainings.length > 0) {
-            active = data.activeTrainings;
-          }
-        }
-      } catch (e) {
-        console.warn('Could not load training settings, using defaults.', e);
-      }
+      for (const id of trainingIds) {
+        const card = document.querySelector(`.menu-card[data-training="${id}"]`);
+        if (!card) continue;
 
-      document.querySelectorAll('.menu-card[data-training]').forEach(card => {
-        const training = card.getAttribute('data-training');
-        if (!active.includes(training)) {
+        const docRef = dataRef(`training/${id}`);
+        const snap = await getDoc(docRef);
+
+        if (!snap.exists()) {
+          // Not assigned → lock it
           card.classList.add('locked');
           card.removeAttribute('href');
           const icon = card.querySelector('.menu-card-icon');
           if (icon) icon.textContent = '🔒';
+
           card.onclick = (e) => {
             e.preventDefault();
-            showToast('This training is currently locked by Sir');
+            const t = document.getElementById('toast');
+            if (t) {
+              t.textContent = 'Locked by Sir';
+              t.classList.add('show');
+              setTimeout(() => t.classList.remove('show'), 2500);
+            }
           };
         }
-      });
+        // If it exists → fully unlocked (do nothing)
+      }
     }
 
     applyTrainingLocks();
   </script>
 
-  <!-- Sidebar -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-  <div class="global-sidebar" id="globalSidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-brand">Dom Sub Hub</div>
-    </div>
-    <div class="sidebar-nav">
-      <a href="index.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">home</span> Home</a>
-      <a href="scene-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">theater_comedy</span> Scene Menu</a>
-      <a href="training-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fitness_center</span> Training Programs</a>
-      <a href="assessment-menu.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">assignment</span> Assessments & Ratings</a>
-      <a href="public-game.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">casino</span> Sir's Public Tasks</a>
-      <a href="bdsm-checklist.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">fact_check</span> BDSM Checklists</a>
-      <a href="help.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon">help</span> Help & Info</a>
-      <a href="settings.html" class="sidebar-link"><span class="material-symbols-rounded sidebar-icon" style="color:var(--gold);">settings</span> Settings</a>
-    </div>
-  </div>
-  <script>
-    function openSidebar() {
-      document.getElementById('sidebarOverlay').classList.add('open');
-      document.getElementById('globalSidebar').classList.add('open');
-    }
-    function closeSidebar() {
-      document.getElementById('sidebarOverlay').classList.remove('open');
-      document.getElementById('globalSidebar').classList.remove('open');
-    }
-  </script>
   <script src="nav.js"></script>
 </body>
 </html>
