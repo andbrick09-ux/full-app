@@ -200,8 +200,11 @@
       }
     }
 
-    // Assign training (Dom only)
+    // Assign training (Dom only) - with due date and note
     window.assignTraining = async function(trainingId, btn) {
+      const dueDate = prompt("Optional due date (YYYY-MM-DD) or leave blank:");
+      const note = prompt("Optional note to your sub (or leave blank):");
+
       btn.disabled = true;
       btn.textContent = 'Assigning...';
 
@@ -211,13 +214,19 @@
           progress: 0,
           assignedBy: (await requireAuth()).uid,
           assignedAt: serverTimestamp(),
+          dueDate: dueDate || null,
+          noteFromSir: note || null,
           status: 'assigned'
         }, { merge: true });
 
         btn.textContent = 'Unassign';
         btn.onclick = () => unassignTraining(trainingId, btn);
         showToast('Training assigned successfully');
+        
+        // Refresh the menu
+        setTimeout(() => renderTrainingMenu(), 800);
       } catch (e) {
+        console.error(e);
         showToast('Failed to assign training');
         btn.textContent = 'Assign to Sub';
         btn.disabled = false;
@@ -237,7 +246,11 @@
         btn.textContent = 'Assign to Sub';
         btn.onclick = () => assignTraining(trainingId, btn);
         showToast('Training unassigned');
+        
+        // Refresh the menu
+        setTimeout(() => renderTrainingMenu(), 800);
       } catch (e) {
+        console.error(e);
         showToast('Failed to unassign');
         btn.textContent = 'Unassign';
         btn.disabled = false;
