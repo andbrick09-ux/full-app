@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#080c14" />
+  <title>Dom Sub Hub — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --gold:#c9a84c;--gold-l:#e2c47a;--gold-dim:rgba(201,168,76,0.10);
+      --gold-b:rgba(201,168,76,0.20);--gold-glow:rgba(201,168,76,0.40);
+      --bg:#080c14;--surface:#0e1420;--text:#f0e6d2;--muted:#68707f;
+      --red:#e05268;--green:#4fc38a;--amber:#f0b94c;
+    }
+    body{
+      min-height:100dvh;background:var(--bg);color:var(--text);
+      font-family:'Raleway',sans-serif;padding:20px 20px 80px;
+    }
+    .orb{position:fixed;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 68%);top:-160px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;animation:floatA 9s ease-in-out infinite}
+    .orb2{position:fixed;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(139,34,48,0.05) 0%,transparent 70%);bottom:80px;right:-60px;pointer-events:none;z-index:0;animation:floatB 11s ease-in-out infinite}
+    @keyframes floatA{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(22px)}}
+    @keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+    .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;z-index:2}
+    .brand{font-family:'Great Vibes',cursive;font-size:32px;color:var(--gold-l)}
+    .admin-badge{background:var(--gold-dim);border:1px solid var(--gold-b);padding:4px 14px;border-radius:20px;font-size:11px;letter-spacing:1px;color:var(--gold-l)}
+
+    .card{background:var(--surface);border:1px solid var(--gold-b);border-radius:24px;padding:28px;margin-bottom:24px;position:relative;z-index:1}
+    .section-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold-l);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:14px 12px;text-align:left;border-bottom:1px solid var(--gold-b)}
+    th{color:var(--muted);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+    tr:hover{background:rgba(201,168,76,0.04)}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:9999px;font-size:11px;font-weight:600}
+    .badge.active{background:rgba(79,195,138,0.15);color:#4fc38a;border:1px solid #4fc38a}
+    .badge.pending{background:rgba(240,185,76,0.15);color:#f0b94c;border:1px solid #f0b94c}
+    .badge.inactive{background:rgba(224,82,104,0.15);color:#e05268;border:1px solid #e05268}
+
+    .search{width:100%;max-width:320px;padding:12px 16px;background:var(--bg);border:1px solid var(--gold-b);border-radius:12px;color:var(--text);margin-bottom:16px}
+    .empty{text-align:center;color:var(--muted);padding:40px 20px;font-style:italic}
+
+    .stats{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+    .stat-card{background:var(--bg);border:1px solid var(--gold-b);border-radius:16px;padding:16px 20px;min-width:140px}
+    .stat-number{font-size:28px;font-weight:700;color:var(--gold-l)}
+    .stat-label{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+    .btn{padding:10px 20px;border-radius:12px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+    .btn-primary{background:linear-gradient(135deg,#c9a84c,#e2c47a);color:#06090f;border:none;font-weight:600}
+    .btn-secondary{background:none;border:1px solid var(--gold-b);color:var(--gold)}
+    .btn:hover{transform:translateY(-1px)}
+  </style>
+</head>
+<body data-nav="more">
+
+  <div class="orb"></div>
+  <div class="orb2"></div>
+
+  <div class="header">
+    <div>
+      <span class="brand">Dom Sub Hub</span>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <div>
+      <span id="current-user" style="color:var(--muted);font-size:13px"></span>
+      <a href="index.html" style="color:var(--gold);text-decoration:none;margin-left:16px">← Back</a>
+    </div>
+  </div>
+
+  <div id="admin-content">
+    <!-- Populated by JS -->
+  </div>
+
+  <script type="module">
+    import { requireAuth, getMyProfile, getUserProfile } from './auth.js';
+    import { db } from './firebase-config.js';
+    import { 
+      collection, query, getDocs, orderBy 
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    let allRelationships = [];
+    let allUsers = [];
+
+    async function init() {
+      await requireAuth();
+      
+      const profile = await getMyProfile();
+      const userEl = document.getElementById('current-user');
+      userEl.innerHTML = `\( {profile.displayName} <span style="color:#e05268">( \){profile.role})</span>`;
+
+      if (profile.role !== 'admin') {
+        document.getElementById('admin-content').innerHTML = `
+          <div class="card" style="text-align:center">
+            <h2 style="color:#e05268;margin-bottom:12px">Access Denied</h2>
+            <p style="color:var(--muted)">This page requires the <strong>admin</strong> role.</p>
+            <p style="margin-top:20px;font-size:13px">Set your role to "admin" in Firestore → users/{uid} → role</p>
+          </div>
+        `;
+        return;
+      }
+
+      document.getElementById('admin-content').innerHTML = `
+        <div class="stats">
+          <div class="stat-card"><div class="stat-number" id="total-pairs">0</div><div class="stat-label">PAIRED RELATIONSHIPS</div></div>
+          <div class="stat-card"><div class="stat-number" id="active-pairs">0</div><div class="stat-label">ACTIVE</div></div>
+          <div class="stat-card"><div class="stat-number" id="pending-pairs">0</div><div class="stat-label">PENDING</div></div>
+          <div class="stat-card"><div class="stat-number" id="total-users">0</div><div class="stat-label">TOTAL USERS</div></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">🔗 Paired Accounts</div>
+          <input type="text" id="search-pairs" class="search" placeholder="Search by name or email...">
+          <div id="pairs-table-container"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">👥 All Users</div>
+          <input type="text" id="search-users" class="search" placeholder="Search users...">
+          <div id="users-table-container"></div>
+        </div>
+
+        <div style="text-align:center;margin-top:20px">
+          <button onclick="refreshData()" class="btn btn-secondary">⟳ Refresh Data</button>
+        </div>
+      `;
+
+      // Attach search listeners
+      document.getElementById('search-pairs').addEventListener('input', filterPairs);
+      document.getElementById('search-users').addEventListener('input', filterUsers);
+
+      await loadAllData();
+    }
+
+    async function loadAllData() {
+      const container = document.getElementById('admin-content');
+      if (!container) return;
+
+      // Load relationships
+      const relSnap = await getDocs(query(collection(db, 'relationships'), orderBy('createdAt', 'desc')));
+      allRelationships = [];
+
+      for (const docSnap of relSnap.docs) {
+        const data = docSnap.data();
+        const domProfile = await getUserProfile(data.domId);
+        const subProfile = await getUserProfile(data.subId);
+
+        allRelationships.push({
+          id: docSnap.id,
+          ...data,
+          domName: domProfile?.displayName || 'Unknown',
+          domEmail: domProfile?.email || '',
+          subName: subProfile?.displayName || 'Unknown',
+          subEmail: subProfile?.email || '',
+        });
+      }
+
+      // Load all users
+      const userSnap = await getDocs(collection(db, 'users'));
+      allUsers = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      renderRelationships(allRelationships);
+      renderUsers(allUsers);
+      updateStats();
+    }
+
+    function updateStats() {
+      const active = allRelationships.filter(r => r.status === 'active').length;
+      const pending = allRelationships.filter(r => r.status === 'pending').length;
+
+      document.getElementById('total-pairs').textContent = allRelationships.length;
+      document.getElementById('active-pairs').textContent = active;
+      document.getElementById('pending-pairs').textContent = pending;
+      document.getElementById('total-users').textContent = allUsers.length;
+    }
+
+    function renderRelationships(relationships) {
+      const container = document.getElementById('pairs-table-container');
+      if (!container) return;
+
+      if (relationships.length === 0) {
+        container.innerHTML = `<div class="empty">No relationships found yet.</div>`;
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>DOM</th>
+              <th>SUB</th>
+              <th>STATUS</th>
+              <th>CREATED</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      relationships.forEach(rel => {
+        const created = rel.createdAt?.toDate ? rel.createdAt.toDate().toLocaleDateString() : '—';
+        const statusClass = rel.status === 'active' ? 'active' : rel.status === 'pending' ? 'pending' : 'inactive';
+
+        html += `
+          <tr>
+            <td>
+              <strong>${rel.domName}</strong><br>
+              <span style="font-size:12px;color:var(--muted)">${rel.domEmail}</span>
+            </td>
+            <td>
+              <strong>${rel.subName}</strong><br>
+              <span style="font-size:12px;color:var(--muted)">${rel.subEmail}</span>
+            </td>
+            <td><span class="badge \( {statusClass}"> \){rel.status.toUpperCase()}</span></td>
+            <td style="color:var(--muted);font-size:13px">${created}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    function renderUsers(users) {
+      const container = document.getElementById('users-table-container');
+      if (!container) return;
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>NAME</th>
+              <th>ROLE</th>
+              <th>PAIRED WITH</th>
+              <th>EMAIL</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      users.forEach(user => {
+        const roleColor = user.role === 'dom' ? '#c9a84c' : user.role === 'sub' ? '#e05268' : '#68707f';
+        const paired = user.relationshipId ? 'Yes' : 'No';
+
+        html += `
+          <tr>
+            <td><strong>${user.displayName || 'Unnamed'}</strong></td>
+            <td><span style="color:\( {roleColor};font-weight:600"> \){user.role?.toUpperCase() || '—'}</span></td>
+            <td>${paired}</td>
+            <td style="color:var(--muted);font-size:13px">${user.email || '—'}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    function filterPairs() {
+      const term = document.getElementById('search-pairs').value.toLowerCase();
+      const filtered = allRelationships.filter(r => 
+        r.domName.toLowerCase().includes(term) || 
+        r.subName.toLowerCase().includes(term) ||
+        r.domEmail.toLowerCase().includes(term) ||
+        r.subEmail.toLowerCase().includes(term)
+      );
+      renderRelationships(filtered);
+    }
+
+    function filterUsers() {
+      const term = document.getElementById('search-users').value.toLowerCase();
+      const filtered = allUsers.filter(u => 
+        (u.displayName || '').toLowerCase().includes(term) ||
+        (u.email || '').toLowerCase().includes(term) ||
+        (u.role || '').toLowerCase().includes(term)
+      );
+      renderUsers(filtered);
+    }
+
+    window.refreshData = async function() {
+      const container = document.getElementById('admin-content');
+      if (container) container.style.opacity = '0.6';
+      await loadAllData();
+      if (container) container.style.opacity = '1';
+    };
+
+    // Boot everything
+    init();
+  </script>
+
+  <!-- Optional: include your nav for consistency -->
+  <script src="nav.js"></script>
+</body>
+</html>
