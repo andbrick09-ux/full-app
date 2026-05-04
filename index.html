@@ -276,7 +276,7 @@ function renderSubDashboard() {
     <div class="sec-lbl">MY SERVICE</div>
     <div class="quick-grid" style="grid-template-columns: repeat(2, 1fr);">
       <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Start Training</span></a>
-      <a href="bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">BDSM Checklist</span></a>
+      <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">BDSM Checklist</span></a>
       <a href="scene-menu.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Map a Scene</span></a>
       <a href="notes.html" class="qbtn"><span class="qi">📝</span><span class="ql">Notes</span></a>
     </div>
@@ -390,8 +390,18 @@ function loadLiveStatsForDom() {
       const el = document.getElementById('pendingVal');
       if (el) el.textContent = snap.size || '—';
     });
+
+    // Tasks Due Today for the Sub (Dom view)
+    const todayStr = new Date().toISOString().slice(0,10);
+    const tasksQuery = query(partnerDataCol('tasks', partnerUid), where('dueDate', '==', todayStr), where('completed', '==', false));
+    onSnapshot(tasksQuery, (snap) => {
+      const el = document.getElementById('tasksVal');
+      if (el) el.textContent = snap.size || '0';
+    });
   } else {
     document.getElementById('pendingVal').textContent = '—';
+    const tasksEl = document.getElementById('tasksVal');
+    if (tasksEl) tasksEl.textContent = '—';
   }
 
   // Live Sub Status
