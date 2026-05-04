@@ -113,7 +113,6 @@
   <script type="module">
     import { requireAuth, dataRef } from './auth.js';
     import { setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-    import { logTrainingCompletion } from './training-log.js';
 
     let currentLevel = 1;
     let currentProgress = 0;
@@ -142,21 +141,15 @@
     async function completeLevel() {
       currentProgress = 100;
 
-      // Save to Firestore
       await setDoc(dataRef('training/the-5'), {
         level: currentLevel,
         progress: currentProgress,
         lastUpdated: serverTimestamp()
       }, { merge: true });
 
-      // Log the completion
-      await logTrainingCompletion('the-5', currentLevel);
-
-      // Move to next level
       currentLevel++;
       currentProgress = 0;
 
-      // Save new level
       await setDoc(dataRef('training/the-5'), {
         level: currentLevel,
         progress: currentProgress,
@@ -178,7 +171,6 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    // Initialize
     loadTrainingData();
   </script>
 
