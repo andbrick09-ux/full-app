@@ -112,8 +112,7 @@ textarea{min-height:80px;resize:vertical}
 
 <script type="module">
 import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, partnerDataRef } from './auth.js';
-import { setDoc, serverTimestamp, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { db } from './firebase-config.js';
+import { setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const trainings = [
   { id: 'deepthroat', name: 'Deepthroat', desc: 'Oral training & control' },
@@ -130,7 +129,7 @@ let subDisplayName = 'your sub';
 
 async function init() {
   await requireAuth();
-  const profile = await getMyProfile();
+  await getMyProfile();
   partnerUid = await getPartnerUid();
 
   if (partnerUid) {
@@ -170,7 +169,6 @@ function renderTrainingList() {
       updateAssignButton();
     };
 
-    // Click anywhere on the row to toggle
     div.onclick = (e) => {
       if (e.target.tagName !== 'INPUT') {
         checkbox.checked = !checkbox.checked;
@@ -183,7 +181,6 @@ function renderTrainingList() {
 
   updateAssignButton();
 
-  // Attach click handler (more reliable than inline onclick in modules)
   const assignBtn = document.getElementById('assignBtn');
   if (assignBtn) {
     assignBtn.addEventListener('click', assignTrainings);
@@ -193,25 +190,20 @@ function renderTrainingList() {
 function updateAssignButton() {
   const btn = document.getElementById('assignBtn');
   btn.disabled = selectedTrainings.size === 0;
-  btn.textContent = selectedTrainings.size > 0 
-    ? `ASSIGN ${selectedTrainings.size} TRAINING${selectedTrainings.size > 1 ? 'S' : ''}` 
+  btn.textContent = selectedTrainings.size > 0
+    ? `ASSIGN ${selectedTrainings.size} TRAINING${selectedTrainings.size > 1 ? 'S' : ''}`
     : 'ASSIGN TO SUB';
 }
 
 async function assignTrainings() {
-  console.log('assignTrainings called');
   const btn = document.getElementById('assignBtn');
   const successMsg = document.getElementById('successMsg');
 
   if (!partnerUid) {
-    console.log('No partnerUid found');
     alert("No partner paired. Please pair with a sub first.");
-    btn.disabled = false;
-    btn.textContent = 'ASSIGN TO SUB';
     return;
   }
 
-  console.log('Starting assignment for:', Array.from(selectedTrainings));
   btn.disabled = true;
   btn.textContent = 'ASSIGNING...';
 
@@ -221,8 +213,9 @@ async function assignTrainings() {
 
   try {
     for (const trainingId of selectedTrainings) {
-      // Manually create reference to sub's training document
-      const ref = doc(db, 'users', partnerUid, 'training', trainingId);
+      // Use partnerDataRef from auth.js — avoids passing db directly,
+      // which was causing "Expected DocumentReference, got Promise" error
+      const ref = partnerDataRef(`training/${trainingId}`);
       await setDoc(ref, {
         level: 1,
         progress: 0,
@@ -237,7 +230,6 @@ async function assignTrainings() {
     successMsg.style.display = 'block';
     successMsg.innerHTML = `✅ Successfully assigned ${selectedTrainings.size} training(s) to ${subDisplayName}`;
 
-    // Redirect back to dashboard after short delay
     setTimeout(() => {
       window.location.href = 'index-enhanced.html';
     }, 1800);
@@ -246,7 +238,7 @@ async function assignTrainings() {
     console.error('Assignment error:', error);
     alert('Error assigning training: ' + error.message);
     btn.disabled = false;
-    btn.textContent = 'ASSIGN TO SUB';
+    btn.textContent = `ASSIGN ${selectedTrainings.size} TRAINING${selectedTrainings.size > 1 ? 'S' : ''}`;
   }
 }
 
