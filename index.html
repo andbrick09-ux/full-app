@@ -202,7 +202,7 @@ function renderDomDashboard() {
 
     <div class="sec-lbl">COMMAND CENTER</div>
     <div class="quick-grid">
-      <a href="protocol-daily.html" class="qbtn"><span class="qi">📜</span><span class="ql">New Directive</span></a>
+      <a href="scene-builder.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
       <a href="scene-builder.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
       <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Review Progress</span></a>
       <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Training Oversight</span></a>
@@ -228,9 +228,6 @@ function renderDomDashboard() {
 
     <div class="sec-lbl">PROTOCOL COMMAND CENTER</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <div onclick="window.location='protocol-daily.html'" class="qbtn" style="flex:1;min-width:110px;padding:12px 10px">
-        <span style="font-size:13px">📅</span><br><span style="font-size:9px">Daily Devotion</span>
-      </div>
       <div onclick="window.location='protocol-maintenance.html'" class="qbtn" style="flex:1;min-width:110px;padding:12px 10px">
         <span style="font-size:13px">🔧</span><br><span style="font-size:9px">Maintenance</span>
       </div>
@@ -278,23 +275,11 @@ function renderSubDashboard() {
 
     <div class="sec-lbl">MY SERVICE</div>
     <div class="quick-grid">
-      <a href="protocol-daily.html" class="qbtn"><span class="qi">📜</span><span class="ql">Today's Protocol</span></a>
       <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Start Training</span></a>
       <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Complete Checklist</span></a>
       <a href="notes.html" class="qbtn"><span class="qi">✍️</span><span class="ql">Report to Sir</span></a>
       <a href="scene-menu.html" class="qbtn"><span class="qi">🎭</span><span class="ql">My Scenes</span></a>
       <a href="notes.html" class="qbtn"><span class="qi">📝</span><span class="ql">Journal &amp; Notes</span></a>
-    </div>
-
-    <div class="sec-lbl">TODAY'S SERVICE</div>
-    <div class="card" style="padding:18px 16px">
-      <div style="margin-bottom:12px" id="todayServiceList">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:13px;font-weight:600">Daily Devotion</span>
-          <span style="font-size:10px;color:#4ade80">100% COMPLETE</span>
-        </div>
-      </div>
-      <button onclick="markServiceComplete()" style="width:100%;padding:11px 0;border-radius:999px;background:var(--gold);color:#080c14;border:none;font-size:11px;letter-spacing:1.5px;font-weight:700">MARK COMPLETE &amp; REPORT TO SIR</button>
     </div>
 
     <div class="sec-lbl">TRAINING PROGRESS HUB <span style="font-size:8px;color:var(--muted)">(live)</span></div>
