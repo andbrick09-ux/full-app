@@ -391,8 +391,12 @@ function loadLiveStatsForDom() {
       if (el) el.textContent = snap.size || '—';
     });
 
-    // Tasks Due Today for the Sub (Dom view)
-    const todayStr = new Date().toISOString().slice(0,10);
+    // Tasks Due Today for the Sub (Dom view) - using LOCAL date
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' + 
+                     String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(today.getDate()).padStart(2, '0');
+
     const tasksQuery = query(partnerDataCol('tasks', partnerUid), where('dueDate', '==', todayStr), where('completed', '==', false));
     onSnapshot(tasksQuery, (snap) => {
       const el = document.getElementById('tasksVal');
@@ -529,8 +533,13 @@ async function loadLiveStatsForSub() {
     document.getElementById('compVal').textContent = comp + '%';
   });
 
-  // Tasks due today (from tasks collection)
-  const tasksQuery = query(dataCol('tasks'), where('dueDate', '==', new Date().toISOString().slice(0,10)), where('completed', '==', false));
+  // Tasks due today (from tasks collection) - using LOCAL date
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+
+  const tasksQuery = query(dataCol('tasks'), where('dueDate', '==', todayStr), where('completed', '==', false));
   onSnapshot(tasksQuery, (snap) => {
     const el = document.getElementById('tasksVal');
     if (el) el.textContent = snap.size || '0';
