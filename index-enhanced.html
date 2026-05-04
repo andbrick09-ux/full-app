@@ -198,7 +198,6 @@ function renderDomDashboard() {
     <div class="stat-grid" id="statsGrid">
       <div class="card"><span class="card-val" id="streakVal">—</span><span class="card-lbl">Sub's Day Streak</span></div>
       <div class="card accent"><span class="card-val" id="compVal">—</span><span class="card-lbl">Compliance</span></div>
-      <div class="card"><span class="card-val" id="protocolsVal">—</span><span class="card-lbl">Active Protocols</span></div>
       <div class="card accent"><span class="card-val" id="pendingVal">—</span><span class="card-lbl">Pending Reports</span></div>
       <div class="card"><span class="card-val" id="scenesVal">—</span><span class="card-lbl">Scenes Created</span></div>
       <div class="card"><span class="card-val">5</span><span class="card-lbl">Training Programs</span></div>
@@ -272,10 +271,7 @@ function renderSubDashboard() {
     <div class="stat-grid" id="statsGrid">
       <div class="card"><span class="card-val" id="streakVal">—</span><span class="card-lbl">My Day Streak</span></div>
       <div class="card accent"><span class="card-val" id="compVal">—</span><span class="card-lbl">My Compliance</span></div>
-      <div class="card"><span class="card-val" id="deepthroatVal">—</span><span class="card-lbl">Deepthroat</span></div>
-      <div class="card"><span class="card-val" id="heelVal">—</span><span class="card-lbl">Heel Mastery</span></div>
       <div class="card accent"><span class="card-val" id="tasksVal">—</span><span class="card-lbl">Tasks Due Today</span></div>
-      <div class="card"><span class="card-val" id="scenesVal">—</span><span class="card-lbl">Scenes Completed</span></div>
     </div>
 
     <div class="sec-lbl">MY SERVICE</div>
@@ -394,21 +390,11 @@ function loadLiveStatsForDom() {
     document.getElementById('compVal').textContent = comp + '%';
   });
 
-  // Scenes count
+  // Scenes count (Dom view)
   const scenesQuery = query(dataCol('scenes'));
   onSnapshot(scenesQuery, (snap) => {
-    document.getElementById('scenesVal').textContent = snap.size;
-  });
-
-  // Active Protocols (count from multiple collections)
-  let protocolCount = 0;
-  const protocolCols = ['protocol-daily', 'protocol-maintenance', 'protocol-scene'];
-  protocolCols.forEach(col => {
-    onSnapshot(query(dataCol(col)), (snap) => {
-      protocolCount += snap.size;
-      const el = document.getElementById('protocolsVal');
-      if (el) el.textContent = protocolCount || '—';
-    });
+    const el = document.getElementById('scenesVal');
+    if (el) el.textContent = snap.size;
   });
 
   // Pending Reports (sub's unchecked notes/tasks)
@@ -490,13 +476,6 @@ async function loadLiveStatsForSub() {
     for(let i=0;i<elapsed;i++){ const d=new Date(mon);d.setDate(mon.getDate()+i); if(saved.includes(d.toISOString().slice(0,10))) done++; }
     const comp = elapsed>0 ? Math.round((done/elapsed)*100) : 0;
     document.getElementById('compVal').textContent = comp + '%';
-  });
-
-  // Scenes count
-  const scenesQuery = query(dataCol('scenes'));
-  onSnapshot(scenesQuery, (snap) => {
-    const el = document.getElementById('scenesVal');
-    if (el) el.textContent = snap.size;
   });
 
   // Tasks due today (from tasks collection)
