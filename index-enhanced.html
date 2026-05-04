@@ -247,12 +247,16 @@ function renderDomDashboard() {
 
     <div class="sec-lbl">SCENE FORGE</div>
     <div class="scenes-list" id="scenesList"></div>
+
+    <div class="sec-lbl">SUB’S TRAINING PROGRESS</div>
+    <div id="subTrainingProgress"></div>
   `;
 
   // Load real data
   loadLiveStatsForDom();
   loadLiveActivityFeedForDom();
   initRealScenes(true);
+  loadSubTrainingProgress();
 }
 
 function renderSubDashboard() {
@@ -438,6 +442,58 @@ function loadLiveActivityFeedForDom() {
       feed.appendChild(el);
     });
   });
+}
+
+async function loadSubTrainingProgress() {
+  const container = document.getElementById('subTrainingProgress');
+  if (!container || !partnerUid) {
+    if (container) container.innerHTML = `<div class="empty"><p>No partner paired yet.</p></div>`;
+    return;
+  }
+
+  const trainings = [
+    { id: 'deepthroat', name: 'Deepthroat', icon: '🍆' },
+    { id: 'heel', name: 'Heel Training', icon: '👠' },
+    { id: 'kegel', name: 'Kegel', icon: '💪' },
+    { id: 'positions', name: 'Positions', icon: '🧘' }
+  ];
+
+  container.innerHTML = '';
+
+  for (const t of trainings) {
+    try {
+      const docRef = partnerDataRef(`training/${t.id}`);
+      const snap = await getDoc(docRef);
+      let level = 1, progress = 0;
+      let assignedData = {};
+      if (snap.exists()) {
+        assignedData = snap.data();
+        level = assignedData.level || 1;
+        progress = assignedData.progress || 0;
+      }
+
+      const isAssignedBySir = !!assignedData.assignedBy;
+
+      const card = document.createElement('div');
+      card.className = 'progress-card';
+      card.innerHTML = `
+        <div class="progress-header">
+          <span class="progress-name">${t.icon} ${t.name}</span>
+          <span class="progress-level">Level ${level} • ${progress}%</span>
+        </div>
+        ${isAssignedBySir ? `
+          <div style="margin:8px 0 4px 0">
+            <span style="background:var(--crimson);color:white;font-size:9px;padding:1px 7px;border-radius:10px">ASSIGNED BY YOU</span>
+            ${assignedData.noteFromSir ? `<div style="font-size:10px;color:#e07585;margin-top:4px">“${assignedData.noteFromSir}”</div>` : ''}
+          </div>
+        ` : ''}
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+      `;
+      container.appendChild(card);
+    } catch (e) {
+      console.log(`Training ${t.id} not found for sub`);
+    }
+  }
 }
 
 async function loadLiveStatsForSub() {
