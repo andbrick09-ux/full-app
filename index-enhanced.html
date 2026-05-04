@@ -145,15 +145,27 @@ body[data-role="sub"] .role-badge{background:var(--gold);color:#080c14}
 
 <script type="module">
 import { requireAuth, getMyRole, getMyProfile, dataRef, dataCol, partnerDataRef, partnerDataCol } from './auth.js';
-import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 let currentRole = null;
 let currentProfile = null;
+let partnerUid = null;
 
 async function init() {
   const user = await requireAuth();
   currentRole = await getMyRole();
   currentProfile = await getMyProfile();
+
+  // Get partner UID if paired
+  if (currentProfile?.relationshipId) {
+    try {
+      const relDoc = await getDoc(doc(collection('relationships'), currentProfile.relationshipId));
+      if (relDoc.exists()) {
+        const rel = relDoc.data();
+        partnerUid = currentRole === 'dom' ? rel.subId : rel.domId;
+      }
+    } catch (e) { console.log('No partner relationship found'); }
+  }
 
   document.body.dataset.role = currentRole;
 
@@ -164,22 +176,15 @@ async function init() {
     renderSubDashboard();
   }
 
-  // Always init week tracker (shared)
-  initWeekTracker();
-
-  // Inject nav
-  const navScript = document.createElement('script');
-  navScript.src = 'nav.js';
-  document.body.appendChild(navScript);
+  // Always init live week tracker
+  initLiveWeekTracker();
 }
 
 function renderDomDashboard() {
   const container = document.getElementById('dashboard');
-  const subName = currentProfile?.partnerName || "your sub";
-  const displayName = currentProfile?.displayName || "Sir";
+  const subName = currentProfile?.partnerName || currentProfile?.displayName || "your sub";
 
   container.innerHTML = `
-    <!-- Header -->
     <header class="hdr">
       <span class="app-name">DOM SUB HUB v1</span>
       <div class="hdr-role">
@@ -189,70 +194,33 @@ function renderDomDashboard() {
       <div style="margin-top:6px;font-size:12px;color:var(--muted)">Overseeing <span style="color:var(--gold-l);font-weight:600">${subName}</span></div>
     </header>
 
-    <!-- Stats -->
-    <div class="stat-grid">
-      <div class="card">
-        <span class="card-val" id="streakVal">47</span>
-        <span class="card-lbl">Sub's Day Streak</span>
-      </div>
-      <div class="card accent">
-        <span class="card-val" id="compVal">94%</span>
-        <span class="card-lbl">Compliance</span>
-      </div>
-      <div class="card">
-        <span class="card-val">8</span>
-        <span class="card-lbl">Active Protocols</span>
-      </div>
-      <div class="card accent">
-        <span class="card-val">3</span>
-        <span class="card-lbl">Pending Reports</span>
-      </div>
-      <div class="card">
-        <span class="card-val">12</span>
-        <span class="card-lbl">Scenes Created</span>
-      </div>
-      <div class="card">
-        <span class="card-val">5</span>
-        <span class="card-lbl">Training Programs</span>
-      </div>
+    <div class="stat-grid" id="statsGrid">
+      <div class="card"><span class="card-val" id="streakVal">—</span><span class="card-lbl">Sub's Day Streak</span></div>
+      <div class="card accent"><span class="card-val" id="compVal">—</span><span class="card-lbl">Compliance</span></div>
+      <div class="card"><span class="card-val" id="protocolsVal">—</span><span class="card-lbl">Active Protocols</span></div>
+      <div class="card accent"><span class="card-val" id="pendingVal">—</span><span class="card-lbl">Pending Reports</span></div>
+      <div class="card"><span class="card-val" id="scenesVal">—</span><span class="card-lbl">Scenes Created</span></div>
+      <div class="card"><span class="card-val">5</span><span class="card-lbl">Training Programs</span></div>
     </div>
 
-    <!-- Quick Access - Command Center -->
     <div class="sec-lbl">COMMAND CENTER</div>
     <div class="quick-grid">
-      <a href="protocol-daily.html" class="qbtn">
-        <span class="qi">📜</span><span class="ql">New Directive</span>
-      </a>
-      <a href="scene-builder.html" class="qbtn">
-        <span class="qi">🎭</span><span class="ql">Build Scene</span>
-      </a>
-      <a href="sub-bdsm-checklist.html" class="qbtn">
-        <span class="qi">📋</span><span class="ql">Review Progress</span>
-      </a>
-      <a href="training-menu.html" class="qbtn">
-        <span class="qi">🏆</span><span class="ql">Training Oversight</span>
-      </a>
-      <a href="public-play-menu.html" class="qbtn">
-        <span class="qi">🌹</span><span class="ql">Public Play</span>
-      </a>
-      <a href="toy-vault.html" class="qbtn">
-        <span class="qi">🧸</span><span class="ql">Vaults &amp; Assets</span>
-      </a>
+      <a href="protocol-daily.html" class="qbtn"><span class="qi">📜</span><span class="ql">New Directive</span></a>
+      <a href="scene-builder.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
+      <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Review Progress</span></a>
+      <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Training Oversight</span></a>
+      <a href="public-play-menu.html" class="qbtn"><span class="qi">🌹</span><span class="ql">Public Play</span></a>
+      <a href="toy-vault.html" class="qbtn"><span class="qi">🧸</span><span class="ql">Vaults &amp; Assets</span></a>
     </div>
 
-    <!-- Sub's Live Status -->
     <div class="sec-lbl">SUB’S LIVE STATUS</div>
-    <div class="card" style="padding:18px 16px">
+    <div class="card" style="padding:18px 16px" id="liveStatusCard">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
         <div style="width:42px;height:42px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:20px">👑</div>
         <div style="flex:1">
           <div style="font-weight:600;color:var(--gold-l);font-size:15px">${subName}</div>
-          <div style="font-size:10px;color:var(--muted)">Day 47 streak • 100% on Daily Devotion</div>
+          <div style="font-size:10px;color:var(--muted)" id="liveStatusText">Loading live status...</div>
         </div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">
-        Last: <span style="color:var(--gold)">Deepthroat Level 4</span> (yesterday)<br>
-        Current mood: <span style="color:#e07585">Devoted &amp; Eager</span>
       </div>
       <div style="display:flex;gap:10px">
         <button onclick="issuePraise()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--gold-b);background:transparent;color:var(--gold);font-size:10px;letter-spacing:1px">ISSUE PRAISE</button>
@@ -260,49 +228,37 @@ function renderDomDashboard() {
       </div>
     </div>
 
-    <!-- Protocol Command Center -->
     <div class="sec-lbl">PROTOCOL COMMAND CENTER</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div onclick="window.location='protocol-daily.html'" class="qbtn" style="flex:1;min-width:110px;padding:12px 10px">
-        <span style="font-size:13px">📅</span><br>
-        <span style="font-size:9px">Daily Devotion</span>
+        <span style="font-size:13px">📅</span><br><span style="font-size:9px">Daily Devotion</span>
       </div>
       <div onclick="window.location='protocol-maintenance.html'" class="qbtn" style="flex:1;min-width:110px;padding:12px 10px">
-        <span style="font-size:13px">🔧</span><br>
-        <span style="font-size:9px">Maintenance</span>
+        <span style="font-size:13px">🔧</span><br><span style="font-size:9px">Maintenance</span>
       </div>
       <div onclick="window.location='protocol-scene.html'" class="qbtn" style="flex:1;min-width:110px;padding:12px 10px">
-        <span style="font-size:13px">🎬</span><br>
-        <span style="font-size:9px">Scene Protocol</span>
+        <span style="font-size:13px">🎬</span><br><span style="font-size:9px">Scene Protocol</span>
       </div>
     </div>
 
-    <!-- Recent Sub Activity -->
-    <div class="sec-lbl">RECENT SUB ACTIVITY</div>
-    <div class="activity-feed" id="activityFeed">
-      <!-- Populated by JS -->
-    </div>
+    <div class="sec-lbl">RECENT SUB ACTIVITY <span style="font-size:8px;color:var(--muted)">(live)</span></div>
+    <div class="activity-feed" id="activityFeed"></div>
 
-    <!-- Scene Forge -->
     <div class="sec-lbl">SCENE FORGE</div>
-    <div class="scenes-list" id="scenesList">
-      <!-- Populated by JS -->
-    </div>
+    <div class="scenes-list" id="scenesList"></div>
   `;
 
-  // Load dynamic content
-  loadDomActivityFeed();
-  initRecentScenes(true); // true = dom view
-  updateStatsForDom();
+  // Load real data
+  loadLiveStatsForDom();
+  loadLiveActivityFeedForDom();
+  initRealScenes(true);
 }
 
 function renderSubDashboard() {
   const container = document.getElementById('dashboard');
   const domName = currentProfile?.partnerName || "Sir";
-  const displayName = currentProfile?.displayName || "sub";
 
   container.innerHTML = `
-    <!-- Header -->
     <header class="hdr">
       <span class="app-name">DOM SUB HUB v1</span>
       <div class="hdr-role">
@@ -312,301 +268,361 @@ function renderSubDashboard() {
       <div style="margin-top:6px;font-size:12px;color:var(--muted)">Serving <span style="color:var(--gold-l);font-weight:600">${domName}</span></div>
     </header>
 
-    <!-- Stats -->
-    <div class="stat-grid">
-      <div class="card">
-        <span class="card-val" id="streakVal">47</span>
-        <span class="card-lbl">My Day Streak</span>
-      </div>
-      <div class="card accent">
-        <span class="card-val" id="compVal">94%</span>
-        <span class="card-lbl">My Compliance</span>
-      </div>
-      <div class="card">
-        <span class="card-val">4/5</span>
-        <span class="card-lbl">Deepthroat</span>
-      </div>
-      <div class="card">
-        <span class="card-val">5/5</span>
-        <span class="card-lbl">Heel Mastery</span>
-      </div>
-      <div class="card accent">
-        <span class="card-val">2</span>
-        <span class="card-lbl">Tasks Due Today</span>
-      </div>
-      <div class="card">
-        <span class="card-val">9</span>
-        <span class="card-lbl">Scenes Completed</span>
-      </div>
+    <div class="stat-grid" id="statsGrid">
+      <div class="card"><span class="card-val" id="streakVal">—</span><span class="card-lbl">My Day Streak</span></div>
+      <div class="card accent"><span class="card-val" id="compVal">—</span><span class="card-lbl">My Compliance</span></div>
+      <div class="card"><span class="card-val" id="deepthroatVal">—</span><span class="card-lbl">Deepthroat</span></div>
+      <div class="card"><span class="card-val" id="heelVal">—</span><span class="card-lbl">Heel Mastery</span></div>
+      <div class="card accent"><span class="card-val" id="tasksVal">—</span><span class="card-lbl">Tasks Due Today</span></div>
+      <div class="card"><span class="card-val" id="scenesVal">—</span><span class="card-lbl">Scenes Completed</span></div>
     </div>
 
-    <!-- Quick Access - My Service -->
     <div class="sec-lbl">MY SERVICE</div>
     <div class="quick-grid">
-      <a href="protocol-daily.html" class="qbtn">
-        <span class="qi">📜</span><span class="ql">Today's Protocol</span>
-      </a>
-      <a href="training-menu.html" class="qbtn">
-        <span class="qi">🏆</span><span class="ql">Start Training</span>
-      </a>
-      <a href="sub-bdsm-checklist.html" class="qbtn">
-        <span class="qi">📋</span><span class="ql">Complete Checklist</span>
-      </a>
-      <a href="notes.html" class="qbtn">
-        <span class="qi">✍️</span><span class="ql">Report to Sir</span>
-      </a>
-      <a href="scene-menu.html" class="qbtn">
-        <span class="qi">🎭</span><span class="ql">My Scenes</span>
-      </a>
-      <a href="notes.html" class="qbtn">
-        <span class="qi">📝</span><span class="ql">Journal &amp; Notes</span>
-      </a>
+      <a href="protocol-daily.html" class="qbtn"><span class="qi">📜</span><span class="ql">Today's Protocol</span></a>
+      <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Start Training</span></a>
+      <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Complete Checklist</span></a>
+      <a href="notes.html" class="qbtn"><span class="qi">✍️</span><span class="ql">Report to Sir</span></a>
+      <a href="scene-menu.html" class="qbtn"><span class="qi">🎭</span><span class="ql">My Scenes</span></a>
+      <a href="notes.html" class="qbtn"><span class="qi">📝</span><span class="ql">Journal &amp; Notes</span></a>
     </div>
 
-    <!-- Today's Service -->
     <div class="sec-lbl">TODAY'S SERVICE</div>
     <div class="card" style="padding:18px 16px">
-      <div style="margin-bottom:12px">
+      <div style="margin-bottom:12px" id="todayServiceList">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:13px;font-weight:600">Daily Devotion</span>
           <span style="font-size:10px;color:#4ade80">100% COMPLETE</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:13px;font-weight:600">Kegel Routine</span>
-          <span style="font-size:10px;color:#fbbf24">PENDING</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:13px;font-weight:600">Evening Affirmation</span>
-          <span style="font-size:10px;color:#fbbf24">PENDING</span>
         </div>
       </div>
       <button onclick="markServiceComplete()" style="width:100%;padding:11px 0;border-radius:999px;background:var(--gold);color:#080c14;border:none;font-size:11px;letter-spacing:1.5px;font-weight:700">MARK COMPLETE &amp; REPORT TO SIR</button>
     </div>
 
-    <!-- Training Progress Hub -->
-    <div class="sec-lbl">TRAINING PROGRESS HUB</div>
-    <div class="progress-card">
-      <div class="progress-header">
-        <span class="progress-name">Deepthroat</span>
-        <span class="progress-level">Level 4 • 80%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
-    </div>
-    <div class="progress-card">
-      <div class="progress-header">
-        <span class="progress-name">Heel Training</span>
-        <span class="progress-level">Mastered • 100%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
-    </div>
-    <div class="progress-card">
-      <div class="progress-header">
-        <span class="progress-name">Kegel</span>
-        <span class="progress-level">Level 3 • 60%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
-    </div>
-    <div class="progress-card">
-      <div class="progress-header">
-        <span class="progress-name">Positions</span>
-        <span class="progress-level">Level 2 • 45%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div>
-    </div>
+    <div class="sec-lbl">TRAINING PROGRESS HUB <span style="font-size:8px;color:var(--muted)">(live)</span></div>
+    <div id="trainingProgress"></div>
 
-    <!-- Assigned Scenes & Directives -->
     <div class="sec-lbl">ASSIGNED SCENES &amp; DIRECTIVES</div>
-    <div class="scenes-list" id="assignedScenes">
-      <div class="srow" onclick="window.location='scene-menu.html'">
-        <div class="sico">🌙</div>
-        <div style="flex:1">
-          <span class="sname">Midnight Protocol</span>
-          <span class="smeta">Ready • 12 elements</span>
-        </div>
-        <span style="color:#4ade80;font-size:10px">READY</span>
-      </div>
-      <div class="srow" onclick="window.location='scene-menu.html'">
-        <div class="sico">🌹</div>
-        <div style="flex:1">
-          <span class="sname">Weekend Public Play</span>
-          <span class="smeta">Awaiting confirmation</span>
-        </div>
-        <span style="color:#fbbf24;font-size:10px">PENDING</span>
-      </div>
-    </div>
+    <div class="scenes-list" id="assignedScenes"></div>
 
-    <!-- Recent Devotions -->
-    <div class="sec-lbl">RECENT DEVOTIONS</div>
-    <div class="activity-feed" id="activityFeed">
-      <!-- Populated by JS -->
-    </div>
+    <div class="sec-lbl">RECENT DEVOTIONS <span style="font-size:8px;color:var(--muted)">(live)</span></div>
+    <div class="activity-feed" id="activityFeed"></div>
   `;
 
-  loadSubActivityFeed();
-  initRecentScenes(false); // sub view
-  updateStatsForSub();
+  loadLiveStatsForSub();
+  loadTrainingProgress();
+  loadLiveActivityFeedForSub();
+  initRealScenes(false);
 }
 
-// Shared functions
-function initWeekTracker() {
-  // Same as original - keep for streak tracking
+// ==================== REAL FIRESTORE FUNCTIONS ====================
+
+async function initLiveWeekTracker() {
   const LABELS = ['M','T','W','T','F','S','S'];
   const today = new Date(); today.setHours(0,0,0,0);
   const dow = today.getDay();
-  const mon = new Date(today); mon.setDate(today.getDate()-((dow+6)%7));
+  const mon = new Date(today); mon.setDate(today.getDate() - ((dow + 6) % 7));
   const weekRef = dataRef('stats/week');
 
-  // ... (keep original week logic, simplified for brevity)
-  // For now we'll just show a static nice week row
   const row = document.createElement('div');
   row.className = 'week-row';
-  row.style.marginTop = '12px';
-  
-  // This would be populated with real data in full implementation
-  const saved = ['2026-04-28','2026-04-29','2026-04-30','2026-05-01','2026-05-02','2026-05-03'];
-  
-  for(let i = 0; i < 7; i++) {
-    const day = new Date(mon); day.setDate(mon.getDate()+i);
-    const iso = day.toISOString().slice(0,10);
-    const isToday = day.getTime() === today.getTime();
-    const isDone = saved.includes(iso);
-    
-    const dot = document.createElement('div');
-    dot.className = 'wdot';
-    dot.textContent = LABELS[i];
-    if(isDone) dot.classList.add('done');
-    if(isToday) dot.classList.add('today');
-    row.appendChild(dot);
+
+  onSnapshot(weekRef, (snap) => {
+    let saved = [];
+    if (snap.exists()) saved = snap.data().done || [];
+
+    row.innerHTML = '';
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(mon); day.setDate(mon.getDate() + i);
+      const iso = day.toISOString().slice(0, 10);
+      const isToday = day.getTime() === today.getTime();
+      const isDone = saved.includes(iso);
+
+      const dot = document.createElement('div');
+      dot.className = 'wdot';
+      dot.textContent = LABELS[i];
+      if (isDone) dot.classList.add('done');
+      if (isToday) dot.classList.add('today');
+
+      dot.onclick = async () => {
+        if (isToday || day > today) return;
+        const idx = saved.indexOf(iso);
+        if (idx === -1) saved.push(iso); else saved.splice(idx, 1);
+        await setDoc(weekRef, { done: saved }, { merge: true });
+      };
+      row.appendChild(dot);
+    }
+  });
+
+  // Add to stats grid if it exists
+  setTimeout(() => {
+    const stats = document.getElementById('statsGrid');
+    if (stats) {
+      const wide = document.createElement('div');
+      wide.className = 'card wide';
+      wide.innerHTML = `<span class="card-lbl" style="margin-bottom:8px">This Week</span>`;
+      wide.appendChild(row);
+      stats.appendChild(wide);
+    }
+  }, 300);
+}
+
+function loadLiveStatsForDom() {
+  // Streak + Compliance (from week stats)
+  const weekRef = dataRef('stats/week');
+  onSnapshot(weekRef, (snap) => {
+    if (!snap.exists()) return;
+    const saved = snap.data().done || [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    let streak = 0;
+    let cur = new Date(today);
+    while (true) {
+      const iso = cur.toISOString().slice(0,10);
+      if (saved.includes(iso)) { streak++; cur.setDate(cur.getDate()-1); }
+      else break;
+    }
+    document.getElementById('streakVal').textContent = streak || '—';
+
+    const mon = new Date(today); mon.setDate(today.getDate() - ((today.getDay()+6)%7));
+    const elapsed = Math.floor((today - mon) / 86400000) + 1;
+    let done = 0;
+    for (let i=0; i<elapsed; i++) {
+      const d = new Date(mon); d.setDate(mon.getDate()+i);
+      if (saved.includes(d.toISOString().slice(0,10))) done++;
+    }
+    const comp = elapsed > 0 ? Math.round((done / elapsed) * 100) : 0;
+    document.getElementById('compVal').textContent = comp + '%';
+  });
+
+  // Scenes count
+  const scenesQuery = query(dataCol('scenes'));
+  onSnapshot(scenesQuery, (snap) => {
+    document.getElementById('scenesVal').textContent = snap.size;
+  });
+
+  // Active Protocols (count from multiple collections)
+  let protocolCount = 0;
+  const protocolCols = ['protocol-daily', 'protocol-maintenance', 'protocol-scene'];
+  protocolCols.forEach(col => {
+    onSnapshot(query(dataCol(col)), (snap) => {
+      protocolCount += snap.size;
+      const el = document.getElementById('protocolsVal');
+      if (el) el.textContent = protocolCount || '—';
+    });
+  });
+
+  // Pending Reports (sub's unchecked notes/tasks)
+  if (partnerUid) {
+    const pendingQuery = query(partnerDataCol('notes', partnerUid), where('checked', '==', false));
+    onSnapshot(pendingQuery, (snap) => {
+      const el = document.getElementById('pendingVal');
+      if (el) el.textContent = snap.size || '—';
+    });
+  } else {
+    document.getElementById('pendingVal').textContent = '—';
   }
-  
-  // Append to stats area if it exists
-  const statsArea = document.querySelector('.stat-grid');
-  if (statsArea) {
-    const wideCard = document.createElement('div');
-    wideCard.className = 'card wide';
-    wideCard.innerHTML = `<span class="card-lbl" style="margin-bottom:8px">This Week</span>`;
-    wideCard.appendChild(row);
-    statsArea.appendChild(wideCard);
+
+  // Live Sub Status
+  loadLiveSubStatus();
+}
+
+function loadLiveSubStatus() {
+  if (!partnerUid) {
+    document.getElementById('liveStatusText').innerHTML = 'No partner paired yet';
+    return;
+  }
+  // Listen to partner's latest note or training completion
+  const notesRef = partnerDataCol('notes', partnerUid);
+  const q = query(notesRef, orderBy('timestamp', 'desc'), limit(1));
+  onSnapshot(q, (snap) => {
+    if (!snap.empty) {
+      const latest = snap.docs[0].data();
+      const text = latest.content || latest.text || 'Recently active';
+      document.getElementById('liveStatusText').innerHTML = `${text} <span style="color:#4ade80">• just now</span>`;
+    }
+  });
+}
+
+function loadLiveActivityFeedForDom() {
+  const feed = document.getElementById('activityFeed');
+  if (!partnerUid || !feed) return;
+
+  const notesCol = partnerDataCol('notes', partnerUid);
+  onSnapshot(query(notesCol, orderBy('timestamp', 'desc'), limit(5)), (snap) => {
+    feed.innerHTML = '';
+    if (snap.empty) {
+      feed.innerHTML = `<div class="empty"><p>No recent activity from your sub yet.</p></div>`;
+      return;
+    }
+    snap.forEach(doc => {
+      const n = doc.data();
+      const el = document.createElement('div');
+      el.className = 'arow';
+      el.innerHTML = `
+        <div class="aico">📝</div>
+        <div style="flex:1">
+          <span class="aname">${n.content || n.text || 'Note added'}</span>
+          <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
+        </div>
+      `;
+      feed.appendChild(el);
+    });
+  });
+}
+
+async function loadLiveStatsForSub() {
+  // Streak + Compliance
+  const weekRef = dataRef('stats/week');
+  onSnapshot(weekRef, (snap) => {
+    if (!snap.exists()) return;
+    const saved = snap.data().done || [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    let streak = 0; let cur = new Date(today);
+    while (true) {
+      const iso = cur.toISOString().slice(0,10);
+      if (saved.includes(iso)) { streak++; cur.setDate(cur.getDate()-1); } else break;
+    }
+    document.getElementById('streakVal').textContent = streak || '—';
+
+    const mon = new Date(today); mon.setDate(today.getDate() - ((today.getDay()+6)%7));
+    const elapsed = Math.floor((today-mon)/86400000)+1;
+    let done = 0;
+    for(let i=0;i<elapsed;i++){ const d=new Date(mon);d.setDate(mon.getDate()+i); if(saved.includes(d.toISOString().slice(0,10))) done++; }
+    const comp = elapsed>0 ? Math.round((done/elapsed)*100) : 0;
+    document.getElementById('compVal').textContent = comp + '%';
+  });
+
+  // Scenes count
+  const scenesQuery = query(dataCol('scenes'));
+  onSnapshot(scenesQuery, (snap) => {
+    const el = document.getElementById('scenesVal');
+    if (el) el.textContent = snap.size;
+  });
+
+  // Tasks due today (from tasks collection)
+  const tasksQuery = query(dataCol('tasks'), where('dueDate', '==', new Date().toISOString().slice(0,10)), where('completed', '==', false));
+  onSnapshot(tasksQuery, (snap) => {
+    const el = document.getElementById('tasksVal');
+    if (el) el.textContent = snap.size || '0';
+  });
+}
+
+async function loadTrainingProgress() {
+  const container = document.getElementById('trainingProgress');
+  if (!container) return;
+
+  const trainings = [
+    { id: 'deepthroat', name: 'Deepthroat', icon: '🍆' },
+    { id: 'heel', name: 'Heel Training', icon: '👠' },
+    { id: 'kegel', name: 'Kegel', icon: '💪' },
+    { id: 'positions', name: 'Positions', icon: '🧘' }
+  ];
+
+  container.innerHTML = '';
+
+  for (const t of trainings) {
+    try {
+      const docRef = dataRef(`training/${t.id}`);
+      const snap = await getDoc(docRef);
+      let level = 1, progress = 0;
+      if (snap.exists()) {
+        const data = snap.data();
+        level = data.level || 1;
+        progress = data.progress || 0;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'progress-card';
+      card.innerHTML = `
+        <div class="progress-header">
+          <span class="progress-name">${t.icon} ${t.name}</span>
+          <span class="progress-level">Level ${level} • ${progress}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+      `;
+      container.appendChild(card);
+    } catch (e) {
+      console.log(`Training ${t.id} not found yet`);
+    }
   }
 }
 
-async function initRecentScenes(isDom) {
-  const list = document.getElementById(isDom ? 'scenesList' : 'assignedScenes');
+function loadLiveActivityFeedForSub() {
+  const feed = document.getElementById('activityFeed');
+  if (!feed) return;
+
+  const notesCol = dataCol('notes');
+  onSnapshot(query(notesCol, orderBy('timestamp', 'desc'), limit(5)), (snap) => {
+    feed.innerHTML = '';
+    if (snap.empty) {
+      feed.innerHTML = `<div class="empty"><p>No recent devotions logged yet.</p></div>`;
+      return;
+    }
+    snap.forEach(doc => {
+      const n = doc.data();
+      const el = document.createElement('div');
+      el.className = 'arow';
+      el.innerHTML = `
+        <div class="aico">✅</div>
+        <div style="flex:1">
+          <span class="aname">${n.content || n.text || 'Task completed'}</span>
+          <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
+        </div>
+      `;
+      feed.appendChild(el);
+    });
+  });
+}
+
+async function initRealScenes(isDom) {
+  const listId = isDom ? 'scenesList' : 'assignedScenes';
+  const list = document.getElementById(listId);
   if (!list) return;
 
-  try {
-    const q = query(dataCol('scenes'), orderBy('date', 'desc'), limit(3));
-    onSnapshot(q, (snap) => {
-      list.innerHTML = '';
-      if (snap.empty) {
-        list.innerHTML = `<div class="empty"><p>No scenes yet.<br>${isDom ? 'Build your first scene for your sub.' : 'Awaiting Sir\'s next scene.'}</p></div>`;
-        return;
-      }
-      snap.forEach(doc => {
-        const s = doc.data();
-        const el = document.createElement('a');
-        el.className = 'srow';
-        el.href = 'scene-menu.html';
-        el.innerHTML = `
-          <div class="sico">${['🎭','🌹','⚡','🔒','🕯️'][Math.floor(Math.random()*5)]}</div>
-          <div style="flex:1;min-width:0">
-            <span class="sname">${s.name || s.title || 'Scene'}</span>
-            <span class="smeta">${s.date ? new Date(s.date).toLocaleDateString() : 'Saved scene'}</span>
-          </div>
-        `;
-        list.appendChild(el);
-      });
+  const q = query(dataCol('scenes'), orderBy('date', 'desc'), limit(3));
+  onSnapshot(q, (snap) => {
+    list.innerHTML = '';
+    if (snap.empty) {
+      list.innerHTML = `<div class="empty"><p>No scenes yet.<br>${isDom ? 'Build your first scene.' : 'Awaiting Sir\'s next scene.'}</p></div>`;
+      return;
+    }
+    snap.forEach(doc => {
+      const s = doc.data();
+      const el = document.createElement('a');
+      el.className = 'srow';
+      el.href = 'scene-menu.html';
+      el.innerHTML = `
+        <div class="sico">${['🎭','🌹','⚡','🔒','🕯️'][Math.floor(Math.random()*5)]}</div>
+        <div style="flex:1;min-width:0">
+          <span class="sname">${s.name || s.title || 'Scene'}</span>
+          <span class="smeta">${s.date ? new Date(s.date).toLocaleDateString() : 'Saved scene'}</span>
+        </div>
+      `;
+      list.appendChild(el);
     });
-  } catch(e) {
-    console.log('Scenes loading (demo mode)');
-  }
-}
-
-function loadDomActivityFeed() {
-  const feed = document.getElementById('activityFeed');
-  if (!feed) return;
-  
-  const activities = [
-    { icon: '👠', text: 'Completed Heel Training', time: '2h ago' },
-    { icon: '📋', text: 'Submitted BDSM Checklist', time: 'Today 09:12' },
-    { icon: '🧘', text: 'Finished Position Drill', time: 'Yesterday' },
-    { icon: '📝', text: 'Logged Scene Reflection', time: '3d ago' }
-  ];
-  
-  feed.innerHTML = activities.map(a => `
-    <div class="arow">
-      <div class="aico">${a.icon}</div>
-      <div style="flex:1">
-        <span class="aname">${a.text}</span>
-        <span class="ameta">${a.time}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-function loadSubActivityFeed() {
-  const feed = document.getElementById('activityFeed');
-  if (!feed) return;
-  
-  const activities = [
-    { icon: '✅', text: 'Completed Deepthroat Session', time: 'Today' },
-    { icon: '📤', text: 'Submitted Checklist to Sir', time: 'Yesterday' },
-    { icon: '📖', text: 'Logged Reflection', time: '2d ago' },
-    { icon: '🔥', text: 'Hit 47-day streak milestone', time: '3d ago' }
-  ];
-  
-  feed.innerHTML = activities.map(a => `
-    <div class="arow">
-      <div class="aico">${a.icon}</div>
-      <div style="flex:1">
-        <span class="aname">${a.text}</span>
-        <span class="ameta">${a.time}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-function updateStatsForDom() {
-  // In real app, fetch from partnerDataRef('stats')
-  // For now, static values match mockup
-  const streakEl = document.getElementById('streakVal');
-  const compEl = document.getElementById('compVal');
-  if (streakEl) streakEl.textContent = '47';
-  if (compEl) compEl.textContent = '94%';
-}
-
-function updateStatsForSub() {
-  const streakEl = document.getElementById('streakVal');
-  const compEl = document.getElementById('compVal');
-  if (streakEl) streakEl.textContent = '47';
-  if (compEl) compEl.textContent = '94%';
+  });
 }
 
 // Action handlers
 window.issuePraise = function() {
   alert("Praise issued to your sub. They will receive a notification. 💖");
-  // In real app: write to partner notes or notifications collection
+  // TODO: Write to partner's notifications collection
 };
 
 window.issueCorrection = function() {
-  if (confirm("Issue a correction? This will be logged in their record.")) {
-    alert("Correction logged. Your sub has been notified.");
-    // Real: add to protocol or notes
+  if (confirm("Issue a correction? This will be logged.")) {
+    alert("Correction logged and sent to your sub.");
   }
 };
 
 window.markServiceComplete = function() {
-  const btn = event.currentTarget;
   alert("Service marked complete and reported to Sir! ✨");
-  // Real implementation would write to tasks/notes + partner feed
-  // Then refresh the Today's Service section
+  // TODO: Write completion to tasks/notes + partner feed
 };
 
-// Boot everything
+// Boot
 init();
 </script>
 
-<!-- nav.js injects the nav bar automatically -->
 <script src="nav.js"></script>
 
 </body>
