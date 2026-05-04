@@ -111,8 +111,8 @@ textarea{min-height:80px;resize:vertical}
 </div>
 
 <script type="module">
-import { requireAuth, getMyProfile, getPartnerUid, getUserProfile } from './auth.js';
-import { setDoc, serverTimestamp, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, partnerDataRef } from './auth.js';
+import { setDoc, serverTimestamp, doc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
 const trainings = [
@@ -140,18 +140,30 @@ async function init() {
 
   document.getElementById('subName').textContent = subDisplayName;
 
-  renderTrainingList();
+  await renderTrainingList();
 }
 
-function renderTrainingList() {
+async function renderTrainingList() {
   const container = document.getElementById('trainingList');
   container.innerHTML = '';
+
+  // Check which trainings the sub already has
+  const currentTrainings = new Set();
+  for (const t of trainings) {
+    try {
+      const ref = doc(db, 'users', partnerUid, 'training', t.id);
+      const snap = await getDoc(ref);
+      if (snap.exists()) currentTrainings.add(t.id);
+    } catch (e) {}
+  }
 
   trainings.forEach(training => {
     const div = document.createElement('div');
     div.className = 'training-item';
+    const isAssigned = currentTrainings.has(training.id);
+
     div.innerHTML = `
-      <input type="checkbox" id="${training.id}" />
+      <input type="checkbox" id="${training.id}" ${isAssigned ? 'checked' : ''} />
       <div class="training-info">
         <div class="training-name">${training.name}</div>
         <div class="training-desc">${training.desc}</div>
@@ -159,6 +171,11 @@ function renderTrainingList() {
     `;
 
     const checkbox = div.querySelector('input');
+    if (isAssigned) {
+      selectedTrainings.add(training.id);
+      div.classList.add('selected');
+    }
+
     checkbox.onchange = () => {
       if (checkbox.checked) {
         selectedTrainings.add(training.id);
@@ -194,59 +211,73 @@ function updateAssignButton() {
   btn.disabled = count === 0;
   if (count > 0) {
     const plural = count > 1 ? 'S' : '';
-    btn.textContent = `ASSIGN \( {count} TRAINING \){plural}`;
+    btn.textContent = `ASSIGN ${count} TRAINING${plural}`;
   } else {
     btn.textContent = 'ASSIGN TO SUB';
   }
 }
 
 async function assignTrainings() {
-  console.log('assignTrainings called');
   const btn = document.getElementById('assignBtn');
   const successMsg = document.getElementById('successMsg');
 
   if (!partnerUid) {
-    console.log('No partnerUid found');
     alert("No partner paired. Please pair with a sub first.");
-    btn.disabled = false;
-    btn.textContent = 'ASSIGN TO SUB';
     return;
   }
 
-  console.log('Starting assignment for:', Array.from(selectedTrainings));
   btn.disabled = true;
-  btn.textContent = 'ASSIGNING...';
+  btn.textContent = 'UPDATING...';
 
   const dueDate = document.getElementById('dueDate').value || null;
   const note = document.getElementById('noteFromSir').value.trim() || null;
   const currentUser = await requireAuth();
 
   try {
+    // Get currently assigned trainings
+    const currentlyAssigned = new Set();
+    for (const t of trainings) {
+      const ref = doc(db, 'users', partnerUid, 'training', t.id);
+      const snap = await getDoc(ref);
+      if (snap.exists()) currentlyAssigned.add(t.id);
+    }
+
+    // Assign new ones
     for (const trainingId of selectedTrainings) {
-      const ref = doc(db, 'users', partnerUid, 'training', trainingId);
-      await setDoc(ref, {
-        level: 1,
-        progress: 0,
-        assignedBy: currentUser.uid,
-        assignedAt: serverTimestamp(),
-        dueDate: dueDate,
-        noteFromSir: note,
-        status: 'assigned'
-      }, { merge: true });
+      if (!currentlyAssigned.has(trainingId)) {
+        const ref = doc(db, 'users', partnerUid, 'training', trainingId);
+        await setDoc(ref, {
+          level: 1,
+          progress: 0,
+          assignedBy: currentUser.uid,
+          assignedAt: serverTimestamp(),
+          dueDate: dueDate,
+          noteFromSir: note,
+          status: 'assigned'
+        }, { merge: true });
+      }
+    }
+
+    // Unassign removed ones
+    for (const trainingId of currentlyAssigned) {
+      if (!selectedTrainings.has(trainingId)) {
+        const ref = doc(db, 'users', partnerUid, 'training', trainingId);
+        await deleteDoc(ref);
+      }
     }
 
     successMsg.style.display = 'block';
-    successMsg.innerHTML = `✅ Successfully assigned ${selectedTrainings.size} training(s) to ${subDisplayName}`;
+    successMsg.innerHTML = `✅ Training assignments updated for ${subDisplayName}`;
 
     setTimeout(() => {
       window.location.href = 'index-enhanced.html';
     }, 1800);
 
   } catch (error) {
-    console.error('Assignment error:', error);
-    alert('Error assigning training: ' + error.message);
+    console.error('Update error:', error);
+    alert('Error updating trainings: ' + error.message);
     btn.disabled = false;
-    btn.textContent = 'ASSIGN TO SUB';
+    btn.textContent = 'UPDATE TRAININGS';
   }
 }
 
