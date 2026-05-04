@@ -311,14 +311,19 @@
     // (month/week/day rendering, etc.)
 
     function renderCurrentView() {
-      // Placeholder - you can paste the rest of your original rendering code here
       const emptyState = document.getElementById('emptyState');
+      const monthView = document.getElementById('view-month');
+      
+      // Always show month view
+      monthView.style.display = 'block';
+      document.getElementById('view-week').style.display = 'none';
+      document.getElementById('view-day').style.display = 'none';
       
       if (events.length === 0 && recurTasks.length === 0) {
         emptyState.style.display = 'block';
       } else {
         emptyState.style.display = 'none';
-        // Render events here
+        // TODO: Render actual calendar grid with events
       }
     }
 
@@ -334,6 +339,30 @@
     // Initialize
     init();
   </script>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="index-enhanced.html" class="nav-item">
+      <span class="material-symbols-rounded">home</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="scene-menu.html" class="nav-item">
+      <span class="material-symbols-rounded">theater_comedy</span>
+      <span class="nav-label">Scenes</span>
+    </a>
+    <a href="training-menu.html" class="nav-item">
+      <span class="material-symbols-rounded">fitness_center</span>
+      <span class="nav-label">Training</span>
+    </a>
+    <a href="calendar.html" class="nav-item active">
+      <span class="material-symbols-rounded">calendar_month</span>
+      <span class="nav-label">Calendar</span>
+    </a>
+    <a href="more.html" class="nav-item">
+      <span class="material-symbols-rounded">more_horiz</span>
+      <span class="nav-label">More</span>
+    </a>
+  </div>
 
   <script src="nav.js"></script>
 </body>
