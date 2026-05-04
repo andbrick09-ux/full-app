@@ -40,7 +40,6 @@
     .dynamic-pill { padding:10px 18px; border-radius:20px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; background:rgba(5,16,36,.85); border:1px solid var(--border); color:var(--cream-dim); cursor:pointer; transition:all .2s; flex:1; text-align:center; }
     .dynamic-pill.selected { background:rgba(212,175,55,.15); border-color:var(--gold); color:var(--gold-light,#f0d060); }
 
-    /* Smart Save Button — 4 states */
     #saveBtn {
       width:100%; padding:16px; border-radius:14px;
       font-family:'Playfair Display',serif; font-size:12px; font-weight:700;
@@ -87,7 +86,6 @@
       animation:none;
     }
 
-    /* Inline action buttons — always gold */
     .settings-action-btn {
       padding:12px 18px; border-radius:14px;
       background:linear-gradient(135deg,#D4AF37,#f0d060);
@@ -204,29 +202,6 @@
         </div>
       </div>
 
-      <!-- TRAINING ROSTER — dom only, hidden until role confirmed -->
-      <div class="settings-group" id="trainingRosterGroup" style="display:none">
-        <span class="settings-group-label" style="color:var(--red);">Training Roster (Sir's Eyes Only)</span>
-        <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:var(--cream-mute);margin-bottom:12px;line-height:1.5;font-style:italic;">
-          Select exactly which trainings are currently active for the sub. Locked trainings will be greyed out with a padlock to tease them.
-        </div>
-        <div class="settings-field">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="trk5" class="training-toggle" value="the-5-training.html"/> The "5" Training</label>
-        </div>
-        <div class="settings-field">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="trkPlug" class="training-toggle" value="anal-plug-training.html"/> Anal Plug Training</label>
-        </div>
-        <div class="settings-field">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="trkDeep" class="training-toggle" value="deepthroat-training.html"/> Deep Throat Training</label>
-        </div>
-        <div class="settings-field">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="trkKegel" class="training-toggle" value="kegel-training.html"/> Kegel Training</label>
-        </div>
-        <div class="settings-field">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" id="trkPos" class="training-toggle" value="position-training.html"/> Position Training</label>
-        </div>
-      </div>
-
       <!-- SMART SAVE BUTTON -->
       <button id="saveBtn" class="state-idle" onclick="saveSettings()">
         <span class="material-symbols-rounded">check_circle</span>All Saved
@@ -262,7 +237,6 @@
     let currentUser   = null;
     let myProfile     = null;
 
-    // ── Toast ────────────────────────────────────────────────
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -270,7 +244,6 @@
       setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    // ── Save button state machine ────────────────────────────
     const STATES = {
       idle:   { cls:'state-idle',   icon:'check_circle',    label:'All Saved'    },
       dirty:  { cls:'state-dirty',  icon:'save',            label:'Save Changes' },
@@ -295,10 +268,8 @@
       document.getElementById('settingName').addEventListener('input', markDirty);
       document.querySelectorAll('.theme-option').forEach(el => el.addEventListener('click', markDirty));
       document.querySelectorAll('#fontSizePills .dynamic-pill').forEach(el => el.addEventListener('click', markDirty));
-      document.querySelectorAll('.training-toggle').forEach(el => el.addEventListener('change', markDirty));
     }
 
-    // ── Init ─────────────────────────────────────────────────
     async function init() {
       currentUser = await requireAuth();
       myProfile   = await getMyProfile();
@@ -310,14 +281,8 @@
       await loadSettings();
       await loadRelationship();
       attachDirtyListeners();
-
-      // Show Training Roster only for doms
-      if (myProfile?.role === 'dom') {
-        document.getElementById('trainingRosterGroup').style.display = 'block';
-      }
     }
 
-    // ── Load settings ────────────────────────────────────────
     async function fetchSettings() {
       try {
         const snap = await getDoc(dataRef('settings'));
@@ -329,7 +294,6 @@
     async function loadSettings() {
       const s = await fetchSettings();
 
-      // Populate username from Firebase auth displayName, fall back to settings doc
       document.getElementById('settingName').value = currentUser.displayName || myProfile?.displayName || s.name || s.subName || '';
 
       const theme = s.theme || 'midnight';
@@ -340,40 +304,30 @@
       document.querySelectorAll('.dynamic-pill').forEach(el =>
         el.classList.toggle('selected', el.dataset.size === size));
 
-      const activeTs = s.activeTrainings || ['anal-plug-training.html','position-training.html','kegel-training.html'];
-      document.querySelectorAll('.training-toggle').forEach(chk =>
-        chk.checked = activeTs.includes(chk.value));
-
       renderLimitsList();
       setSaveState('idle');
     }
 
-    // ── Save settings (FIXED) ────────────────────────────────────────
     async function saveSettings() {
       setSaveState('saving');
 
       const themeEl    = document.querySelector('.theme-option.selected');
       const sizeEl     = document.querySelector('.dynamic-pill.selected');
-      const activeTs   = Array.from(document.querySelectorAll('.training-toggle:checked')).map(c => c.value);
       const newUsername = document.getElementById('settingName').value.trim();
 
       const s = {
         ...settingsCache,
-        name:            newUsername,
-        theme:           themeEl ? themeEl.dataset.theme : 'midnight',
-        fontSize:        sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
-        activeTrainings: activeTs,
+        name:     newUsername,
+        theme:    themeEl ? themeEl.dataset.theme : 'midnight',
+        fontSize: sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
       };
 
       try {
-        // Write to Firestore settings doc
         await setDoc(dataRef('settings'), s, { merge:true });
         settingsCache = s;
 
-        // Write displayName back to Firebase Auth profile
         if (newUsername && newUsername !== currentUser.displayName) {
           await updateProfile(currentUser, { displayName: newUsername });
-          // Reflect immediately in Account card
           document.getElementById('acctName').innerHTML =
             '<span style="font-size:11px;color:var(--cream-mute)">Username:</span> ' + newUsername;
         }
@@ -392,7 +346,6 @@
       }
     }
 
-    // ── Theme / font helpers ─────────────────────────────────
     function selectTheme(el) {
       document.querySelectorAll('.theme-option').forEach(p => p.classList.remove('selected'));
       el.classList.add('selected');
@@ -403,7 +356,6 @@
       el.classList.add('selected');
     }
 
-    // ── Limits ───────────────────────────────────────────────
     function renderLimitsList() {
       const list   = document.getElementById('limitsList');
       const limits = settingsCache.limits || [];
@@ -453,7 +405,6 @@
       }
     }
 
-    // ── Relationship ─────────────────────────────────────────
     async function loadRelationship() {
       const card       = document.getElementById('relStatusCard');
       const inviteForm = document.getElementById('inviteForm');
@@ -512,7 +463,6 @@
       }
     }
 
-    // ── Window-scoped handlers ───────────────────────────────
     window.sendInviteFromSettings = async function() {
       const emailInput = document.getElementById('inviteEmail');
       const msg        = document.getElementById('inviteMsg');
