@@ -100,36 +100,22 @@
       border-color: var(--gold);
       box-shadow: 0 0 0 2px rgba(212,175,55,0.3);
     }
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .empty-state .icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.6;
-    }
-    .empty-state h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: var(--gold);
-      margin-bottom: 6px;
-    }
-    .empty-state p {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-    .btn {
-      padding: 10px 20px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      border: none;
-      cursor: pointer;
+    .fab {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
       background: var(--gold);
       color: #080c14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 4px 20px rgba(212,175,55,0.4);
+      cursor: pointer;
+      z-index: 200;
     }
     .bottom-nav {
       position: fixed;
@@ -154,9 +140,6 @@
     .nav-item.active {
       color: var(--gold);
     }
-    .nav-item .material-symbols-rounded {
-      font-size: 20px;
-    }
   </style>
 </head>
 <body>
@@ -174,40 +157,54 @@
   </div>
 
   <div class="view-toggle">
-    <button class="view-btn active">MONTH</button>
-    <button class="view-btn">WEEK</button>
-    <button class="view-btn">DAY</button>
+    <button class="view-btn active" onclick="switchView('month')">MONTH</button>
+    <button class="view-btn" onclick="switchView('week')">WEEK</button>
+    <button class="view-btn" onclick="switchView('day')">DAY</button>
   </div>
 
   <div class="page-wrap">
 
-    <!-- Empty State -->
-    <div class="empty-state">
-      <div class="icon">📅</div>
-      <h3>No events yet</h3>
-      <p>Nothing has been scheduled.<br>Add your first event to get started.</p>
-      <button class="btn" onclick="alert('Event creation coming soon!')">Add First Event</button>
+    <!-- Month View -->
+    <div id="view-month">
+      <div class="month-nav">
+        <button class="month-nav-btn" onclick="prevMonth()">←</button>
+        <div class="month-label" id="monthLabel">July 2026</div>
+        <button class="month-nav-btn" onclick="nextMonth()">→</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid">
+        <!-- Calendar days populated by JS -->
+      </div>
     </div>
 
-    <!-- Month Calendar Grid -->
-    <div class="month-nav">
-      <button class="month-nav-btn">←</button>
-      <div class="month-label">July 2026</div>
-      <button class="month-nav-btn">→</button>
+    <!-- Week View -->
+    <div id="view-week" style="display: none;">
+      <div class="month-nav">
+        <button class="month-nav-btn" onclick="prevWeek()">←</button>
+        <div class="month-label" id="weekLabel">Week of July 13</div>
+        <button class="month-nav-btn" onclick="nextWeek()">→</button>
+      </div>
+      <div id="weekContainer" style="padding: 20px; text-align: center; color: #888;">
+        Week view coming soon
+      </div>
     </div>
 
-    <div class="calendar-grid">
-      <!-- Calendar days will be generated here -->
-      <div class="calendar-day"><div class="day-number">1</div></div>
-      <div class="calendar-day"><div class="day-number">2</div></div>
-      <div class="calendar-day"><div class="day-number">3</div></div>
-      <div class="calendar-day"><div class="day-number">4</div></div>
-      <div class="calendar-day"><div class="day-number">5</div></div>
-      <div class="calendar-day"><div class="day-number">6</div></div>
-      <div class="calendar-day"><div class="day-number">7</div></div>
-      <!-- Add more days as needed -->
+    <!-- Day View -->
+    <div id="view-day" style="display: none;">
+      <div class="month-nav">
+        <button class="month-nav-btn" onclick="prevDay()">←</button>
+        <div class="month-label" id="dayLabel">July 17, 2026</div>
+        <button class="month-nav-btn" onclick="nextDay()">→</button>
+      </div>
+      <div id="dayContainer" style="padding: 20px; text-align: center; color: #888;">
+        Day view coming soon
+      </div>
     </div>
 
+  </div>
+
+  <!-- Floating Action Button -->
+  <div class="fab" onclick="addEvent()">
+    <span class="material-symbols-rounded">add</span>
   </div>
 
   <!-- Bottom Navigation -->
@@ -235,5 +232,95 @@
   </div>
 
   <script src="nav.js"></script>
+  <script>
+    let currentView = 'month';
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+
+    function switchView(view) {
+      currentView = view;
+      
+      document.getElementById('view-month').style.display = 'none';
+      document.getElementById('view-week').style.display = 'none';
+      document.getElementById('view-day').style.display = 'none';
+      
+      document.getElementById('view-' + view).style.display = 'block';
+      
+      document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function renderMonth() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+      
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                         'July', 'August', 'September', 'October', 'November', 'December'];
+      document.getElementById('monthLabel').textContent = monthNames[currentMonth] + ' ' + currentYear;
+      
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'calendar-day';
+        grid.appendChild(empty);
+      }
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.innerHTML = `<div class="day-number">${day}</div>`;
+        
+        const today = new Date();
+        if (currentYear === today.getFullYear() && 
+            currentMonth === today.getMonth() && 
+            day === today.getDate()) {
+          dayEl.classList.add('today');
+        }
+        
+        grid.appendChild(dayEl);
+      }
+    }
+
+    function prevMonth() {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderMonth();
+    }
+
+    function nextMonth() {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderMonth();
+    }
+
+    function prevWeek() { alert('Week navigation coming soon'); }
+    function nextWeek() { alert('Week navigation coming soon'); }
+    function prevDay() { alert('Day navigation coming soon'); }
+    function nextDay() { alert('Day navigation coming soon'); }
+
+    function addEvent() {
+      const title = prompt('Event title:');
+      if (title) {
+        alert('Event "' + title + '" added! (This would save to Firestore)');
+      }
+    }
+
+    function init() {
+      renderMonth();
+      document.getElementById('view-month').style.display = 'block';
+      document.getElementById('view-week').style.display = 'none';
+      document.getElementById('view-day').style.display = 'none';
+    }
+
+    init();
+  </script>
 </body>
 </html>
