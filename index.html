@@ -436,7 +436,9 @@ async function loadSubTrainingProgress() {
     { id: 'deepthroat', name: 'Deepthroat', icon: '🍆' },
     { id: 'heel', name: 'Heel Training', icon: '👠' },
     { id: 'kegel', name: 'Kegel', icon: '💪' },
-    { id: 'positions', name: 'Positions', icon: '🧘' }
+    { id: 'positions', name: 'Positions', icon: '🧘' },
+    { id: 'anal-plug', name: 'Anal Plug', icon: '🔌' },
+    { id: 'the-5', name: 'The 5 Training', icon: '⭐' }
   ];
 
   container.innerHTML = '';
@@ -445,11 +447,11 @@ async function loadSubTrainingProgress() {
     try {
       const docRef = partnerDataRef(`training/${t.id}`);
       const snap = await getDoc(docRef);
-      let level = 1, progress = 0;
+      let progress = 0;
       let assignedData = {};
+
       if (snap.exists()) {
         assignedData = snap.data();
-        level = assignedData.level || 1;
         progress = assignedData.progress || 0;
       }
 
@@ -460,7 +462,7 @@ async function loadSubTrainingProgress() {
       card.innerHTML = `
         <div class="progress-header">
           <span class="progress-name">${t.icon} ${t.name}</span>
-          <span class="progress-level">Level ${level} • ${progress}%</span>
+          <span class="progress-level">${progress}%</span>
         </div>
         ${isAssignedBySir ? `
           <div style="margin:8px 0 4px 0; display:flex; justify-content:space-between; align-items:center;">
@@ -532,7 +534,6 @@ async function loadTrainingProgress() {
   container.innerHTML = '';
 
   try {
-    // Only show trainings that actually exist (assigned by Dom)
     const trainingIds = ['deepthroat', 'heel', 'kegel', 'positions', 'anal-plug', 'the-5'];
     const trainingNames = {
       'deepthroat': 'Deepthroat',
@@ -560,23 +561,15 @@ async function loadTrainingProgress() {
       if (snap.exists()) {
         hasAny = true;
         const data = snap.data();
-        const level = data.level || 1;
         const progress = data.progress || 0;
-        const isAssignedBySir = !!data.assignedBy;
 
         const card = document.createElement('div');
         card.className = 'progress-card';
         card.innerHTML = `
           <div class="progress-header">
             <span class="progress-name">${trainingIcons[id]} ${trainingNames[id]}</span>
-            <span class="progress-level">Level ${level} • ${progress}%</span>
+            <span class="progress-level">${progress}%</span>
           </div>
-          ${isAssignedBySir ? `
-            <div style="margin:8px 0 4px 0">
-              <span style="background:var(--crimson);color:white;font-size:9px;padding:1px 7px;border-radius:10px">ASSIGNED BY SIR</span>
-              ${data.noteFromSir ? `<div style="font-size:10px;color:#e07585;margin-top:4px">“${data.noteFromSir}”</div>` : ''}
-            </div>
-          ` : ''}
           <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
         `;
         container.appendChild(card);
