@@ -226,17 +226,10 @@ async function assignTrainings() {
     successMsg.style.display = 'block';
     successMsg.innerHTML = `✅ Successfully assigned ${selectedTrainings.size} training(s) to ${subDisplayName}`;
 
-    // Reset form
+    // Redirect back to dashboard after short delay
     setTimeout(() => {
-      selectedTrainings.clear();
-      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-      document.querySelectorAll('.training-item').forEach(el => el.classList.remove('selected'));
-      document.getElementById('noteFromSir').value = '';
-      document.getElementById('dueDate').value = '';
-      btn.textContent = 'ASSIGN TO SUB';
-      btn.disabled = true;
-      successMsg.style.display = 'none';
-    }, 2200);
+      window.location.href = 'index-enhanced.html';
+    }, 1800);
 
   } catch (error) {
     console.error(error);
