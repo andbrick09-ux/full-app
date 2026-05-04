@@ -208,12 +208,15 @@ async function renderTrainingList() {
 function updateAssignButton() {
   const btn = document.getElementById('assignBtn');
   const count = selectedTrainings.size;
-  btn.disabled = count === 0;
+
+  // Always enable the button (Dom can always update assignments)
+  btn.disabled = false;
+
   if (count > 0) {
     const plural = count > 1 ? 'S' : '';
-    btn.textContent = `ASSIGN ${count} TRAINING${plural}`;
+    btn.textContent = `UPDATE ${count} TRAINING${plural}`;
   } else {
-    btn.textContent = 'ASSIGN TO SUB';
+    btn.textContent = 'UPDATE TRAININGS';
   }
 }
 
