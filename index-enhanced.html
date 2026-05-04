@@ -209,6 +209,7 @@ function renderDomDashboard() {
       <a href="scene-builder.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
       <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Review Progress</span></a>
       <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Training Oversight</span></a>
+      <a href="assign-training.html" class="qbtn"><span class="qi">📋</span><span class="ql">Assign Training</span></a>
       <a href="public-play-menu.html" class="qbtn"><span class="qi">🌹</span><span class="ql">Public Play</span></a>
       <a href="toy-vault.html" class="qbtn"><span class="qi">🧸</span><span class="ql">Vaults &amp; Assets</span></a>
     </div>
@@ -487,11 +488,14 @@ async function loadTrainingProgress() {
       const docRef = dataRef(`training/${t.id}`);
       const snap = await getDoc(docRef);
       let level = 1, progress = 0;
+      let assignedData = {};
       if (snap.exists()) {
-        const data = snap.data();
-        level = data.level || 1;
-        progress = data.progress || 0;
+        assignedData = snap.data();
+        level = assignedData.level || 1;
+        progress = assignedData.progress || 0;
       }
+
+      const isAssignedBySir = !!assignedData.assignedBy;
 
       const card = document.createElement('div');
       card.className = 'progress-card';
@@ -500,6 +504,12 @@ async function loadTrainingProgress() {
           <span class="progress-name">${t.icon} ${t.name}</span>
           <span class="progress-level">Level ${level} • ${progress}%</span>
         </div>
+        ${isAssignedBySir ? `
+          <div style="margin:8px 0 4px 0">
+            <span style="background:var(--crimson);color:white;font-size:9px;padding:1px 7px;border-radius:10px">ASSIGNED BY SIR</span>
+            ${assignedData.noteFromSir ? `<div style="font-size:10px;color:#e07585;margin-top:4px">“${assignedData.noteFromSir}”</div>` : ''}
+          </div>
+        ` : ''}
         <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
       `;
       container.appendChild(card);
