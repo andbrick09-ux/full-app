@@ -95,17 +95,6 @@ textarea{min-height:80px;resize:vertical}
   </div>
 
   <div class="form-group">
-    <label>Starting Level</label>
-    <select id="startLevel">
-      <option value="1">Level 1 (Beginner)</option>
-      <option value="2">Level 2</option>
-      <option value="3" selected>Level 3</option>
-      <option value="4">Level 4</option>
-      <option value="5">Level 5 (Advanced)</option>
-    </select>
-  </div>
-
-  <div class="form-group">
     <label>Due Date (optional)</label>
     <input type="date" id="dueDate" />
   </div>
@@ -208,7 +197,6 @@ async function assignTrainings() {
   btn.disabled = true;
   btn.textContent = 'ASSIGNING...';
 
-  const level = parseInt(document.getElementById('startLevel').value);
   const dueDate = document.getElementById('dueDate').value || null;
   const note = document.getElementById('noteFromSir').value.trim() || null;
 
@@ -216,7 +204,7 @@ async function assignTrainings() {
     for (const trainingId of selectedTrainings) {
       const ref = partnerDataRef(`training/${trainingId}`);
       await setDoc(ref, {
-        level: level,
+        level: 1,
         progress: 0,
         assignedBy: (await requireAuth()).uid,
         assignedAt: serverTimestamp(),
