@@ -195,11 +195,19 @@ async function assignTrainings() {
   const btn = document.getElementById('assignBtn');
   const successMsg = document.getElementById('successMsg');
 
+  if (!partnerUid) {
+    alert("No partner paired. Please pair with a sub first.");
+    btn.disabled = false;
+    btn.textContent = 'ASSIGN TO SUB';
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'ASSIGNING...';
 
   const dueDate = document.getElementById('dueDate').value || null;
   const note = document.getElementById('noteFromSir').value.trim() || null;
+  const currentUser = await requireAuth();
 
   try {
     for (const trainingId of selectedTrainings) {
@@ -207,7 +215,7 @@ async function assignTrainings() {
       await setDoc(ref, {
         level: 1,
         progress: 0,
-        assignedBy: (await requireAuth()).uid,
+        assignedBy: currentUser.uid,
         assignedAt: serverTimestamp(),
         dueDate: dueDate,
         noteFromSir: note,
@@ -231,6 +239,7 @@ async function assignTrainings() {
     }, 2200);
 
   } catch (error) {
+    console.error(error);
     alert('Error assigning training: ' + error.message);
     btn.disabled = false;
     btn.textContent = 'ASSIGN TO SUB';
