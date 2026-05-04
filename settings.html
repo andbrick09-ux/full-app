@@ -348,7 +348,7 @@
       setSaveState('idle');
     }
 
-    // ── Save settings ────────────────────────────────────────
+    // ── Save settings (FIXED) ────────────────────────────────────────
     async function saveSettings() {
       setSaveState('saving');
 
@@ -378,20 +378,15 @@
             '<span style="font-size:11px;color:var(--cream-mute)">Username:</span> ' + newUsername;
         }
 
-        // Also write to user profile doc if your auth.js maintains one
-        try {
-          await setDoc(dataRef('profile'), { displayName: newUsername }, { merge:true });
-        } catch(e) { /* profile doc optional */ }
-
         setSaveState('saved');
         showToast('Settings saved \u2736');
         setTimeout(() => setSaveState('idle'), 1500);
 
       } catch(ex) {
         console.error('Save error:', ex);
-        let msg = 'Save failed \u2014 check your connection';
-        if (ex.message?.includes('permission'))    msg = 'Permission denied \u2014 check Firestore rules';
-        if (ex.message?.includes('authenticated')) msg = 'Not logged in \u2014 please log in again';
+        let msg = 'Save failed — check your connection';
+        if (ex.message?.includes('permission'))    msg = 'Permission denied — check Firestore rules';
+        if (ex.message?.includes('authenticated')) msg = 'Not logged in — please log in again';
         showToast(msg);
         setSaveState('dirty');
       }
