@@ -105,7 +105,7 @@ textarea{min-height:80px;resize:vertical}
     <textarea id="noteFromSir" placeholder="Focus on breathing technique this week..."></textarea>
   </div>
 
-  <button class="btn" id="assignBtn" onclick="assignTrainings()">ASSIGN TO SUB</button>
+  <button class="btn" id="assignBtn">ASSIGN TO SUB</button>
 
   <div id="successMsg" class="success" style="display:none"></div>
 </div>
@@ -181,6 +181,12 @@ function renderTrainingList() {
   });
 
   updateAssignButton();
+
+  // Attach click handler (more reliable than inline onclick in modules)
+  const assignBtn = document.getElementById('assignBtn');
+  if (assignBtn) {
+    assignBtn.addEventListener('click', assignTrainings);
+  }
 }
 
 function updateAssignButton() {
@@ -192,16 +198,19 @@ function updateAssignButton() {
 }
 
 async function assignTrainings() {
+  console.log('assignTrainings called');
   const btn = document.getElementById('assignBtn');
   const successMsg = document.getElementById('successMsg');
 
   if (!partnerUid) {
+    console.log('No partnerUid found');
     alert("No partner paired. Please pair with a sub first.");
     btn.disabled = false;
     btn.textContent = 'ASSIGN TO SUB';
     return;
   }
 
+  console.log('Starting assignment for:', Array.from(selectedTrainings));
   btn.disabled = true;
   btn.textContent = 'ASSIGNING...';
 
@@ -232,7 +241,7 @@ async function assignTrainings() {
     }, 1800);
 
   } catch (error) {
-    console.error(error);
+    console.error('Assignment error:', error);
     alert('Error assigning training: ' + error.message);
     btn.disabled = false;
     btn.textContent = 'ASSIGN TO SUB';
