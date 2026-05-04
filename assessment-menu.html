@@ -112,7 +112,8 @@ textarea{min-height:80px;resize:vertical}
 
 <script type="module">
 import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, partnerDataRef } from './auth.js';
-import { setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { setDoc, serverTimestamp, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { db } from './firebase-config.js';
 
 const trainings = [
   { id: 'deepthroat', name: 'Deepthroat', desc: 'Oral training & control' },
@@ -220,7 +221,8 @@ async function assignTrainings() {
 
   try {
     for (const trainingId of selectedTrainings) {
-      const ref = await partnerDataRef(`training/${trainingId}`);
+      // Manually create reference to sub's training document
+      const ref = doc(db, 'users', partnerUid, 'training', trainingId);
       await setDoc(ref, {
         level: 1,
         progress: 0,
