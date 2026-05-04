@@ -213,21 +213,6 @@ function renderDomDashboard() {
       <a href="toy-vault.html" class="qbtn"><span class="qi">🧸</span><span class="ql">Vaults &amp; Assets</span></a>
     </div>
 
-    <div class="sec-lbl">SUB’S LIVE STATUS</div>
-    <div class="card" style="padding:18px 16px" id="liveStatusCard">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-        <div style="width:42px;height:42px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:20px">👑</div>
-        <div style="flex:1">
-          <div style="font-weight:600;color:var(--gold-l);font-size:15px">${subName}</div>
-          <div style="font-size:10px;color:var(--muted)" id="liveStatusText">Loading live status...</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button onclick="issuePraise()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--gold-b);background:transparent;color:var(--gold);font-size:10px;letter-spacing:1px">ISSUE PRAISE</button>
-        <button onclick="issueCorrection()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--crimson);background:var(--crimson);color:white;font-size:10px;letter-spacing:1px">ISSUE CORRECTION</button>
-      </div>
-    </div>
-
     <div class="sec-lbl">PROTOCOL COMMAND CENTER</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div onclick="window.location='protocol-daily.html'" class="qbtn" style="flex:1;min-width:110px;padding:12px 10px">
@@ -408,25 +393,6 @@ function loadLiveStatsForDom() {
     document.getElementById('pendingVal').textContent = '—';
   }
 
-  // Live Sub Status
-  loadLiveSubStatus();
-}
-
-function loadLiveSubStatus() {
-  if (!partnerUid) {
-    document.getElementById('liveStatusText').innerHTML = 'No partner paired yet';
-    return;
-  }
-  // Listen to partner's latest note or training completion
-  const notesRef = partnerDataCol('notes', partnerUid);
-  const q = query(notesRef, orderBy('timestamp', 'desc'), limit(1));
-  onSnapshot(q, (snap) => {
-    if (!snap.empty) {
-      const latest = snap.docs[0].data();
-      const text = latest.content || latest.text || 'Recently active';
-      document.getElementById('liveStatusText').innerHTML = `${text} <span style="color:#4ade80">• just now</span>`;
-    }
-  });
 }
 
 function loadLiveActivityFeedForDom() {
