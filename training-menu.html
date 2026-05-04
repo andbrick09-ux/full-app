@@ -34,6 +34,39 @@
       color: var(--gold, #D4AF37);
       opacity: 0.6;
     }
+    .progress-bar {
+      height: 6px;
+      background: rgba(212,175,55,0.2);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+    .training-meta {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .assign-btn {
+      margin-top: 10px;
+      padding: 6px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .assign-btn:hover {
+      background: var(--gold);
+      color: #080c14;
+    }
   </style>
 </head>
 <body data-nav="training">
@@ -46,85 +79,181 @@
   </div>
 
   <div class="main">
-    <div class="menu-grid">
-      <a href="the-5-training.html" class="menu-card" data-training="the-5">
-        <span class="menu-card-icon">🖐️</span>
-        <span class="menu-card-title">The "5" Training</span>
-        <span class="menu-card-desc">Classical conditioning protocol to cum on Sir's command. 4-phase program with edging, trigger association, and maintenance.</span>
-      </a>
-
-      <a href="anal-plug-training.html" class="menu-card" data-training="anal-plug">
-        <span class="menu-card-icon">💎</span>
-        <span class="menu-card-title">Anal Plug Training</span>
-        <span class="menu-card-desc">Progressive size and duration training program with tracking and scheduled milestones.</span>
-      </a>
-
-      <a href="deepthroat-training.html" class="menu-card" data-training="deepthroat">
-        <span class="menu-card-icon">👄</span>
-        <span class="menu-card-title">Deep Throat Training</span>
-        <span class="menu-card-desc">Step-by-step depth and endurance conditioning with techniques and progress tracking.</span>
-      </a>
-
-      <a href="kegel-training.html" class="menu-card" data-training="kegel">
-        <span class="menu-card-icon">🔐</span>
-        <span class="menu-card-title">Kegel Training</span>
-        <span class="menu-card-desc">Pelvic floor strengthening routines with timed exercises and intensity progression.</span>
-      </a>
-
-      <a href="position-training.html" class="menu-card" data-training="positions">
-        <span class="menu-card-icon">🧎‍♀️</span>
-        <span class="menu-card-title">Position Training</span>
-        <span class="menu-card-desc">12 submissive positions with step-by-step form instructions, hold durations, and mastery tracking.</span>
-      </a>
-
-      <a href="heel-training.html" class="menu-card" data-training="heel">
-        <span class="menu-card-icon">👠</span>
-        <span class="menu-card-title">Heel Training</span>
-        <span class="menu-card-desc">Progressive heel height and endurance protocol with posture drills, session logging, and Sir's review.</span>
-      </a>
+    <div class="menu-grid" id="trainingGrid">
+      <!-- Populated by JavaScript -->
     </div>
   </div>
 
-  <div id="toast" class="toast">Locked by Sir</div>
+  <div id="toast" class="toast"></div>
 
   <script type="module">
-    import { requireAuth, dataRef } from './auth.js';
-    import { getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { requireAuth, getMyProfile, dataRef, partnerDataRef } from './auth.js';
+    import { getDoc, setDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    async function applyTrainingLocks() {
+    const trainings = [
+      { id: 'the-5', name: 'The "5" Training', icon: '🖐️', desc: 'Classical conditioning protocol to cum on Sir\'s command.' },
+      { id: 'anal-plug', name: 'Anal Plug Training', icon: '💎', desc: 'Progressive size and duration training program.' },
+      { id: 'deepthroat', name: 'Deep Throat Training', icon: '👄', desc: 'Step-by-step depth and endurance conditioning.' },
+      { id: 'kegel', name: 'Kegel Training', icon: '🔐', desc: 'Pelvic floor strengthening routines.' },
+      { id: 'positions', name: 'Position Training', icon: '🧎‍♀️', desc: '12 submissive positions with mastery tracking.' },
+      { id: 'heel', name: 'Heel Training', icon: '👠', desc: 'Progressive heel height and endurance protocol.' }
+    ];
+
+    async function renderTrainingMenu() {
       await requireAuth();
+      const profile = await getMyProfile();
+      const isDom = profile?.role === 'dom';
+      const grid = document.getElementById('trainingGrid');
+      grid.innerHTML = '';
 
-      const trainingIds = ['the-5', 'anal-plug', 'deepthroat', 'kegel', 'positions', 'heel'];
+      for (const t of trainings) {
+        const card = document.createElement('div');
+        card.className = 'menu-card';
 
-      for (const id of trainingIds) {
-        const card = document.querySelector(`.menu-card[data-training="${id}"]`);
-        if (!card) continue;
+        let progress = 0;
+        let isAssigned = false;
+        let assignedData = {};
 
-        const docRef = dataRef(`training/${id}`);
-        const snap = await getDoc(docRef);
+        // Check if this training is assigned to the sub
+        try {
+          let ref;
+          if (isDom) {
+            // Dom checks the partner's (sub's) training document
+            const partnerRef = await partnerDataRef(`training/${t.id}`);
+            const snap = await getDoc(partnerRef);
+            if (snap.exists()) {
+              isAssigned = true;
+              assignedData = snap.data();
+              progress = assignedData.progress || 0;
+            }
+          } else {
+            // Sub checks their own training document
+            const snap = await getDoc(dataRef(`training/${t.id}`));
+            if (snap.exists()) {
+              isAssigned = true;
+              assignedData = snap.data();
+              progress = assignedData.progress || 0;
+            }
+          }
+        } catch (e) {
+          console.log(`Error checking training ${t.id}`);
+        }
 
-        if (!snap.exists()) {
-          // Not assigned → lock it
-          card.classList.add('locked');
-          card.removeAttribute('href');
-          const icon = card.querySelector('.menu-card-icon');
-          if (icon) icon.textContent = '🔒';
+        let html = `
+          <span class="menu-card-icon">${t.icon}</span>
+          <span class="menu-card-title">${t.name}</span>
+          <span class="menu-card-desc">${t.desc}</span>
+        `;
 
-          card.onclick = (e) => {
-            e.preventDefault();
-            const t = document.getElementById('toast');
-            if (t) {
-              t.textContent = 'Locked by Sir';
-              t.classList.add('show');
-              setTimeout(() => t.classList.remove('show'), 2500);
+        if (isDom) {
+          // DOM VIEW
+          html += `
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progress}%"></div>
+            </div>
+            <div class="training-meta">
+              ${isAssigned ? `Progress: ${progress}%` : 'Not assigned yet'}
+            </div>
+          `;
+
+          if (isAssigned) {
+            html += `<button class="assign-btn" onclick="unassignTraining('${t.id}', this)">Unassign</button>`;
+          } else {
+            html += `<button class="assign-btn" onclick="assignTraining('${t.id}', this)">Assign to Sub</button>`;
+          }
+
+          card.innerHTML = html;
+          card.onclick = () => {
+            if (isAssigned) {
+              window.location.href = `${t.id}-training.html`;
             }
           };
+
+        } else {
+          // SUB VIEW
+          if (!isAssigned) {
+            card.classList.add('locked');
+            card.onclick = (e) => {
+              e.preventDefault();
+              const toast = document.getElementById('toast');
+              if (toast) {
+                toast.textContent = 'Locked by Sir';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2500);
+              }
+            };
+          } else {
+            card.onclick = () => window.location.href = `${t.id}-training.html`;
+          }
+
+          html += `
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progress}%"></div>
+            </div>
+            <div class="training-meta">Progress: ${progress}%</div>
+          `;
+
+          card.innerHTML = html;
         }
-        // If it exists → fully unlocked (do nothing)
+
+        grid.appendChild(card);
       }
     }
 
-    applyTrainingLocks();
+    // Assign training (Dom only)
+    window.assignTraining = async function(trainingId, btn) {
+      btn.disabled = true;
+      btn.textContent = 'Assigning...';
+
+      try {
+        const ref = await partnerDataRef(`training/${trainingId}`);
+        await setDoc(ref, {
+          progress: 0,
+          assignedBy: (await requireAuth()).uid,
+          assignedAt: serverTimestamp(),
+          status: 'assigned'
+        }, { merge: true });
+
+        btn.textContent = 'Unassign';
+        btn.onclick = () => unassignTraining(trainingId, btn);
+        showToast('Training assigned successfully');
+      } catch (e) {
+        showToast('Failed to assign training');
+        btn.textContent = 'Assign to Sub';
+        btn.disabled = false;
+      }
+    };
+
+    // Unassign training (Dom only)
+    window.unassignTraining = async function(trainingId, btn) {
+      if (!confirm('Unassign this training from your sub?')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Removing...';
+
+      try {
+        const ref = await partnerDataRef(`training/${trainingId}`);
+        await deleteDoc(ref);
+        btn.textContent = 'Assign to Sub';
+        btn.onclick = () => assignTraining(trainingId, btn);
+        showToast('Training unassigned');
+      } catch (e) {
+        showToast('Failed to unassign');
+        btn.textContent = 'Unassign';
+        btn.disabled = false;
+      }
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if (t) {
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+      }
+    }
+
+    renderTrainingMenu();
   </script>
 
   <script src="nav.js"></script>
