@@ -2623,7 +2623,7 @@
       return '<div class="seg-control">' +
         `<button class="seg-btn${isYes ? ' active-yes' : ''}" onclick="setSeg(this,'${sk}','Yes')" data-sk-seg="${sk}">Yes</button>` +
         `<button class="seg-btn${isWant ? ' active-want' : ''}" onclick="setSeg(this,'${sk}','No but I want to')" data-sk-seg="${sk}">Want to</button>` +
-        `<button class="seg-btn${isNo ? ' active-no' : ''}" onclick="setSeg(this,'${sk}',SEG_NO)" data-sk-seg="${sk}">No</button>` +
+        `<button class="seg-btn${isNo ? ' active-no' : ''}" onclick="setSeg(this,'${sk}','${SEG_NO}')" data-sk-seg="${sk}">No</button>` +
         '</div>';
     }
 
@@ -2869,6 +2869,7 @@
         const label = cat === 'special' ? '⭐ Special' : cat === 'Dominance/submission' ? 'D/s' : cat === 'Voyeurism/Exhibitionism' ? 'Voyeur/Exhib' : cat === 'Service and Restrictive Behaviour' ? 'Service' : cat;
         return `<div class="tab-grid-item" onclick="pickTabFromGrid('${esc(cat)}')">
       <div class="tgi-name">${label}</div>
+      ${prog ? `<div style="font-size:9px;color:var(--text-muted);margin-top:2px;">${prog}</div>` : ''}
     </div>`;
       }).join('');
       document.getElementById('tabGridOverlay').classList.add('open');
