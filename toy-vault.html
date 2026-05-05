@@ -461,7 +461,7 @@
       </div>
       <div class="filter-group">
         <button class="filter-pill active" onclick="setOwnerF(this,'all')">All</button>
-        <button class="filter-pill dom"    onclick="setOwnerF(this,'Dom')">Dom</button>
+        <button class="filter-pill dom"    onclick="setOwnerF(this,&quot;Sir's Toys&quot;)">Sir's</button>
         <button class="filter-pill sub"    onclick="setOwnerF(this,'Sub')">Sub</button>
       </div>
       <button class="btn-add" onclick="openToyModal()">+ Add</button>
@@ -736,8 +736,9 @@ function setWishF(el, v) {
 function openToyModal(id) {
   const ownerSelect = document.getElementById('t-owner');
   ownerSelect.innerHTML = `
-    <option value="dom">${myName}'s Toys</option>
-    <option value="sub">${partnerName}'s Toys</option>
+    <option value="Sir's Toys">${myName}'s Toys</option>
+    <option value="Sub">${partnerName}'s Toys</option>
+    <option value="Shared">Shared</option>
   `;
 
   document.getElementById('t-id').value = id || '';
@@ -756,7 +757,7 @@ function openToyModal(id) {
     document.getElementById('tms').textContent = 'Document a new toy for the vault';
     ['t-name','t-notes','t-drat','t-srat'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('t-cat').value   = 'Vibration';
-    document.getElementById('t-owner').value = myRole === 'dom' ? 'dom' : 'sub';
+    document.getElementById('t-owner').value = myRole === 'dom' ? "Sir's Toys" : 'Sub';
   }
   document.getElementById('toy-modal').classList.add('open');
 }
@@ -878,13 +879,15 @@ function renderVault() {
     return mo && mq;
   });
 
-  // Stats
-  const total=toys.length, domC=toys.filter(t=>t.owner==='Dom').length,
-    subC=toys.filter(t=>t.owner==='Sub').length, domC=toys.filter(t=>t.owner==="Sir's Toys").length,
-    rated=toys.filter(t=>t.domRating>0||t.subRating>0).length;
+  // Stats — Bug 1 fix: removed duplicate const domC and declared sharedC properly
+  const total   = toys.length;
+  const domC    = toys.filter(t => t.owner === "Sir's Toys").length;
+  const subC    = toys.filter(t => t.owner === 'Sub').length;
+  const sharedC = toys.filter(t => t.owner === 'Shared').length;
+  const rated   = toys.filter(t => t.domRating > 0 || t.subRating > 0).length;
   document.getElementById('stats-bar').innerHTML = [
     `<div class="stat-pill"><span>${total}</span>Total</div>`,
-    `<div class="stat-pill"><span>${domC}</span>Dom</div>`,
+    `<div class="stat-pill"><span>${domC}</span>Sir's</div>`,
     `<div class="stat-pill"><span>${subC}</span>Sub</div>`,
     `<div class="stat-pill"><span>${sharedC}</span>Shared</div>`,
     `<div class="stat-pill"><span>${total-rated}</span>Unrated</div>`,
@@ -921,7 +924,7 @@ function renderVault() {
 
     items.forEach(t => {
       const isExp = expandedId === t.id;
-      const stripeClass = t.owner==='Dom'?'stripe-dom':t.owner==='Sub'?'stripe-sub':'stripe-shared';
+      const stripeClass = t.owner==="Sir's Toys"?'stripe-dom':t.owner==='Sub'?'stripe-sub':'stripe-shared';
       html += `
         <div class="toy-row${isExp?' expanded':''}" onclick="toggleRow('${t.id}')">
           <div class="toy-row-stripe ${stripeClass}"></div>
@@ -1012,7 +1015,14 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');})
 );
 
+// ─── BACKDROP CLICK ───────────────────────────────────────────────────────────
+// Bug 4 fix: this function was referenced in HTML but never defined
+function handleToyBackdropClick(e) {
+  if (e.target === document.getElementById('toy-modal')) closeToyModal();
+}
+
 // Expose for inline onclick handlers
+window.handleToyBackdropClick = handleToyBackdropClick;
 window.switchTab     = switchTab;
 window.setOwnerF     = setOwnerF;
 window.setWishF      = setWishF;
