@@ -461,7 +461,7 @@
       </div>
       <div class="filter-group">
         <button class="filter-pill active" onclick="setOwnerF(this,'all')">All</button>
-        <button class="filter-pill dom"    onclick="setOwnerF(this,&quot;Sir's Toys&quot;)">Sir's</button>
+        <button class="filter-pill dom"    onclick="setOwnerF(this,'Dom')">Dom</button>
         <button class="filter-pill sub"    onclick="setOwnerF(this,'Sub')">Sub</button>
       </div>
       <button class="btn-add" onclick="openToyModal()">+ Add</button>
@@ -664,6 +664,8 @@ let collapsedCats = {};
 let myName = 'Dom';
 let partnerName = 'Sub';
 let myRole = 'dom';
+let domLabel = "Dom's Toys";
+let subLabel = "Sub's Toys";
 
 // ─── FIX 2: declare collection refs at module scope ───────────────────────────
 let toysCol;
@@ -674,7 +676,23 @@ async function loadData(user) {
     toysCol   = dataCol('vault-toys',   user.uid);
     wishesCol = dataCol('vault-wishes', user.uid);
 
-    // Names are set to defaults above (can be made dynamic later)
+    // Load real names for dynamic "Belongs To"
+    try {
+      const profile = await getMyProfile();
+      myName = profile?.displayName || user.email?.split('@')[0] || 'Dom';
+      myRole = profile?.role || 'dom';
+
+      const pUid = await getPartnerUid();
+      if (pUid) {
+        const pProfile = await getUserProfile(pUid);
+        partnerName = pProfile?.displayName || 'Sub';
+      }
+
+      domLabel = `${myName}'s Toys`;
+      subLabel = `${partnerName}'s Toys`;
+    } catch(e) {
+      console.log('Using default names (partner info not available)');
+    }
 
     const [toysSnap, wishesSnap] = await Promise.all([
       getDocs(toysCol),
@@ -736,9 +754,8 @@ function setWishF(el, v) {
 function openToyModal(id) {
   const ownerSelect = document.getElementById('t-owner');
   ownerSelect.innerHTML = `
-    <option value="Sir's Toys">${myName}'s Toys</option>
-    <option value="Sub">${partnerName}'s Toys</option>
-    <option value="Shared">Shared</option>
+    <option value="dom">${domLabel}</option>
+    <option value="sub">${subLabel}</option>
   `;
 
   document.getElementById('t-id').value = id || '';
@@ -757,7 +774,7 @@ function openToyModal(id) {
     document.getElementById('tms').textContent = 'Document a new toy for the vault';
     ['t-name','t-notes','t-drat','t-srat'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('t-cat').value   = 'Vibration';
-    document.getElementById('t-owner').value = myRole === 'dom' ? "Sir's Toys" : 'Sub';
+    document.getElementById('t-owner').value = myRole === 'dom' ? 'dom' : 'sub';
   }
   document.getElementById('toy-modal').classList.add('open');
 }
@@ -879,15 +896,13 @@ function renderVault() {
     return mo && mq;
   });
 
-  // Stats — Bug 1 fix: removed duplicate const domC and declared sharedC properly
-  const total   = toys.length;
-  const domC    = toys.filter(t => t.owner === "Sir's Toys").length;
-  const subC    = toys.filter(t => t.owner === 'Sub').length;
-  const sharedC = toys.filter(t => t.owner === 'Shared').length;
-  const rated   = toys.filter(t => t.domRating > 0 || t.subRating > 0).length;
+  // Stats
+  const total=toys.length, domC=toys.filter(t=>t.owner==='Dom').length,
+    subC=toys.filter(t=>t.owner==='Sub').length, domC=toys.filter(t=>t.owner==="Sir's Toys").length,
+    rated=toys.filter(t=>t.domRating>0||t.subRating>0).length;
   document.getElementById('stats-bar').innerHTML = [
     `<div class="stat-pill"><span>${total}</span>Total</div>`,
-    `<div class="stat-pill"><span>${domC}</span>Sir's</div>`,
+    `<div class="stat-pill"><span>${domC}</span>Dom</div>`,
     `<div class="stat-pill"><span>${subC}</span>Sub</div>`,
     `<div class="stat-pill"><span>${sharedC}</span>Shared</div>`,
     `<div class="stat-pill"><span>${total-rated}</span>Unrated</div>`,
@@ -924,7 +939,7 @@ function renderVault() {
 
     items.forEach(t => {
       const isExp = expandedId === t.id;
-      const stripeClass = t.owner==="Sir's Toys"?'stripe-dom':t.owner==='Sub'?'stripe-sub':'stripe-shared';
+      const stripeClass = t.owner==='Dom'?'stripe-dom':t.owner==='Sub'?'stripe-sub':'stripe-shared';
       html += `
         <div class="toy-row${isExp?' expanded':''}" onclick="toggleRow('${t.id}')">
           <div class="toy-row-stripe ${stripeClass}"></div>
@@ -1015,14 +1030,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');})
 );
 
-// ─── BACKDROP CLICK ───────────────────────────────────────────────────────────
-// Bug 4 fix: this function was referenced in HTML but never defined
-function handleToyBackdropClick(e) {
-  if (e.target === document.getElementById('toy-modal')) closeToyModal();
-}
-
 // Expose for inline onclick handlers
-window.handleToyBackdropClick = handleToyBackdropClick;
 window.switchTab     = switchTab;
 window.setOwnerF     = setOwnerF;
 window.setWishF      = setWishF;
