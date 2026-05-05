@@ -755,6 +755,13 @@ async function loadCategories() {
     console.warn('Could not load categories from Firestore, using local/defaults:', e);
     if (!Array.isArray(categories)) categories = [];
   }
+  sortCategories();
+}
+
+function sortCategories() {
+  if (Array.isArray(categories)) {
+    categories.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  }
 }
 
 async function saveCategory(name) {
@@ -816,6 +823,7 @@ async function addCategory() {
 
   categories.push(name);
   await saveCategory(name);
+  sortCategories();
   input.value = '';
   renderCategoryList();
   updateCategorySelects();
@@ -837,6 +845,7 @@ function editCategory(oldName) {
   // Save changes
   saveCategory(newName);
   deleteCategoryFromDB(oldName);
+  sortCategories();
 
   renderCategoryList();
   updateCategorySelects();
@@ -855,6 +864,7 @@ async function deleteCategory(name) {
 
   categories = categories.filter(c => c !== name);
   await deleteCategoryFromDB(name);
+  sortCategories();
 
   renderCategoryList();
   updateCategorySelects();
