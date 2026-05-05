@@ -245,20 +245,6 @@
     }
     .empty-sub { font-size: 11px; color: #555; letter-spacing: 0.5px; }
 
-    /* ── FAB ── */
-    .fab {
-      position: fixed; bottom: calc(24px + var(--safe-b)); right: 22px;
-      width: 58px; height: 58px; border-radius: 50%;
-      background: var(--luxury-gradient); color: var(--midnight);
-      border: none; font-size: 26px; font-weight: 300;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 90;
-      box-shadow: 0 8px 24px rgba(212,175,55,0.45);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .fab:hover { transform: scale(1.06); box-shadow: 0 12px 32px rgba(212,175,55,0.55); }
-    .fab:active { transform: scale(0.94); }
-
     /* ── Modal overlay ── */
     .modal-back {
       position: fixed; inset: 0; z-index: 300;
@@ -562,13 +548,10 @@
     <div id="empty-state">
       <div class="empty-ornament">✦</div>
       <div class="empty-title">No notes found</div>
-      <div class="empty-sub">Try a different filter, or tap + to create one.</div>
+      <div class="empty-sub">Try a different filter, or tap the New Note button above.</div>
     </div>
 
   </div>
-
-  <!-- FAB -->
-  <button class="fab" onclick="openNewNoteModal()" aria-label="New note">+</button>
 
   <!-- ══ New / Edit Note Modal ══ -->
   <div id="note-modal" class="modal-back" onclick="handleModalBackdropClick(event)">
