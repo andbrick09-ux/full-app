@@ -743,22 +743,42 @@ async function loadCategories() {
     if (!Array.isArray(categories)) categories = [];
     const snap = await getDocs(categoryCol);
     if (!snap.empty) {
-      categories = snap.docs.map(d => d.data().name);
+      const savedNames = snap.docs.map(d => d.data().name);
+      // Merge saved categories with local ones (avoid duplicates)
+      savedNames.forEach(name => {
+        if (!categories.includes(name)) {
+          categories.push(name);
+        }
+      });
     }
   } catch (e) {
-    console.warn('Could not load categories, using defaults');
+    console.warn('Could not load categories from Firestore, using local/defaults:', e);
     if (!Array.isArray(categories)) categories = [];
   }
 }
 
 async function saveCategory(name) {
-  const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
-  await setDoc(doc(categoryCol, id), { name, added: Date.now() });
+  try {
+    if (!categoryCol) {
+      console.error('categoryCol not ready');
+      return;
+    }
+    const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
+    await setDoc(doc(categoryCol, id), { name, added: Date.now() });
+  } catch (e) {
+    console.error('Failed to save category to Firestore:', e);
+    alert('Failed to save the new category. Please check console for details.');
+  }
 }
 
 async function deleteCategoryFromDB(name) {
-  const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
-  await deleteDoc(doc(categoryCol, id));
+  try {
+    if (!categoryCol) return;
+    const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
+    await deleteDoc(doc(categoryCol, id));
+  } catch (e) {
+    console.error('Failed to delete category from Firestore:', e);
+  }
 }
 
 function openCategoryModal() {
