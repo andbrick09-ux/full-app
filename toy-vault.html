@@ -661,8 +661,8 @@ let wishF  = 'all';
 let expandedId = null;
 let collapsedCats = {};
 
-let myName = 'You';
-let partnerName = 'Partner';
+let myName = 'Dom';
+let partnerName = 'Sub';
 let myRole = 'dom';
 
 // ─── FIX 2: declare collection refs at module scope ───────────────────────────
@@ -674,18 +674,7 @@ async function loadData(user) {
     toysCol   = dataCol('vault-toys',   user.uid);
     wishesCol = dataCol('vault-wishes', user.uid);
 
-    // Fetch names for dynamic "Belongs To"
-    try {
-      const profile = await getMyProfile();
-      myName = profile?.displayName || user.email?.split('@')[0] || 'You';
-      myRole = profile?.role || 'dom';
-
-      const pUid = await getPartnerUid();
-      if (pUid) {
-        const pProfile = await getUserProfile(pUid);
-        partnerName = pProfile?.displayName || 'Partner';
-      }
-    } catch(e) { console.log('Partner info load failed (non-critical)'); }
+    // Names are set to defaults above (can be made dynamic later)
 
     const [toysSnap, wishesSnap] = await Promise.all([
       getDocs(toysCol),
@@ -745,14 +734,10 @@ function setWishF(el, v) {
 
 // ─── MODALS ───────────────────────────────────────────────────────────────────
 function openToyModal(id) {
-  // Dynamically set owner options with real names (with fallback)
   const ownerSelect = document.getElementById('t-owner');
-  const domLabel = myName && myName !== 'You' ? `${myName}'s Toys` : "Dom's Toys";
-  const subLabel = partnerName && partnerName !== 'Partner' ? `${partnerName}'s Toys` : "Sub's Toys";
-
   ownerSelect.innerHTML = `
-    <option value="dom">${domLabel}</option>
-    <option value="sub">${subLabel}</option>
+    <option value="dom">${myName}'s Toys</option>
+    <option value="sub">${partnerName}'s Toys</option>
   `;
 
   document.getElementById('t-id').value = id || '';
