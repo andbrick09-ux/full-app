@@ -1053,7 +1053,8 @@ function renderVault() {
   const groups = {};
   categories.forEach(c => groups[c] = []);
   filtered.forEach(t => {
-    const c = groups[t.category] !== undefined ? t.category : 'Other';
+    let c = groups[t.category] !== undefined ? t.category : 'Other';
+    if (!groups[c]) groups[c] = [];
     groups[c].push(t);
   });
 
