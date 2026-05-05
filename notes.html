@@ -526,8 +526,6 @@
         <option value="za">Z – A</option>
       </select>
 
-      <button class="export-btn" onclick="exportNotes()">Export ↗</button>
-
       <!-- Prominent New Note button -->
       <button class="new-note-btn" onclick="openNewNoteModal()">
         <span class="material-symbols-rounded">add</span>
@@ -1010,17 +1008,6 @@
       showToast('Note deleted');
     }
 
-    /* ── Export ── */
-    function exportNotes() {
-      const data = JSON.stringify(notes, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'dsh-notes.json';
-      a.click();
-      showToast('Notes exported');
-    }
-
     /* ── Init ── */
     // Expose all functions called from inline HTML onclick handlers
     window.saveNote          = saveNote;
@@ -1030,7 +1017,6 @@
     window.openViewModal     = openViewModal;
     window.closeViewModal    = closeViewModal;
     window.editCurrentNote   = editCurrentNote;
-    window.exportNotes       = exportNotes;
     window.handleViewBackdropClick = handleViewBackdropClick;
     window.openNewNoteModal  = openNewNoteModal;
     window.selectAccent      = selectAccent;
