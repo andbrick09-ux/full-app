@@ -697,6 +697,12 @@ function updateLabels() {
       <option value="Sub">${subName}</option>
     `;
   }
+
+  // Update wishlist filter button texts (dynamic names)
+  const wishDomBtn = document.querySelector('#tab-wishlist .filter-pill.dom');
+  if (wishDomBtn) wishDomBtn.textContent = domName;
+  const wishSubBtn = document.querySelector('#tab-wishlist .filter-pill.sub');
+  if (wishSubBtn) wishSubBtn.textContent = subName;
 }
 
 // ─── TABS ────────────────────────────────────────────────────────────────────
