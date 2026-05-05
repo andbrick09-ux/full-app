@@ -586,7 +586,7 @@
 
 <script type="module">
 // ─── FIX 1: imports added ─────────────────────────────────────────────────────
-import { requireAuth } from './auth.js';
+import { requireAuth, getMyProfile, getPartnerUid, getUserProfile } from './auth.js';
 import {
   doc, setDoc, deleteDoc, getDocs, collection
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -745,11 +745,14 @@ function setWishF(el, v) {
 
 // ─── MODALS ───────────────────────────────────────────────────────────────────
 function openToyModal(id) {
-  // Dynamically set owner options with real names
+  // Dynamically set owner options with real names (with fallback)
   const ownerSelect = document.getElementById('t-owner');
+  const domLabel = myName && myName !== 'You' ? `${myName}'s Toys` : "Dom's Toys";
+  const subLabel = partnerName && partnerName !== 'Partner' ? `${partnerName}'s Toys` : "Sub's Toys";
+
   ownerSelect.innerHTML = `
-    <option value="dom">${myName}'s Toys</option>
-    <option value="sub">${partnerName}'s Toys</option>
+    <option value="dom">${domLabel}</option>
+    <option value="sub">${subLabel}</option>
   `;
 
   document.getElementById('t-id').value = id || '';
