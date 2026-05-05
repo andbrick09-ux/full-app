@@ -397,6 +397,7 @@
         <button class="filter-pill sub"    onclick="setOwnerF(this,'Sub')">Sub</button>
       </div>
       <button class="btn-add" onclick="openToyModal()">+ Add</button>
+      <button class="btn-add" onclick="openCategoryModal()" style="background:linear-gradient(135deg,#555,#777);margin-left:6px">⚙ Manage</button>
     </div>
     <div id="stats-bar" class="stats-bar"></div>
     <div id="vault-list"></div>
@@ -525,6 +526,31 @@
   </div>
 </div>
 
+<!-- CATEGORY MODAL -->
+<div id="category-modal" class="modal-overlay">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">Manage Categories</div>
+    <div class="modal-subtitle">Add, rename, or remove categories</div>
+
+    <!-- Add new -->
+    <div class="form-group" style="margin-bottom:16px">
+      <div style="display:flex; gap:8px">
+        <input type="text" class="form-input" id="cat-new-name" placeholder="New category name" style="flex:1">
+        <button class="btn-primary" onclick="addCategory()" style="flex:0 0 auto; padding:9px 16px">Add</button>
+      </div>
+    </div>
+
+    <!-- List -->
+    <div id="category-list" style="max-height:320px; overflow-y:auto; border:1px solid var(--glass-border); border-radius:4px; background:var(--card); padding:4px">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-cancel" onclick="closeCategoryModal()">Done</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 // ─── FIX 1: imports added ─────────────────────────────────────────────────────
 import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
@@ -588,7 +614,7 @@ const SEED = [
   {name:'Blindfold',        cat:'Gag & Blindfold',    owner:'Dom'},
 ];
 
-const CATS = [
+let categories = [
   'Vibration','Insertion','Anal Play','Pumps','Internal',
   'Nipple Play','Clamps & Spreaders','Impact','Restraint',
   'Sensation','Gag & Blindfold','Other'
@@ -617,6 +643,7 @@ async function loadData(user) {
   try {
     toysCol   = dataCol('vault-toys',   user.uid);
     wishesCol = dataCol('vault-wishes', user.uid);
+    categoryCol = dataCol('categories', user.uid);
 
     // Fetch dynamic Dom/Sub names from relationship profiles
     try {
@@ -641,6 +668,9 @@ async function loadData(user) {
     } catch (nameErr) {
       console.warn('Could not load partner names, using defaults:', nameErr);
     }
+
+    await loadCategories();
+    updateCategorySelects();
 
     const [toysSnap, wishesSnap] = await Promise.all([
       getDocs(toysCol),
@@ -703,6 +733,127 @@ function updateLabels() {
   if (wishDomBtn) wishDomBtn.textContent = domName;
   const wishSubBtn = document.querySelector('#tab-wishlist .filter-pill.sub');
   if (wishSubBtn) wishSubBtn.textContent = subName;
+}
+
+// ─── CATEGORY MANAGEMENT ─────────────────────────────────────────────────────
+let categoryCol; // will be set in loadData
+
+async function loadCategories() {
+  try {
+    const snap = await getDocs(categoryCol);
+    if (!snap.empty) {
+      categories = snap.docs.map(d => d.data().name);
+    }
+  } catch (e) {
+    console.warn('Could not load categories, using defaults');
+  }
+}
+
+async function saveCategory(name) {
+  const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
+  await setDoc(doc(categoryCol, id), { name, added: Date.now() });
+}
+
+async function deleteCategoryFromDB(name) {
+  const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
+  await deleteDoc(doc(categoryCol, id));
+}
+
+function openCategoryModal() {
+  document.getElementById('category-modal').classList.add('open');
+  renderCategoryList();
+}
+
+function closeCategoryModal() {
+  document.getElementById('category-modal').classList.remove('open');
+}
+
+function renderCategoryList() {
+  const container = document.getElementById('category-list');
+  container.innerHTML = '';
+
+  categories.forEach(cat => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--glass-border);';
+    div.innerHTML = `
+      <span style="flex:1; font-size:0.85rem;">${esc(cat)}</span>
+      <div style="display:flex; gap:4px">
+        <button onclick="editCategory('${cat}')" style="background:none; border:1px solid var(--gold-border); color:var(--gold); padding:2px 8px; border-radius:3px; font-size:0.7rem; cursor:pointer">Edit</button>
+        <button onclick="deleteCategory('${cat}')" style="background:none; border:1px solid #e57373; color:#e57373; padding:2px 8px; border-radius:3px; font-size:0.7rem; cursor:pointer">Delete</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function addCategory() {
+  const input = document.getElementById('cat-new-name');
+  const name = input.value.trim();
+  if (!name || categories.includes(name)) return;
+
+  categories.push(name);
+  await saveCategory(name);
+  input.value = '';
+  renderCategoryList();
+  updateCategorySelects();
+  renderVault();
+}
+
+function editCategory(oldName) {
+  const newName = prompt('Rename category to:', oldName);
+  if (!newName || newName === oldName || categories.includes(newName)) return;
+
+  const index = categories.indexOf(oldName);
+  categories[index] = newName;
+
+  // Update all toys using this category
+  toys.forEach(t => {
+    if (t.category === oldName) t.category = newName;
+  });
+
+  // Save changes
+  saveCategory(newName);
+  deleteCategoryFromDB(oldName);
+
+  renderCategoryList();
+  updateCategorySelects();
+  renderVault();
+}
+
+async function deleteCategory(name) {
+  if (!confirm(`Delete category "${name}"? Toys in this category will be moved to "Other".`)) return;
+
+  const count = toys.filter(t => t.category === name).length;
+  if (count > 0) {
+    toys.forEach(t => {
+      if (t.category === name) t.category = 'Other';
+    });
+  }
+
+  categories = categories.filter(c => c !== name);
+  await deleteCategoryFromDB(name);
+
+  renderCategoryList();
+  updateCategorySelects();
+  renderVault();
+}
+
+function updateCategorySelects() {
+  // Update toy modal select
+  const toySel = document.getElementById('t-cat');
+  if (toySel) {
+    const current = toySel.value;
+    toySel.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+    if (categories.includes(current)) toySel.value = current;
+  }
+
+  // Update wish modal select
+  const wishSel = document.getElementById('w-cat');
+  if (wishSel) {
+    const current = wishSel.value;
+    wishSel.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+    if (categories.includes(current)) wishSel.value = current;
+  }
 }
 
 // ─── TABS ────────────────────────────────────────────────────────────────────
@@ -895,16 +1046,16 @@ function renderVault() {
     return;
   }
 
-  // Group by category, preserving CATS order
+  // Group by category, preserving order
   const groups = {};
-  CATS.forEach(c => groups[c] = []);
+  categories.forEach(c => groups[c] = []);
   filtered.forEach(t => {
     const c = groups[t.category] !== undefined ? t.category : 'Other';
     groups[c].push(t);
   });
 
   let html = '';
-  CATS.forEach(cat => {
+  categories.forEach(cat => {
     const items = groups[cat];
     if (!items || !items.length) return;
     const collapsed = collapsedCats[cat];
@@ -1028,6 +1179,8 @@ window.deleteWish    = deleteWish;
 window.acquireWish   = acquireWish;
 window.toggleRow     = toggleRow;
 window.toggleCat     = toggleCat;
+window.openCategoryModal = openCategoryModal;
+window.closeCategoryModal = closeCategoryModal;
 
 // Init
 requireAuth().then(user => loadData(user));
