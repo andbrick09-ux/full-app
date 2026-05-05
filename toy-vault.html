@@ -740,12 +740,14 @@ let categoryCol; // will be set in loadData
 
 async function loadCategories() {
   try {
+    if (!Array.isArray(categories)) categories = [];
     const snap = await getDocs(categoryCol);
     if (!snap.empty) {
       categories = snap.docs.map(d => d.data().name);
     }
   } catch (e) {
     console.warn('Could not load categories, using defaults');
+    if (!Array.isArray(categories)) categories = [];
   }
 }
 
@@ -787,6 +789,7 @@ function renderCategoryList() {
 }
 
 async function addCategory() {
+  if (!Array.isArray(categories)) categories = [];
   const input = document.getElementById('cat-new-name');
   const name = input.value.trim();
   if (!name || categories.includes(name)) return;
