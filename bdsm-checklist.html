@@ -2532,6 +2532,15 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
+    // Robust error handler - catches import failures and other errors
+    window.addEventListener('error', function(e) {
+      console.error('Global error caught:', e);
+      const loading = document.getElementById('loadingOverlay');
+      const errorBox = document.getElementById('firebaseError');
+      if (loading) loading.classList.add('hidden');
+      if (errorBox) errorBox.style.display = 'flex';
+    });
+
     import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, getRelationship } from './auth.js';
     import { db } from './firebase-config.js';
     import { doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
