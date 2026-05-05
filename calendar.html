@@ -203,8 +203,45 @@
   </div>
 
   <!-- Floating Action Button -->
-  <div class="fab" onclick="addEvent()">
+  <div class="fab" onclick="showAddEventModal()">
     <span class="material-symbols-rounded">add</span>
+  </div>
+
+  <!-- Add Event Modal -->
+  <div id="addEventModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 300; align-items: center; justify-content: center;">
+    <div style="background: #051024; border-radius: 16px; padding: 24px; width: 90%; max-width: 400px; border: 1px solid var(--border);">
+      <h3 style="color: var(--gold); margin-bottom: 20px; font-family: 'Playfair Display', serif;">Add New Event</h3>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="color: #888; font-size: 12px; display: block; margin-bottom: 6px;">Event Title</label>
+        <input type="text" id="eventTitle" style="width: 100%; padding: 12px; background: rgba(5,16,36,0.8); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 15px;" placeholder="Enter event title">
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="color: #888; font-size: 12px; display: block; margin-bottom: 6px;">Date</label>
+        <input type="date" id="eventDate" style="width: 100%; padding: 12px; background: rgba(5,16,36,0.8); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 15px;">
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="color: #888; font-size: 12px; display: block; margin-bottom: 6px;">Type</label>
+        <select id="eventType" style="width: 100%; padding: 12px; background: rgba(5,16,36,0.8); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 15px;">
+          <option value="scene">Scene</option>
+          <option value="task">Task</option>
+          <option value="ritual">Ritual</option>
+          <option value="personal">Personal</option>
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="color: #888; font-size: 12px; display: block; margin-bottom: 6px;">Description (optional)</label>
+        <textarea id="eventDesc" style="width: 100%; padding: 12px; background: rgba(5,16,36,0.8); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 15px; min-height: 80px;" placeholder="Add details..."></textarea>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button onclick="hideAddEventModal()" style="flex: 1; padding: 14px; background: transparent; border: 1px solid #666; color: #888; border-radius: 999px; font-weight: 700;">Cancel</button>
+        <button onclick="saveNewEvent()" style="flex: 1; padding: 14px; background: var(--gold); color: #080c14; border: none; border-radius: 999px; font-weight: 700;">Add Event</button>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Navigation -->
@@ -306,11 +343,36 @@
     function prevDay() { alert('Day navigation coming soon'); }
     function nextDay() { alert('Day navigation coming soon'); }
 
-    function addEvent() {
-      const title = prompt('Event title:');
-      if (title) {
-        alert('Event "' + title + '" added! (This would save to Firestore)');
+    function showAddEventModal() {
+      document.getElementById('addEventModal').style.display = 'flex';
+      // Set default date to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('eventDate').value = today;
+    }
+
+    function hideAddEventModal() {
+      document.getElementById('addEventModal').style.display = 'none';
+    }
+
+    function saveNewEvent() {
+      const title = document.getElementById('eventTitle').value;
+      const date = document.getElementById('eventDate').value;
+      const type = document.getElementById('eventType').value;
+      const desc = document.getElementById('eventDesc').value;
+
+      if (!title || !date) {
+        alert('Please enter a title and date');
+        return;
       }
+
+      // Here you would save to Firestore
+      alert('Event "' + title + '" added for ' + date + '! (This would save to Firestore)');
+
+      hideAddEventModal();
+
+      // Clear form
+      document.getElementById('eventTitle').value = '';
+      document.getElementById('eventDesc').value = '';
     }
 
     function init() {
