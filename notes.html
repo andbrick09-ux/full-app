@@ -467,6 +467,39 @@
       border: 1px solid var(--gold);
       color: #ddd;
     }
+
+    /* === New Note Button (matches theme) === */
+    .new-note-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 18px;
+      height: 42px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #D4AF37, #f0d060);
+      color: #051024;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(212,175,55,0.35);
+      white-space: nowrap;
+    }
+    .new-note-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(212,175,55,0.45);
+    }
+    .new-note-btn:active {
+      transform: scale(0.96);
+    }
+    .new-note-btn .material-symbols-rounded {
+      font-size: 18px;
+      margin-top: -1px;
+    }
   </style>
 </head>
 
@@ -498,7 +531,7 @@
       <button class="filter-btn"        id="filter-archived" onclick="setFilter('archived')">Archived</button>
     </div>
 
-    <!-- Sort + Export -->
+    <!-- Sort + Export + New Note -->
     <div class="controls-row">
       <select id="sort-select" class="sort-select" onchange="renderNotes()">
         <option value="newest">Newest First</option>
@@ -506,7 +539,14 @@
         <option value="az">A – Z</option>
         <option value="za">Z – A</option>
       </select>
+
       <button class="export-btn" onclick="exportNotes()">Export ↗</button>
+
+      <!-- Prominent New Note button -->
+      <button class="new-note-btn" onclick="openNewNoteModal()">
+        <span class="material-symbols-rounded">add</span>
+        <span>New Note</span>
+      </button>
     </div>
 
     <!-- Count -->
