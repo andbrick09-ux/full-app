@@ -140,6 +140,15 @@
     .nav-item.active {
       color: var(--gold);
     }
+    .event-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+    }
   </style>
 </head>
 <body>
@@ -171,9 +180,7 @@
         <div class="month-label" id="monthLabel">July 2026</div>
         <button class="month-nav-btn" onclick="nextMonth()">→</button>
       </div>
-      <div class="calendar-grid" id="calendarGrid">
-        <!-- Calendar days populated by JS -->
-      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
     <!-- Week View -->
@@ -273,16 +280,15 @@
     let currentView = 'month';
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
+    let events = [];
+    let recurTasks = [];
 
     function switchView(view) {
       currentView = view;
-      
       document.getElementById('view-month').style.display = 'none';
       document.getElementById('view-week').style.display = 'none';
       document.getElementById('view-day').style.display = 'none';
-      
       document.getElementById('view-' + view).style.display = 'block';
-      
       document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
     }
@@ -316,6 +322,15 @@
           dayEl.classList.add('today');
         }
         
+        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        const dayEvents = events.filter(e => e.date === dateStr);
+        
+        if (dayEvents.length > 0) {
+          const dot = document.createElement('div');
+          dot.className = 'event-dot';
+          dayEl.appendChild(dot);
+        }
+        
         grid.appendChild(dayEl);
       }
     }
@@ -345,7 +360,6 @@
 
     function showAddEventModal() {
       document.getElementById('addEventModal').style.display = 'flex';
-      // Set default date to today
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('eventDate').value = today;
     }
@@ -365,17 +379,28 @@
         return;
       }
 
-      // Here you would save to Firestore
-      alert('Event "' + title + '" added for ' + date + '! (This would save to Firestore)');
+      events.push({
+        id: Date.now().toString(),
+        date: date,
+        type: type,
+        title: title,
+        desc: desc,
+        createdBy: 'user',
+        visibility: 'both',
+        unlocked: true,
+        completed: false
+      });
 
       hideAddEventModal();
-
-      // Clear form
       document.getElementById('eventTitle').value = '';
       document.getElementById('eventDesc').value = '';
+      renderMonth();
+      alert('Event "' + title + '" added!');
     }
 
     function init() {
+      events = [];
+      recurTasks = [];
       renderMonth();
       document.getElementById('view-month').style.display = 'block';
       document.getElementById('view-week').style.display = 'none';
