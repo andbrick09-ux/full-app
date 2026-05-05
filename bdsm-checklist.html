@@ -2281,6 +2281,25 @@
 <body data-nav="more">
 
   <div class="loading-overlay" id="loadingOverlay">
+  
+  <!-- Firebase Error Message -->
+  <div id="firebaseError" style="display:none; position:fixed; inset:0; background:rgba(5,16,36,0.95); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+    <div style="max-width:520px; background:#071830; border:1px solid #D4AF37; border-radius:16px; padding:32px 28px; text-align:center; color:#f0e6d3;">
+      <div style="font-size:42px; margin-bottom:12px;">🔥</div>
+      <h2 style="font-family:'Playfair Display',serif; color:#D4AF37; margin-bottom:12px;">Firebase Connection Required</h2>
+      <p style="font-size:15px; line-height:1.6; color:#e8d9b8; margin-bottom:20px;">
+        This checklist is part of the full <strong>BDSM Hub</strong> app.<br>
+        It needs the real Firebase backend + authentication to work.
+      </p>
+      <div style="background:rgba(212,175,55,0.1); border:1px solid #D4AF37; border-radius:10px; padding:14px; font-size:13px; text-align:left; margin-bottom:20px;">
+        <strong>To run this page:</strong><br>
+        • Open it from the full BDSM Hub web app (with auth.js + firebase-config.js present)<br>
+        • Or run it on a local dev server with all supporting files<br>
+        • Make sure your Firebase project is correctly configured
+      </div>
+      <button onclick="location.reload()" style="background:#D4AF37; color:#051024; border:none; padding:12px 28px; font-weight:700; border-radius:999px; cursor:pointer; font-size:14px;">Try Again</button>
+    </div>
+  </div>
     <div class="loading-title">BDSM Checklist</div>
     <div class="spinner"></div>
     <div class="loading-sub">Loading Checklist…</div>
@@ -3603,7 +3622,13 @@ Final response.
       localStorage.setItem('checklist_view_mode', mode);
     };
 
-    init().catch(e => { console.error(e); document.getElementById('loadingOverlay').classList.add('hidden'); });
+    init().catch(e => {
+      console.error('Firebase init failed:', e);
+      const loading = document.getElementById('loadingOverlay');
+      const errorBox = document.getElementById('firebaseError');
+      if (loading) loading.classList.add('hidden');
+      if (errorBox) errorBox.style.display = 'flex';
+    });
   </script>
 
   <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
