@@ -420,6 +420,53 @@
     }
   </style>
 <link rel="stylesheet" href="nav.css" />
+
+  <!-- Quill Rich Text Editor -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <style>
+    /* Quill toolbar styled to match Dom Sub Hub theme */
+    .ql-toolbar.ql-snow {
+      background: rgba(5,16,36,0.95);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      padding: 8px 12px;
+    }
+    .ql-toolbar.ql-snow .ql-stroke {
+      stroke: #D4AF37;
+    }
+    .ql-toolbar.ql-snow .ql-fill {
+      fill: #D4AF37;
+    }
+    .ql-toolbar.ql-snow .ql-picker-label {
+      color: #D4AF37;
+    }
+    .ql-container.ql-snow {
+      background: var(--glass2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      color: #ddd;
+      min-height: 180px;
+    }
+    .ql-editor {
+      min-height: 160px;
+      padding: 14px 16px;
+      line-height: 1.7;
+    }
+    .ql-editor.ql-blank::before {
+      color: rgba(255,255,255,0.25);
+      font-style: normal;
+    }
+    /* Make Quill feel native */
+    .ql-snow .ql-tooltip {
+      background: #051024;
+      border: 1px solid var(--gold);
+      color: #ddd;
+    }
+  </style>
 </head>
 
 <body data-nav="more">
@@ -494,7 +541,9 @@
       <input id="note-title-input" class="field-input" type="text" placeholder="Note heading…" />
 
       <label class="field-label">Content</label>
-      <textarea id="note-body-input" class="field-textarea" placeholder="Write your thoughts here…"></textarea>
+      <div id="quill-editor" style="min-height: 180px;"></div>
+      <!-- Hidden fallback for old notes -->
+      <textarea id="note-body-input" style="display:none;"></textarea>
 
       <label class="field-label">Tags (comma-separated)</label>
       <input id="note-tags-input" class="field-input" type="text" placeholder="e.g. scene, reflection, rule" />
@@ -566,6 +615,7 @@
     let selectedVisibility = 'private';
     let editingId = null;
     let viewingId = null;
+    let quill = null; // Quill rich text editor instance
 
     async function init() {
       currentUser = await requireAuth();
@@ -716,10 +766,14 @@
       document.getElementById('modal-heading').textContent   = 'New Note';
       document.getElementById('modal-subheading').textContent = 'Add to your private record';
       document.getElementById('note-title-input').value = '';
-      document.getElementById('note-body-input').value  = '';
       document.getElementById('note-tags-input').value  = '';
       selectAccent(document.querySelector('[data-accent="gold"]'), 'gold');
       setVisibility('private');
+
+      // Initialize Quill and clear it
+      const q = initQuill();
+      q.setText('');
+
       document.getElementById('note-modal').classList.add('open');
     }
 
@@ -729,6 +783,24 @@
 
     function handleModalBackdropClick(e) {
       if (e.target === document.getElementById('note-modal')) closeModal();
+    }
+
+    /* ── Initialize Quill Rich Text Editor (once) ── */
+    function initQuill() {
+      if (quill) return quill;
+      quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Write your thoughts, protocols, reflections…',
+        modules: {
+          toolbar: [
+            [{ 'header': [2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['clean']
+          ]
+        }
+      });
+      return quill;
     }
 
     /* ── Accent / visibility ── */
@@ -748,7 +820,8 @@
     /* ── Save with Activity Logging ── */
     async function saveNote() {
       const title = document.getElementById('note-title-input').value.trim();
-      const body  = document.getElementById('note-body-input').value.trim();
+      const q = initQuill();
+      const body = q.root.innerHTML.trim();   // Save as rich HTML
       if (!title) { showToast('Please add a title'); return; }
 
       const tags = document.getElementById('note-tags-input').value
@@ -822,7 +895,16 @@
       document.getElementById('view-badges').innerHTML = badgeHTML;
       document.getElementById('view-title').textContent = n.title;
       document.getElementById('view-meta').textContent  = date;
-      document.getElementById('view-body').textContent  = n.body;
+
+      // Render rich text if it contains HTML tags, otherwise plain text (backward compat)
+      const viewBodyEl = document.getElementById('view-body');
+      if (n.body && (n.body.includes('<p>') || n.body.includes('<strong>') || n.body.includes('<em>'))) {
+        viewBodyEl.innerHTML = n.body;
+        viewBodyEl.style.whiteSpace = 'normal';
+      } else {
+        viewBodyEl.textContent = n.body || '';
+        viewBodyEl.style.whiteSpace = 'pre-wrap';
+      }
       document.getElementById('view-tags').innerHTML = (n.tags||[]).map(t =>
         `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
       ).join('');
@@ -876,11 +958,19 @@
       document.getElementById('modal-heading').textContent    = 'Edit Note';
       document.getElementById('modal-subheading').textContent = 'Update your record';
       document.getElementById('note-title-input').value = n.title;
-      document.getElementById('note-body-input').value  = n.body;
       document.getElementById('note-tags-input').value  = (n.tags||[]).join(', ');
       const dot = document.querySelector(`[data-accent="${n.accent}"]`);
       if (dot) selectAccent(dot, n.accent);
       setVisibility(n.visibility || 'private');
+
+      // Load into Quill (backward compatible with old plain-text notes)
+      const q = initQuill();
+      if (n.body && (n.body.includes('<') || n.body.includes('</'))) {
+        q.root.innerHTML = n.body;           // rich text
+      } else {
+        q.setText(n.body || '');             // old plain text
+      }
+
       document.getElementById('note-modal').classList.add('open');
     }
 
