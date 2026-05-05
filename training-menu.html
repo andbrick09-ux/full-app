@@ -163,10 +163,9 @@
           }
 
           card.innerHTML = html;
+          // Dom can always click to view the training (no locks for Dom)
           card.onclick = () => {
-            if (isAssigned) {
-              window.location.href = `${t.id}-training.html`;
-            }
+            window.location.href = `${t.id}-training.html`;
           };
 
         } else {
