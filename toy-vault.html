@@ -371,6 +371,70 @@
     .form-row { grid-template-columns:1fr; }
     .modal { padding:20px 14px; }
   }
+
+  /* === Match Notes Modal Style === */
+  .modal-back {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.82); backdrop-filter: blur(10px);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .modal-back.open { opacity: 1; pointer-events: all; }
+
+  .modal-sheet {
+    background: rgba(5,16,36,0.97); backdrop-filter: blur(24px);
+    border: 1px solid var(--border); border-radius: 28px 28px 0 0;
+    width: 100%; max-width: 600px;
+    padding: 12px 22px calc(60px + var(--safe-b));
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
+    max-height: 92vh; overflow-y: auto;
+  }
+  .modal-back.open .modal-sheet { transform: translateY(0); }
+
+  .modal-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.1); margin: 14px auto 20px;
+  }
+
+  .modal-heading {
+    font-family: 'Great Vibes', cursive; font-size: 32px;
+    background: linear-gradient(135deg,#D4AF37,#f0d060);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; margin-bottom: 4px;
+  }
+  .modal-subheading {
+    font-size: 11px; color: var(--cream-mute); margin-bottom: 18px;
+  }
+
+  .field-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--gold); margin-bottom: 6px; display: block;
+  }
+  .field-input, .field-textarea {
+    width: 100%; background: rgba(5,16,36,.85); border: 1px solid var(--border);
+    border-radius: 12px; color: #ddd; font-family: 'Montserrat', sans-serif;
+    font-size: 14px; padding: 14px 16px; outline: none; transition: all .2s;
+  }
+  .field-input:focus, .field-textarea:focus { border-color: var(--gold); }
+  .field-textarea { min-height: 90px; resize: vertical; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .modal-cancel {
+    flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03); color: #666;
+    font-family: 'Montserrat', sans-serif; font-size: 10px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+  }
+  .modal-save {
+    flex: 2; padding: 14px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg,#D4AF37,#f0d060); color: #051024;
+    font-family: 'Montserrat', sans-serif; font-size: 10px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(212,175,55,0.25);
+  }
 </style>
 <link rel="stylesheet" href="nav.css" />
 </head>
@@ -424,50 +488,54 @@
 
 </main>
 
-<!-- TOY MODAL -->
-<div id="toy-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-title" id="tmt">Add to Collection</div>
-    <div class="modal-subtitle" id="tms">Document a new toy for the vault</div>
-    <div class="form-group">
-      <label class="form-label">Toy Name</label>
-      <input type="text" class="form-input" id="t-name">
-    </div>
+<!-- TOY MODAL (styled like Notes modal) -->
+<div id="toy-modal" class="modal-back" onclick="handleToyBackdropClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="modal-heading" id="tmt">Add to Collection</div>
+    <div class="modal-subheading" id="tms">Document a new toy for the vault</div>
+
+    <label class="field-label">Toy Name</label>
+    <input id="t-name" class="field-input" type="text" placeholder="e.g. Magic Wand" />
+
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select class="form-select" id="t-cat">
+      <div>
+        <label class="field-label">Category</label>
+        <select id="t-cat" class="field-input">
           <option>Vibration</option><option>Insertion</option><option>Anal Play</option>
           <option>Pumps</option><option>Internal</option><option>Nipple Play</option>
           <option>Clamps &amp; Spreaders</option><option>Impact</option><option>Restraint</option>
           <option>Sensation</option><option>Gag &amp; Blindfold</option><option>Other</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Belongs To</label>
-        <select class="form-select" id="t-owner">
+      <div>
+        <label class="field-label">Belongs To</label>
+        <select id="t-owner" class="field-input">
           <option>Shared</option><option>Dom</option><option>Sub</option>
         </select>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="t-notes" placeholder="Material, brand, how it's used…"></textarea>
-    </div>
+
+    <label class="field-label">Notes / Description</label>
+    <textarea id="t-notes" class="field-textarea" placeholder="Material, brand, how it's used…"></textarea>
+
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Dom Rating (0–5)</label>
-        <input type="number" class="form-input" id="t-drat" min="0" max="5" step="0.5" placeholder="0">
+      <div>
+        <label class="field-label">Dom Rating (0–5)</label>
+        <input id="t-drat" class="field-input" type="number" min="0" max="5" step="0.5" placeholder="0">
       </div>
-      <div class="form-group">
-        <label class="form-label">Sub Rating (0–5)</label>
-        <input type="number" class="form-input" id="t-srat" min="0" max="5" step="0.5" placeholder="0">
+      <div>
+        <label class="field-label">Sub Rating (0–5)</label>
+        <input id="t-srat" class="field-input" type="number" min="0" max="5" step="0.5" placeholder="0">
       </div>
     </div>
+
     <input type="hidden" id="t-id">
+
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveToy()">Save to Vault</button>
+      <button class="modal-cancel" onclick="closeToyModal()">Cancel</button>
+      <button class="modal-save" onclick="saveToy()">Save to Vault</button>
     </div>
   </div>
 </div>
