@@ -414,6 +414,11 @@
         <button class="filter-pill" onclick="setWishF(this,'Medium')">Medium</button>
         <button class="filter-pill" onclick="setWishF(this,'Low')">Low</button>
       </div>
+      <div class="filter-group">
+        <button class="filter-pill active" onclick="setWishOwnerF(this,'all')">All</button>
+        <button class="filter-pill dom"    onclick="setWishOwnerF(this,'Dom')">Dom</button>
+        <button class="filter-pill sub"    onclick="setWishOwnerF(this,'Sub')">Sub</button>
+      </div>
       <button class="btn-add" onclick="openWishModal()">+ Add</button>
     </div>
     <div id="wish-list" class="wish-list"></div>
@@ -492,6 +497,15 @@
         <label class="form-label">Priority</label>
         <select class="form-select" id="w-pri">
           <option>High</option><option selected>Medium</option><option>Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Added By</label>
+        <select class="form-select" id="w-addedby">
+          <option value="Dom">Dom</option>
+          <option value="Sub">Sub</option>
         </select>
       </div>
     </div>
@@ -585,6 +599,7 @@ let toys   = [];
 let wishes = [];
 let ownerF = 'all';
 let wishF  = 'all';
+let wishOwnerF = 'all';
 let expandedId = null;
 let collapsedCats = {};
 
@@ -707,6 +722,13 @@ function setWishF(el, v) {
   renderWishlist();
 }
 
+function setWishOwnerF(el, v) {
+  wishOwnerF = v;
+  document.querySelectorAll('#tab-wishlist .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderWishlist();
+}
+
 // ─── MODALS ───────────────────────────────────────────────────────────────────
 function openToyModal(id) {
   document.getElementById('t-id').value = id || '';
@@ -738,11 +760,13 @@ function openWishModal(id) {
     document.getElementById('w-name').value  = w.name;
     document.getElementById('w-cat').value   = w.category;
     document.getElementById('w-pri').value   = w.priority;
+    document.getElementById('w-addedby').value = w.addedBy || 'Dom';
     document.getElementById('w-notes').value = w.notes;
     document.getElementById('w-link').value  = w.link || '';
   } else {
     ['w-name','w-notes','w-link'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('w-pri').value = 'Medium';
+    document.getElementById('w-addedby').value = 'Dom';
   }
   document.getElementById('wish-modal').classList.add('open');
 }
@@ -776,6 +800,7 @@ async function saveWish() {
     id: id || 'wish_'+Date.now(), name,
     category: document.getElementById('w-cat').value,
     priority: document.getElementById('w-pri').value,
+    addedBy:  document.getElementById('w-addedby').value,
     notes:    document.getElementById('w-notes').value.trim(),
     link:     document.getElementById('w-link').value.trim(),
     added: id ? (wishes.find(w=>w.id===id)?.added||Date.now()) : Date.now()
@@ -942,8 +967,9 @@ function renderWishlist() {
   const q = document.getElementById('wish-search').value.toLowerCase();
   const filtered = wishes.filter(w => {
     const mp = wishF==='all'||w.priority===wishF;
+    const mo = wishOwnerF==='all'||w.addedBy===wishOwnerF;
     const mq = !q||w.name.toLowerCase().includes(q)||w.category.toLowerCase().includes(q);
-    return mp&&mq;
+    return mp&&mo&&mq;
   });
   const list = document.getElementById('wish-list');
   if (!filtered.length) {
@@ -957,7 +983,7 @@ function renderWishlist() {
       <div class="wish-pri-dot ${dotCls(w.priority)}"></div>
       <div class="wish-body">
         <div class="wish-name">${esc(w.name)}</div>
-        <div class="wish-meta">${esc(w.category)}</div>
+        <div class="wish-meta">${esc(w.category)} • Added by ${w.addedBy === 'Dom' ? domName : subName}</div>
         ${w.notes?`<div class="wish-notes-text">${esc(w.notes)}</div>`:''}
         <div class="wish-actions">
           <button class="btn-wa acquire" onclick="acquireWish('${w.id}')">Acquired ✓</button>
@@ -984,6 +1010,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
 window.switchTab     = switchTab;
 window.setOwnerF     = setOwnerF;
 window.setWishF      = setWishF;
+window.setWishOwnerF = setWishOwnerF;
 window.openToyModal  = openToyModal;
 window.closeToyModal = closeToyModal;
 window.openWishModal = openWishModal;
