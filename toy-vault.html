@@ -385,10 +385,12 @@
     background: rgba(5,16,36,0.97); backdrop-filter: blur(24px);
     border: 1px solid var(--border); border-radius: 28px 28px 0 0;
     width: 100%; max-width: 600px;
-    padding: 12px 22px calc(80px + var(--safe-b));   /* Extra safe for nav bar */
+    padding: 16px 22px calc(90px + var(--safe-b));
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
-    max-height: 92vh; overflow-y: auto;
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .modal-back.open .modal-sheet { transform: translateY(0); }
 
@@ -518,7 +520,7 @@
     </div>
 
     <label class="field-label">Notes / Description</label>
-    <textarea id="t-notes" class="field-textarea" placeholder="Material, brand, how it's used…"></textarea>
+    <textarea id="t-notes" class="field-textarea" placeholder="Material, brand, how it's used…" style="min-height: 70px;"></textarea>
 
     <div class="form-row">
       <div>
