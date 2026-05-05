@@ -218,21 +218,19 @@
           status: 'assigned'
         }, { merge: true });
 
-        btn.textContent = 'Unassign';
-        btn.onclick = () => unassignTraining(trainingId, btn);
         showToast('Training assigned successfully');
         
-        // Refresh the menu
-        setTimeout(() => renderTrainingMenu(), 800);
+        // Always refresh the full menu for reliable state
+        setTimeout(() => renderTrainingMenu(), 600);
       } catch (e) {
         console.error(e);
         showToast('Failed to assign training');
-        btn.textContent = 'Assign to Sub';
         btn.disabled = false;
+        btn.textContent = 'Assign to Sub';
       }
     };
 
-    // Unassign training (Dom only)
+    // Unassign training (Dom only) - simplified for reliability
     window.unassignTraining = async function(trainingId, btn) {
       if (!confirm('Unassign this training from your sub?')) return;
 
@@ -242,17 +240,15 @@
       try {
         const ref = await partnerDataRef(`training/${trainingId}`);
         await deleteDoc(ref);
-        btn.textContent = 'Assign to Sub';
-        btn.onclick = () => assignTraining(trainingId, btn);
         showToast('Training unassigned');
         
-        // Refresh the menu
-        setTimeout(() => renderTrainingMenu(), 800);
+        // Always refresh the full menu — this guarantees the button and card update correctly
+        setTimeout(() => renderTrainingMenu(), 600);
       } catch (e) {
         console.error(e);
         showToast('Failed to unassign');
-        btn.textContent = 'Unassign';
         btn.disabled = false;
+        btn.textContent = 'Unassign';
       }
     };
 
