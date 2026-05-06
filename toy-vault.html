@@ -552,12 +552,12 @@
             <div id="cat-rows-${cat}" style="padding: 0 12px;">
               ${items.map(t => `
                 <div class="toy-row" onclick="openToyModal('${t.id}'); event.stopImmediatePropagation();">
-                  <div class="toy-stripe ${t.owner === myRole ? 'stripe-mine' : 'stripe-partner'}"></div>
+                  <div class="toy-stripe ${t.owner.toLowerCase() === myRole ? 'stripe-mine' : 'stripe-partner'}"></div>
                   <div class="toy-main">
                     <div class="toy-name">${t.name}</div>
                     <div class="toy-ratings">
-                      <span>${t.owner === myRole ? 'Mine' : partnerName}: ${createMiniStars(t.domRating)}</span>
-                      <span>${t.owner === myRole ? partnerName : 'Mine'}: ${createMiniStars(t.subRating)}</span>
+                      <span>${t.owner.toLowerCase() === myRole ? 'Mine' : partnerName}: ${createMiniStars(t.domRating)}</span>
+                      <span>${t.owner.toLowerCase() === myRole ? partnerName : 'Mine'}: ${createMiniStars(t.subRating)}</span>
                     </div>
                   </div>
                 </div>
@@ -622,7 +622,7 @@
     function renderWishlist() {
       const container = document.getElementById('wish-list');
       container.innerHTML = wishes.map(w => {
-        const addedBy = (w.owner === myRole) ? "Added by Me" : `Added by ${partnerName}`;
+        const addedBy = (w.owner?.toLowerCase() === myRole) ? "Added by Me" : `Added by ${partnerName}`;
         return `
           <div class="menu-card" onclick="openWishModal('${w.id}')">
             <div class="menu-card-title">${w.name}</div>
