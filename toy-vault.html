@@ -96,7 +96,7 @@
     .toy-name { font-family: 'Playfair Display', serif; font-size: 15px; color: #ddd; font-weight: 600; }
     .toy-ratings { display: flex; gap: 12px; margin-top: 4px; }
     .mini-star { font-size: 13px; color: #444; }
-    .mini-star.filled { color: var(--gold); }
+    .mini-star.filled { color: #D4AF37 !important; }
 
     /* Wishlist Menu Grid */
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
@@ -556,8 +556,8 @@
                   <div class="toy-main">
                     <div class="toy-name">${t.name}</div>
                     <div class="toy-ratings">
-                      <span>${t.owner.toLowerCase() === myRole ? 'Mine' : partnerName}: ${createMiniStars(t.domRating)}</span>
-                      <span>${t.owner.toLowerCase() === myRole ? partnerName : 'Mine'}: ${createMiniStars(t.subRating)}</span>
+                      <span>Mine: ${createMiniStars(t.domRating)}</span>
+                      <span>${partnerName}: ${createMiniStars(t.subRating)}</span>
                     </div>
                   </div>
                 </div>
