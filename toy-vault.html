@@ -301,11 +301,11 @@
         </div>
       </div>
       <div class="filter-section" style="margin-bottom:0">
-        <div class="filter-label">Added</div>
+        <div class="filter-label">Owner</div>
         <div class="filter-pills">
-          <button class="filter-pill active" onclick="setDateFilter(this, 'all')">All Time</button>
-          <button class="filter-pill" onclick="setDateFilter(this, 'month')">This Month</button>
-          <button class="filter-pill" onclick="setDateFilter(this, 'quarter')">Last 3 Months</button>
+          <button class="filter-pill active" onclick="setOwnerFilter(this, 'all')">All</button>
+          <button class="filter-pill dom" onclick="setOwnerFilter(this, 'Dom')">Dom</button>
+          <button class="filter-pill sub" onclick="setOwnerFilter(this, 'Sub')">Sub</button>
         </div>
       </div>
     </div>
@@ -373,6 +373,7 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
       <button class="btn-primary" onclick="saveToy()">Save</button>
+      <button id="toy-delete-btn" class="btn-cancel" onclick="deleteToyFromModal()" style="color:#e57373; border-color:#e57373; display:none;">Delete</button>
     </div>
   </div>
 </div>
@@ -392,20 +393,12 @@
       <select class="form-select" id="w-cat"></select>
     </div>
     
-    <div class="form-group">
-      <label class="form-label">Priority</label>
-      <select class="form-select" id="w-priority">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
-      </select>
-    </div>
-    
     <input type="hidden" id="w-id">
     
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeWishModal()">Cancel</button>
       <button class="btn-primary" onclick="saveWish()">Save</button>
+      <button id="wish-delete-btn" class="btn-cancel" onclick="deleteWish()" style="color:#e57373; border-color:#e57373; display:none;">Delete</button>
     </div>
   </div>
 </div>
@@ -446,11 +439,12 @@ let categories = ['Vibration','Insertion','Anal Play','Impact','Restraint','Sens
 let toysCol, wishesCol, categoryCol;
 let domName = 'Dom', subName = 'Sub', domInitial = 'D', subInitial = 'S';
 let ownerF = 'all', wishF = 'all', collapsedCats = {};
+let myRole = null; // 'dom' or 'sub'
 
 // NEW: Filter state
 let ratingFilter = 'all';
 let smartFilter = 'all';
-let dateFilter = 'all';
+let ownerFilter = 'all';   // New owner filter in panel
 
 // ─── HELPER ───
 function dataCol(path, id) { return collection(db, 'data', id, path); }
@@ -498,6 +492,7 @@ async function loadData(user) {
     }
     domInitial = domName.charAt(0);
     subInitial = subName.charAt(0);
+    myRole = myProfile?.role || null;
     updateLabels();
 
     const catSnap = await getDocs(categoryCol);
@@ -562,8 +557,8 @@ function setSmartFilter(el, value) {
   renderVault();
 }
 
-function setDateFilter(el, value) {
-  dateFilter = value;
+function setOwnerFilter(el, value) {
+  ownerFilter = value;
   document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderVault();
@@ -572,7 +567,7 @@ function setDateFilter(el, value) {
 window.toggleFiltersPanel = toggleFiltersPanel;
 window.setRatingFilter = setRatingFilter;
 window.setSmartFilter = setSmartFilter;
-window.setDateFilter = setDateFilter;
+window.setOwnerFilter = setOwnerFilter;
 
 // ─── SAVE & DELETE ───
 async function saveToy() {
@@ -605,6 +600,15 @@ async function deleteToy(id) {
   showToast("Toy removed", "success");
   renderVault();
 }
+
+window.deleteToyFromModal = async function(id) {
+  if (!confirm('Delete this toy?')) return;
+  await deleteDoc(doc(toysCol, id));
+  toys = toys.filter(t => t.id !== id);
+  document.getElementById('toy-modal').classList.remove('open');
+  showToast("Toy deleted", "success");
+  renderVault();
+};
 
 // ─── QUICK MOVE FROM WISHLIST ───
 async function quickMoveToVault(wishId) {
@@ -727,17 +731,9 @@ function renderVault() {
     });
   }
 
-  // Apply date filter
-  if (dateFilter !== 'all') {
-    const now = Date.now();
-    const monthAgo = now - (30 * 24 * 60 * 60 * 1000);
-    const quarterAgo = now - (90 * 24 * 60 * 60 * 1000);
-    
-    filtered = filtered.filter(t => {
-      if (dateFilter === 'month') return t.added >= monthAgo;
-      if (dateFilter === 'quarter') return t.added >= quarterAgo;
-      return true;
-    });
+  // Apply owner filter from panel
+  if (ownerFilter !== 'all') {
+    filtered = filtered.filter(t => t.owner === ownerFilter);
   }
 
   const groups = {};
@@ -790,7 +786,7 @@ function renderWishlist() {
     <div class="wish-card">
       <div class="wish-body">
         <div class="wish-name">${w.name}</div>
-        <div class="wish-meta">${w.category || 'Uncategorized'} • ${w.priority || 'Medium'}</div>
+        <div class="wish-meta">${w.category || 'Uncategorized'}</div>
       </div>
       <div class="wish-actions">
         <button class="wish-btn" onclick="quickMoveToVault('${w.id}')">Add to Vault</button>
@@ -803,8 +799,8 @@ function renderWishlist() {
 window.openWishModal = (id) => {
   const modal = document.getElementById('wish-modal');
   const wCat = document.getElementById('w-cat');
+  const deleteBtn = document.getElementById('wish-delete-btn');
   
-  // Make sure categories are loaded
   if (wCat && wCat.options.length === 0) {
     wCat.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
   }
@@ -815,12 +811,16 @@ window.openWishModal = (id) => {
     document.getElementById('w-id').value = id;
     document.getElementById('w-name').value = w.name;
     document.getElementById('w-cat').value = w.category || 'Other';
-    document.getElementById('w-priority').value = w.priority || 'Medium';
+    
+    // Show delete button only if user owns this item
+    const canDelete = (myRole === 'dom' && w.owner === 'Dom') || (myRole === 'sub' && w.owner === 'Sub');
+    deleteBtn.style.display = canDelete ? 'inline-block' : 'none';
+    deleteBtn.onclick = () => deleteWish(id);
   } else {
     document.getElementById('wmt').textContent = 'Add to Wishlist';
     ['w-name','w-id'].forEach(f => document.getElementById(f).value = '');
     document.getElementById('w-cat').value = 'Vibration';
-    document.getElementById('w-priority').value = 'Medium';
+    deleteBtn.style.display = 'none';
   }
   modal.classList.add('open');
 };
@@ -838,7 +838,6 @@ window.saveWish = async function() {
     id,
     name,
     category: document.getElementById('w-cat').value,
-    priority: document.getElementById('w-priority').value,
     added: Date.now()
   };
   
@@ -847,6 +846,15 @@ window.saveWish = async function() {
   wishes.push(wish);
   document.getElementById('wish-modal').classList.remove('open');
   showToast("Wishlist item saved!", "success");
+  renderWishlist();
+};
+
+window.deleteWish = async function(id) {
+  if (!confirm('Remove this item from wishlist?')) return;
+  await deleteDoc(doc(wishesCol, id));
+  wishes = wishes.filter(w => w.id !== id);
+  document.getElementById('wish-modal').classList.remove('open');
+  showToast("Wishlist item removed", "success");
   renderWishlist();
 };
 
@@ -874,6 +882,7 @@ window.openToyModal = (id) => {
   const modal = document.getElementById('toy-modal');
   const domStars = document.getElementById('dom-star-rating');
   const subStars = document.getElementById('sub-star-rating');
+  const deleteBtn = document.getElementById('toy-delete-btn');
   
   if (id) {
     const t = toys.find(x => x.id === id);
@@ -885,13 +894,19 @@ window.openToyModal = (id) => {
     document.getElementById('t-notes').value = t.notes || '';
     document.getElementById('t-drat').value = t.domRating || 0;
     document.getElementById('t-srat').value = t.subRating || 0;
+    
+    // Show delete only if current user owns this toy
+    const canDelete = (myRole === 'dom' && t.owner === 'Dom') || (myRole === 'sub' && t.owner === 'Sub');
+    deleteBtn.style.display = canDelete ? 'inline-block' : 'none';
+    deleteBtn.onclick = () => deleteToyFromModal(id);
   } else {
     document.getElementById('tmt').textContent = 'Add to Collection';
-    ['t-name','t-notes','t-id'].forEach(f => document.getElementById(f).value = '');
+    ['t-name','t-notes','t-drat','t-srat','t-id'].forEach(f => document.getElementById(f).value = '');
     document.getElementById('t-cat').value = 'Vibration';
     document.getElementById('t-owner').value = 'Dom';
     document.getElementById('t-drat').value = 0;
     document.getElementById('t-srat').value = 0;
+    deleteBtn.style.display = 'none';
   }
   
   initStarRating(domStars, 'dom', document.getElementById('t-drat').value);
