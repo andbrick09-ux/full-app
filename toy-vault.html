@@ -182,11 +182,13 @@
 
     <!-- COLLECTION TAB -->
     <div id="tab-vault">
-      <div style="display:flex; gap:8px; margin-bottom:16px;">
+      <div style="display:flex; gap:8px; margin-bottom:16px; align-items:center;">
         <input type="text" id="search" placeholder="Search toys..." 
                style="flex:1; background:#0a1224; border:1px solid var(--border); border-radius:9999px; padding:12px 18px; color:#ddd;"
                oninput="renderVault()">
         <button onclick="openFilterSheet()" class="btn btn-outline" style="padding:12px 18px;">Filter</button>
+        <button onclick="expandAllCategories()" class="btn btn-outline" style="padding:12px 14px; font-size:11px;">Expand All</button>
+        <button onclick="collapseAllCategories()" class="btn btn-outline" style="padding:12px 14px; font-size:11px;">Collapse All</button>
       </div>
 
       <div id="vault-list"></div>
@@ -517,7 +519,7 @@
             <div onclick="toggleCategory('${cat}')" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 20px; cursor:pointer;">
               <div style="display:flex; align-items:center; gap:10px;">
                 <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold);">${cat}</span>
-                <span style="background:rgba(212,175,55,0.15); color:#aaa; font-size:11px; padding:3px 10px; border-radius:9999px; font-weight:500;">${items.length}</span>
+                <span style="background:rgba(212,175,55,0.2); color:#ddd; font-size:12px; padding:4px 11px; border-radius:9999px; font-weight:600;">${items.length}</span>
               </div>
               <span id="chevron-${cat}" style="color:#666; font-size:18px; transition:transform .3s;">▾</span>
             </div>
@@ -560,6 +562,26 @@
         rows.style.display = 'block';
         chevron.style.transform = 'rotate(0deg)';
       }
+    };
+
+    window.expandAllCategories = function() {
+      categories.forEach(cat => {
+        collapsedCategories[cat] = false;
+        const rows = document.getElementById('cat-rows-' + cat);
+        const chevron = document.getElementById('chevron-' + cat);
+        if (rows) rows.style.display = 'block';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      });
+    };
+
+    window.collapseAllCategories = function() {
+      categories.forEach(cat => {
+        collapsedCategories[cat] = true;
+        const rows = document.getElementById('cat-rows-' + cat);
+        const chevron = document.getElementById('chevron-' + cat);
+        if (rows) rows.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      });
     };
 
     function createMiniStars(rating) {
