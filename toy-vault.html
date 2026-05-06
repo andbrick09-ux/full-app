@@ -120,7 +120,8 @@
     .modal-sheet {
       width: 100%; max-width: 620px; background: var(--glass);
       border: 1px solid var(--border); border-radius: 24px 24px 0 0;
-      padding: 8px 24px 32px; transform: translateY(100%);
+      padding: 8px 24px calc(32px + 80px); /* Extra padding to clear bottom nav */
+      transform: translateY(100%);
       transition: transform .35s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .modal-back.open .modal-sheet { transform: translateY(0); }
@@ -292,10 +293,8 @@
       
       <div class="form-group">
         <label class="form-label">Owner</label>
-        <div class="filter-pills">
-          <div class="filter-pill active" onclick="setFilter('owner', 'all', this)">All</div>
-          <div class="filter-pill" onclick="setFilter('owner', 'Dom', this)">Dom</div>
-          <div class="filter-pill" onclick="setFilter('owner', 'Sub', this)">Sub</div>
+        <div class="filter-pills" id="owner-filter-pills">
+          <!-- Populated dynamically with "My Toys" / "Partner's Toys" -->
         </div>
       </div>
       
@@ -318,6 +317,13 @@
         </div>
       </div>
       
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <div class="filter-pills" id="category-filter-pills">
+          <!-- Populated dynamically in JS -->
+        </div>
+      </div>
+      
       <button onclick="applyFiltersAndClose()" class="btn btn-gold" style="margin-top:20px;">Apply Filters</button>
     </div>
   </div>
@@ -333,9 +339,10 @@
     let wishes = [];
     let categories = ['Vibration','Insertion','Anal Play','Impact','Restraint','Sensation','Other'];
     let myRole = null;
+    let partnerName = 'Partner';
 
     let toysCol, wishesCol;
-    let currentFilters = { owner: 'all', rating: 0, smart: 'none' };
+    let currentFilters = { owner: 'all', rating: 0, smart: 'none', category: 'all' };
     let expandedId = null;
 
     function dataCol(path, id) {
@@ -353,11 +360,20 @@
       const profile = await getMyProfile();
       myRole = profile?.role || null;
 
+      // Get partner name for dynamic labels
+      if (rel) {
+        const partnerUid = rel.domId === myUid ? rel.subId : rel.domId;
+        const partnerProfile = await getUserProfile(partnerUid);
+        partnerName = partnerProfile?.displayName || 'Partner';
+      }
+
       const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
       toys = tSnap.docs.map(d => d.data());
       wishes = wSnap.docs.map(d => d.data());
 
       updateCategorySelects();
+      populateCategoryPills();
+      populateOwnerPills();
       renderVault();
       renderWishlist();
     }
@@ -387,12 +403,13 @@
         const matchesOwner = currentFilters.owner === 'all' || t.owner === currentFilters.owner;
         const avg = (t.domRating + t.subRating) / 2;
         const matchesRating = avg >= currentFilters.rating;
+        const matchesCategory = currentFilters.category === 'all' || t.category === currentFilters.category;
         
         let matchesSmart = true;
         if (currentFilters.smart === 'mutual') matchesSmart = t.domRating >= 4 && t.subRating >= 4;
         if (currentFilters.smart === 'attention') matchesSmart = (t.domRating <= 2 || t.subRating <= 2);
         
-        return matchesSearch && matchesOwner && matchesRating && matchesSmart;
+        return matchesSearch && matchesOwner && matchesRating && matchesCategory && matchesSmart;
       });
 
       // Group by category
@@ -636,9 +653,44 @@
 
     window.setFilter = function(type, value, el) {
       currentFilters[type] = value;
-      document.querySelectorAll('#filter-sheet .filter-pill').forEach(p => p.classList.remove('active'));
+      
+      // Special handling for category pills
+      if (type === 'category') {
+        document.querySelectorAll('#category-filter-pills .filter-pill').forEach(p => p.classList.remove('active'));
+      } else {
+        document.querySelectorAll('#filter-sheet .filter-pill').forEach(p => p.classList.remove('active'));
+      }
       el.classList.add('active');
     };
+
+    function populateCategoryPills() {
+      const container = document.getElementById('category-filter-pills');
+      if (!container) return;
+      
+      let html = `<div class="filter-pill active" onclick="setFilter('category', 'all', this)">All</div>`;
+      
+      categories.forEach(cat => {
+        html += `<div class="filter-pill" onclick="setFilter('category', '${cat}', this)">${cat}</div>`;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    function populateOwnerPills() {
+      const container = document.getElementById('owner-filter-pills');
+      if (!container) return;
+      
+      const myLabel = myRole === 'dom' ? "My Toys" : "My Toys";
+      const partnerLabel = `${partnerName}'s Toys`;
+      
+      let html = `
+        <div class="filter-pill active" onclick="setFilter('owner', 'all', this)">All</div>
+        <div class="filter-pill" onclick="setFilter('owner', '${myRole === 'dom' ? 'Dom' : 'Sub'}', this)">${myLabel}</div>
+        <div class="filter-pill" onclick="setFilter('owner', '${myRole === 'dom' ? 'Sub' : 'Dom'}', this)">${partnerLabel}</div>
+      `;
+      
+      container.innerHTML = html;
+    }
 
     window.applyFiltersAndClose = function() {
       document.getElementById('filter-sheet').classList.remove('open');
