@@ -111,6 +111,21 @@
   }
   .btn-add:hover { opacity:0.88; transform:translateY(-1px); }
 
+  /* ── Filters Panel ── */
+  .filters-panel {
+    background: var(--card);
+    border: 1px solid var(--gold-border);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .filters-panel.open { display: block; }
+  .filter-section { margin-bottom: 10px; }
+  .filter-section:last-child { margin-bottom: 0; }
+  .filter-label { font-size: 0.55rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .filter-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+
   /* ── Stats ── */
   .stats-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
   .stat-pill {
@@ -195,15 +210,48 @@
   /* ── Wishlist ── */
   .wish-list { display:flex; flex-direction:column; gap:8px; }
   .wish-card { background:var(--card); border:1px solid var(--glass-border); border-radius:6px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
-  .wish-pri-dot { width:8px; height:8px; border-radius:50%; }
-  .dot-high { background:#e57373; }
-  .dot-med { background:var(--gold); }
-  .dot-low { background:#555; }
   .wish-body { flex:1; }
   .wish-name { font-family:'Playfair Display',serif; font-size:0.88rem; color:var(--text); }
   .wish-meta { font-size:0.58rem; color:var(--gold); text-transform:uppercase; }
-  .wish-pri-badge { font-size:0.52rem; padding:2px 7px; border-radius:2px; text-transform:uppercase; }
-  .badge-high { background:rgba(192,57,43,0.2); color:#e57373; border:1px solid rgba(192,57,43,0.4); }
+  .wish-actions { display:flex; gap:6px; }
+  .wish-btn {
+    background: var(--glass); border:1px solid var(--glass-border); border-radius:3px;
+    color: var(--text-dim); font-size:0.55rem; padding:4px 10px; cursor:pointer;
+    white-space: nowrap;
+  }
+  .wish-btn:hover { background: var(--gold-dim); color: var(--gold-light); border-color: var(--gold); }
+
+  /* ── Toasts ── */
+  #toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast {
+    background: var(--deep-blue);
+    border: 1px solid var(--gold-border);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 320px;
+    animation: toastSlideIn 0.3s ease forwards;
+  }
+  .toast.success { border-color: #00b894; }
+  .toast.error { border-color: #e57373; }
+  .toast.info { border-color: var(--gold); }
+  @keyframes toastSlideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   @media(max-width:480px) { .form-row { grid-template-columns:1fr; } }
 </style>
@@ -221,31 +269,56 @@
 </header>
 
 <main class="container">
+  <!-- COLLECTION TAB -->
   <div id="tab-vault" class="tab-panel active">
     <div class="controls-bar">
       <div class="search-wrap">
         <input type="text" id="vault-search" placeholder="Search…" oninput="renderVault()">
       </div>
-      <div class="filter-group">
-        <button class="filter-pill active" onclick="setOwnerF(this,'all')">All</button>
-        <button class="filter-pill dom" onclick="setOwnerF(this,'Dom')">Dom</button>
-        <button class="filter-pill sub" onclick="setOwnerF(this,'Sub')">Sub</button>
-      </div>
+      <button class="btn-add" onclick="toggleFiltersPanel()" style="background:linear-gradient(135deg,#555,#777); padding:9px 14px;">⚙ Filters</button>
       <button class="btn-add" onclick="openToyModal()">+ Add</button>
       <button class="btn-add" onclick="openCategoryModal()" style="background:linear-gradient(135deg,#555,#777);margin-left:6px">⚙ Manage</button>
     </div>
+
+    <!-- COLLAPSIBLE FILTERS PANEL -->
+    <div id="filters-panel" class="filters-panel">
+      <div class="filter-section">
+        <div class="filter-label">Rating</div>
+        <div class="filter-pills">
+          <button class="filter-pill active" onclick="setRatingFilter(this, 'all')">All</button>
+          <button class="filter-pill" onclick="setRatingFilter(this, '5')">5★</button>
+          <button class="filter-pill" onclick="setRatingFilter(this, '4')">4+★</button>
+          <button class="filter-pill" onclick="setRatingFilter(this, '3')">3+★</button>
+          <button class="filter-pill" onclick="setRatingFilter(this, 'unrated')">Unrated</button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <div class="filter-label">Smart Filters</div>
+        <div class="filter-pills">
+          <button class="filter-pill" onclick="setSmartFilter(this, 'all')">All</button>
+          <button class="filter-pill" onclick="setSmartFilter(this, 'mutual')">Mutual Favorites</button>
+          <button class="filter-pill" onclick="setSmartFilter(this, 'needs')">Needs Attention</button>
+        </div>
+      </div>
+      <div class="filter-section" style="margin-bottom:0">
+        <div class="filter-label">Added</div>
+        <div class="filter-pills">
+          <button class="filter-pill active" onclick="setDateFilter(this, 'all')">All Time</button>
+          <button class="filter-pill" onclick="setDateFilter(this, 'month')">This Month</button>
+          <button class="filter-pill" onclick="setDateFilter(this, 'quarter')">Last 3 Months</button>
+        </div>
+      </div>
+    </div>
+
     <div id="stats-bar" class="stats-bar"></div>
     <div id="vault-list"></div>
   </div>
 
+  <!-- WISHLIST TAB -->
   <div id="tab-wishlist" class="tab-panel">
     <div class="controls-bar">
       <div class="search-wrap">
         <input type="text" id="wish-search" placeholder="Search…" oninput="renderWishlist()">
-      </div>
-      <div class="filter-group">
-        <button class="filter-pill active" onclick="setWishF(this,'all')">All</button>
-        <button class="filter-pill" onclick="setWishF(this,'High')">High</button>
       </div>
       <button class="btn-add" onclick="openWishModal()">+ Add</button>
     </div>
@@ -282,7 +355,6 @@
       <textarea class="form-textarea" id="t-notes" placeholder="Optional notes..."></textarea>
     </div>
     
-    <!-- NEW STAR RATINGS -->
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Dom Rating</label>
@@ -322,6 +394,9 @@
   </div>
 </div>
 
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
 <script type="module">
 import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
 import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -339,8 +414,31 @@ let toysCol, wishesCol, categoryCol;
 let domName = 'Dom', subName = 'Sub', domInitial = 'D', subInitial = 'S';
 let ownerF = 'all', wishF = 'all', collapsedCats = {};
 
+// NEW: Filter state
+let ratingFilter = 'all';
+let smartFilter = 'all';
+let dateFilter = 'all';
+
 // ─── HELPER ───
 function dataCol(path, id) { return collection(db, 'data', id, path); }
+
+// ─── TOAST NOTIFICATIONS ───
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span>${message}</span>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.3s ease';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 2800);
+}
 
 // ─── DATA LOADING ───
 async function loadData(user) {
@@ -353,7 +451,6 @@ async function loadData(user) {
     wishesCol = dataCol('vault-wishes', relId);
     categoryCol = dataCol('categories', relId);
 
-    // Profiles & Names
     const myProfile = await getMyProfile();
     if (rel) {
       partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
@@ -370,18 +467,15 @@ async function loadData(user) {
     subInitial = subName.charAt(0);
     updateLabels();
 
-    // Load Categories
     const catSnap = await getDocs(categoryCol);
     catSnap.docs.map(d => d.data().name).forEach(n => {
       if(!categories.includes(n)) categories.push(n);
     });
 
-    // Load Items
     const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
     toys = tSnap.docs.map(d => d.data());
     wishes = wSnap.docs.map(d => d.data());
 
-    // Category scanner
     [...toys, ...wishes].forEach(item => {
       if (item.category && !categories.includes(item.category)) {
         categories.push(item.category);
@@ -395,6 +489,7 @@ async function loadData(user) {
 
   } catch (e) { 
     console.error("Vault Load Error:", e); 
+    showToast("Failed to load data", "error");
   }
 }
 
@@ -412,6 +507,33 @@ function updateCategorySelects() {
   const wCat = document.getElementById('w-cat');
   if (tCat) tCat.innerHTML = html;
   if (wCat) wCat.innerHTML = html;
+}
+
+// ─── FILTER FUNCTIONS ───
+function toggleFiltersPanel() {
+  const panel = document.getElementById('filters-panel');
+  panel.classList.toggle('open');
+}
+
+function setRatingFilter(el, value) {
+  ratingFilter = value;
+  document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderVault();
+}
+
+function setSmartFilter(el, value) {
+  smartFilter = value;
+  document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderVault();
+}
+
+function setDateFilter(el, value) {
+  dateFilter = value;
+  document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderVault();
 }
 
 // ─── SAVE & DELETE ───
@@ -434,6 +556,7 @@ async function saveToy() {
   toys = toys.filter(t => t.id !== id);
   toys.push(toy);
   document.getElementById('toy-modal').classList.remove('open');
+  showToast("Toy saved successfully!", "success");
   renderVault();
 }
 
@@ -441,7 +564,43 @@ async function deleteToy(id) {
   if (!confirm('Remove this toy from the vault?')) return;
   await deleteDoc(doc(toysCol, id));
   toys = toys.filter(t => t.id !== id);
+  showToast("Toy removed", "success");
   renderVault();
+}
+
+// ─── QUICK MOVE FROM WISHLIST ───
+async function quickMoveToVault(wishId) {
+  const wish = wishes.find(w => w.id === wishId);
+  if (!wish) return;
+
+  // Pre-fill modal
+  document.getElementById('tmt').textContent = 'Add from Wishlist';
+  document.getElementById('t-id').value = '';
+  document.getElementById('t-name').value = wish.name;
+  document.getElementById('t-cat').value = wish.category || 'Other';
+  document.getElementById('t-owner').value = 'Dom';
+  document.getElementById('t-notes').value = '';
+  document.getElementById('t-drat').value = 0;
+  document.getElementById('t-srat').value = 0;
+
+  // Initialize stars
+  initStarRating(document.getElementById('dom-star-rating'), 'dom', 0);
+  initStarRating(document.getElementById('sub-star-rating'), 'sub', 0);
+
+  // Open modal
+  document.getElementById('toy-modal').classList.add('open');
+
+  // After saving, optionally remove from wishlist
+  const originalSave = window.saveToy;
+  window.saveToy = async function() {
+    await originalSave();
+    // Remove from wishlist
+    await deleteDoc(doc(wishesCol, wishId));
+    wishes = wishes.filter(w => w.id !== wishId);
+    renderWishlist();
+    showToast("Moved to collection!", "success");
+    window.saveToy = originalSave; // restore
+  };
 }
 
 // ─── STAR RATING FUNCTIONS ───
@@ -456,7 +615,6 @@ function initStarRating(container, type, initialValue = 0) {
     star.textContent = '★';
     star.dataset.value = i;
     
-    // Click to set rating
     star.onclick = (e) => {
       e.stopImmediatePropagation();
       const newRating = parseInt(star.dataset.value);
@@ -465,7 +623,6 @@ function initStarRating(container, type, initialValue = 0) {
       document.getElementById(hiddenId).value = newRating;
     };
     
-    // Hover preview
     star.onmouseenter = () => highlightStars(container, type, parseInt(star.dataset.value));
     star.onmouseleave = () => {
       const current = parseFloat(document.getElementById(type === 'dom' ? 't-drat' : 't-srat').value) || 0;
@@ -505,11 +662,45 @@ function renderVault() {
   const list = document.getElementById('vault-list');
   const q = document.getElementById('vault-search').value.toLowerCase();
   
-  const filtered = toys.filter(t => {
+  let filtered = toys.filter(t => {
     const mo = (ownerF === 'all' || t.owner === ownerF);
-    const mq = (!q || t.name.toLowerCase().includes(q));
+    const mq = (!q || t.name.toLowerCase().includes(q) || (t.notes && t.notes.toLowerCase().includes(q)));
     return mo && mq;
   });
+
+  // Apply rating filter
+  if (ratingFilter !== 'all') {
+    filtered = filtered.filter(t => {
+      const avg = (t.domRating + t.subRating) / 2;
+      if (ratingFilter === '5') return Math.round(avg) === 5;
+      if (ratingFilter === '4') return avg >= 4;
+      if (ratingFilter === '3') return avg >= 3;
+      if (ratingFilter === 'unrated') return t.domRating === 0 && t.subRating === 0;
+      return true;
+    });
+  }
+
+  // Apply smart filter
+  if (smartFilter !== 'all') {
+    filtered = filtered.filter(t => {
+      if (smartFilter === 'mutual') return t.domRating >= 4 && t.subRating >= 4;
+      if (smartFilter === 'needs') return (t.domRating <= 2 || t.subRating <= 2) || (t.domRating === 0 && t.subRating === 0);
+      return true;
+    });
+  }
+
+  // Apply date filter
+  if (dateFilter !== 'all') {
+    const now = Date.now();
+    const monthAgo = now - (30 * 24 * 60 * 60 * 1000);
+    const quarterAgo = now - (90 * 24 * 60 * 60 * 1000);
+    
+    filtered = filtered.filter(t => {
+      if (dateFilter === 'month') return t.added >= monthAgo;
+      if (dateFilter === 'quarter') return t.added >= quarterAgo;
+      return true;
+    });
+  }
 
   const groups = {};
   categories.forEach(c => groups[c] = []);
@@ -561,7 +752,10 @@ function renderWishlist() {
     <div class="wish-card">
       <div class="wish-body">
         <div class="wish-name">${w.name}</div>
-        <div class="wish-meta">${w.category}</div>
+        <div class="wish-meta">${w.category || 'Uncategorized'}</div>
+      </div>
+      <div class="wish-actions">
+        <button class="wish-btn" onclick="quickMoveToVault('${w.id}')">Add to Vault</button>
       </div>
     </div>`).join('');
 }
@@ -610,7 +804,6 @@ window.openToyModal = (id) => {
     document.getElementById('t-srat').value = 0;
   }
   
-  // Initialize star ratings
   initStarRating(domStars, 'dom', document.getElementById('t-drat').value);
   initStarRating(subStars, 'sub', document.getElementById('t-srat').value);
   
