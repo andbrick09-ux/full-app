@@ -198,6 +198,12 @@
   </div>
 </header>
 
+<button onclick="rescueMissingData()" 
+        style="width:100%; padding:20px; background:blue; color:white; font-weight:bold; margin-bottom:10px;">
+    TAP TO RESCUE MISSING TOYS & CATEGORIES
+</button>
+
+
 <main class="container">
   <div id="tab-vault" class="tab-panel active">
     <div class="controls-bar">
@@ -451,7 +457,54 @@ window.closeCategoryModal = () => document.getElementById('category-modal').clas
 window.saveToy = saveToy;
 
 requireAuth().then(user => loadData(user));
+
+window.rescueMissingData = async function() {
+  const { collection, getDocs, setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  
+  if (!myUid || !relId || relId === "solo_" + myUid) {
+    alert("Error: Relationship not fully loaded. Try again in 2 seconds.");
+    return;
+  }
+
+  try {
+    // 1. Reference old personal paths
+    const oldToysCol = collection(db, 'data', myUid, 'vault-toys');
+    const oldWishesCol = collection(db, 'data', myUid, 'vault-wishes');
+    const oldCatsCol = collection(db, 'data', myUid, 'categories');
+
+    // 2. Fetch everything from the "old" folder
+    const [tSnap, wSnap, cSnap] = await Promise.all([
+      getDocs(oldToysCol),
+      getDocs(oldWishesCol),
+      getDocs(oldCatsCol)
+    ]);
+
+    // 3. Move Toys
+    for (const d of tSnap.docs) {
+      await setDoc(doc(db, 'data', relId, 'vault-toys', d.id), d.data());
+    }
+
+    // 4. Move Wishes
+    for (const d of wSnap.docs) {
+      await setDoc(doc(db, 'data', relId, 'vault-wishes', d.id), d.data());
+    }
+
+    // 5. Move Categories
+    for (const d of cSnap.docs) {
+      await setDoc(doc(db, 'data', relId, 'categories', d.id), d.data());
+    }
+
+    alert(`Success! Rescued ${tSnap.size} toys and ${cSnap.size} categories. Refreshing page...`);
+    window.location.reload();
+    
+  } catch (e) {
+    alert("Rescue failed: " + e.message);
+    console.error(e);
+  }
+};
+
 </script>
+
 <script src="nav.js"></script>
 </body>
 </html>
