@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Vault — Toy Collection & Wishlist</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<title>The Vault — Toy Collection &amp; Wishlist</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Great+Vibes&amp;family=Josefin+Sans:wght@200;300;400&amp;display=swap" rel="stylesheet">
 <style>
   :root {
     --midnight: #0a0e1a;
@@ -151,14 +151,23 @@
   .mini-star { font-size:0.6rem; color:#1e2640; }
   .mini-star.fd { color:#e57373; }
   .mini-star.fs { color:#b39ddb; }
-  .toy-row-chevron { font-size:0.65rem; color:var(--text-dim); padding:0 10px; opacity:0.4; transition:transform 0.22s; }
-  .toy-row.expanded .toy-row-chevron { transform:rotate(180deg); }
 
-  .toy-detail { max-height:0; overflow:hidden; transition:max-height 0.28s; background:rgba(10,14,26,0.95); }
-  .toy-row.expanded + .toy-detail { max-height:300px; }
-  .toy-detail-inner { padding:12px 15px; display:flex; flex-direction:column; gap:8px; }
-  .detail-actions { display:flex; gap:6px; }
-  .detail-btn { background:var(--glass); border:1px solid var(--glass-border); border-radius:3px; color:var(--text-dim); font-size:0.58rem; padding:5px 12px; cursor:pointer; }
+  /* ── Star Rating in Modal ── */
+  .star-rating {
+    display: flex;
+    gap: 6px;
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+  }
+  .star-rating .star {
+    color: #1e2640;
+    transition: color 0.1s ease, transform 0.1s ease;
+  }
+  .star-rating .star.filled.dom { color: #e57373; }
+  .star-rating .star.filled.sub { color: #b39ddb; }
+  .star-rating .star:hover { transform: scale(1.2); }
 
   /* ── Modals ── */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:100; align-items:center; justify-content:center; padding:16px; }
@@ -169,6 +178,19 @@
   .form-input, .form-select, .form-textarea { width:100%; background:var(--card); border:1px solid var(--glass-border); border-radius:3px; color:var(--text); padding:9px 12px; outline:none; }
   .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .modal-actions { display:flex; gap:10px; margin-top:20px; }
+  .btn-primary {
+    background:linear-gradient(135deg,#b8860b,var(--gold)); border:none; border-radius:3px;
+    color:var(--midnight); font-family:'Josefin Sans',sans-serif;
+    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase;
+    padding:9px 18px; cursor:pointer; transition:opacity 0.2s,transform 0.2s;
+  }
+  .btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
+  .btn-cancel {
+    background:transparent; border:1px solid var(--glass-border); border-radius:3px;
+    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
+    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase;
+    padding:9px 18px; cursor:pointer;
+  }
 
   /* ── Wishlist ── */
   .wish-list { display:flex; flex-direction:column; gap:8px; }
@@ -231,13 +253,16 @@
   </div>
 </main>
 
+<!-- TOY MODAL -->
 <div id="toy-modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-title" id="tmt">Add to Collection</div>
+    
     <div class="form-group">
       <label class="form-label">Toy Name</label>
       <input type="text" class="form-input" id="t-name">
     </div>
+    
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Category</label>
@@ -251,21 +276,28 @@
         </select>
       </div>
     </div>
+    
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="t-notes"></textarea>
+      <textarea class="form-textarea" id="t-notes" placeholder="Optional notes..."></textarea>
     </div>
+    
+    <!-- NEW STAR RATINGS -->
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Dom Rating</label>
-        <input type="number" class="form-input" id="t-drat" min="0" max="5" step="0.5">
+        <div class="star-rating" id="dom-star-rating" data-type="dom"></div>
+        <input type="hidden" id="t-drat" value="0">
       </div>
       <div class="form-group">
         <label class="form-label">Sub Rating</label>
-        <input type="number" class="form-input" id="t-srat" min="0" max="5" step="0.5">
+        <div class="star-rating" id="sub-star-rating" data-type="sub"></div>
+        <input type="hidden" id="t-srat" value="0">
       </div>
     </div>
+    
     <input type="hidden" id="t-id">
+    
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
       <button class="btn-primary" onclick="saveToy()">Save</button>
@@ -273,6 +305,7 @@
   </div>
 </div>
 
+<!-- CATEGORY MODAL -->
 <div id="category-modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-title">Categories</div>
@@ -289,7 +322,7 @@
   </div>
 </div>
 
-<<<script type="module">
+<script type="module">
 import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
 import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
@@ -300,13 +333,13 @@ let relId = null;
 let partnerUid = null;
 let toys = [];
 let wishes = [];
-// Starting categories - the scanner will add your custom ones automatically
 let categories = ['Vibration','Insertion','Anal Play','Impact','Restraint','Sensation','Other'];
 
 let toysCol, wishesCol, categoryCol;
 let domName = 'Dom', subName = 'Sub', domInitial = 'D', subInitial = 'S';
-let ownerF = 'all', wishF = 'all', expandedId = null, collapsedCats = {};
+let ownerF = 'all', wishF = 'all', collapsedCats = {};
 
+// ─── HELPER ───
 function dataCol(path, id) { return collection(db, 'data', id, path); }
 
 // ─── DATA LOADING ───
@@ -320,7 +353,7 @@ async function loadData(user) {
     wishesCol = dataCol('vault-wishes', relId);
     categoryCol = dataCol('categories', relId);
 
-    // 1. Profiles & Names
+    // Profiles & Names
     const myProfile = await getMyProfile();
     if (rel) {
       partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
@@ -337,18 +370,18 @@ async function loadData(user) {
     subInitial = subName.charAt(0);
     updateLabels();
 
-    // 2. Load Categories from DB
+    // Load Categories
     const catSnap = await getDocs(categoryCol);
     catSnap.docs.map(d => d.data().name).forEach(n => {
       if(!categories.includes(n)) categories.push(n);
     });
 
-    // 3. Load Items
+    // Load Items
     const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
     toys = tSnap.docs.map(d => d.data());
     wishes = wSnap.docs.map(d => d.data());
 
-    // 4. CATEGORY SCANNER
+    // Category scanner
     [...toys, ...wishes].forEach(item => {
       if (item.category && !categories.includes(item.category)) {
         categories.push(item.category);
@@ -385,6 +418,7 @@ function updateCategorySelects() {
 async function saveToy() {
   const name = document.getElementById('t-name').value.trim();
   if (!name) return;
+  
   const id = document.getElementById('t-id').value || 'toy_'+Date.now();
   const toy = {
     id, name,
@@ -395,6 +429,7 @@ async function saveToy() {
     subRating: parseFloat(document.getElementById('t-srat').value) || 0,
     added: Date.now()
   };
+  
   await setDoc(doc(toysCol, id), toy);
   toys = toys.filter(t => t.id !== id);
   toys.push(toy);
@@ -407,6 +442,62 @@ async function deleteToy(id) {
   await deleteDoc(doc(toysCol, id));
   toys = toys.filter(t => t.id !== id);
   renderVault();
+}
+
+// ─── STAR RATING FUNCTIONS ───
+function initStarRating(container, type, initialValue = 0) {
+  if (!container) return;
+  container.innerHTML = '';
+  const rating = Math.round(parseFloat(initialValue) || 0);
+  
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('span');
+    star.className = `star${i <= rating ? ' filled ' + type : ''}`;
+    star.textContent = '★';
+    star.dataset.value = i;
+    
+    // Click to set rating
+    star.onclick = (e) => {
+      e.stopImmediatePropagation();
+      const newRating = parseInt(star.dataset.value);
+      updateStarRating(container, type, newRating);
+      const hiddenId = type === 'dom' ? 't-drat' : 't-srat';
+      document.getElementById(hiddenId).value = newRating;
+    };
+    
+    // Hover preview
+    star.onmouseenter = () => highlightStars(container, type, parseInt(star.dataset.value));
+    star.onmouseleave = () => {
+      const current = parseFloat(document.getElementById(type === 'dom' ? 't-drat' : 't-srat').value) || 0;
+      highlightStars(container, type, Math.round(current));
+    };
+    
+    container.appendChild(star);
+  }
+}
+
+function updateStarRating(container, type, rating) {
+  const stars = container.querySelectorAll('.star');
+  stars.forEach((star, index) => {
+    const val = index + 1;
+    if (val <= rating) {
+      star.classList.add('filled', type);
+    } else {
+      star.classList.remove('filled', type);
+    }
+  });
+}
+
+function highlightStars(container, type, rating) {
+  const stars = container.querySelectorAll('.star');
+  stars.forEach((star, index) => {
+    const val = index + 1;
+    if (val <= rating) {
+      star.classList.add('filled', type);
+    } else {
+      star.classList.remove('filled', type);
+    }
+  });
 }
 
 // ─── RENDER ENGINE ───
@@ -440,10 +531,8 @@ function renderVault() {
           <span class="cat-chevron">▾</span>
         </div>
         <div class="cat-rows">
-          ${items.map(t => {
-            const isExp = expandedId === t.id;
-            return `
-            <div class="toy-row ${isExp ? 'expanded' : ''}" onclick="toggleRow('${t.id}')">
+          ${items.map(t => `
+            <div class="toy-row" onclick="window.openToyModal('${t.id}')">
               <div class="toy-row-stripe ${t.owner==='Dom'?'stripe-dom':'stripe-sub'}"></div>
               <div class="toy-row-main">
                 <span class="toy-row-name">${t.name}</span>
@@ -452,18 +541,8 @@ function renderVault() {
                   <div class="mini-rating"><span class="mini-label s">${subInitial}</span>${miniStars(t.subRating,'s')}</div>
                 </div>
               </div>
-              <span class="toy-row-chevron">▾</span>
             </div>
-            <div class="toy-detail" style="${isExp ? 'max-height:400px;' : 'max-height:0;'}">
-              <div class="toy-detail-inner">
-                ${t.notes ? `<div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px; font-style:italic; line-height:1.4;">${t.notes}</div>` : ''}
-                <div class="detail-actions">
-                  <button class="detail-btn" onclick="event.stopPropagation(); window.openToyModal('${t.id}')">Edit</button>
-                  <button class="detail-btn del" onclick="event.stopPropagation(); window.deleteToy('${t.id}')" style="color:#e57373;">Remove</button>
-                </div>
-              </div>
-            </div>`;
-          }).join('')}
+          `).join('')}
         </div>
       </div>`;
   }).join('');
@@ -494,16 +573,24 @@ window.switchTab = (t, b) => {
   document.getElementById('tab-'+t).classList.add('active');
   b.classList.add('active');
 };
+
 window.setOwnerF = (el, v) => {
   ownerF = v;
   document.querySelectorAll('#tab-vault .filter-pill').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderVault();
 };
-window.toggleRow = (id) => { expandedId = expandedId === id ? null : id; renderVault(); };
-window.toggleCat = (cat) => { collapsedCats[cat] = !collapsedCats[cat]; renderVault(); };
+
+window.toggleCat = (cat) => { 
+  collapsedCats[cat] = !collapsedCats[cat]; 
+  renderVault(); 
+};
+
 window.openToyModal = (id) => {
   const modal = document.getElementById('toy-modal');
+  const domStars = document.getElementById('dom-star-rating');
+  const subStars = document.getElementById('sub-star-rating');
+  
   if (id) {
     const t = toys.find(x => x.id === id);
     document.getElementById('tmt').textContent = 'Edit Toy';
@@ -516,15 +603,31 @@ window.openToyModal = (id) => {
     document.getElementById('t-srat').value = t.subRating || 0;
   } else {
     document.getElementById('tmt').textContent = 'Add to Collection';
-    ['t-name','t-notes','t-drat','t-srat','t-id'].forEach(f => document.getElementById(f).value = '');
+    ['t-name','t-notes','t-id'].forEach(f => document.getElementById(f).value = '');
     document.getElementById('t-cat').value = 'Vibration';
     document.getElementById('t-owner').value = 'Dom';
+    document.getElementById('t-drat').value = 0;
+    document.getElementById('t-srat').value = 0;
   }
+  
+  // Initialize star ratings
+  initStarRating(domStars, 'dom', document.getElementById('t-drat').value);
+  initStarRating(subStars, 'sub', document.getElementById('t-srat').value);
+  
   modal.classList.add('open');
 };
-window.closeToyModal = () => document.getElementById('toy-modal').classList.remove('open');
-window.openCategoryModal = () => { document.getElementById('category-modal').classList.add('open'); renderCategoryList(); };
+
+window.closeToyModal = () => {
+  document.getElementById('toy-modal').classList.remove('open');
+};
+
+window.openCategoryModal = () => { 
+  document.getElementById('category-modal').classList.add('open'); 
+  renderCategoryList(); 
+};
+
 window.closeCategoryModal = () => document.getElementById('category-modal').classList.remove('open');
+
 window.saveToy = saveToy;
 window.deleteToy = deleteToy;
 
@@ -568,7 +671,6 @@ function renderCategoryList() {
 
 requireAuth().then(user => loadData(user));
 </script>
-
 
 <script src="nav.js"></script>
 </body>
