@@ -497,8 +497,8 @@
           <div class="glass-card" style="margin-bottom: 20px; padding: 8px 0;">
             <div onclick="toggleCategory('${cat}')" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 20px; cursor:pointer;">
               <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-family:'Playfair Display',serif; font-size:15px; color:var(--gold);">${cat}</span>
-                <span style="background:rgba(212,175,55,0.1); color:#888; font-size:11px; padding:1px 8px; border-radius:10px;">${items.length}</span>
+                <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold);">${cat}</span>
+                <span style="background:rgba(212,175,55,0.15); color:#aaa; font-size:10px; padding:2px 9px; border-radius:9999px; font-weight:500;">${items.length}</span>
               </div>
               <span id="chevron-${cat}" style="color:#666; font-size:18px; transition:transform .3s;">▾</span>
             </div>
@@ -554,12 +554,15 @@
 
     function renderWishlist() {
       const container = document.getElementById('wish-list');
-      container.innerHTML = wishes.map(w => `
-        <div class="menu-card" onclick="openWishModal('${w.id}')">
-          <div class="menu-card-title">${w.name}</div>
-          <div class="menu-card-meta">${w.category || 'Uncategorized'}</div>
-        </div>
-      `).join('');
+      container.innerHTML = wishes.map(w => {
+        const addedBy = (w.owner === myRole) ? "Added by Me" : `Added by ${partnerName}`;
+        return `
+          <div class="menu-card" onclick="openWishModal('${w.id}')">
+            <div class="menu-card-title">${w.name}</div>
+            <div class="menu-card-meta">${w.category || 'Uncategorized'} • ${addedBy}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     // Star Rating Component
@@ -720,6 +723,7 @@
         id,
         name,
         category: document.getElementById('w-cat').value,
+        owner: myRole,
         added: Date.now()
       };
 
