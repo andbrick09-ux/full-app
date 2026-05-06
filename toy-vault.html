@@ -377,6 +377,39 @@
   </div>
 </div>
 
+<!-- WISHLIST MODAL -->
+<div id="wish-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="wmt">Add to Wishlist</div>
+    
+    <div class="form-group">
+      <label class="form-label">Item Name</label>
+      <input type="text" class="form-input" id="w-name">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="w-cat"></select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <select class="form-select" id="w-priority">
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+    
+    <input type="hidden" id="w-id">
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeWishModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveWish()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- CATEGORY MODAL -->
 <div id="category-modal" class="modal-overlay">
   <div class="modal">
@@ -535,6 +568,11 @@ function setDateFilter(el, value) {
   el.classList.add('active');
   renderVault();
 }
+
+window.toggleFiltersPanel = toggleFiltersPanel;
+window.setRatingFilter = setRatingFilter;
+window.setSmartFilter = setSmartFilter;
+window.setDateFilter = setDateFilter;
 
 // ─── SAVE & DELETE ───
 async function saveToy() {
@@ -752,13 +790,65 @@ function renderWishlist() {
     <div class="wish-card">
       <div class="wish-body">
         <div class="wish-name">${w.name}</div>
-        <div class="wish-meta">${w.category || 'Uncategorized'}</div>
+        <div class="wish-meta">${w.category || 'Uncategorized'} • ${w.priority || 'Medium'}</div>
       </div>
       <div class="wish-actions">
         <button class="wish-btn" onclick="quickMoveToVault('${w.id}')">Add to Vault</button>
+        <button class="wish-btn" onclick="openWishModal('${w.id}')" style="color:#e57373;">Edit</button>
       </div>
     </div>`).join('');
 }
+
+// ─── WISHLIST FUNCTIONS ───
+window.openWishModal = (id) => {
+  const modal = document.getElementById('wish-modal');
+  const wCat = document.getElementById('w-cat');
+  
+  // Make sure categories are loaded
+  if (wCat && wCat.options.length === 0) {
+    wCat.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+  }
+  
+  if (id) {
+    const w = wishes.find(x => x.id === id);
+    document.getElementById('wmt').textContent = 'Edit Wishlist Item';
+    document.getElementById('w-id').value = id;
+    document.getElementById('w-name').value = w.name;
+    document.getElementById('w-cat').value = w.category || 'Other';
+    document.getElementById('w-priority').value = w.priority || 'Medium';
+  } else {
+    document.getElementById('wmt').textContent = 'Add to Wishlist';
+    ['w-name','w-id'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('w-cat').value = 'Vibration';
+    document.getElementById('w-priority').value = 'Medium';
+  }
+  modal.classList.add('open');
+};
+
+window.closeWishModal = () => {
+  document.getElementById('wish-modal').classList.remove('open');
+};
+
+window.saveWish = async function() {
+  const name = document.getElementById('w-name').value.trim();
+  if (!name) return;
+  
+  const id = document.getElementById('w-id').value || 'wish_'+Date.now();
+  const wish = {
+    id,
+    name,
+    category: document.getElementById('w-cat').value,
+    priority: document.getElementById('w-priority').value,
+    added: Date.now()
+  };
+  
+  await setDoc(doc(wishesCol, id), wish);
+  wishes = wishes.filter(w => w.id !== id);
+  wishes.push(wish);
+  document.getElementById('wish-modal').classList.remove('open');
+  showToast("Wishlist item saved!", "success");
+  renderWishlist();
+};
 
 // ─── WINDOW HELPERS ───
 window.switchTab = (t, b) => {
