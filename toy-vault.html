@@ -150,6 +150,19 @@
     .btn-outline { background: transparent; border: 1px solid var(--border); color: #aaa; }
     .btn-danger { background: transparent; border: 1px solid #F44336; color: #F44336; }
 
+  .btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--gold);
+    padding: 8px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: transform 0.1s ease;
+  }
+  .btn-icon:active { transform: scale(0.9); }
+  .btn-icon:hover { color: var(--gold-light); }
+
     .filter-pills { display: flex; flex-wrap: wrap; gap: 8px; }
     .filter-pill {
       padding: 8px 16px; border-radius: 9999px; font-size: 12px;
@@ -187,8 +200,21 @@
                style="flex:1; background:#0a1224; border:1px solid var(--border); border-radius:9999px; padding:12px 18px; color:#ddd;"
                oninput="renderVault()">
         <button onclick="openFilterSheet()" class="btn btn-outline" style="padding:12px 18px;">Filter</button>
-        <button onclick="expandAllCategories()" class="btn btn-outline" style="padding:12px 14px; font-size:11px;">Expand All</button>
-        <button onclick="collapseAllCategories()" class="btn btn-outline" style="padding:12px 14px; font-size:11px;">Collapse All</button>
+        
+        <!-- Luxury Icon Group for Expand/Collapse -->
+        <div style="display:flex; background:var(--glass); border:1px solid var(--border); border-radius:12px; padding:2px; align-items:center;">
+          <button onclick="expandAllCategories()" class="btn-icon" title="Expand All">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+            </svg>
+          </button>
+          <div style="width:1px; background:var(--border); margin:4px 0;"></div>
+          <button onclick="collapseAllCategories()" class="btn-icon" title="Collapse All">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 11l-5-5-5 5M17 18l-5-5-5 5"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div id="vault-list"></div>
