@@ -120,243 +120,70 @@
   }
   .stat-pill span { color:var(--gold-light); font-weight:600; margin-right:3px; }
 
-  /* ── Category Group ── */
+  /* ── Categories ── */
   .cat-group { margin-bottom:6px; border-radius:8px; overflow:hidden; }
-
   .cat-header {
-    display:flex; align-items:center; gap:10px;
-    padding:7px 12px;
+    display:flex; align-items:center; gap:10px; padding:7px 12px;
     background: linear-gradient(90deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
-    border:1px solid rgba(201,168,76,0.18);
-    border-radius:6px 6px 0 0;
-    cursor:pointer;
-    user-select:none;
-    -webkit-tap-highlight-color:transparent;
-    transition:background 0.2s;
+    border:1px solid rgba(201,168,76,0.18); border-radius:6px 6px 0 0;
+    cursor:pointer; user-select:none; transition:background 0.2s;
   }
   .cat-group.collapsed .cat-header { border-radius:6px; }
-  .cat-header:active { background:rgba(201,168,76,0.18); }
-
-  .cat-header-name {
-    font-size:0.62rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold); font-weight:400; flex:1;
-  }
-  .cat-header-count {
-    font-size:0.58rem; color:var(--text-dim); letter-spacing:0.1em;
-    background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2);
-    border-radius:20px; padding:1px 8px;
-  }
-  .cat-chevron {
-    font-size:0.7rem; color:var(--gold); opacity:0.6;
-    transition:transform 0.25s;
-  }
+  .cat-header-name { font-size:0.62rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); flex:1; }
+  .cat-header-count { font-size:0.58rem; color:var(--text-dim); background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2); border-radius:20px; padding:1px 8px; }
+  .cat-chevron { font-size:0.7rem; color:var(--gold); opacity:0.6; transition:transform 0.25s; }
   .cat-group.collapsed .cat-chevron { transform:rotate(-90deg); }
-
-  .cat-rows {
-    border:1px solid rgba(201,168,76,0.1);
-    border-top:none;
-    border-radius:0 0 6px 6px;
-    overflow:hidden;
-    transition:max-height 0.3s cubic-bezier(0.4,0,0.2,1);
-  }
+  .cat-rows { border:1px solid rgba(201,168,76,0.1); border-top:none; border-radius:0 0 6px 6px; overflow:hidden; transition:max-height 0.3s; }
   .cat-group.collapsed .cat-rows { max-height:0 !important; }
 
-  /* ── Toy Row ── */
-  .toy-row {
-    display:flex; align-items:center; gap:0;
-    background:var(--card);
-    border-bottom:1px solid var(--glass-border);
-    position:relative; overflow:hidden;
-    min-height:42px;
-    transition:background 0.18s;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .toy-row:last-child { border-bottom:none; }
-  .toy-row:active { background:rgba(201,168,76,0.06); }
-  .toy-row.expanded { background:rgba(18,26,50,0.98); }
-
-  .toy-row-stripe {
-    width:3px; align-self:stretch; flex-shrink:0;
-    transition:width 0.2s;
-  }
-  .stripe-dom    { background:var(--dom-color); }
-  .stripe-sub    { background:var(--sub-color); }
-
-  .toy-row-main {
-    flex:1; min-width:0;
-    display:flex; align-items:center; gap:8px;
-    padding:8px 10px;
-  }
-
-  .toy-row-name {
-    flex:1; min-width:0;
-    font-family:'Playfair Display',serif;
-    font-size:0.85rem; font-weight:600;
-    color:var(--text);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-
-  .toy-row-ratings {
-    display:flex; flex-direction:column; gap:3px; flex-shrink:0;
-  }
+  /* ── Rows ── */
+  .toy-row { display:flex; align-items:center; background:var(--card); border-bottom:1px solid var(--glass-border); position:relative; min-height:42px; cursor:pointer; }
+  .toy-row-stripe { width:3px; align-self:stretch; }
+  .stripe-dom { background:var(--dom-color); }
+  .stripe-sub { background:var(--sub-color); }
+  .toy-row-main { flex:1; display:flex; align-items:center; gap:8px; padding:8px 10px; }
+  .toy-row-name { flex:1; font-family:'Playfair Display',serif; font-size:0.85rem; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .toy-row-ratings { display:flex; flex-direction:column; gap:3px; }
   .mini-rating { display:flex; align-items:center; gap:4px; }
-  .mini-label {
-    font-size:0.48rem; letter-spacing:0.12em; text-transform:uppercase;
-    width:20px; flex-shrink:0;
-  }
+  .mini-label { font-size:0.48rem; width:20px; }
   .mini-label.d { color:#e57373; }
   .mini-label.s { color:#b39ddb; }
-  .mini-stars { display:flex; gap:1px; }
   .mini-star { font-size:0.6rem; color:#1e2640; }
   .mini-star.fd { color:#e57373; }
   .mini-star.fs { color:#b39ddb; }
+  .toy-row-chevron { font-size:0.65rem; color:var(--text-dim); padding:0 10px; opacity:0.4; transition:transform 0.22s; }
+  .toy-row.expanded .toy-row-chevron { transform:rotate(180deg); }
 
-  .toy-row-chevron {
-    font-size:0.65rem; color:var(--text-dim); padding:0 10px 0 4px;
-    flex-shrink:0; transition:transform 0.22s;
-    opacity:0.4;
-  }
-  .toy-row.expanded .toy-row-chevron { transform:rotate(180deg); opacity:0.8; }
-
-  .toy-detail {
-    max-height:0; overflow:hidden;
-    transition:max-height 0.28s cubic-bezier(0.4,0,0.2,1);
-    background:rgba(10,14,26,0.95);
-    border-bottom:1px solid var(--glass-border);
-  }
-  .toy-row.expanded + .toy-detail { max-height:200px; }
-  .toy-row:last-child.expanded + .toy-detail { border-bottom:none; }
-
-  .toy-detail-inner {
-    padding:10px 12px 10px 15px;
-    display:flex; flex-direction:column; gap:8px;
-  }
-
-  .detail-ratings { display:flex; gap:14px; }
-  .detail-rating-row { display:flex; align-items:center; gap:6px; }
-  .detail-label {
-    font-size:0.55rem; letter-spacing:0.15em; text-transform:uppercase; width:26px;
-  }
-  .detail-label.d { color:#e57373; }
-  .detail-label.s { color:#b39ddb; }
-  .detail-stars { display:flex; gap:2px; }
-  .detail-star { font-size:0.78rem; color:#1e2640; }
-  .detail-star.fd { color:#e57373; }
-  .detail-star.fs { color:#b39ddb; }
-  .detail-val { font-size:0.58rem; color:var(--text-dim); }
-
-  .toy-detail-notes {
-    font-family:'Playfair Display',serif; font-style:italic;
-    font-size:0.78rem; color:var(--text-dim); line-height:1.45;
-  }
-
+  .toy-detail { max-height:0; overflow:hidden; transition:max-height 0.28s; background:rgba(10,14,26,0.95); }
+  .toy-row.expanded + .toy-detail { max-height:300px; }
+  .toy-detail-inner { padding:12px 15px; display:flex; flex-direction:column; gap:8px; }
   .detail-actions { display:flex; gap:6px; }
-  .detail-btn {
-    background:var(--glass); border:1px solid var(--glass-border); border-radius:3px;
-    color:var(--text-dim); font-size:0.58rem; letter-spacing:0.15em; text-transform:uppercase;
-    padding:5px 12px; cursor:pointer; font-family:'Josefin Sans',sans-serif;
-    transition:all 0.2s;
-  }
-  .detail-btn:hover { border-color:var(--gold-border); color:var(--gold); }
-  .detail-btn.del:hover { border-color:#e57373; color:#e57373; }
-
-  .empty-state { text-align:center; padding:50px 20px; color:var(--text-dim); }
-  .empty-icon  { font-size:2rem; margin-bottom:12px; opacity:0.35; }
-  .empty-title { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--gold-dim); margin-bottom:6px; }
-  .empty-sub   { font-size:0.7rem; letter-spacing:0.1em; }
+  .detail-btn { background:var(--glass); border:1px solid var(--glass-border); border-radius:3px; color:var(--text-dim); font-size:0.58rem; padding:5px 12px; cursor:pointer; }
 
   /* ── Modals ── */
-  .modal-overlay {
-    display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,0.8); backdrop-filter:blur(6px);
-    z-index:100; align-items:center; justify-content:center; padding:16px;
-  }
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:100; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open { display:flex; }
-  .modal {
-    background:var(--deep-blue); border:1px solid var(--gold-border); border-radius:8px;
-    padding:28px 24px; width:100%; max-width:460px;
-    box-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 60px rgba(201,168,76,0.08);
-    animation:modalIn 0.28s ease both; max-height:92vh; overflow-y:auto;
-  }
-  @keyframes modalIn { from{opacity:0;transform:scale(.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
-  .modal-title    { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--gold-light); margin-bottom:4px; }
-  .modal-subtitle { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); margin-bottom:22px; }
+  .modal { background:var(--deep-blue); border:1px solid var(--gold-border); border-radius:8px; padding:28px 24px; width:100%; max-width:460px; max-height:92vh; overflow-y:auto; }
   .form-group { margin-bottom:14px; }
-  .form-label { display:block; font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
-  .form-input,.form-select,.form-textarea {
-    width:100%; background:var(--card); border:1px solid var(--glass-border); border-radius:3px;
-    color:var(--text); font-family:'Josefin Sans',sans-serif; font-size:0.76rem; letter-spacing:0.05em;
-    padding:9px 12px; outline:none; transition:border-color 0.3s;
-  }
-  .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--gold); }
-  .form-select option { background:var(--deep-blue); }
-  .form-textarea { resize:vertical; min-height:60px; line-height:1.5; }
+  .form-label { display:block; font-size:0.6rem; color:var(--gold); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.1em; }
+  .form-input, .form-select, .form-textarea { width:100%; background:var(--card); border:1px solid var(--glass-border); border-radius:3px; color:var(--text); padding:9px 12px; outline:none; }
   .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .modal-actions { display:flex; gap:10px; margin-top:20px; }
-  .btn-primary {
-    flex:1; background:linear-gradient(135deg,#b8860b,var(--gold)); border:none; border-radius:3px;
-    color:var(--midnight); font-family:'Josefin Sans',sans-serif;
-    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; padding:11px; cursor:pointer; transition:opacity 0.2s;
-  }
-  .btn-primary:hover { opacity:0.88; }
-  .btn-cancel {
-    background:transparent; border:1px solid var(--glass-border); border-radius:3px;
-    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
-    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; padding:11px 18px; cursor:pointer; transition:all 0.2s;
-  }
-  .btn-cancel:hover { border-color:var(--gold-border); color:var(--text); }
 
   /* ── Wishlist ── */
   .wish-list { display:flex; flex-direction:column; gap:8px; }
-  .wish-card {
-    background:var(--card); border:1px solid var(--glass-border); border-radius:6px;
-    padding:12px 14px; display:flex; align-items:center; gap:12px;
-    position:relative; animation:rowIn 0.3s ease both;
-    transition:border-color 0.2s;
-  }
-  .wish-card:hover { border-color:var(--gold-border); }
-  @keyframes rowIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
-
-  .wish-pri-dot {
-    width:8px; height:8px; border-radius:50%; flex-shrink:0;
-  }
-  .dot-high   { background:#e57373; }
-  .dot-med    { background:var(--gold); }
-  .dot-low    { background:#555; }
-
-  .wish-body { flex:1; min-width:0; }
+  .wish-card { background:var(--card); border:1px solid var(--glass-border); border-radius:6px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
+  .wish-pri-dot { width:8px; height:8px; border-radius:50%; }
+  .dot-high { background:#e57373; }
+  .dot-med { background:var(--gold); }
+  .dot-low { background:#555; }
+  .wish-body { flex:1; }
   .wish-name { font-family:'Playfair Display',serif; font-size:0.88rem; color:var(--text); }
-  .wish-meta { font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-top:2px; }
-  .wish-notes-text { font-size:0.72rem; color:var(--text-dim); margin-top:3px; line-height:1.4; font-style:italic; }
-
-  .wish-right { display:flex; flex-direction:column; gap:4px; align-items:flex-end; flex-shrink:0; }
-  .wish-pri-badge {
-    font-size:0.52rem; letter-spacing:0.15em; text-transform:uppercase;
-    padding:2px 7px; border-radius:2px;
-  }
+  .wish-meta { font-size:0.58rem; color:var(--gold); text-transform:uppercase; }
+  .wish-pri-badge { font-size:0.52rem; padding:2px 7px; border-radius:2px; text-transform:uppercase; }
   .badge-high { background:rgba(192,57,43,0.2); color:#e57373; border:1px solid rgba(192,57,43,0.4); }
-  .badge-med  { background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid var(--gold-border); }
-  .badge-low  { background:var(--glass); color:var(--text-dim); border:1px solid var(--glass-border); }
 
-  .wish-actions { display:flex; gap:5px; margin-top:6px; }
-  .btn-wa {
-    background:var(--glass); border:1px solid var(--glass-border); border-radius:3px;
-    color:var(--text-dim); font-size:0.55rem; letter-spacing:0.12em; text-uppercase;
-    padding:4px 9px; cursor:pointer; font-family:'Josefin Sans',sans-serif; transition:all 0.2s;
-  }
-  .btn-wa:hover      { border-color:var(--gold-border); color:var(--gold); }
-  .btn-wa.acquire:hover { border-color:var(--shared-color); color:#80cbc4; }
-  .btn-wa.wdel:hover    { border-color:var(--dom-color); color:#e57373; }
-
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:var(--midnight); }
-  ::-webkit-scrollbar-thumb { background:var(--gold-dim); border-radius:4px; }
-
-  @media(max-width:480px) {
-    .form-row { grid-template-columns:1fr; }
-    .modal { padding:20px 14px; }
-  }
+  @media(max-width:480px) { .form-row { grid-template-columns:1fr; } }
 </style>
 <link rel="stylesheet" href="nav.css" />
 </head>
@@ -372,7 +199,6 @@
 </header>
 
 <main class="container">
-
   <div id="tab-vault" class="tab-panel active">
     <div class="controls-bar">
       <div class="search-wrap">
@@ -380,8 +206,8 @@
       </div>
       <div class="filter-group">
         <button class="filter-pill active" onclick="setOwnerF(this,'all')">All</button>
-        <button class="filter-pill dom"    onclick="setOwnerF(this,'Dom')">Dom</button>
-        <button class="filter-pill sub"    onclick="setOwnerF(this,'Sub')">Sub</button>
+        <button class="filter-pill dom" onclick="setOwnerF(this,'Dom')">Dom</button>
+        <button class="filter-pill sub" onclick="setOwnerF(this,'Sub')">Sub</button>
       </div>
       <button class="btn-add" onclick="openToyModal()">+ Add</button>
       <button class="btn-add" onclick="openCategoryModal()" style="background:linear-gradient(135deg,#555,#777);margin-left:6px">⚙ Manage</button>
@@ -398,25 +224,16 @@
       <div class="filter-group">
         <button class="filter-pill active" onclick="setWishF(this,'all')">All</button>
         <button class="filter-pill" onclick="setWishF(this,'High')">High</button>
-        <button class="filter-pill" onclick="setWishF(this,'Medium')">Medium</button>
-        <button class="filter-pill" onclick="setWishF(this,'Low')">Low</button>
-      </div>
-      <div class="filter-group">
-        <button class="filter-pill active" onclick="setWishOwnerF(this,'all')">All</button>
-        <button class="filter-pill dom"    onclick="setWishOwnerF(this,'Dom')">Dom</button>
-        <button class="filter-pill sub"    onclick="setWishOwnerF(this,'Sub')">Sub</button>
       </div>
       <button class="btn-add" onclick="openWishModal()">+ Add</button>
     </div>
     <div id="wish-list" class="wish-list"></div>
   </div>
-
 </main>
 
 <div id="toy-modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-title" id="tmt">Add to Collection</div>
-    <div class="modal-subtitle" id="tms">Document a new toy for the vault</div>
     <div class="form-group">
       <label class="form-label">Toy Name</label>
       <input type="text" class="form-input" id="t-name">
@@ -424,63 +241,11 @@
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Category</label>
-        <select class="form-select" id="t-cat">
-          </select>
+        <select class="form-select" id="t-cat"></select>
       </div>
       <div class="form-group">
         <label class="form-label">Belongs To</label>
         <select class="form-select" id="t-owner">
-          <option>Dom</option><option>Sub</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="t-notes" placeholder="Material, brand, how it's used…"></textarea>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Dom Rating (0–5)</label>
-        <input type="number" class="form-input" id="t-drat" min="0" max="5" step="0.5" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Sub Rating (0–5)</label>
-        <input type="number" class="form-input" id="t-srat" min="0" max="5" step="0.5" placeholder="0">
-      </div>
-    </div>
-    <input type="hidden" id="t-id">
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveToy()">Save to Vault</button>
-    </div>
-  </div>
-</div>
-
-<div id="wish-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-title">Add to Wishlist</div>
-    <div class="modal-subtitle">Curate desires for the collection</div>
-    <div class="form-group">
-      <label class="form-label">Item Name</label>
-      <input type="text" class="form-input" id="w-name">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select class="form-select" id="w-cat">
-          </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Priority</label>
-        <select class="form-select" id="w-pri">
-          <option>High</option><option selected>Medium</option><option>Low</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Added By</label>
-        <select class="form-select" id="w-addedby">
           <option value="Dom">Dom</option>
           <option value="Sub">Sub</option>
         </select>
@@ -488,32 +253,37 @@
     </div>
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="w-notes" placeholder="Why you want it…"></textarea>
+      <textarea class="form-textarea" id="t-notes"></textarea>
     </div>
-    <div class="form-group">
-      <label class="form-label">Link (optional)</label>
-      <input type="url" class="form-input" id="w-link" placeholder="https://…">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Dom Rating</label>
+        <input type="number" class="form-input" id="t-drat" min="0" max="5" step="0.5">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub Rating</label>
+        <input type="number" class="form-input" id="t-srat" min="0" max="5" step="0.5">
+      </div>
     </div>
-    <input type="hidden" id="w-id">
+    <input type="hidden" id="t-id">
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeWishModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveWish()">Add to Wishlist</button>
+      <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveToy()">Save</button>
     </div>
   </div>
 </div>
 
 <div id="category-modal" class="modal-overlay">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-title">Manage Categories</div>
-    <div class="modal-subtitle">Add, rename, or remove categories</div>
-    <div class="form-group" style="margin-bottom:16px">
+  <div class="modal">
+    <div class="modal-title">Categories</div>
+    <div class="form-group">
       <div style="display:flex; gap:8px">
-        <input type="text" class="form-input" id="cat-new-name" placeholder="New category name" style="flex:1">
-        <button class="btn-primary" onclick="addCategory()" style="flex:0 0 auto; padding:9px 16px">Add</button>
+        <input type="text" class="form-input" id="cat-new-name" placeholder="New category">
+        <button class="btn-primary" onclick="addCategory()">Add</button>
       </div>
     </div>
-    <div id="category-list" style="max-height:320px; overflow-y:auto; border:1px solid var(--glass-border); border-radius:4px; background:var(--card); padding:4px"></div>
-    <div class="modal-actions" style="margin-top:16px">
+    <div id="category-list"></div>
+    <div class="modal-actions">
       <button class="btn-cancel" onclick="closeCategoryModal()">Done</button>
     </div>
   </div>
@@ -521,289 +291,111 @@
 
 <script type="module">
 import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
-import {
-  doc, setDoc, deleteDoc, getDocs, collection
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
-function dataCol(path, sharedId) {
-  return collection(db, 'data', sharedId, path);
+function dataCol(path, id) { return collection(db, 'data', id, path); }
+
+let toys = [], wishes = [], categories = ['Other'];
+let toysCol, wishesCol, categoryCol;
+let domName = 'Dom', subName = 'Sub', domInitial = 'D', subInitial = 'S';
+let ownerF = 'all', wishF = 'all', expandedId = null, collapsedCats = {};
+
+async function migratePersonalData(user, sharedId) {
+  if (sharedId === user.uid) return;
+  const personalToys = await getDocs(collection(db, 'data', user.uid, 'vault-toys'));
+  const personalWishes = await getDocs(collection(db, 'data', user.uid, 'vault-wishes'));
+  const personalCats = await getDocs(collection(db, 'data', user.uid, 'categories'));
+
+  for (const d of personalToys.docs) await setDoc(doc(toysCol, d.id), d.data());
+  for (const d of personalWishes.docs) await setDoc(doc(wishesCol, d.id), d.data());
+  for (const d of personalCats.docs) await setDoc(doc(categoryCol, d.id), d.data());
+  console.log("Personal data migrated to shared vault.");
 }
-
-// ─── STATE ───────────────────────────────────────────────────────────────────
-let toys   = [];
-let wishes = [];
-let categories = [
-  'Vibration','Insertion','Anal Play','Pumps','Internal',
-  'Nipple Play','Clamps & Spreaders','Impact','Restraint',
-  'Sensation','Gag & Blindfold','Other'
-];
-
-let ownerF = 'all';
-let wishF  = 'all';
-let wishOwnerF = 'all';
-let expandedId = null;
-let collapsedCats = {};
-
-let domName = 'Dom';
-let subName = 'Sub';
-let domInitial = 'D';
-let subInitial = 'S';
-
-let toysCol;
-let wishesCol;
-let categoryCol;
 
 async function loadData(user) {
   try {
     const rel = await getRelationship();
-    const sharedId = rel?.id || user.uid; // Shared bucket!
+    const sharedId = rel?.id || user.uid;
 
-    toysCol     = dataCol('vault-toys',   sharedId);
-    wishesCol   = dataCol('vault-wishes', sharedId);
-    categoryCol = dataCol('categories',   sharedId);
+    toysCol = dataCol('vault-toys', sharedId);
+    wishesCol = dataCol('vault-wishes', sharedId);
+    categoryCol = dataCol('categories', sharedId);
 
-    try {
-      const myProfile = await getMyProfile();
-      let partnerProfile = null;
-      if (rel && rel.domId && rel.subId) {
-        const partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
-        partnerProfile = await getUserProfile(partnerUid);
-      }
-      const myRole = myProfile?.role || null;
-      if (myRole === 'dom') {
-        domName = myProfile?.displayName || 'Dom';
+    if (rel?.id) await migratePersonalData(user, sharedId);
+
+    const myProfile = await getMyProfile();
+    if (rel) {
+      const partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
+      const partnerProfile = await getUserProfile(partnerUid);
+      if (myProfile?.role === 'dom') {
+        domName = myProfile.displayName || 'Dom';
         subName = partnerProfile?.displayName || 'Sub';
-      } else if (myRole === 'sub') {
+      } else {
         subName = myProfile?.displayName || 'Sub';
         domName = partnerProfile?.displayName || 'Dom';
       }
-      domInitial = (domName || 'D').charAt(0).toUpperCase();
-      subInitial = (subName || 'S').charAt(0).toUpperCase();
-      updateLabels();
-    } catch (nameErr) {
-      console.warn('Could not load partner names, using defaults:', nameErr);
     }
+    domInitial = domName[0]; subInitial = subName[0];
+    updateLabels();
 
     await loadCategories();
-    updateCategorySelects();
-
-    const [toysSnap, wishesSnap] = await Promise.all([
-      getDocs(toysCol),
-      getDocs(wishesCol)
-    ]);
-
-    toys   = toysSnap.docs.map(d => d.data());
-    wishes = wishesSnap.docs.map(d => d.data());
+    const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
+    toys = tSnap.docs.map(d => d.data());
+    wishes = wSnap.docs.map(d => d.data());
 
     renderVault();
-    renderWishlist();
-  } catch (e) {
-    console.error('Vault load failed:', e);
-    document.getElementById('vault-list').innerHTML =
-      `<div class="empty-state"><div class="empty-icon">⚠</div><div class="empty-title">Failed to load vault</div><div class="empty-sub">${e.message}</div></div>`;
-  }
+  } catch (e) { console.error(e); }
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-async function writeToy(toy)   { await setDoc(doc(toysCol,   toy.id),  toy); }
-async function writeWish(wish) { await setDoc(doc(wishesCol, wish.id), wish); }
-
-function updateLabels() {
-  const domBtn = document.querySelector('#tab-vault .filter-pill.dom');
-  if (domBtn) domBtn.textContent = domName;
-  const subBtn = document.querySelector('#tab-vault .filter-pill.sub');
-  if (subBtn) subBtn.textContent = subName;
-
-  document.querySelectorAll('#toy-modal .form-label').forEach(l => {
-    if (l.textContent.includes('Dom Rating')) l.textContent = `${domName} Rating (0–5)`;
-    if (l.textContent.includes('Sub Rating')) l.textContent = `${subName} Rating (0–5)`;
-  });
-
-  const ownerSel = document.getElementById('t-owner');
-  if (ownerSel) {
-    ownerSel.innerHTML = `<option value="Dom">${domName}</option><option value="Sub">${subName}</option>`;
-  }
-
-  const wishDomBtn = document.querySelector('#tab-wishlist .filter-pill.dom');
-  if (wishDomBtn) wishDomBtn.textContent = domName;
-  const wishSubBtn = document.querySelector('#tab-wishlist .filter-pill.sub');
-  if (wishSubBtn) wishSubBtn.textContent = subName;
-}
-
-// ─── CATEGORIES ───────────────────────────────────────────────────────────────
 async function loadCategories() {
-  try {
-    const snap = await getDocs(categoryCol);
-    if (!snap.empty) {
-      const savedNames = snap.docs.map(d => d.data().name);
-      savedNames.forEach(name => { if (!categories.includes(name)) categories.push(name); });
-    }
-  } catch (e) { console.warn('Categories load error:', e); }
-  sortCategories();
-}
-
-function sortCategories() { categories.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })); }
-
-async function saveCategory(name) {
-  const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
-  await setDoc(doc(categoryCol, id), { name, added: Date.now() });
-}
-
-async function deleteCategoryFromDB(name) {
-  const id = 'cat_' + name.toLowerCase().replace(/\s+/g, '_');
-  await deleteDoc(doc(categoryCol, id));
-}
-
-function renderCategoryList() {
-  const container = document.getElementById('category-list');
-  container.innerHTML = categories.map(cat => `
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--glass-border);">
-      <span style="flex:1; font-size:0.85rem;">${esc(cat)}</span>
-      <div style="display:flex; gap:4px">
-        <button onclick="editCategory('${cat}')" style="background:none; border:1px solid var(--gold-border); color:var(--gold); padding:2px 8px; border-radius:3px; font-size:0.7rem; cursor:pointer">Edit</button>
-        <button onclick="deleteCategory('${cat}')" style="background:none; border:1px solid #e57373; color:#e57373; padding:2px 8px; border-radius:3px; font-size:0.7rem; cursor:pointer">Delete</button>
-      </div>
-    </div>`).join('');
-}
-
-async function addCategory() {
-  const input = document.getElementById('cat-new-name');
-  const name = input.value.trim();
-  if (!name || categories.includes(name)) return;
-  categories.push(name);
-  await saveCategory(name);
-  sortCategories();
-  input.value = '';
-  renderCategoryList();
+  const snap = await getDocs(categoryCol);
+  const names = snap.docs.map(d => d.data().name);
+  names.forEach(n => { if(!categories.includes(n)) categories.push(n); });
+  categories.sort();
   updateCategorySelects();
-  renderVault();
-}
-
-async function editCategory(oldName) {
-  const newName = prompt('Rename category to:', oldName);
-  if (!newName || newName === oldName || categories.includes(newName)) return;
-  const index = categories.indexOf(oldName);
-  categories[index] = newName;
-  toys.forEach(t => { if (t.category === oldName) t.category = newName; });
-  await saveCategory(newName);
-  await deleteCategoryFromDB(oldName);
-  sortCategories();
-  renderCategoryList();
-  updateCategorySelects();
-  renderVault();
-}
-
-async function deleteCategory(name) {
-  if (!confirm(`Delete category "${name}"? Toys move to "Other".`)) return;
-  toys.forEach(t => { if (t.category === name) t.category = 'Other'; });
-  categories = categories.filter(c => c !== name);
-  await deleteCategoryFromDB(name);
-  sortCategories();
-  renderCategoryList();
-  updateCategorySelects();
-  renderVault();
 }
 
 function updateCategorySelects() {
-  const tSel = document.getElementById('t-cat');
-  const wSel = document.getElementById('w-cat');
   const html = categories.map(c => `<option>${c}</option>`).join('');
-  if (tSel) tSel.innerHTML = html;
-  if (wSel) wSel.innerHTML = html;
-}
-
-// ─── ACTIONS ─────────────────────────────────────────────────────────────────
-function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  btn.classList.add('active');
-}
-
-function setOwnerF(el, v) {
-  ownerF = v;
-  document.querySelectorAll('#tab-vault .filter-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderVault();
-}
-
-function openToyModal(id) {
-  document.getElementById('t-id').value = id || '';
-  if (id) {
-    const t = toys.find(x => x.id === id);
-    document.getElementById('tmt').textContent = 'Edit Toy';
-    document.getElementById('t-name').value = t.name;
-    document.getElementById('t-cat').value = t.category;
-    document.getElementById('t-owner').value = t.owner;
-    document.getElementById('t-notes').value = t.notes;
-    document.getElementById('t-drat').value = t.domRating || '';
-    document.getElementById('t-srat').value = t.subRating || '';
-  } else {
-    document.getElementById('tmt').textContent = 'Add to Collection';
-    ['t-name','t-notes','t-drat','t-srat'].forEach(i => document.getElementById(i).value = '');
-  }
-  document.getElementById('toy-modal').classList.add('open');
+  document.getElementById('t-cat').innerHTML = html;
 }
 
 async function saveToy() {
   const name = document.getElementById('t-name').value.trim();
   if (!name) return;
-  const id = document.getElementById('t-id').value;
+  const id = document.getElementById('t-id').value || 'toy_'+Date.now();
   const toy = {
-    id: id || 'toy_'+Date.now(), name,
-    category:  document.getElementById('t-cat').value,
-    owner:     document.getElementById('t-owner').value,
-    notes:     document.getElementById('t-notes').value.trim(),
+    id, name,
+    category: document.getElementById('t-cat').value,
+    owner: document.getElementById('t-owner').value,
+    notes: document.getElementById('t-notes').value,
     domRating: parseFloat(document.getElementById('t-drat').value) || 0,
     subRating: parseFloat(document.getElementById('t-srat').value) || 0,
-    added: id ? (toys.find(t=>t.id===id)?.added||Date.now()) : Date.now()
+    added: Date.now()
   };
-  toys = id ? toys.map(t=>t.id===id?toy:t) : [toy,...toys];
-  await writeToy(toy);
-  document.getElementById('toy-modal').classList.remove('open');
+  await setDoc(doc(toysCol, id), toy);
+  toys = toys.filter(t => t.id !== id); toys.push(toy);
+  closeToyModal();
   renderVault();
 }
 
-async function deleteToy(id) {
-  if (!confirm('Remove this toy?')) return;
-  toys = toys.filter(t => t.id !== id);
-  await deleteDoc(doc(toysCol, id));
-  renderVault();
-}
-
-// ─── RENDER ──────────────────────────────────────────────────────────────────
 function renderVault() {
-  const q = document.getElementById('vault-search').value.toLowerCase();
-  const filtered = toys.filter(t => {
-    const mo = ownerF==='all' || t.owner===ownerF;
-    const mq = !q || t.name.toLowerCase().includes(q);
-    return mo && mq;
-  });
-
-  const total=toys.length, domC=toys.filter(t=>t.owner==='Dom').length, subC=toys.filter(t=>t.owner==='Sub').length;
-  document.getElementById('stats-bar').innerHTML = `
-    <div class="stat-pill"><span>${total}</span>Total</div>
-    <div class="stat-pill"><span>${domC}</span>${domName}</div>
-    <div class="stat-pill"><span>${subC}</span>${subName}</div>`;
-
   const list = document.getElementById('vault-list');
-  if (!filtered.length) {
-    list.innerHTML = `<div class="empty-state">Nothing found.</div>`;
-    return;
-  }
+  const q = document.getElementById('vault-search').value.toLowerCase();
+  const filtered = toys.filter(t => (ownerF==='all' || t.owner===ownerF) && t.name.toLowerCase().includes(q));
 
   const groups = {};
   categories.forEach(c => groups[c] = []);
-  filtered.forEach(t => { if(groups[t.category]) groups[t.category].push(t); else groups['Other'].push(t); });
+  filtered.forEach(t => groups[t.category]?.push(t));
 
   list.innerHTML = categories.map(cat => {
     const items = groups[cat];
-    if (!items || !items.length) return '';
+    if (!items?.length) return '';
     return `
       <div class="cat-group ${collapsedCats[cat]?'collapsed':''}">
-        <div class="cat-header" onclick="toggleCat('${esc(cat)}')">
-          <span class="cat-header-name">${esc(cat)}</span>
+        <div class="cat-header" onclick="toggleCat('${cat}')">
+          <span class="cat-header-name">${cat}</span>
           <span class="cat-header-count">${items.length}</span>
           <span class="cat-chevron">▾</span>
         </div>
@@ -812,21 +404,13 @@ function renderVault() {
             <div class="toy-row ${expandedId===t.id?'expanded':''}" onclick="toggleRow('${t.id}')">
               <div class="toy-row-stripe ${t.owner==='Dom'?'stripe-dom':'stripe-sub'}"></div>
               <div class="toy-row-main">
-                <span class="toy-row-name">${esc(t.name)}</span>
+                <span class="toy-row-name">${t.name}</span>
                 <div class="toy-row-ratings">
                   <div class="mini-rating"><span class="mini-label d">${domInitial}</span>${miniStars(t.domRating,'d')}</div>
                   <div class="mini-rating"><span class="mini-label s">${subInitial}</span>${miniStars(t.subRating,'s')}</div>
                 </div>
               </div>
               <span class="toy-row-chevron">▾</span>
-            </div>
-            <div class="toy-detail">
-              <div class="toy-detail-inner">
-                <div class="detail-actions">
-                  <button class="detail-btn" onclick="event.stopPropagation();openToyModal('${t.id}')">Edit</button>
-                  <button class="detail-btn del" onclick="event.stopPropagation();deleteToy('${t.id}')">Remove</button>
-                </div>
-              </div>
             </div>`).join('')}
         </div>
       </div>`;
@@ -839,19 +423,32 @@ function miniStars(r,t) {
   return h;
 }
 
-function toggleRow(id) { expandedId = expandedId === id ? null : id; renderVault(); }
-function toggleCat(cat) { collapsedCats[cat] = !collapsedCats[cat]; renderVault(); }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function updateLabels() {
+  document.querySelector('.filter-pill.dom').textContent = domName;
+  document.querySelector('.filter-pill.sub').textContent = subName;
+}
 
-// Expose to window
-Object.assign(window, {
-  switchTab, setOwnerF, openToyModal, saveToy, deleteToy, toggleRow, toggleCat,
-  openCategoryModal: () => { document.getElementById('category-modal').classList.add('open'); renderCategoryList(); },
-  closeCategoryModal: () => document.getElementById('category-modal').classList.remove('open'),
-  addCategory, editCategory, deleteCategory,
-  closeToyModal: () => document.getElementById('toy-modal').classList.remove('open'),
-  renderVault, renderWishlist: () => {} // Simplified for brevity
-});
+window.switchTab = (t, b) => {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  b.classList.add('active');
+};
+
+window.setOwnerF = (el, v) => {
+  ownerF = v;
+  document.querySelectorAll('#tab-vault .filter-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderVault();
+};
+
+window.toggleRow = (id) => { expandedId = expandedId === id ? null : id; renderVault(); };
+window.toggleCat = (cat) => { collapsedCats[cat] = !collapsedCats[cat]; renderVault(); };
+window.openToyModal = () => document.getElementById('toy-modal').classList.add('open');
+window.closeToyModal = () => document.getElementById('toy-modal').classList.remove('open');
+window.openCategoryModal = () => { document.getElementById('category-modal').classList.add('open'); };
+window.closeCategoryModal = () => document.getElementById('category-modal').classList.remove('open');
+window.saveToy = saveToy;
 
 requireAuth().then(user => loadData(user));
 </script>
