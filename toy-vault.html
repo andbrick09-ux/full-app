@@ -252,12 +252,12 @@
       
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
         <div>
-          <label class="form-label">Dom Rating</label>
+          <label class="form-label" id="dom-rating-label">Mine Rating</label>
           <div class="star-rating" id="dom-stars"></div>
           <input type="hidden" id="t-drat" value="0">
         </div>
         <div>
-          <label class="form-label">Sub Rating</label>
+          <label class="form-label" id="sub-rating-label">Partner Rating</label>
           <div class="star-rating" id="sub-stars"></div>
           <input type="hidden" id="t-srat" value="0">
         </div>
@@ -376,7 +376,7 @@
     let myRole = null;
     let partnerName = 'Partner';
 
-    let toysCol, wishesCol;
+    let toysCol, wishesCol, categoryCol;
     let currentFilters = { owner: 'all', rating: 0, smart: 'none', category: 'all' };
     let expandedId = null;
 
@@ -391,6 +391,7 @@
       
       toysCol = dataCol('vault-toys', relId);
       wishesCol = dataCol('vault-wishes', relId);
+      categoryCol = dataCol('categories', relId);
 
       const profile = await getMyProfile();
       myRole = profile?.role || null;
@@ -402,9 +403,27 @@
         partnerName = partnerProfile?.displayName || 'Partner';
       }
 
+      // Load categories from Firestore
+      const catSnap = await getDocs(categoryCol);
+      catSnap.docs.forEach(d => {
+        const name = d.data().name;
+        if (name && !categories.includes(name)) {
+          categories.push(name);
+        }
+      });
+
       const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
       toys = tSnap.docs.map(d => d.data());
       wishes = wSnap.docs.map(d => d.data());
+
+      // Auto-scan categories from items
+      [...toys, ...wishes].forEach(item => {
+        if (item.category && !categories.includes(item.category)) {
+          categories.push(item.category);
+        }
+      });
+
+      categories.sort((a, b) => a.localeCompare(b));
 
       updateCategorySelects();
       populateCategoryPills();
@@ -593,6 +612,10 @@
       // Set dynamic labels
       ownerSelect.options[0].text = "My Toys";
       ownerSelect.options[1].text = `${partnerName}'s Toys`;
+      
+      // Dynamic rating labels
+      document.getElementById('dom-rating-label').textContent = "Mine Rating";
+      document.getElementById('sub-rating-label').textContent = `${partnerName} Rating`;
       
       if (id) {
         const t = toys.find(x => x.id === id);
