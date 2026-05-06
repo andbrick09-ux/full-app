@@ -240,8 +240,8 @@
       <div class="form-group">
         <label class="form-label">Belongs To</label>
         <select id="t-owner" class="form-select">
-          <option value="Dom">Dom</option>
-          <option value="Sub">Sub</option>
+          <option value="Dom">My Toys</option>
+          <option value="Sub">Partner's Toys</option>
         </select>
       </div>
       
@@ -448,7 +448,7 @@
       }
     };
 
-    function switchTab(tab, el) {
+    window.switchTab = function(tab, el) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       
@@ -585,6 +585,11 @@
     window.openToyModal = function(id) {
       const modal = document.getElementById('toy-modal');
       const deleteBtn = document.getElementById('toy-delete-btn');
+      const ownerSelect = document.getElementById('t-owner');
+      
+      // Set dynamic labels
+      ownerSelect.options[0].text = "My Toys";
+      ownerSelect.options[1].text = `${partnerName}'s Toys`;
       
       if (id) {
         const t = toys.find(x => x.id === id);
