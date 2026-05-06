@@ -90,8 +90,8 @@
     .toy-stripe {
       width: 5px; height: 42px; border-radius: 9999px; flex-shrink: 0;
     }
-    .stripe-dom { background: var(--dom-rose); }
-    .stripe-sub { background: var(--sub-cream); }
+    .stripe-mine { background: #0a1628; border: 1px solid var(--gold); }
+    .stripe-partner { background: var(--dom-rose); }
     .toy-main { flex: 1; min-width: 0; }
     .toy-name { font-family: 'Playfair Display', serif; font-size: 15px; color: #ddd; font-weight: 600; }
     .toy-ratings { display: flex; gap: 12px; margin-top: 4px; }
@@ -552,7 +552,7 @@
             <div id="cat-rows-${cat}" style="padding: 0 12px;">
               ${items.map(t => `
                 <div class="toy-row" onclick="openToyModal('${t.id}'); event.stopImmediatePropagation();">
-                  <div class="toy-stripe ${t.owner === 'Dom' ? 'stripe-dom' : 'stripe-sub'}"></div>
+                  <div class="toy-stripe ${t.owner === myRole ? 'stripe-mine' : 'stripe-partner'}"></div>
                   <div class="toy-main">
                     <div class="toy-name">${t.name}</div>
                     <div class="toy-ratings">
