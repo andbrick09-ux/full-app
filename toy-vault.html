@@ -395,19 +395,74 @@
         return matchesSearch && matchesOwner && matchesRating && matchesSmart;
       });
 
-      container.innerHTML = filtered.map(t => `
-        <div class="toy-row" onclick="openToyModal('${t.id}')">
-          <div class="toy-stripe ${t.owner === 'Dom' ? 'stripe-dom' : 'stripe-sub'}"></div>
-          <div class="toy-main">
-            <div class="toy-name">${t.name}</div>
-            <div class="toy-ratings">
-              <span>Dom: ${createMiniStars(t.domRating)}</span>
-              <span>Sub: ${createMiniStars(t.subRating)}</span>
+      // Group by category
+      const groups = {};
+      categories.forEach(cat => groups[cat] = []);
+      
+      filtered.forEach(t => {
+        if (groups[t.category]) {
+          groups[t.category].push(t);
+        } else {
+          groups['Other'] = groups['Other'] || [];
+          groups['Other'].push(t);
+        }
+      });
+
+      let html = '';
+      
+      categories.forEach(cat => {
+        const items = groups[cat];
+        if (!items || items.length === 0) return;
+        
+        html += `
+          <div class="glass-card" style="margin-bottom: 20px; padding: 8px 0;">
+            <div onclick="toggleCategory('${cat}')" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 20px; cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'Playfair Display',serif; font-size:15px; color:var(--gold);">${cat}</span>
+                <span style="background:rgba(212,175,55,0.1); color:#888; font-size:11px; padding:1px 8px; border-radius:10px;">${items.length}</span>
+              </div>
+              <span id="chevron-${cat}" style="color:#666; font-size:18px; transition:transform .3s;">▾</span>
+            </div>
+            <div id="cat-rows-${cat}" style="padding: 0 12px;">
+              ${items.map(t => `
+                <div class="toy-row" onclick="openToyModal('${t.id}'); event.stopImmediatePropagation();">
+                  <div class="toy-stripe ${t.owner === 'Dom' ? 'stripe-dom' : 'stripe-sub'}"></div>
+                  <div class="toy-main">
+                    <div class="toy-name">${t.name}</div>
+                    <div class="toy-ratings">
+                      <span>Dom: ${createMiniStars(t.domRating)}</span>
+                      <span>Sub: ${createMiniStars(t.subRating)}</span>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      });
+      
+      container.innerHTML = html || '<div style="text-align:center; color:#666; padding:40px 20px;">No toys match your filters</div>';
     }
+
+    // Category collapse state
+    let collapsedCategories = {};
+
+    window.toggleCategory = function(cat) {
+      const rows = document.getElementById('cat-rows-' + cat);
+      const chevron = document.getElementById('chevron-' + cat);
+      
+      if (!rows) return;
+      
+      collapsedCategories[cat] = !collapsedCategories[cat];
+      
+      if (collapsedCategories[cat]) {
+        rows.style.display = 'none';
+        chevron.style.transform = 'rotate(-90deg)';
+      } else {
+        rows.style.display = 'block';
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    };
 
     function createMiniStars(rating) {
       let html = '';
