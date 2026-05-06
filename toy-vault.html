@@ -289,7 +289,7 @@
   </div>
 </div>
 
-<<script type="module">
+<<<script type="module">
 import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
 import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
@@ -300,7 +300,7 @@ let relId = null;
 let partnerUid = null;
 let toys = [];
 let wishes = [];
-// Baseline categories - the scanner will add your custom ones automatically
+// Starting categories - the scanner will add your custom ones automatically
 let categories = ['Vibration','Insertion','Anal Play','Impact','Restraint','Sensation','Other'];
 
 let toysCol, wishesCol, categoryCol;
@@ -314,14 +314,13 @@ async function loadData(user) {
   try {
     myUid = user.uid;
     const rel = await getRelationship();
-    relId = rel?.id || user.uid; // If not paired, use individual UID
+    relId = rel?.id || user.uid; 
 
-    // Initialize collection references with the shared ID
     toysCol = dataCol('vault-toys', relId);
     wishesCol = dataCol('vault-wishes', relId);
     categoryCol = dataCol('categories', relId);
 
-    // 1. Load Profiles & Nicknames
+    // 1. Profiles & Names
     const myProfile = await getMyProfile();
     if (rel) {
       partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
@@ -349,8 +348,7 @@ async function loadData(user) {
     toys = tSnap.docs.map(d => d.data());
     wishes = wSnap.docs.map(d => d.data());
 
-    // 4. THE CATEGORY SCANNER
-    // Scan toys/wishes for categories that might be missing from the official list
+    // 4. CATEGORY SCANNER
     [...toys, ...wishes].forEach(item => {
       if (item.category && !categories.includes(item.category)) {
         categories.push(item.category);
@@ -377,8 +375,10 @@ function updateLabels() {
 
 function updateCategorySelects() {
   const html = categories.map(c => `<option>${c}</option>`).join('');
-  if (document.getElementById('t-cat')) document.getElementById('t-cat').innerHTML = html;
-  if (document.getElementById('w-cat')) document.getElementById('w-cat').innerHTML = html;
+  const tCat = document.getElementById('t-cat');
+  const wCat = document.getElementById('w-cat');
+  if (tCat) tCat.innerHTML = html;
+  if (wCat) wCat.innerHTML = html;
 }
 
 // ─── SAVE & DELETE ───
@@ -390,7 +390,7 @@ async function saveToy() {
     id, name,
     category: document.getElementById('t-cat').value,
     owner: document.getElementById('t-owner').value,
-    notes: document.getElementById('t-notes').value,
+    notes: document.getElementById('t-notes').value.trim(),
     domRating: parseFloat(document.getElementById('t-drat').value) || 0,
     subRating: parseFloat(document.getElementById('t-srat').value) || 0,
     added: Date.now()
@@ -440,8 +440,10 @@ function renderVault() {
           <span class="cat-chevron">▾</span>
         </div>
         <div class="cat-rows">
-          ${items.map(t => `
-            <div class="toy-row ${expandedId===t.id?'expanded':''}" onclick="toggleRow('${t.id}')">
+          ${items.map(t => {
+            const isExp = expandedId === t.id;
+            return `
+            <div class="toy-row ${isExp ? 'expanded' : ''}" onclick="toggleRow('${t.id}')">
               <div class="toy-row-stripe ${t.owner==='Dom'?'stripe-dom':'stripe-sub'}"></div>
               <div class="toy-row-main">
                 <span class="toy-row-name">${t.name}</span>
@@ -451,7 +453,17 @@ function renderVault() {
                 </div>
               </div>
               <span class="toy-row-chevron">▾</span>
-            </div>`).join('')}
+            </div>
+            <div class="toy-detail" style="${isExp ? 'max-height:400px;' : 'max-height:0;'}">
+              <div class="toy-detail-inner">
+                ${t.notes ? `<div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px; font-style:italic; line-height:1.4;">${t.notes}</div>` : ''}
+                <div class="detail-actions">
+                  <button class="detail-btn" onclick="event.stopPropagation(); window.openToyModal('${t.id}')">Edit</button>
+                  <button class="detail-btn del" onclick="event.stopPropagation(); window.deleteToy('${t.id}')" style="color:#e57373;">Remove</button>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
         </div>
       </div>`;
   }).join('');
@@ -466,10 +478,16 @@ function miniStars(r,t) {
 function renderWishlist() {
   const container = document.getElementById('wish-list');
   if (!container) return;
-  container.innerHTML = wishes.map(w => `<div class="wish-card"><div class="wish-body"><div class="wish-name">${w.name}</div><div class="wish-meta">${w.category}</div></div></div>`).join('');
+  container.innerHTML = wishes.map(w => `
+    <div class="wish-card">
+      <div class="wish-body">
+        <div class="wish-name">${w.name}</div>
+        <div class="wish-meta">${w.category}</div>
+      </div>
+    </div>`).join('');
 }
 
-// ─── INTERACTION HELPERS ───
+// ─── WINDOW HELPERS ───
 window.switchTab = (t, b) => {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -484,15 +502,37 @@ window.setOwnerF = (el, v) => {
 };
 window.toggleRow = (id) => { expandedId = expandedId === id ? null : id; renderVault(); };
 window.toggleCat = (cat) => { collapsedCats[cat] = !collapsedCats[cat]; renderVault(); };
-window.openToyModal = () => document.getElementById('toy-modal').classList.add('open');
+window.openToyModal = (id) => {
+  const modal = document.getElementById('toy-modal');
+  if (id) {
+    const t = toys.find(x => x.id === id);
+    document.getElementById('tmt').textContent = 'Edit Toy';
+    document.getElementById('t-id').value = id;
+    document.getElementById('t-name').value = t.name;
+    document.getElementById('t-cat').value = t.category;
+    document.getElementById('t-owner').value = t.owner;
+    document.getElementById('t-notes').value = t.notes || '';
+    document.getElementById('t-drat').value = t.domRating || 0;
+    document.getElementById('t-srat').value = t.subRating || 0;
+  } else {
+    document.getElementById('tmt').textContent = 'Add to Collection';
+    ['t-name','t-notes','t-drat','t-srat','t-id'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('t-cat').value = 'Vibration';
+    document.getElementById('t-owner').value = 'Dom';
+  }
+  modal.classList.add('open');
+};
 window.closeToyModal = () => document.getElementById('toy-modal').classList.remove('open');
+window.openCategoryModal = () => { document.getElementById('category-modal').classList.add('open'); renderCategoryList(); };
+window.closeCategoryModal = () => document.getElementById('category-modal').classList.remove('open');
 window.saveToy = saveToy;
+window.deleteToy = deleteToy;
 
 // ─── RESCUE SCRIPT ───
 window.rescueMissingData = async function() {
   alert("Checking personal folder...");
   if (!myUid || !relId || relId === myUid) {
-    alert("Error: ID or Relationship not loaded. Wait 2 seconds and try again.");
+    alert("Error: Partnership not detected. Pair your accounts first.");
     return;
   }
   try {
@@ -501,7 +541,7 @@ window.rescueMissingData = async function() {
     const oldCats = await getDocs(collection(db, 'data', myUid, 'categories'));
 
     if (oldToys.empty && oldCats.empty) {
-      alert("No old data found in your personal folder.");
+      alert("Found nothing to rescue in your personal folder.");
       return;
     }
 
@@ -516,9 +556,19 @@ window.rescueMissingData = async function() {
   }
 };
 
-// Start initialization
+// ─── CATEGORY LIST RENDER ───
+function renderCategoryList() {
+  const container = document.getElementById('category-list');
+  if (!container) return;
+  container.innerHTML = categories.map(cat => `
+    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--glass-border);">
+      <span>${cat}</span>
+    </div>`).join('');
+}
+
 requireAuth().then(user => loadData(user));
 </script>
+
 
 <script src="nav.js"></script>
 </body>
