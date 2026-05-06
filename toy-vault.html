@@ -169,7 +169,7 @@
       <div class="topbar-title">The Vault</div>
       <div style="font-size:10px; color:#666; letter-spacing:1px;">TOY COLLECTION</div>
     </div>
-    <div class="topbar-gear" onclick="openCategoryModal()">⚙️</div>
+    <!-- Gear removed - category management now inside Add/Edit modal -->
   </div>
 
   <div class="main">
@@ -190,6 +190,15 @@
       </div>
 
       <div id="vault-list"></div>
+
+      <!-- Floating Add Button -->
+      <button onclick="openToyModal()" 
+              style="position:fixed; bottom:90px; right:20px; width:56px; height:56px; 
+                     background:var(--luxury-gradient); color:#051024; border:none; 
+                     border-radius:50%; font-size:28px; box-shadow:0 6px 20px rgba(212,175,55,0.4);
+                     display:flex; align-items:center; justify-content:center; z-index:200;">
+        +
+      </button>
     </div>
 
     <!-- WISHLIST TAB -->
@@ -199,6 +208,15 @@
         <button onclick="openWishModal()" class="btn btn-gold" style="width:auto; padding:10px 20px; font-size:11px;">+ Add Desire</button>
       </div>
       <div id="wish-list" class="menu-grid"></div>
+
+      <!-- Floating Add Button for Wishlist -->
+      <button onclick="openWishModal()" 
+              style="position:fixed; bottom:90px; right:20px; width:56px; height:56px; 
+                     background:var(--luxury-gradient); color:#051024; border:none; 
+                     border-radius:50%; font-size:28px; box-shadow:0 6px 20px rgba(212,175,55,0.4);
+                     display:flex; align-items:center; justify-content:center; z-index:200;">
+        +
+      </button>
     </div>
 
   </div>
@@ -216,7 +234,7 @@
       
       <div class="form-group">
         <label class="form-label">Category</label>
-        <select id="t-cat" class="form-select"></select>
+        <select id="t-cat" class="form-select" onchange="handleCategoryChange(this)"></select>
       </div>
       
       <div class="form-group">
@@ -282,6 +300,23 @@
       
       <button id="wish-delete-btn" onclick="deleteWish()" 
               class="btn btn-danger" style="width:100%; margin-top:12px; display:none;">Remove from Wishlist</button>
+    </div>
+  </div>
+
+  <!-- CATEGORY MANAGEMENT MODAL -->
+  <div id="category-modal" class="modal-back">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Manage Categories</div>
+      
+      <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <input type="text" id="new-category-name" class="form-input" placeholder="New category name" style="flex:1;">
+        <button onclick="addNewCategory()" class="btn btn-gold" style="width:auto; padding:0 20px;">Add</button>
+      </div>
+      
+      <div id="category-list" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
+      
+      <button onclick="closeCategoryModal()" class="btn btn-outline" style="width:100%;">Done</button>
     </div>
   </div>
 
@@ -379,12 +414,39 @@
     }
 
     function updateCategorySelects() {
-      const html = categories.map(c => `<option>${c}</option>`).join('');
+      let html = categories.map(c => `<option>${c}</option>`).join('');
+      html += `<option value="__new__">New Category...</option>`;
+      html += `<option value="__manage__">Manage Categories...</option>`;
+      
       const t = document.getElementById('t-cat');
       const w = document.getElementById('w-cat');
       if (t) t.innerHTML = html;
       if (w) w.innerHTML = html;
     }
+
+    window.handleCategoryChange = function(select) {
+      if (select.value === '__new__') {
+        const newCat = prompt("Enter new category name:");
+        if (newCat && newCat.trim()) {
+          const name = newCat.trim();
+          if (!categories.includes(name)) {
+            categories.push(name);
+            categories.sort();
+            updateCategorySelects();
+            select.value = name;
+          } else {
+            alert("Category already exists");
+            select.value = '';
+          }
+        } else {
+          select.value = '';
+        }
+      } 
+      else if (select.value === '__manage__') {
+        openCategoryModal();
+        select.value = ''; // reset
+      }
+    };
 
     function switchTab(tab, el) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -561,9 +623,26 @@
 
     window.saveToy = async function() {
       const name = document.getElementById('t-name').value.trim();
-      if (!name) return alert("Toy name is required");
+      if (!name) {
+        showToast("Toy name is required", "error");
+        return;
+      }
 
-      const id = document.getElementById('t-id').value || 'toy_' + Date.now();
+      const currentId = document.getElementById('t-id').value;
+      const isNew = !currentId;
+
+      // Check for duplicate name (excluding current toy if editing)
+      const duplicate = toys.find(t => 
+        t.name.toLowerCase() === name.toLowerCase() && 
+        t.id !== currentId
+      );
+
+      if (duplicate) {
+        showToast("A toy with this name already exists", "error");
+        return;
+      }
+
+      const id = currentId || 'toy_' + Date.now();
       const toy = {
         id,
         name,
@@ -580,6 +659,9 @@
       toys.push(toy);
       closeToyModal();
       renderVault();
+
+      const message = isNew ? "Toy added successfully" : "Toy updated successfully";
+      showToast(message, "success");
     };
 
     window.deleteToyFromModal = async function(id) {
@@ -588,6 +670,7 @@
       toys = toys.filter(t => t.id !== id);
       closeToyModal();
       renderVault();
+      showToast("Toy deleted successfully", "success");
     };
 
     // Wishlist functions
@@ -621,8 +704,12 @@
 
     window.saveWish = async function() {
       const name = document.getElementById('w-name').value.trim();
-      if (!name) return alert("Name is required");
+      if (!name) {
+        showToast("Name is required", "error");
+        return;
+      }
 
+      const isNew = !document.getElementById('w-id').value;
       const id = document.getElementById('w-id').value || 'wish_' + Date.now();
       const wish = {
         id,
@@ -636,6 +723,8 @@
       wishes.push(wish);
       closeWishModal();
       renderWishlist();
+
+      showToast(isNew ? "Added to wishlist" : "Wishlist item updated", "success");
     };
 
     window.deleteWish = async function(id) {
@@ -644,6 +733,7 @@
       wishes = wishes.filter(w => w.id !== id);
       closeWishModal();
       renderWishlist();
+      showToast("Item removed from wishlist", "success");
     };
 
     // Filter Sheet
@@ -698,7 +788,69 @@
     };
 
     window.openCategoryModal = function() {
-      alert("Category management coming in next update. For now, categories are fixed.");
+      const modal = document.getElementById('category-modal');
+      renderCategoryList();
+      modal.classList.add('open');
+    };
+
+    window.closeCategoryModal = function() {
+      document.getElementById('category-modal').classList.remove('open');
+      updateCategorySelects();
+      renderVault(); // Refresh in case categories changed
+    };
+
+    function renderCategoryList() {
+      const container = document.getElementById('category-list');
+      if (!container) return;
+      
+      container.innerHTML = categories.map((cat, index) => {
+        const inUse = toys.some(t => t.category === cat);
+        
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border);">
+            <span style="color:#ddd;">${cat}</span>
+            ${inUse 
+              ? `<span style="color:#666; font-size:11px;">In use</span>` 
+              : `<button onclick="deleteCategory(${index})" style="background:none; border:none; color:#F44336; font-size:18px; cursor:pointer;">×</button>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.addNewCategory = function() {
+      const input = document.getElementById('new-category-name');
+      const name = input.value.trim();
+      
+      if (!name) {
+        showToast("Category name is required", "error");
+        return;
+      }
+      if (categories.includes(name)) {
+        showToast("Category already exists", "error");
+        return;
+      }
+      
+      categories.push(name);
+      categories.sort();
+      input.value = '';
+      renderCategoryList();
+      showToast("Category added", "success");
+    };
+
+    window.deleteCategory = function(index) {
+      const cat = categories[index];
+      
+      // Check if any toys are using this category
+      const inUse = toys.some(t => t.category === cat);
+      if (inUse) {
+        if (!confirm(`"${cat}" is currently used by some toys. Delete anyway?`)) {
+          return;
+        }
+      }
+      
+      categories.splice(index, 1);
+      renderCategoryList();
     };
 
     // Init
