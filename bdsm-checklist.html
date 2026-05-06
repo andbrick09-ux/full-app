@@ -2152,6 +2152,66 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* === NEW: Z-Pattern Header & Sticky + Recent Updates === */
+    .app-header {
+      height: auto;
+      flex-direction: column;
+      padding: 8px 14px;
+      gap: 8px;
+    }
+
+    .header-top-row {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-group-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-right: 6px;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .cat-header-sticky {
+      position: sticky;
+      top: 112px;
+      z-index: 100;
+      background: rgba(7, 24, 48, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .update-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulse-gold 2s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes pulse-gold {
+      0% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0.4; transform: scale(1); }
+    }
   </style>
 </head>
 
@@ -2165,12 +2225,14 @@
 
   <!-- HEADER -->
   <header class="app-header">
-    <div class="user-pill" id="userPill">
-      <div class="role-dot"></div><span id="userPillName">…</span>
+    <div class="header-top-row">
+      <div class="user-pill" id="userPill">
+        <div class="role-dot"></div><span id="userPillName">…</span>
+      </div>
+      <div class="header-title">BDSM Checklist</div>
+      <button class="swipe-btn" onclick="openSwipe()" title="Swipe mode">⇄</button>
+      <div class="save-status" id="saveStatus">—</div>
     </div>
-    <div class="header-title">BDSM Checklist</div>
-    <button class="swipe-btn" onclick="openSwipe()" title="Swipe mode">⇄</button>
-    <div class="save-status" id="saveStatus">—</div>
   </header>
 
   <!-- FILTER BAR -->
@@ -2182,12 +2244,20 @@
       <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
     </div>
     <div class="filter-chips">
+      <span class="filter-group-label">ALIGNMENT</span>
       <span class="chip" data-filter="both-tried" onclick="toggleChip(this,'success-chip')">Both Tried</span>
-      <span class="chip" data-filter="my-fetish" onclick="toggleChip(this,'purple-chip')">My Fetish/Need</span>
-      <span class="chip" data-filter="hard-limits" onclick="toggleChip(this,'danger-chip')">Hard Limits</span>
-      <span class="chip" data-filter="disagreements" onclick="toggleChip(this,'warn-chip')">Disagreements</span>
-      <span class="chip" data-filter="scene-flagged" onclick="toggleChip(this,'purple-chip')">Scene Flagged</span>
-      <span class="chip" data-filter="unset" onclick="toggleChip(this,'')">Show Unset Only</span>
+      <span class="chip" data-filter="my-fetish" onclick="toggleChip(this,'purple-chip')">My Fetish</span>
+      
+      <div style="width: 1px; background: var(--glass-border); margin: 0 8px; align-self: stretch;"></div>
+      
+      <span class="filter-group-label">REVIEW</span>
+      <span class="chip" data-filter="disagreements" onclick="toggleChip(this,'warn-chip')">Conflicts</span>
+      <span class="chip" data-filter="hard-limits" onclick="toggleChip(this,'danger-chip')">Limits</span>
+      
+      <div style="width: 1px; background: var(--glass-border); margin: 0 8px; align-self: stretch;"></div>
+      
+      <span class="chip" data-filter="scene-flagged" onclick="toggleChip(this,'purple-chip')">Scene</span>
+      <span class="chip" data-filter="unset" onclick="toggleChip(this,'')">Unset</span>
     </div>
   </div>
 
@@ -2464,9 +2534,17 @@
       saveTimer = setTimeout(doSave, 450);
     };
     async function doSave() {
+      const now = Date.now();
+      
+      // Attach timestamp to any changed note (and mark item as recently updated)
       document.querySelectorAll('textarea[data-sk]').forEach(el => {
-        myData[el.dataset.sk] = el.value;
+        const key = el.dataset.sk;
+        if (myData[key] !== el.value) {
+          myData[key] = el.value;
+          myData[key.replace('.ns', '') + '.ts'] = now; // timestamp the parent item
+        }
       });
+
       try {
         await setDoc(getRespRef(myUid), myData, { merge: true });
         setSaveStatus('saved', '✓ Saved');
@@ -2593,10 +2671,15 @@
       const delBtn = isCustom ? `<button class="del-btn" onclick="event.stopPropagation();delCustom('${item.id}')">✕</button>` : '';
       const flagged = myData[key + '.flagged'] ? 'flagged' : '';
 
+      // Check if updated in last 24 hours (by you or partner)
+      const lastUpdate = myData[key + '.ts'] || partnerData[key + '.ts'] || 0;
+      const isRecent = (Date.now() - lastUpdate) < (24 * 60 * 60 * 1000);
+      const updateIndicator = isRecent ? '<span class="update-dot"></span>' : '';
+
       return `
 <div class="activity-card ${accent}" id="c_${sid}" data-cat="${cat}" data-act="${activity}">
   <div class="card-header" onclick="toggleCard(this)">
-    <div class="activity-name">${activity}</div>
+    <div class="activity-name">${updateIndicator}${activity}</div>
     <div class="badge-row">${statusPair}${cBadge}${sBadge}</div>
     ${delBtn}
     <button class="flag-btn ${flagged}" onclick="event.stopPropagation();toggleFlag('${key}')">⚑</button>
