@@ -2467,33 +2467,68 @@
     }
 
     // ═══ INIT ═══
-    async function init() {
-      const user = await requireAuth(); myUid = user.uid;
-      const [prof, rel] = await Promise.all([getMyProfile(), getRelationship()]);
-      myRole = prof?.role ?? 'sub'; myName = prof?.displayName ?? myRole; relId = rel?.id ?? null;
+        async function init() {
+      const user = await requireAuth();
+      myUid = user.uid;
+
+      // 1. Fetch Cloud Template, Profile, and Relationship status
+      const [prof, rel, tSnap] = await Promise.all([
+        getMyProfile(), 
+        getRelationship(),
+        getDoc(doc(db, 'system_data', 'checklist_v1'))
+      ]);
+
+      if (!tSnap.exists()) {
+        alert("Critical Error: Cloud template missing. Did you run the upload button?");
+        return;
+      }
+      template = tSnap.data();
+
+      // 2. Set IDs and Names
+      relId = rel?.id || "solo_" + myUid;
+      myRole = prof?.role || 'sub';
+      myName = prof?.displayName || 'Me';
+
       partnerUid = await getPartnerUid();
-      if (partnerUid) { const pp = await getUserProfile(partnerUid); partnerName = pp?.displayName ?? (myRole === 'dom' ? 'Sub' : 'Dom'); }
-      setupIdentity();
-      await loadMyData();
       if (partnerUid) {
-        onSnapshot(doc(db, 'users', partnerUid, 'checklist', 'responses'), snap => {
+        const pp = await getUserProfile(partnerUid);
+        partnerName = pp?.displayName || (myRole === 'dom' ? 'Sub' : 'Dom');
+      }
+
+      // 3. Migration Check (Moves old personal data to shared relationship)
+      if (rel?.id) {
+        await migrate(myUid);
+        if (partnerUid) await migrate(partnerUid);
+      }
+
+      // 4. Load My Data from Shared Bucket
+      const mySnap = await getDoc(getRespRef(myUid));
+      myData = mySnap.exists() ? mySnap.data() : {};
+
+      // 5. Listeners (Syncing partner results and custom items)
+      if (partnerUid) {
+        onSnapshot(getRespRef(partnerUid), snap => {
           partnerData = snap.exists() ? snap.data() : {};
           refreshAll();
         });
       }
-      if (relId) {
+      if (relId && relId !== "solo_" + myUid) {
         onSnapshot(collection(db, 'relationships', relId, 'checklistCustom'), snap => {
           customItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          renderCustomItems(); rebuildCustomTabs(); buildStats();
+          renderCustomItems(); 
+          rebuildCustomTabs(); 
+          buildStats();
         });
       }
+
+      setupIdentity();
       buildAll();
       document.getElementById('loadingOverlay').classList.add('hidden');
-      
-      // Load view mode
+
       const savedView = localStorage.getItem('checklist_view_mode') || 'both';
       setViewMode(savedView);
     }
+
 
     function setupIdentity() {
       const pill = document.getElementById('userPill'); 
