@@ -1,975 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Vault — Toy Collection &amp; Wishlist</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Great+Vibes&amp;family=Josefin+Sans:wght@200;300;400&amp;display=swap" rel="stylesheet">
-<style>
-  :root {
-    --midnight: #0a0e1a;
-    --deep-blue: #0d1528;
-    --card: rgba(18,26,45,0.9);
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --gold-dim: rgba(201,168,76,0.18);
-    --gold-border: rgba(201,168,76,0.35);
-    --dom-color: #c0392b;
-    --dom-soft: rgba(192,57,43,0.18);
-    --sub-color: #6c5ce7;
-    --sub-soft: rgba(108,92,231,0.18);
-    --shared-color: #00b894;
-    --shared-soft: rgba(0,184,148,0.18);
-    --text: #e8dcc8;
-    --text-dim: rgba(232,220,200,0.5);
-    --glass: rgba(255,255,255,0.03);
-    --glass-border: rgba(255,255,255,0.07);
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Vault — V2</title>
+  
+  <!-- Global Design System -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&amp;family=Great+Vibes&amp;family=Montserrat:wght@400;600&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    /* === Sir's Protocol Global Tokens (V2) === */
+    :root {
+      --midnight: #051024;
+      --glass: rgba(5,16,36,0.85);
+      --glass2: rgba(2,8,20,0.6);
+      --gold: #D4AF37;
+      --gold-light: #F5E6A3;
+      --gold-dim: rgba(212,175,55,0.18);
+      --border: rgba(212,175,55,0.15);
+      --cream: #f0e6d2;
+      --cream-dim: rgba(240,230,211,0.7);
+      --luxury-gradient: linear-gradient(135deg, #D4AF37, #F5E6A3);
+      --dom-rose: #b76e79;
+      --sub-cream: #f0e6d2;
+    }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background: var(--midnight);
+      color: #ccc;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
 
-  body {
-    background: var(--midnight);
-    color: var(--text);
-    font-family: 'Josefin Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(108,92,231,0.05) 0%, transparent 50%);
-  }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(5,16,36,0.92);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: 28px;
+      background: var(--luxury-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .topbar-gear {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: var(--gold);
+      cursor: pointer;
+      transition: transform .2s;
+    }
+    .topbar-gear:active { transform: scale(0.9); }
 
-  /* ── Header ── */
-  .site-header { text-align:center; padding:36px 24px 20px; }
-  .site-header::after {
-    content:''; display:block; width:200px; height:1px;
-    background:linear-gradient(90deg,transparent,var(--gold),transparent);
-    margin:14px auto 0;
-  }
-  .script-title {
-    font-family:'Great Vibes',cursive;
-    font-size:clamp(2rem,6vw,3rem);
-    color:var(--gold-light);
-    text-shadow:0 0 40px rgba(201,168,76,0.4);
-  }
-  .subtitle {
-    font-size:0.62rem; letter-spacing:0.35em; text-transform:uppercase;
-    color:var(--text-dim); margin-top:4px;
-  }
+    .main { max-width: 620px; margin: 0 auto; padding: 20px; }
 
-  /* ── Tabs ── */
-  .tabs {
-    display:flex; justify-content:center; margin:18px auto 0;
-    max-width:400px; border:1px solid var(--gold-border);
-    border-radius:4px; overflow:hidden;
-  }
-  .tab-btn {
-    flex:1; background:transparent; border:none;
-    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
-    font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase;
-    padding:10px 8px; cursor:pointer; transition:all 0.3s;
-  }
-  .tab-btn + .tab-btn { border-left:1px solid var(--gold-border); }
-  .tab-btn.active { background:var(--gold-dim); color:var(--gold-light); }
-  .tab-btn:hover:not(.active) { background:var(--glass); color:var(--text); }
+    /* Tabs */
+    .tabs {
+      display: flex; background: var(--glass); border-radius: 9999px;
+      padding: 4px; margin-bottom: 20px; border: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 10px; text-align: center; font-size: 13px;
+      font-weight: 600; letter-spacing: 0.5px; color: #aaa;
+      border-radius: 9999px; transition: all .2s;
+    }
+    .tab-btn.active { background: var(--gold); color: #051024; font-weight: 700; }
 
-  /* ── Layout ── */
-  .container { max-width:700px; margin:0 auto; padding:20px 14px 80px; }
-  .tab-panel { display:none; }
-  .tab-panel.active { display:block; }
+    /* Glass Card */
+    .glass-card {
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: 20px; padding: 20px; margin-bottom: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
 
-  /* ── Controls ── */
-  .controls-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
-  .search-wrap { flex:1; min-width:160px; position:relative; }
-  .search-wrap input {
-    width:100%; background:var(--card); border:1px solid var(--gold-border);
-    border-radius:3px; color:var(--text); font-family:'Josefin Sans',sans-serif;
-    font-size:0.72rem; letter-spacing:0.08em; padding:9px 12px 9px 32px;
-    outline:none; transition:border-color 0.3s;
-  }
-  .search-wrap input:focus { border-color:var(--gold); }
-  .search-wrap::before {
-    content:'⌕'; position:absolute; left:10px; top:50%;
-    transform:translateY(-50%); color:var(--gold); font-size:1rem; pointer-events:none;
-  }
-  .filter-group { display:flex; gap:6px; flex-wrap:wrap; }
-  .filter-pill {
-    background:transparent; border:1px solid var(--gold-border); border-radius:2px;
-    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
-    font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase;
-    padding:6px 11px; cursor:pointer; transition:all 0.22s;
-  }
-  .filter-pill.active, .filter-pill:hover { border-color:var(--gold); color:var(--gold-light); background:var(--gold-dim); }
-  .filter-pill.dom.active    { border-color:var(--dom-color);    color:#e57373; background:var(--dom-soft); }
-  .filter-pill.sub.active    { border-color:var(--sub-color);    color:#b39ddb; background:var(--sub-soft); }
+    /* Toy Row V2 */
+    .toy-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; background: var(--glass2);
+      border: 1px solid var(--border); border-radius: 16px;
+      margin-bottom: 8px; cursor: pointer; transition: all .2s;
+    }
+    .toy-row:active { transform: scale(0.985); }
+    .toy-stripe {
+      width: 5px; height: 42px; border-radius: 9999px; flex-shrink: 0;
+    }
+    .stripe-dom { background: var(--dom-rose); }
+    .stripe-sub { background: var(--sub-cream); }
+    .toy-main { flex: 1; min-width: 0; }
+    .toy-name { font-family: 'Playfair Display', serif; font-size: 15px; color: #ddd; font-weight: 600; }
+    .toy-ratings { display: flex; gap: 12px; margin-top: 4px; }
+    .mini-star { font-size: 13px; color: #444; }
+    .mini-star.filled { color: var(--gold); }
 
-  .btn-add {
-    background:linear-gradient(135deg,#b8860b,var(--gold)); border:none; border-radius:3px;
-    color:var(--midnight); font-family:'Josefin Sans',sans-serif;
-    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase;
-    padding:9px 16px; cursor:pointer; transition:opacity 0.2s,transform 0.2s; white-space:nowrap;
-  }
-  .btn-add:hover { opacity:0.88; transform:translateY(-1px); }
+    /* Wishlist Menu Grid */
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .menu-card {
+      background: var(--glass2); border: 1px solid var(--border);
+      border-radius: 18px; padding: 18px 16px; text-align: center;
+      transition: all .3s ease; position: relative;
+    }
+    .menu-card:active { transform: scale(0.96); }
+    .menu-card-title { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--gold); margin-bottom: 6px; }
+    .menu-card-meta { font-size: 11px; color: #888; }
 
-  /* ── Filters Panel ── */
-  .filters-panel {
-    background: var(--card);
-    border: 1px solid var(--gold-border);
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 12px;
-    display: none;
-  }
-  .filters-panel.open { display: block; }
-  .filter-section { margin-bottom: 10px; }
-  .filter-section:last-child { margin-bottom: 0; }
-  .filter-label { font-size: 0.55rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
-  .filter-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    /* Bottom Sheet Modal */
+    .modal-back {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px); z-index: 300;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .modal-back.open { opacity: 1; pointer-events: all; }
+    .modal-sheet {
+      width: 100%; max-width: 620px; background: var(--glass);
+      border: 1px solid var(--border); border-radius: 24px 24px 0 0;
+      padding: 8px 24px 32px; transform: translateY(100%);
+      transition: transform .35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .modal-back.open .modal-sheet { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; background: #444; border-radius: 2px; margin: 12px auto 16px; }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #ddd; text-align: center; margin-bottom: 20px; }
 
-  /* ── Stats ── */
-  .stats-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-  .stat-pill {
-    background:var(--card); border:1px solid var(--glass-border);
-    border-radius:40px; padding:4px 12px;
-    font-size:0.6rem; letter-spacing:0.12em; color:var(--text-dim);
-  }
-  .stat-pill span { color:var(--gold-light); font-weight:600; margin-right:3px; }
+    /* Form Elements */
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: #0a1224; border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; color: #ddd; font-size: 15px;
+    }
+    .form-textarea { min-height: 90px; resize: vertical; }
 
-  /* ── Categories ── */
-  .cat-group { margin-bottom:6px; border-radius:8px; overflow:hidden; }
-  .cat-header {
-    display:flex; align-items:center; gap:10px; padding:7px 12px;
-    background: linear-gradient(90deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
-    border:1px solid rgba(201,168,76,0.18); border-radius:6px 6px 0 0;
-    cursor:pointer; user-select:none; transition:background 0.2s;
-  }
-  .cat-group.collapsed .cat-header { border-radius:6px; }
-  .cat-header-name { font-size:0.62rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); flex:1; }
-  .cat-header-count { font-size:0.58rem; color:var(--text-dim); background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2); border-radius:20px; padding:1px 8px; }
-  .cat-chevron { font-size:0.7rem; color:var(--gold); opacity:0.6; transition:transform 0.25s; }
-  .cat-group.collapsed .cat-chevron { transform:rotate(-90deg); }
-  .cat-rows { border:1px solid rgba(201,168,76,0.1); border-top:none; border-radius:0 0 6px 6px; overflow:hidden; transition:max-height 0.3s; }
-  .cat-group.collapsed .cat-rows { max-height:0 !important; }
+    /* Star Rating */
+    .star-rating { display: flex; gap: 8px; font-size: 28px; }
+    .star { color: #333; cursor: pointer; transition: transform .1s; }
+    .star.filled { color: var(--gold); }
+    .star:active { transform: scale(1.3); }
 
-  /* ── Rows ── */
-  .toy-row { display:flex; align-items:center; background:var(--card); border-bottom:1px solid var(--glass-border); position:relative; min-height:42px; cursor:pointer; }
-  .toy-row-stripe { width:3px; align-self:stretch; }
-  .stripe-dom { background:var(--dom-color); }
-  .stripe-sub { background:var(--sub-color); }
-  .toy-row-main { flex:1; display:flex; align-items:center; gap:8px; padding:8px 10px; }
-  .toy-row-name { flex:1; font-family:'Playfair Display',serif; font-size:0.85rem; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .toy-row-ratings { display:flex; flex-direction:column; gap:3px; }
-  .mini-rating { display:flex; align-items:center; gap:4px; }
-  .mini-label { font-size:0.48rem; width:20px; }
-  .mini-label.d { color:#e57373; }
-  .mini-label.s { color:#b39ddb; }
-  .mini-star { font-size:0.6rem; color:#1e2640; }
-  .mini-star.fd { color:#e57373; }
-  .mini-star.fs { color:#b39ddb; }
+    /* Buttons */
+    .btn { padding: 14px 24px; border-radius: 14px; font-size: 12px; font-weight: 700;
+           letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: .2s; }
+    .btn-gold { background: var(--luxury-gradient); color: #051024; border: none; width: 100%; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: #aaa; }
+    .btn-danger { background: transparent; border: 1px solid #F44336; color: #F44336; }
 
-  /* ── Star Rating in Modal ── */
-  .star-rating {
-    display: flex;
-    gap: 6px;
-    font-size: 2rem;
-    cursor: pointer;
-    user-select: none;
-    padding: 4px 0;
-  }
-  .star-rating .star {
-    color: #1e2640;
-    transition: color 0.1s ease, transform 0.1s ease;
-  }
-  .star-rating .star.filled.dom { color: #e57373; }
-  .star-rating .star.filled.sub { color: #b39ddb; }
-  .star-rating .star:hover { transform: scale(1.2); }
-
-  /* ── Modals ── */
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:100; align-items:center; justify-content:center; padding:16px; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:var(--deep-blue); border:1px solid var(--gold-border); border-radius:8px; padding:28px 24px; width:100%; max-width:460px; max-height:92vh; overflow-y:auto; }
-  .form-group { margin-bottom:14px; }
-  .form-label { display:block; font-size:0.6rem; color:var(--gold); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.1em; }
-  .form-input, .form-select, .form-textarea { width:100%; background:var(--card); border:1px solid var(--glass-border); border-radius:3px; color:var(--text); padding:9px 12px; outline:none; }
-  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .modal-actions { display:flex; gap:10px; margin-top:20px; }
-  .btn-primary {
-    background:linear-gradient(135deg,#b8860b,var(--gold)); border:none; border-radius:3px;
-    color:var(--midnight); font-family:'Josefin Sans',sans-serif;
-    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase;
-    padding:9px 18px; cursor:pointer; transition:opacity 0.2s,transform 0.2s;
-  }
-  .btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
-  .btn-cancel {
-    background:transparent; border:1px solid var(--glass-border); border-radius:3px;
-    color:var(--text-dim); font-family:'Josefin Sans',sans-serif;
-    font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase;
-    padding:9px 18px; cursor:pointer;
-  }
-
-  /* ── Wishlist ── */
-  .wish-list { display:flex; flex-direction:column; gap:8px; }
-  .wish-card { background:var(--card); border:1px solid var(--glass-border); border-radius:6px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
-  .wish-body { flex:1; }
-  .wish-name { font-family:'Playfair Display',serif; font-size:0.88rem; color:var(--text); }
-  .wish-meta { font-size:0.58rem; color:var(--gold); text-transform:uppercase; }
-  .wish-actions { display:flex; gap:6px; }
-  .wish-btn {
-    background: var(--glass); border:1px solid var(--glass-border); border-radius:3px;
-    color: var(--text-dim); font-size:0.55rem; padding:4px 10px; cursor:pointer;
-    white-space: nowrap;
-  }
-  .wish-btn:hover { background: var(--gold-dim); color: var(--gold-light); border-color: var(--gold); }
-
-  /* ── Toasts ── */
-  #toast-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .toast {
-    background: var(--deep-blue);
-    border: 1px solid var(--gold-border);
-    color: var(--text);
-    padding: 12px 18px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: 320px;
-    animation: toastSlideIn 0.3s ease forwards;
-  }
-  .toast.success { border-color: #00b894; }
-  .toast.error { border-color: #e57373; }
-  .toast.info { border-color: var(--gold); }
-  @keyframes toastSlideIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @media(max-width:480px) { .form-row { grid-template-columns:1fr; } }
-</style>
-<link rel="stylesheet" href="nav.css" />
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter-pill {
+      padding: 8px 16px; border-radius: 9999px; font-size: 12px;
+      border: 1px solid var(--border); color: #aaa; background: transparent;
+      transition: all .2s;
+    }
+    .filter-pill.active { background: var(--gold); color: #051024; border-color: var(--gold); }
+  </style>
+  
+  <link rel="stylesheet" href="nav.css">
 </head>
-<body data-nav="vault">
+<body data-nav="more">
 
-<header class="site-header">
-  <div class="script-title">The Vault</div>
-  <div class="subtitle">Toy Collection &amp; Wishlist</div>
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('vault',this)">Collection</button>
-    <button class="tab-btn" onclick="switchTab('wishlist',this)">Wishlist</button>
-  </div>
-</header>
-
-<main class="container">
-  <!-- COLLECTION TAB -->
-  <div id="tab-vault" class="tab-panel active">
-    <div class="controls-bar">
-      <div class="search-wrap">
-        <input type="text" id="vault-search" placeholder="Search…" oninput="renderVault()">
-      </div>
-      <button class="btn-add" onclick="toggleFiltersPanel()" style="background:linear-gradient(135deg,#555,#777); padding:9px 14px;">⚙ Filters</button>
-      <button class="btn-add" onclick="openToyModal()">+ Add</button>
-      <button class="btn-add" onclick="openCategoryModal()" style="background:linear-gradient(135deg,#555,#777);margin-left:6px">⚙ Manage</button>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">The Vault</div>
+      <div style="font-size:10px; color:#666; letter-spacing:1px;">TOY COLLECTION</div>
     </div>
-
-    <!-- COLLAPSIBLE FILTERS PANEL -->
-    <div id="filters-panel" class="filters-panel">
-      <div class="filter-section">
-        <div class="filter-label">Rating</div>
-        <div class="filter-pills">
-          <button class="filter-pill active" onclick="setRatingFilter(this, 'all')">All</button>
-          <button class="filter-pill" onclick="setRatingFilter(this, '5')">5★</button>
-          <button class="filter-pill" onclick="setRatingFilter(this, '4')">4+★</button>
-          <button class="filter-pill" onclick="setRatingFilter(this, '3')">3+★</button>
-          <button class="filter-pill" onclick="setRatingFilter(this, 'unrated')">Unrated</button>
-        </div>
-      </div>
-      <div class="filter-section">
-        <div class="filter-label">Smart Filters</div>
-        <div class="filter-pills">
-          <button class="filter-pill" onclick="setSmartFilter(this, 'all')">All</button>
-          <button class="filter-pill" onclick="setSmartFilter(this, 'mutual')">Mutual Favorites</button>
-          <button class="filter-pill" onclick="setSmartFilter(this, 'needs')">Needs Attention</button>
-        </div>
-      </div>
-      <div class="filter-section" style="margin-bottom:0">
-        <div class="filter-label">Owner</div>
-        <div class="filter-pills">
-          <button class="filter-pill active" onclick="setOwnerFilter(this, 'all')">All</button>
-          <button class="filter-pill dom" onclick="setOwnerFilter(this, 'Dom')">Dom</button>
-          <button class="filter-pill sub" onclick="setOwnerFilter(this, 'Sub')">Sub</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="stats-bar" class="stats-bar"></div>
-    <div id="vault-list"></div>
+    <div class="topbar-gear" onclick="openCategoryModal()">⚙️</div>
   </div>
 
-  <!-- WISHLIST TAB -->
-  <div id="tab-wishlist" class="tab-panel">
-    <div class="controls-bar">
-      <div class="search-wrap">
-        <input type="text" id="wish-search" placeholder="Search…" oninput="renderWishlist()">
-      </div>
-      <button class="btn-add" onclick="openWishModal()">+ Add</button>
-    </div>
-    <div id="wish-list" class="wish-list"></div>
-  </div>
-</main>
+  <div class="main">
 
-<!-- TOY MODAL -->
-<div id="toy-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-title" id="tmt">Add to Collection</div>
-    
-    <div class="form-group">
-      <label class="form-label">Toy Name</label>
-      <input type="text" class="form-input" id="t-name">
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab-btn active" onclick="switchTab('vault', this)">Collection</div>
+      <div class="tab-btn" onclick="switchTab('wishlist', this)">Wishlist</div>
     </div>
-    
-    <div class="form-row">
+
+    <!-- COLLECTION TAB -->
+    <div id="tab-vault">
+      <div style="display:flex; gap:8px; margin-bottom:16px;">
+        <input type="text" id="search" placeholder="Search toys..." 
+               style="flex:1; background:#0a1224; border:1px solid var(--border); border-radius:9999px; padding:12px 18px; color:#ddd;"
+               oninput="renderVault()">
+        <button onclick="openFilterSheet()" class="btn btn-outline" style="padding:12px 18px;">Filter</button>
+      </div>
+
+      <div id="vault-list"></div>
+    </div>
+
+    <!-- WISHLIST TAB -->
+    <div id="tab-wishlist" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div style="font-size:13px; color:#888;">Your Desires</div>
+        <button onclick="openWishModal()" class="btn btn-gold" style="width:auto; padding:10px 20px; font-size:11px;">+ Add Desire</button>
+      </div>
+      <div id="wish-list" class="menu-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- TOY MODAL (Bottom Sheet) -->
+  <div id="toy-modal" class="modal-back">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="toy-modal-title">Add Toy</div>
+      
+      <div class="form-group">
+        <label class="form-label">Toy Name</label>
+        <input type="text" id="t-name" class="form-input">
+      </div>
+      
       <div class="form-group">
         <label class="form-label">Category</label>
-        <select class="form-select" id="t-cat"></select>
+        <select id="t-cat" class="form-select"></select>
       </div>
+      
       <div class="form-group">
         <label class="form-label">Belongs To</label>
-        <select class="form-select" id="t-owner">
+        <select id="t-owner" class="form-select">
           <option value="Dom">Dom</option>
           <option value="Sub">Sub</option>
         </select>
       </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="t-notes" placeholder="Optional notes..."></textarea>
-    </div>
-    
-    <div class="form-row">
+      
       <div class="form-group">
-        <label class="form-label">Dom Rating</label>
-        <div class="star-rating" id="dom-star-rating" data-type="dom"></div>
-        <input type="hidden" id="t-drat" value="0">
+        <label class="form-label">Notes</label>
+        <textarea id="t-notes" class="form-textarea" placeholder="Optional notes..."></textarea>
       </div>
-      <div class="form-group">
-        <label class="form-label">Sub Rating</label>
-        <div class="star-rating" id="sub-star-rating" data-type="sub"></div>
-        <input type="hidden" id="t-srat" value="0">
-      </div>
-    </div>
-    
-    <input type="hidden" id="t-id">
-    
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeToyModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveToy()">Save</button>
-      <button id="toy-delete-btn" class="btn-cancel" onclick="deleteToyFromModal()" style="color:#e57373; border-color:#e57373; display:none;">Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- WISHLIST MODAL -->
-<div id="wish-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-title" id="wmt">Add to Wishlist</div>
-    
-    <div class="form-group">
-      <label class="form-label">Item Name</label>
-      <input type="text" class="form-input" id="w-name">
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Category</label>
-      <select class="form-select" id="w-cat"></select>
-    </div>
-    
-    <input type="hidden" id="w-id">
-    
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeWishModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveWish()">Save</button>
-      <button id="wish-delete-btn" class="btn-cancel" onclick="deleteWish()" style="color:#e57373; border-color:#e57373; display:none;">Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- CATEGORY MODAL -->
-<div id="category-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-title">Categories</div>
-    <div class="form-group">
-      <div style="display:flex; gap:8px">
-        <input type="text" class="form-input" id="cat-new-name" placeholder="New category">
-        <button class="btn-primary" onclick="addCategory()">Add</button>
-      </div>
-    </div>
-    <div id="category-list"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeCategoryModal()">Done</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST CONTAINER -->
-<div id="toast-container"></div>
-
-<script type="module">
-import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
-import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { db } from './firebase-config.js';
-
-// ─── STATE ───
-let myUid = null;
-let relId = null;
-let partnerUid = null;
-let toys = [];
-let wishes = [];
-let categories = ['Vibration','Insertion','Anal Play','Impact','Restraint','Sensation','Other'];
-
-let toysCol, wishesCol, categoryCol;
-let domName = 'Dom', subName = 'Sub', domInitial = 'D', subInitial = 'S';
-let ownerF = 'all', wishF = 'all', collapsedCats = {};
-let myRole = null; // 'dom' or 'sub'
-
-// NEW: Filter state
-let ratingFilter = 'all';
-let smartFilter = 'all';
-let ownerFilter = 'all';   // New owner filter in panel
-
-// ─── HELPER ───
-function dataCol(path, id) { return collection(db, 'data', id, path); }
-
-// ─── TOAST NOTIFICATIONS ───
-function showToast(message, type = 'success') {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `
-    <span>${message}</span>
-  `;
-  
-  container.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.transition = 'opacity 0.3s ease';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 2800);
-}
-
-// ─── DATA LOADING ───
-async function loadData(user) {
-  try {
-    myUid = user.uid;
-    const rel = await getRelationship();
-    relId = rel?.id || user.uid; 
-
-    toysCol = dataCol('vault-toys', relId);
-    wishesCol = dataCol('vault-wishes', relId);
-    categoryCol = dataCol('categories', relId);
-
-    const myProfile = await getMyProfile();
-    if (rel) {
-      partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
-      const partnerProfile = await getUserProfile(partnerUid);
-      if (myProfile?.role === 'dom') {
-        domName = myProfile.displayName || 'Dom';
-        subName = partnerProfile?.displayName || 'Sub';
-      } else {
-        subName = myProfile?.displayName || 'Sub';
-        domName = partnerProfile?.displayName || 'Dom';
-      }
-    }
-    domInitial = domName.charAt(0);
-    subInitial = subName.charAt(0);
-    myRole = myProfile?.role || null;
-    updateLabels();
-
-    const catSnap = await getDocs(categoryCol);
-    catSnap.docs.map(d => d.data().name).forEach(n => {
-      if(!categories.includes(n)) categories.push(n);
-    });
-
-    const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
-    toys = tSnap.docs.map(d => d.data());
-    wishes = wSnap.docs.map(d => d.data());
-
-    [...toys, ...wishes].forEach(item => {
-      if (item.category && !categories.includes(item.category)) {
-        categories.push(item.category);
-      }
-    });
-
-    categories.sort((a,b) => a.localeCompare(b));
-    updateCategorySelects();
-    renderVault();
-    renderWishlist();
-
-  } catch (e) { 
-    console.error("Vault Load Error:", e); 
-    showToast("Failed to load data", "error");
-  }
-}
-
-// ─── UI UPDATES ───
-function updateLabels() {
-  const dPill = document.querySelector('.filter-pill.dom');
-  const sPill = document.querySelector('.filter-pill.sub');
-  if (dPill) dPill.textContent = domName;
-  if (sPill) sPill.textContent = subName;
-}
-
-function updateCategorySelects() {
-  const html = categories.map(c => `<option>${c}</option>`).join('');
-  const tCat = document.getElementById('t-cat');
-  const wCat = document.getElementById('w-cat');
-  if (tCat) tCat.innerHTML = html;
-  if (wCat) wCat.innerHTML = html;
-}
-
-// ─── FILTER FUNCTIONS ───
-function toggleFiltersPanel() {
-  const panel = document.getElementById('filters-panel');
-  panel.classList.toggle('open');
-}
-
-function setRatingFilter(el, value) {
-  ratingFilter = value;
-  document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderVault();
-}
-
-function setSmartFilter(el, value) {
-  smartFilter = value;
-  document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderVault();
-}
-
-function setOwnerFilter(el, value) {
-  ownerFilter = value;
-  document.querySelectorAll('#filters-panel .filter-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderVault();
-}
-
-window.toggleFiltersPanel = toggleFiltersPanel;
-window.setRatingFilter = setRatingFilter;
-window.setSmartFilter = setSmartFilter;
-window.setOwnerFilter = setOwnerFilter;
-
-// ─── SAVE & DELETE ───
-async function saveToy() {
-  const name = document.getElementById('t-name').value.trim();
-  if (!name) return;
-  
-  const id = document.getElementById('t-id').value || 'toy_'+Date.now();
-  const toy = {
-    id, name,
-    category: document.getElementById('t-cat').value,
-    owner: document.getElementById('t-owner').value,
-    notes: document.getElementById('t-notes').value.trim(),
-    domRating: parseFloat(document.getElementById('t-drat').value) || 0,
-    subRating: parseFloat(document.getElementById('t-srat').value) || 0,
-    added: Date.now()
-  };
-  
-  await setDoc(doc(toysCol, id), toy);
-  toys = toys.filter(t => t.id !== id);
-  toys.push(toy);
-  document.getElementById('toy-modal').classList.remove('open');
-  showToast("Toy saved successfully!", "success");
-  renderVault();
-}
-
-async function deleteToy(id) {
-  if (!confirm('Remove this toy from the vault?')) return;
-  await deleteDoc(doc(toysCol, id));
-  toys = toys.filter(t => t.id !== id);
-  showToast("Toy removed", "success");
-  renderVault();
-}
-
-window.deleteToyFromModal = async function(id) {
-  if (!confirm('Delete this toy?')) return;
-  await deleteDoc(doc(toysCol, id));
-  toys = toys.filter(t => t.id !== id);
-  document.getElementById('toy-modal').classList.remove('open');
-  showToast("Toy deleted", "success");
-  renderVault();
-};
-
-// ─── QUICK MOVE FROM WISHLIST ───
-async function quickMoveToVault(wishId) {
-  const wish = wishes.find(w => w.id === wishId);
-  if (!wish) return;
-
-  // Pre-fill modal
-  document.getElementById('tmt').textContent = 'Add from Wishlist';
-  document.getElementById('t-id').value = '';
-  document.getElementById('t-name').value = wish.name;
-  document.getElementById('t-cat').value = wish.category || 'Other';
-  document.getElementById('t-owner').value = 'Dom';
-  document.getElementById('t-notes').value = '';
-  document.getElementById('t-drat').value = 0;
-  document.getElementById('t-srat').value = 0;
-
-  // Initialize stars
-  initStarRating(document.getElementById('dom-star-rating'), 'dom', 0);
-  initStarRating(document.getElementById('sub-star-rating'), 'sub', 0);
-
-  // Open modal
-  document.getElementById('toy-modal').classList.add('open');
-
-  // After saving, optionally remove from wishlist
-  const originalSave = window.saveToy;
-  window.saveToy = async function() {
-    await originalSave();
-    // Remove from wishlist
-    await deleteDoc(doc(wishesCol, wishId));
-    wishes = wishes.filter(w => w.id !== wishId);
-    renderWishlist();
-    showToast("Moved to collection!", "success");
-    window.saveToy = originalSave; // restore
-  };
-}
-
-// ─── STAR RATING FUNCTIONS ───
-function initStarRating(container, type, initialValue = 0) {
-  if (!container) return;
-  container.innerHTML = '';
-  const rating = Math.round(parseFloat(initialValue) || 0);
-  
-  for (let i = 1; i <= 5; i++) {
-    const star = document.createElement('span');
-    star.className = `star${i <= rating ? ' filled ' + type : ''}`;
-    star.textContent = '★';
-    star.dataset.value = i;
-    
-    star.onclick = (e) => {
-      e.stopImmediatePropagation();
-      const newRating = parseInt(star.dataset.value);
-      updateStarRating(container, type, newRating);
-      const hiddenId = type === 'dom' ? 't-drat' : 't-srat';
-      document.getElementById(hiddenId).value = newRating;
-    };
-    
-    star.onmouseenter = () => highlightStars(container, type, parseInt(star.dataset.value));
-    star.onmouseleave = () => {
-      const current = parseFloat(document.getElementById(type === 'dom' ? 't-drat' : 't-srat').value) || 0;
-      highlightStars(container, type, Math.round(current));
-    };
-    
-    container.appendChild(star);
-  }
-}
-
-function updateStarRating(container, type, rating) {
-  const stars = container.querySelectorAll('.star');
-  stars.forEach((star, index) => {
-    const val = index + 1;
-    if (val <= rating) {
-      star.classList.add('filled', type);
-    } else {
-      star.classList.remove('filled', type);
-    }
-  });
-}
-
-function highlightStars(container, type, rating) {
-  const stars = container.querySelectorAll('.star');
-  stars.forEach((star, index) => {
-    const val = index + 1;
-    if (val <= rating) {
-      star.classList.add('filled', type);
-    } else {
-      star.classList.remove('filled', type);
-    }
-  });
-}
-
-// ─── RENDER ENGINE ───
-function renderVault() {
-  const list = document.getElementById('vault-list');
-  const q = document.getElementById('vault-search').value.toLowerCase();
-  
-  let filtered = toys.filter(t => {
-    const mo = (ownerF === 'all' || t.owner === ownerF);
-    const mq = (!q || t.name.toLowerCase().includes(q) || (t.notes && t.notes.toLowerCase().includes(q)));
-    return mo && mq;
-  });
-
-  // Apply rating filter
-  if (ratingFilter !== 'all') {
-    filtered = filtered.filter(t => {
-      const avg = (t.domRating + t.subRating) / 2;
-      if (ratingFilter === '5') return Math.round(avg) === 5;
-      if (ratingFilter === '4') return avg >= 4;
-      if (ratingFilter === '3') return avg >= 3;
-      if (ratingFilter === 'unrated') return t.domRating === 0 && t.subRating === 0;
-      return true;
-    });
-  }
-
-  // Apply smart filter
-  if (smartFilter !== 'all') {
-    filtered = filtered.filter(t => {
-      if (smartFilter === 'mutual') return t.domRating >= 4 && t.subRating >= 4;
-      if (smartFilter === 'needs') return (t.domRating <= 2 || t.subRating <= 2) || (t.domRating === 0 && t.subRating === 0);
-      return true;
-    });
-  }
-
-  // Apply owner filter from panel
-  if (ownerFilter !== 'all') {
-    filtered = filtered.filter(t => t.owner === ownerFilter);
-  }
-
-  const groups = {};
-  categories.forEach(c => groups[c] = []);
-  if (!groups['Other']) groups['Other'] = [];
-
-  filtered.forEach(t => {
-    if (groups[t.category]) groups[t.category].push(t);
-    else groups['Other'].push(t);
-  });
-
-  list.innerHTML = categories.map(cat => {
-    const items = groups[cat];
-    if (!items || !items.length) return '';
-    return `
-      <div class="cat-group ${collapsedCats[cat]?'collapsed':''}">
-        <div class="cat-header" onclick="toggleCat('${cat}')">
-          <span class="cat-header-name">${cat}</span>
-          <span class="cat-header-count">${items.length}</span>
-          <span class="cat-chevron">▾</span>
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div>
+          <label class="form-label">Dom Rating</label>
+          <div class="star-rating" id="dom-stars"></div>
+          <input type="hidden" id="t-drat" value="0">
         </div>
-        <div class="cat-rows">
-          ${items.map(t => `
-            <div class="toy-row" onclick="window.openToyModal('${t.id}')">
-              <div class="toy-row-stripe ${t.owner==='Dom'?'stripe-dom':'stripe-sub'}"></div>
-              <div class="toy-row-main">
-                <span class="toy-row-name">${t.name}</span>
-                <div class="toy-row-ratings">
-                  <div class="mini-rating"><span class="mini-label d">${domInitial}</span>${miniStars(t.domRating,'d')}</div>
-                  <div class="mini-rating"><span class="mini-label s">${subInitial}</span>${miniStars(t.subRating,'s')}</div>
-                </div>
-              </div>
+        <div>
+          <label class="form-label">Sub Rating</label>
+          <div class="star-rating" id="sub-stars"></div>
+          <input type="hidden" id="t-srat" value="0">
+        </div>
+      </div>
+      
+      <input type="hidden" id="t-id">
+      
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <button onclick="closeToyModal()" class="btn btn-outline" style="flex:1;">Cancel</button>
+        <button onclick="saveToy()" class="btn btn-gold" style="flex:1;">Save</button>
+      </div>
+      
+      <button id="toy-delete-btn" onclick="deleteToyFromModal()" 
+              class="btn btn-danger" style="width:100%; margin-top:12px; display:none;">Delete Toy</button>
+    </div>
+  </div>
+
+  <!-- WISHLIST MODAL -->
+  <div id="wish-modal" class="modal-back">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="wish-modal-title">Add to Wishlist</div>
+      
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input type="text" id="w-name" class="form-input">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="w-cat" class="form-select"></select>
+      </div>
+      
+      <input type="hidden" id="w-id">
+      
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <button onclick="closeWishModal()" class="btn btn-outline" style="flex:1;">Cancel</button>
+        <button onclick="saveWish()" class="btn btn-gold" style="flex:1;">Save</button>
+      </div>
+      
+      <button id="wish-delete-btn" onclick="deleteWish()" 
+              class="btn btn-danger" style="width:100%; margin-top:12px; display:none;">Remove from Wishlist</button>
+    </div>
+  </div>
+
+  <!-- FILTER BOTTOM SHEET -->
+  <div id="filter-sheet" class="modal-back">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Filter Collection</div>
+      
+      <div class="form-group">
+        <label class="form-label">Owner</label>
+        <div class="filter-pills">
+          <div class="filter-pill active" onclick="setFilter('owner', 'all', this)">All</div>
+          <div class="filter-pill" onclick="setFilter('owner', 'Dom', this)">Dom</div>
+          <div class="filter-pill" onclick="setFilter('owner', 'Sub', this)">Sub</div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Minimum Rating</label>
+        <div class="filter-pills">
+          <div class="filter-pill active" onclick="setFilter('rating', 0, this)">Any</div>
+          <div class="filter-pill" onclick="setFilter('rating', 3, this)">3★+</div>
+          <div class="filter-pill" onclick="setFilter('rating', 4, this)">4★+</div>
+          <div class="filter-pill" onclick="setFilter('rating', 5, this)">5★</div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Smart Filters</label>
+        <div class="filter-pills">
+          <div class="filter-pill active" onclick="setFilter('smart', 'none', this)">None</div>
+          <div class="filter-pill" onclick="setFilter('smart', 'mutual', this)">Mutual Favorites</div>
+          <div class="filter-pill" onclick="setFilter('smart', 'attention', this)">Needs Attention</div>
+        </div>
+      </div>
+      
+      <button onclick="applyFiltersAndClose()" class="btn btn-gold" style="margin-top:20px;">Apply Filters</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
+    import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { db } from './firebase-config.js';
+
+    let myUid = null;
+    let relId = null;
+    let toys = [];
+    let wishes = [];
+    let categories = ['Vibration','Insertion','Anal Play','Impact','Restraint','Sensation','Other'];
+    let myRole = null;
+
+    let toysCol, wishesCol;
+    let currentFilters = { owner: 'all', rating: 0, smart: 'none' };
+    let expandedId = null;
+
+    function dataCol(path, id) {
+      return collection(db, 'data', id, path);
+    }
+
+    async function loadData(user) {
+      myUid = user.uid;
+      const rel = await getRelationship();
+      relId = rel?.id || user.uid;
+      
+      toysCol = dataCol('vault-toys', relId);
+      wishesCol = dataCol('vault-wishes', relId);
+
+      const profile = await getMyProfile();
+      myRole = profile?.role || null;
+
+      const [tSnap, wSnap] = await Promise.all([getDocs(toysCol), getDocs(wishesCol)]);
+      toys = tSnap.docs.map(d => d.data());
+      wishes = wSnap.docs.map(d => d.data());
+
+      updateCategorySelects();
+      renderVault();
+      renderWishlist();
+    }
+
+    function updateCategorySelects() {
+      const html = categories.map(c => `<option>${c}</option>`).join('');
+      const t = document.getElementById('t-cat');
+      const w = document.getElementById('w-cat');
+      if (t) t.innerHTML = html;
+      if (w) w.innerHTML = html;
+    }
+
+    function switchTab(tab, el) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      
+      document.getElementById('tab-vault').style.display = tab === 'vault' ? 'block' : 'none';
+      document.getElementById('tab-wishlist').style.display = tab === 'wishlist' ? 'block' : 'none';
+    }
+
+    function renderVault() {
+      const container = document.getElementById('vault-list');
+      const q = (document.getElementById('search')?.value || '').toLowerCase();
+
+      let filtered = toys.filter(t => {
+        const matchesSearch = !q || t.name.toLowerCase().includes(q) || (t.notes && t.notes.toLowerCase().includes(q));
+        const matchesOwner = currentFilters.owner === 'all' || t.owner === currentFilters.owner;
+        const avg = (t.domRating + t.subRating) / 2;
+        const matchesRating = avg >= currentFilters.rating;
+        
+        let matchesSmart = true;
+        if (currentFilters.smart === 'mutual') matchesSmart = t.domRating >= 4 && t.subRating >= 4;
+        if (currentFilters.smart === 'attention') matchesSmart = (t.domRating <= 2 || t.subRating <= 2);
+        
+        return matchesSearch && matchesOwner && matchesRating && matchesSmart;
+      });
+
+      container.innerHTML = filtered.map(t => `
+        <div class="toy-row" onclick="openToyModal('${t.id}')">
+          <div class="toy-stripe ${t.owner === 'Dom' ? 'stripe-dom' : 'stripe-sub'}"></div>
+          <div class="toy-main">
+            <div class="toy-name">${t.name}</div>
+            <div class="toy-ratings">
+              <span>Dom: ${createMiniStars(t.domRating)}</span>
+              <span>Sub: ${createMiniStars(t.subRating)}</span>
             </div>
-          `).join('')}
+          </div>
         </div>
-      </div>`;
-  }).join('');
-}
-
-function miniStars(r,t) {
-  let h=''; const f=Math.round(r);
-  for(let i=1;i<=5;i++) h+=`<span class="mini-star${i<=f?' f'+t:''}">★</span>`;
-  return h;
-}
-
-function renderWishlist() {
-  const container = document.getElementById('wish-list');
-  if (!container) return;
-  container.innerHTML = wishes.map(w => `
-    <div class="wish-card">
-      <div class="wish-body">
-        <div class="wish-name">${w.name}</div>
-        <div class="wish-meta">${w.category || 'Uncategorized'}</div>
-      </div>
-      <div class="wish-actions">
-        <button class="wish-btn" onclick="quickMoveToVault('${w.id}')">Add to Vault</button>
-        <button class="wish-btn" onclick="openWishModal('${w.id}')" style="color:#e57373;">Edit</button>
-      </div>
-    </div>`).join('');
-}
-
-// ─── WISHLIST FUNCTIONS ───
-window.openWishModal = (id) => {
-  const modal = document.getElementById('wish-modal');
-  const wCat = document.getElementById('w-cat');
-  const deleteBtn = document.getElementById('wish-delete-btn');
-  
-  if (wCat && wCat.options.length === 0) {
-    wCat.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
-  }
-  
-  if (id) {
-    const w = wishes.find(x => x.id === id);
-    document.getElementById('wmt').textContent = 'Edit Wishlist Item';
-    document.getElementById('w-id').value = id;
-    document.getElementById('w-name').value = w.name;
-    document.getElementById('w-cat').value = w.category || 'Other';
-    
-    // Show delete button only if user owns this item
-    const canDelete = (myRole === 'dom' && w.owner === 'Dom') || (myRole === 'sub' && w.owner === 'Sub');
-    deleteBtn.style.display = canDelete ? 'inline-block' : 'none';
-    deleteBtn.onclick = () => deleteWish(id);
-  } else {
-    document.getElementById('wmt').textContent = 'Add to Wishlist';
-    ['w-name','w-id'].forEach(f => document.getElementById(f).value = '');
-    document.getElementById('w-cat').value = 'Vibration';
-    deleteBtn.style.display = 'none';
-  }
-  modal.classList.add('open');
-};
-
-window.closeWishModal = () => {
-  document.getElementById('wish-modal').classList.remove('open');
-};
-
-window.saveWish = async function() {
-  const name = document.getElementById('w-name').value.trim();
-  if (!name) return;
-  
-  const id = document.getElementById('w-id').value || 'wish_'+Date.now();
-  const wish = {
-    id,
-    name,
-    category: document.getElementById('w-cat').value,
-    added: Date.now()
-  };
-  
-  await setDoc(doc(wishesCol, id), wish);
-  wishes = wishes.filter(w => w.id !== id);
-  wishes.push(wish);
-  document.getElementById('wish-modal').classList.remove('open');
-  showToast("Wishlist item saved!", "success");
-  renderWishlist();
-};
-
-window.deleteWish = async function(id) {
-  if (!confirm('Remove this item from wishlist?')) return;
-  await deleteDoc(doc(wishesCol, id));
-  wishes = wishes.filter(w => w.id !== id);
-  document.getElementById('wish-modal').classList.remove('open');
-  showToast("Wishlist item removed", "success");
-  renderWishlist();
-};
-
-// ─── WINDOW HELPERS ───
-window.switchTab = (t, b) => {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  b.classList.add('active');
-};
-
-window.setOwnerF = (el, v) => {
-  ownerF = v;
-  document.querySelectorAll('#tab-vault .filter-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderVault();
-};
-
-window.toggleCat = (cat) => { 
-  collapsedCats[cat] = !collapsedCats[cat]; 
-  renderVault(); 
-};
-
-window.openToyModal = (id) => {
-  const modal = document.getElementById('toy-modal');
-  const domStars = document.getElementById('dom-star-rating');
-  const subStars = document.getElementById('sub-star-rating');
-  const deleteBtn = document.getElementById('toy-delete-btn');
-  
-  if (id) {
-    const t = toys.find(x => x.id === id);
-    document.getElementById('tmt').textContent = 'Edit Toy';
-    document.getElementById('t-id').value = id;
-    document.getElementById('t-name').value = t.name;
-    document.getElementById('t-cat').value = t.category;
-    document.getElementById('t-owner').value = t.owner;
-    document.getElementById('t-notes').value = t.notes || '';
-    document.getElementById('t-drat').value = t.domRating || 0;
-    document.getElementById('t-srat').value = t.subRating || 0;
-    
-    // Show delete only if current user owns this toy
-    const canDelete = (myRole === 'dom' && t.owner === 'Dom') || (myRole === 'sub' && t.owner === 'Sub');
-    deleteBtn.style.display = canDelete ? 'inline-block' : 'none';
-    deleteBtn.onclick = () => deleteToyFromModal(id);
-  } else {
-    document.getElementById('tmt').textContent = 'Add to Collection';
-    ['t-name','t-notes','t-drat','t-srat','t-id'].forEach(f => document.getElementById(f).value = '');
-    document.getElementById('t-cat').value = 'Vibration';
-    document.getElementById('t-owner').value = 'Dom';
-    document.getElementById('t-drat').value = 0;
-    document.getElementById('t-srat').value = 0;
-    deleteBtn.style.display = 'none';
-  }
-  
-  initStarRating(domStars, 'dom', document.getElementById('t-drat').value);
-  initStarRating(subStars, 'sub', document.getElementById('t-srat').value);
-  
-  modal.classList.add('open');
-};
-
-window.closeToyModal = () => {
-  document.getElementById('toy-modal').classList.remove('open');
-};
-
-window.openCategoryModal = () => { 
-  document.getElementById('category-modal').classList.add('open'); 
-  renderCategoryList(); 
-};
-
-window.closeCategoryModal = () => document.getElementById('category-modal').classList.remove('open');
-
-window.saveToy = saveToy;
-window.deleteToy = deleteToy;
-
-// ─── RESCUE SCRIPT ───
-window.rescueMissingData = async function() {
-  alert("Checking personal folder...");
-  if (!myUid || !relId || relId === myUid) {
-    alert("Error: Partnership not detected. Pair your accounts first.");
-    return;
-  }
-  try {
-    const oldToys = await getDocs(collection(db, 'data', myUid, 'vault-toys'));
-    const oldWishes = await getDocs(collection(db, 'data', myUid, 'vault-wishes'));
-    const oldCats = await getDocs(collection(db, 'data', myUid, 'categories'));
-
-    if (oldToys.empty && oldCats.empty) {
-      alert("Found nothing to rescue in your personal folder.");
-      return;
+      `).join('');
     }
 
-    for (const d of oldToys.docs) await setDoc(doc(db, 'data', relId, 'vault-toys', d.id), d.data());
-    for (const d of oldWishes.docs) await setDoc(doc(db, 'data', relId, 'vault-wishes', d.id), d.data());
-    for (const d of oldCats.docs) await setDoc(doc(db, 'data', relId, 'categories', d.id), d.data());
+    function createMiniStars(rating) {
+      let html = '';
+      const r = Math.round(rating);
+      for (let i = 1; i <= 5; i++) {
+        html += `<span class="mini-star ${i <= r ? 'filled' : ''}">★</span>`;
+      }
+      return html;
+    }
 
-    alert(`Success! Moved ${oldToys.size} items. Reloading...`);
-    window.location.reload();
-  } catch (e) {
-    alert("Rescue failed: " + e.message);
-  }
-};
+    function renderWishlist() {
+      const container = document.getElementById('wish-list');
+      container.innerHTML = wishes.map(w => `
+        <div class="menu-card" onclick="openWishModal('${w.id}')">
+          <div class="menu-card-title">${w.name}</div>
+          <div class="menu-card-meta">${w.category || 'Uncategorized'}</div>
+        </div>
+      `).join('');
+    }
 
-// ─── CATEGORY LIST RENDER ───
-function renderCategoryList() {
-  const container = document.getElementById('category-list');
-  if (!container) return;
-  container.innerHTML = categories.map(cat => `
-    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--glass-border);">
-      <span>${cat}</span>
-    </div>`).join('');
-}
+    // Star Rating Component
+    function initStarRating(containerId, type, currentValue) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      container.innerHTML = '';
+      const value = Math.round(currentValue || 0);
+      
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = `star ${i <= value ? 'filled' : ''}`;
+        star.textContent = '★';
+        star.onclick = () => {
+          document.getElementById(type === 'dom' ? 't-drat' : 't-srat').value = i;
+          initStarRating(containerId, type, i);
+        };
+        container.appendChild(star);
+      }
+    }
 
-requireAuth().then(user => loadData(user));
-</script>
+    window.openToyModal = function(id) {
+      const modal = document.getElementById('toy-modal');
+      const deleteBtn = document.getElementById('toy-delete-btn');
+      
+      if (id) {
+        const t = toys.find(x => x.id === id);
+        document.getElementById('toy-modal-title').textContent = 'Edit Toy';
+        document.getElementById('t-id').value = id;
+        document.getElementById('t-name').value = t.name;
+        document.getElementById('t-cat').value = t.category;
+        document.getElementById('t-owner').value = t.owner;
+        document.getElementById('t-notes').value = t.notes || '';
+        document.getElementById('t-drat').value = t.domRating || 0;
+        document.getElementById('t-srat').value = t.subRating || 0;
+        
+        initStarRating('dom-stars', 'dom', t.domRating);
+        initStarRating('sub-stars', 'sub', t.subRating);
+        
+        // Ownership check
+        const canDelete = (myRole === 'dom' && t.owner === 'Dom') || (myRole === 'sub' && t.owner === 'Sub');
+        deleteBtn.style.display = canDelete ? 'block' : 'none';
+        deleteBtn.onclick = () => deleteToyFromModal(id);
+      } else {
+        document.getElementById('toy-modal-title').textContent = 'Add New Toy';
+        ['t-name','t-notes','t-drat','t-srat','t-id'].forEach(f => document.getElementById(f).value = '');
+        document.getElementById('t-cat').value = 'Vibration';
+        document.getElementById('t-owner').value = 'Dom';
+        initStarRating('dom-stars', 'dom', 0);
+        initStarRating('sub-stars', 'sub', 0);
+        deleteBtn.style.display = 'none';
+      }
+      
+      modal.classList.add('open');
+    };
 
-<script src="nav.js"></script>
+    window.closeToyModal = function() {
+      document.getElementById('toy-modal').classList.remove('open');
+    };
+
+    window.saveToy = async function() {
+      const name = document.getElementById('t-name').value.trim();
+      if (!name) return alert("Toy name is required");
+
+      const id = document.getElementById('t-id').value || 'toy_' + Date.now();
+      const toy = {
+        id,
+        name,
+        category: document.getElementById('t-cat').value,
+        owner: document.getElementById('t-owner').value,
+        notes: document.getElementById('t-notes').value.trim(),
+        domRating: parseFloat(document.getElementById('t-drat').value) || 0,
+        subRating: parseFloat(document.getElementById('t-srat').value) || 0,
+        added: Date.now()
+      };
+
+      await setDoc(doc(toysCol, id), toy);
+      toys = toys.filter(t => t.id !== id);
+      toys.push(toy);
+      closeToyModal();
+      renderVault();
+    };
+
+    window.deleteToyFromModal = async function(id) {
+      if (!confirm("Delete this toy?")) return;
+      await deleteDoc(doc(toysCol, id));
+      toys = toys.filter(t => t.id !== id);
+      closeToyModal();
+      renderVault();
+    };
+
+    // Wishlist functions
+    window.openWishModal = function(id) {
+      const modal = document.getElementById('wish-modal');
+      const deleteBtn = document.getElementById('wish-delete-btn');
+      
+      if (id) {
+        const w = wishes.find(x => x.id === id);
+        document.getElementById('wish-modal-title').textContent = 'Edit Desire';
+        document.getElementById('w-id').value = id;
+        document.getElementById('w-name').value = w.name;
+        document.getElementById('w-cat').value = w.category || 'Other';
+        
+        const canDelete = true; // Wishlist items are personal
+        deleteBtn.style.display = canDelete ? 'block' : 'none';
+        deleteBtn.onclick = () => deleteWish(id);
+      } else {
+        document.getElementById('wish-modal-title').textContent = 'Add New Desire';
+        ['w-name','w-id'].forEach(f => document.getElementById(f).value = '');
+        document.getElementById('w-cat').value = 'Vibration';
+        deleteBtn.style.display = 'none';
+      }
+      
+      modal.classList.add('open');
+    };
+
+    window.closeWishModal = function() {
+      document.getElementById('wish-modal').classList.remove('open');
+    };
+
+    window.saveWish = async function() {
+      const name = document.getElementById('w-name').value.trim();
+      if (!name) return alert("Name is required");
+
+      const id = document.getElementById('w-id').value || 'wish_' + Date.now();
+      const wish = {
+        id,
+        name,
+        category: document.getElementById('w-cat').value,
+        added: Date.now()
+      };
+
+      await setDoc(doc(wishesCol, id), wish);
+      wishes = wishes.filter(w => w.id !== id);
+      wishes.push(wish);
+      closeWishModal();
+      renderWishlist();
+    };
+
+    window.deleteWish = async function(id) {
+      if (!confirm("Remove from wishlist?")) return;
+      await deleteDoc(doc(wishesCol, id));
+      wishes = wishes.filter(w => w.id !== id);
+      closeWishModal();
+      renderWishlist();
+    };
+
+    // Filter Sheet
+    window.openFilterSheet = function() {
+      document.getElementById('filter-sheet').classList.add('open');
+    };
+
+    window.setFilter = function(type, value, el) {
+      currentFilters[type] = value;
+      document.querySelectorAll('#filter-sheet .filter-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+    };
+
+    window.applyFiltersAndClose = function() {
+      document.getElementById('filter-sheet').classList.remove('open');
+      renderVault();
+    };
+
+    window.openCategoryModal = function() {
+      alert("Category management coming in next update. For now, categories are fixed.");
+    };
+
+    // Init
+    requireAuth().then(user => loadData(user));
+  </script>
+  
+  <script src="nav.js"></script>
 </body>
 </html>
