@@ -295,13 +295,17 @@
   </div>
 </div>
 
-<script type="module">
+<<script type="module">
 import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
 import { doc, setDoc, deleteDoc, getDocs, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
 function dataCol(path, id) { return collection(db, 'data', id, path); }
 
+// ─── STATE ───
+let myUid = null;    // FIXED: Now properly assigned
+let relId = null;    // FIXED: Now properly assigned
+let partnerUid = null;
 let toys = [], wishes = [], categories = ['Other'];
 let toysCol, wishesCol, categoryCol;
 let domName = 'Dom', subName = 'Sub', domInitial = 'D', subInitial = 'S';
@@ -309,30 +313,34 @@ let ownerF = 'all', wishF = 'all', expandedId = null, collapsedCats = {};
 
 async function migratePersonalData(user, sharedId) {
   if (sharedId === user.uid) return;
-  const personalToys = await getDocs(collection(db, 'data', user.uid, 'vault-toys'));
-  const personalWishes = await getDocs(collection(db, 'data', user.uid, 'vault-wishes'));
-  const personalCats = await getDocs(collection(db, 'data', user.uid, 'categories'));
+  // Reference paths
+  const pToys = await getDocs(collection(db, 'data', user.uid, 'vault-toys'));
+  const pWishes = await getDocs(collection(db, 'data', user.uid, 'vault-wishes'));
+  const pCats = await getDocs(collection(db, 'data', user.uid, 'categories'));
 
-  for (const d of personalToys.docs) await setDoc(doc(toysCol, d.id), d.data());
-  for (const d of personalWishes.docs) await setDoc(doc(wishesCol, d.id), d.data());
-  for (const d of personalCats.docs) await setDoc(doc(categoryCol, d.id), d.data());
-  console.log("Personal data migrated to shared vault.");
+  // Move them
+  for (const d of pToys.docs) await setDoc(doc(toysCol, d.id), d.data());
+  for (const d of pWishes.docs) await setDoc(doc(wishesCol, d.id), d.data());
+  for (const d of pCats.docs) await setDoc(doc(categoryCol, d.id), d.data());
+  console.log("Auto-migration check complete.");
 }
 
 async function loadData(user) {
   try {
+    myUid = user.uid; // ASSIGN GLOBAL UID
     const rel = await getRelationship();
-    const sharedId = rel?.id || user.uid;
+    relId = rel?.id || user.uid; // ASSIGN GLOBAL RELID
 
-    toysCol = dataCol('vault-toys', sharedId);
-    wishesCol = dataCol('vault-wishes', sharedId);
-    categoryCol = dataCol('categories', sharedId);
+    toysCol = dataCol('vault-toys', relId);
+    wishesCol = dataCol('vault-wishes', relId);
+    categoryCol = dataCol('categories', relId);
 
-    if (rel?.id) await migratePersonalData(user, sharedId);
+    // Run migration if paired
+    if (rel?.id) await migratePersonalData(user, relId);
 
     const myProfile = await getMyProfile();
     if (rel) {
-      const partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
+      partnerUid = rel.domId === user.uid ? rel.subId : rel.domId;
       const partnerProfile = await getUserProfile(partnerUid);
       if (myProfile?.role === 'dom') {
         domName = myProfile.displayName || 'Dom';
@@ -351,20 +359,21 @@ async function loadData(user) {
     wishes = wSnap.docs.map(d => d.data());
 
     renderVault();
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error("Load failed:", e); }
 }
 
 async function loadCategories() {
   const snap = await getDocs(categoryCol);
   const names = snap.docs.map(d => d.data().name);
   names.forEach(n => { if(!categories.includes(n)) categories.push(n); });
-  categories.sort();
+  categories.sort((a,b) => a.localeCompare(b));
   updateCategorySelects();
 }
 
 function updateCategorySelects() {
   const html = categories.map(c => `<option>${c}</option>`).join('');
-  document.getElementById('t-cat').innerHTML = html;
+  const tCat = document.getElementById('t-cat');
+  if (tCat) tCat.innerHTML = html;
 }
 
 async function saveToy() {
@@ -389,15 +398,32 @@ async function saveToy() {
 function renderVault() {
   const list = document.getElementById('vault-list');
   const q = document.getElementById('vault-search').value.toLowerCase();
-  const filtered = toys.filter(t => (ownerF==='all' || t.owner===ownerF) && t.name.toLowerCase().includes(q));
+  
+  // 1. Filter the toys
+  const filtered = toys.filter(t => {
+    const matchOwner = (ownerF === 'all' || t.owner === ownerF);
+    const matchSearch = (!q || t.name.toLowerCase().includes(q));
+    return matchOwner && matchSearch;
+  });
 
+  // 2. Prepare groups
   const groups = {};
   categories.forEach(c => groups[c] = []);
-  filtered.forEach(t => groups[t.category]?.push(t));
+  if (!groups['Other']) groups['Other'] = [];
 
+  // 3. Assign items (FALLBACK TO OTHER IF CATEGORY MISSING)
+  filtered.forEach(t => {
+    if (groups[t.category]) {
+      groups[t.category].push(t);
+    } else {
+      groups['Other'].push(t);
+    }
+  });
+
+  // 4. Generate HTML
   list.innerHTML = categories.map(cat => {
     const items = groups[cat];
-    if (!items?.length) return '';
+    if (!items || !items.length) return '';
     return `
       <div class="cat-group ${collapsedCats[cat]?'collapsed':''}">
         <div class="cat-header" onclick="toggleCat('${cat}')">
@@ -430,79 +456,69 @@ function miniStars(r,t) {
 }
 
 function updateLabels() {
-  document.querySelector('.filter-pill.dom').textContent = domName;
-  document.querySelector('.filter-pill.sub').textContent = subName;
+  const dPill = document.querySelector('.filter-pill.dom');
+  const sPill = document.querySelector('.filter-pill.sub');
+  if (dPill) dPill.textContent = domName;
+  if (sPill) sPill.textContent = subName;
 }
 
+// ─── WINDOW EXPOSURE ───
 window.switchTab = (t, b) => {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
   b.classList.add('active');
 };
-
 window.setOwnerF = (el, v) => {
   ownerF = v;
   document.querySelectorAll('#tab-vault .filter-pill').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderVault();
 };
-
 window.toggleRow = (id) => { expandedId = expandedId === id ? null : id; renderVault(); };
 window.toggleCat = (cat) => { collapsedCats[cat] = !collapsedCats[cat]; renderVault(); };
 window.openToyModal = () => document.getElementById('toy-modal').classList.add('open');
 window.closeToyModal = () => document.getElementById('toy-modal').classList.remove('open');
-window.openCategoryModal = () => { document.getElementById('category-modal').classList.add('open'); };
+window.openCategoryModal = () => { document.getElementById('category-modal').classList.add('open'); renderCategoryList(); };
 window.closeCategoryModal = () => document.getElementById('category-modal').classList.remove('open');
 window.saveToy = saveToy;
 
-requireAuth().then(user => loadData(user));
-
+// ─── RESCUE SCRIPT ───
 window.rescueMissingData = async function() {
-  const { collection, getDocs, setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  alert("Checking for items to rescue...");
   
-  if (!myUid || !relId || relId === "solo_" + myUid) {
-    alert("Error: Relationship not fully loaded. Try again in 2 seconds.");
+  if (!myUid || !relId || relId === myUid) {
+    alert("Relationship not paired or ID not set. Ensure you are paired first.");
     return;
   }
 
   try {
-    // 1. Reference old personal paths
     const oldToysCol = collection(db, 'data', myUid, 'vault-toys');
     const oldWishesCol = collection(db, 'data', myUid, 'vault-wishes');
     const oldCatsCol = collection(db, 'data', myUid, 'categories');
 
-    // 2. Fetch everything from the "old" folder
     const [tSnap, wSnap, cSnap] = await Promise.all([
-      getDocs(oldToysCol),
-      getDocs(oldWishesCol),
-      getDocs(oldCatsCol)
+      getDocs(oldToysCol), getDocs(oldWishesCol), getDocs(oldCatsCol)
     ]);
 
-    // 3. Move Toys
-    for (const d of tSnap.docs) {
-      await setDoc(doc(db, 'data', relId, 'vault-toys', d.id), d.data());
+    if (tSnap.empty && cSnap.empty) {
+      alert("Found nothing to rescue in your personal folder.");
+      return;
     }
 
-    // 4. Move Wishes
-    for (const d of wSnap.docs) {
-      await setDoc(doc(db, 'data', relId, 'vault-wishes', d.id), d.data());
-    }
+    for (const d of tSnap.docs) await setDoc(doc(db, 'data', relId, 'vault-toys', d.id), d.data());
+    for (const d of wSnap.docs) await setDoc(doc(db, 'data', relId, 'vault-wishes', d.id), d.data());
+    for (const d of cSnap.docs) await setDoc(doc(db, 'data', relId, 'categories', d.id), d.data());
 
-    // 5. Move Categories
-    for (const d of cSnap.docs) {
-      await setDoc(doc(db, 'data', relId, 'categories', d.id), d.data());
-    }
-
-    alert(`Success! Rescued ${tSnap.size} toys and ${cSnap.size} categories. Refreshing page...`);
+    alert(`Rescue complete! Moved ${tSnap.size} items. Reloading...`);
     window.location.reload();
-    
   } catch (e) {
-    alert("Rescue failed: " + e.message);
-    console.error(e);
+    alert("Rescue error: " + e.message);
   }
 };
 
+// Start
+requireAuth().then(user => loadData(user));
 </script>
 
 <script src="nav.js"></script>
