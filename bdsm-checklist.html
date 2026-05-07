@@ -292,6 +292,21 @@
       <div id="raw-data-container" style="max-height:400px; overflow-y:auto; background:#0a1224; border-radius:8px; padding:8px;"></div>
     </div>
 
+    <!-- IMPORT FROM EXCEL -->
+    <div class="glass-card">
+      <div class="section-title">📤 Import from Excel File</div>
+      <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
+        Upload your original Excel file (like the one you pasted) and import all activities + ratings into Firestore in one click.
+      </p>
+      
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+        <input type="file" id="excel-file" accept=".xlsx,.xls" style="flex:1; background:#0a1224; border:1px solid var(--border); padding:10px; border-radius:8px; color:#ddd;">
+        <button onclick="importFromExcel()" class="btn btn-gold">Import Excel</button>
+      </div>
+      
+      <div id="excel-status" style="margin-top:8px; font-size:12px; display:none;"></div>
+    </div>
+
   </div>
 
   <script type="module">
