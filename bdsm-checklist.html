@@ -348,29 +348,48 @@
 
     <!-- STATS -->
     <div class="status-bar">
-      <div class="stat-card" onclick="showTab('all', this)">
+      <div class="stat-card" onclick="document.querySelector('.chip[data-filter=all]').click()">
         <div class="stat-num" id="stat-total">0</div>
         <div class="stat-lbl">Total</div>
       </div>
-      <div class="stat-card" onclick="showTab('loved', this)">
+      <div class="stat-card" onclick="document.querySelector('.chip[data-filter=loved]').click()">
         <div class="stat-num" id="stat-loved">0</div>
         <div class="stat-lbl">Loved</div>
       </div>
-      <div class="stat-card" onclick="showTab('hard', this)">
+      <div class="stat-card" onclick="document.querySelector('.chip[data-filter=hard]').click()">
         <div class="stat-num" id="stat-hard">0</div>
         <div class="stat-lbl">Hard Limits</div>
       </div>
-      <div class="stat-card" onclick="showTab('custom', this)">
+      <div class="stat-card" onclick="document.querySelector('.chip[data-filter=scene]').click()">
         <div class="stat-num" id="stat-custom">0</div>
         <div class="stat-lbl">Custom</div>
       </div>
     </div>
 
-    <!-- SEARCH + FILTERS -->
-    <div class="search-wrap">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search activities..." oninput="onSearch(this.value)">
-      <span class="search-icon">🔍</span>
-      <button onclick="clearSearch()" class="search-clear" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:#666; font-size:18px; display:none;">×</button>
+    <!-- SEARCH + FILTERS + EXPAND/COLLAPSE (matches Toy Vault) -->
+    <div style="display:flex; gap:8px; margin-bottom:16px; align-items:center;">
+      <div class="search-wrap" style="flex:1; margin-bottom:0;">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search activities..." oninput="onSearch(this.value)">
+        <span class="search-icon">🔍</span>
+        <button onclick="clearSearch()" class="search-clear" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:#666; font-size:18px; display:none;">×</button>
+      </div>
+      
+      <button onclick="openFilterSheet()" class="btn btn-outline" style="padding:12px 18px; white-space:nowrap;">Filter</button>
+      
+      <!-- Luxury Icon Group for Expand/Collapse (exact from Toy Vault) -->
+      <div style="display:flex; background:var(--glass); border:1px solid var(--border); border-radius:12px; padding:2px; align-items:center;">
+        <button onclick="expandAllCategories()" class="btn-icon" title="Expand All">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+          </svg>
+        </button>
+        <div style="width:1px; background:var(--border); margin:4px 0;"></div>
+        <button onclick="collapseAllCategories()" class="btn-icon" title="Collapse All">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 11l-5-5-5 5M17 18l-5-5-5 5"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="filter-chips" style="margin-bottom:16px;">
@@ -380,10 +399,7 @@
       <div class="chip" onclick="toggleChip(this, 'purple-chip')" data-filter="scene">⚑ Scene</div>
     </div>
 
-    <!-- CATEGORY TABS (pill style) -->
-    <div class="tabs" id="categoryTabs" style="margin-bottom:16px;"></div>
-
-    <!-- CATEGORY PANELS -->
+    <!-- CATEGORY PANELS (grouped & collapsible, like Toy Vault) -->
     <div id="catPanels"></div>
 
     <!-- SEARCH RESULTS -->
@@ -431,8 +447,13 @@
 
     const SEG_NO = "No and I don't want to";
 
-    // === FIREBASE PATHS ===
-    function dataCol(path, id) { return collection(db, 'data', id, path); }
+    // === FIREBASE PATHS (original structure: relationships/{relId}/checklist) ===
+    function checklistCol(id) {
+      return collection(db, 'relationships', id, 'checklist');
+    }
+    function checklistCustomCol(id) {
+      return collection(db, 'relationships', id, 'checklistCustom');
+    }
 
     async function init() {
       try {
@@ -483,19 +504,19 @@
         };
 
         // Load user data
-        const mySnap = await getDocs(dataCol('checklist', myUid));
+        const mySnap = await getDocs(checklistCol(relId));
         myData = {};
         mySnap.docs.forEach(d => myData[d.id] = d.data().v);
 
         if (relId && relId !== myUid) {
-          const partnerSnap = await getDocs(dataCol('checklist', relId));
+          const partnerSnap = await getDocs(checklistCol(relId));
           partnerData = {};
           partnerSnap.docs.forEach(d => partnerData[d.id] = d.data().v);
         }
 
         // Load custom items
         if (relId && relId !== "solo_" + myUid) {
-          const customSnap = await getDocs(dataCol('checklistCustom', relId));
+          const customSnap = await getDocs(checklistCustomCol(relId));
           customItems = customSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
 
@@ -506,15 +527,15 @@
         const savedView = localStorage.getItem('checklist_view_mode') || 'both';
         setViewMode(savedView);
 
-        // Real-time sync
-        onSnapshot(dataCol('checklist', myUid), snap => {
+        // Real-time sync (original paths)
+        onSnapshot(checklistCol(relId), snap => {
           myData = {};
           snap.docs.forEach(d => myData[d.id] = d.data().v);
           refreshAll();
         });
 
         if (relId && relId !== myUid) {
-          onSnapshot(dataCol('checklist', relId), snap => {
+          onSnapshot(checklistCol(relId), snap => {
             partnerData = {};
             snap.docs.forEach(d => partnerData[d.id] = d.data().v);
             refreshAll();
@@ -540,55 +561,10 @@
     }
 
     function buildAll() {
-      buildCategoryTabs();
       Object.keys(template.base).forEach(cat => buildCatPanel(cat, template.base[cat]));
       renderCustomItems();
       buildStats();
       setSaveStatus('', '—');
-    }
-
-    function buildCategoryTabs() {
-      const container = document.getElementById('categoryTabs');
-      container.innerHTML = '';
-      
-      const allTab = document.createElement('div');
-      allTab.className = 'tab-btn active';
-      allTab.textContent = 'All';
-      allTab.onclick = () => showTab('all', allTab);
-      container.appendChild(allTab);
-
-      Object.keys(template.base).forEach(cat => {
-        const btn = document.createElement('div');
-        btn.className = 'tab-btn';
-        btn.textContent = cat.split(' ')[0];
-        btn.onclick = () => showTab(cat, btn);
-        container.appendChild(btn);
-      });
-
-      if (customItems.length > 0) {
-        const customBtn = document.createElement('div');
-        customBtn.className = 'tab-btn';
-        customBtn.textContent = 'Custom';
-        customBtn.onclick = () => showTab('custom', customBtn);
-        container.appendChild(customBtn);
-      }
-    }
-
-    function showTab(cat, btn) {
-      document.querySelectorAll('#categoryTabs .tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-      
-      if (cat === 'all') {
-        document.querySelectorAll('.section-panel').forEach(p => p.classList.add('active'));
-      } else if (cat === 'custom') {
-        const customPanel = document.getElementById('panel-custom');
-        if (customPanel) customPanel.classList.add('active');
-      } else {
-        const panel = document.getElementById('panel-' + cat);
-        if (panel) panel.classList.add('active');
-      }
     }
 
     function buildCard(cat, item, isCustom = false) {
@@ -681,11 +657,30 @@
 </div>`;
     }
 
+    // Category collapse state (like Toy Vault)
+    let collapsedCategories = {};
+
     function buildCatPanel(cat, items) {
       const div = document.createElement('div');
-      div.className = 'section-panel glass-card';
-      div.id = 'panel-' + cat;
-      div.innerHTML = items.map(i => buildCard(cat, i)).join('');
+      div.className = 'glass-card';
+      div.style.marginBottom = '20px';
+      div.style.padding = '8px 0';
+      
+      const count = items.length;
+      
+      div.innerHTML = `
+        <div onclick="toggleCategory('${cat}')" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 20px; cursor:pointer;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold);">${cat}</span>
+            <span style="background:rgba(212,175,55,0.2); color:#ddd; font-size:12px; padding:4px 11px; border-radius:9999px; font-weight:600;">${count}</span>
+          </div>
+          <span id="chevron-${cat}" style="color:#666; font-size:18px; transition:transform .3s;">▾</span>
+        </div>
+        <div id="cat-rows-${cat}" style="padding: 0 12px;">
+          ${items.map(i => buildCard(cat, i)).join('')}
+        </div>
+      `;
+      
       document.getElementById('catPanels').appendChild(div);
     }
 
@@ -696,11 +691,65 @@
       if (customItems.length === 0) return;
 
       const div = document.createElement('div');
-      div.className = 'section-panel glass-card';
-      div.id = 'panel-custom';
-      div.innerHTML = customItems.map(item => buildCard('Custom', item, true)).join('');
+      div.className = 'glass-card';
+      div.style.marginBottom = '20px';
+      div.style.padding = '8px 0';
+      
+      div.innerHTML = `
+        <div onclick="toggleCategory('Custom')" style="display:flex; align-items:center; justify-content:space-between; padding: 12px 20px; cursor:pointer;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:var(--gold);">Custom</span>
+            <span style="background:rgba(212,175,55,0.2); color:#ddd; font-size:12px; padding:4px 11px; border-radius:9999px; font-weight:600;">${customItems.length}</span>
+          </div>
+          <span id="chevron-Custom" style="color:#666; font-size:18px; transition:transform .3s;">▾</span>
+        </div>
+        <div id="cat-rows-Custom" style="padding: 0 12px;">
+          ${customItems.map(item => buildCard('Custom', item, true)).join('')}
+        </div>
+      `;
+      
       document.getElementById('catPanels').appendChild(div);
     }
+
+    // === COLLAPSIBLE CATEGORY FUNCTIONS (exact from Toy Vault) ===
+    window.toggleCategory = function(cat) {
+      const rows = document.getElementById('cat-rows-' + cat);
+      const chevron = document.getElementById('chevron-' + cat);
+      
+      if (!rows) return;
+      
+      collapsedCategories[cat] = !collapsedCategories[cat];
+      
+      if (collapsedCategories[cat]) {
+        rows.style.display = 'none';
+        chevron.style.transform = 'rotate(-90deg)';
+      } else {
+        rows.style.display = 'block';
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    };
+
+    window.expandAllCategories = function() {
+      const cats = [...Object.keys(template.base), 'Custom'];
+      cats.forEach(cat => {
+        collapsedCategories[cat] = false;
+        const rows = document.getElementById('cat-rows-' + cat);
+        const chevron = document.getElementById('chevron-' + cat);
+        if (rows) rows.style.display = 'block';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      });
+    };
+
+    window.collapseAllCategories = function() {
+      const cats = [...Object.keys(template.base), 'Custom'];
+      cats.forEach(cat => {
+        collapsedCategories[cat] = true;
+        const rows = document.getElementById('cat-rows-' + cat);
+        const chevron = document.getElementById('chevron-' + cat);
+        if (rows) rows.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      });
+    };
 
     // === HELPER FUNCTIONS (kept from original) ===
     function ik(cat, act) { return cat.toLowerCase().replace(/\s+/g,'_') + '|' + act.toLowerCase().replace(/\s+/g,'_'); }
@@ -969,9 +1018,9 @@
       renderCustomItems();
       buildStats();
 
-      // Save to Firestore
+      // Save to Firestore (original path)
       if (relId) {
-        setDoc(doc(dataCol('checklistCustom', relId), id), newItem);
+        setDoc(doc(checklistCustomCol(relId), id), newItem);
       }
 
       showToast("Custom activity added", "success");
@@ -984,7 +1033,7 @@
       buildStats();
 
       if (relId) {
-        await deleteDoc(doc(dataCol('checklistCustom', relId), id));
+        await deleteDoc(doc(checklistCustomCol(relId), id));
       }
     };
 
@@ -998,7 +1047,7 @@
           const updates = [];
           Object.keys(myData).forEach(sk => {
             if (sk.endsWith('.ts')) return;
-            updates.push(setDoc(doc(dataCol('checklist', myUid), sk), { v: myData[sk], ts: Date.now() }));
+            updates.push(setDoc(doc(checklistCol(relId), sk), { v: myData[sk], ts: Date.now() }));
           });
           await Promise.all(updates);
           setSaveStatus('Saved', 'saved');
