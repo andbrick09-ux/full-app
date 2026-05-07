@@ -1,2609 +1,496 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>BDSM Checklist — BDSM Hub</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="nav.css">
+  <title>Assessments — BDSM Hub</title>
+  
+  <!-- Global Design System (matches Toy Vault V2 exactly) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&amp;family=Great+Vibes&amp;family=Montserrat:wght@400;600&amp;display=swap" rel="stylesheet">
+  
   <style>
+    /* === Sir's Protocol Global Tokens (V2) — EXACT MATCH TO TOY VAULT === */
     :root {
       --midnight: #051024;
-      --midnight-mid: #071830;
+      --glass: rgba(5,16,36,0.85);
+      --glass2: rgba(2,8,20,0.6);
       --gold: #D4AF37;
-      --gold-light: #e8c84a;
-      --gold-dim: rgba(212, 175, 55, 0.12);
-      --gold-border: rgba(212, 175, 55, 0.3);
-      --glass: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.07);
-      --text-primary: #f0e6d3;
-      --text-secondary: rgba(240, 230, 211, 0.6);
-      --text-muted: rgba(240, 230, 211, 0.35);
-      --sub-color: #e84a91;
-      --sub-dim: rgba(232, 74, 145, 0.12);
-      --sub-border: rgba(232, 74, 145, 0.3);
+      --gold-light: #F5E6A3;
+      --gold-dim: rgba(212,175,55,0.18);
+      --border: rgba(212,175,55,0.15);
+      --cream: #f0e6d2;
+      --cream-dim: rgba(240,230,211,0.7);
+      --luxury-gradient: linear-gradient(135deg, #D4AF37, #F5E6A3);
+      --dom-rose: #b76e79;
+      --sub-cream: #f0e6d2;
       --danger: #c0392b;
-      --danger-dim: rgba(192, 57, 43, 0.15);
       --success: #27ae60;
-      --success-dim: rgba(39, 174, 96, 0.15);
-      --warn: #e67e22;
-      --warn-dim: rgba(230, 126, 34, 0.15);
-      --purple-dim: rgba(142, 68, 173, 0.15);
       --blue: #5dade2;
-      --blue-dim: rgba(93, 173, 226, 0.12);
-      --blue-border: rgba(93, 173, 226, 0.3);
       --purple: #bb8fce;
-      --purple-border: rgba(187, 143, 206, 0.3);
-      --radius: 12px;
-      --transition: 0.2s ease;
-      --header-h: 56px;
-      --filter-h: 96px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin:0; padding:0; }
     body {
       background: var(--midnight);
-      color: var(--text-primary);
+      color: #ccc;
       font-family: 'Montserrat', sans-serif;
       font-size: 14px;
       min-height: 100vh;
+      padding-bottom: 90px;
       overflow-x: hidden;
     }
 
-    /* LOADING */
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--midnight);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      flex-direction: column;
-      gap: 16px;
-      transition: opacity 0.4s ease;
+    /* === TOPBAR (exact from Toy Vault) === */
+    .topbar {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(5,16,36,0.92);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid var(--border);
     }
-
-    .loading-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .loading-title {
+    .topbar-title {
       font-family: 'Great Vibes', cursive;
-      font-size: 36px;
-      color: var(--gold);
+      font-size: 28px;
+      background: var(--luxury-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .topbar-sub {
+      font-size: 10px; color: #666; letter-spacing: 1px; margin-top: 2px;
     }
 
-    .loading-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-    }
-
-    .spinner {
-      width: 32px;
-      height: 32px;
-      border: 2px solid var(--gold-border);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* HEADER */
-    .app-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: var(--header-h);
-      background: rgba(5, 16, 36, 0.96);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--gold-border);
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      z-index: 200;
-      gap: 10px;
-    }
-
-    .header-title {
-      font-family: 'Great Vibes', cursive;
-      font-size: 24px;
-      color: var(--gold);
-      flex: 1;
-      text-align: center;
-      line-height: 1;
-    }
-
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 4px 10px 4px 6px;
-      font-size: 11px;
-      font-weight: 600;
-      flex-shrink: 0;
-      letter-spacing: 0.3px;
-    }
-
-    .user-pill .role-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    .user-pill.dom {
-      color: var(--gold);
-      border-color: var(--gold-border);
-    }
-
-    .user-pill.dom .role-dot {
-      background: var(--gold);
-    }
-
-    .user-pill.sub {
-      color: var(--sub-color);
-      border-color: var(--sub-border);
-    }
-
-    .user-pill.sub .role-dot {
-      background: var(--sub-color);
-    }
-
-    /* SAVE STATUS */
-    .save-status {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      flex-shrink: 0;
-      min-width: 60px;
-      text-align: right;
-      transition: color 0.3s ease;
-      color: var(--text-muted);
-    }
-
-    .save-status.saving {
-      color: var(--gold);
-    }
-
-    .save-status.saved {
-      color: var(--success);
-    }
-
-    .save-status.error {
-      color: var(--danger);
-    }
-
-    /* SWIPE MODE BTN */
-    .swipe-btn {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 18px;
-      padding: 4px 9px;
-      cursor: pointer;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .swipe-btn:hover {
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    /* FILTER BAR */
-    .filter-bar {
-      position: fixed;
-      top: var(--header-h);
-      left: 0;
-      right: 0;
-      background: rgba(5, 16, 36, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--glass-border);
-      padding: 8px 12px;
-      z-index: 190;
-    }
-
-    .search-wrap {
-      position: relative;
-      margin-bottom: 7px;
-    }
-
-    .search-input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      padding: 8px 32px 8px 34px;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .search-input:focus {
-      border-color: var(--gold-border);
-    }
-
-    .search-input::placeholder {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 11px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    .search-clear {
-      position: absolute;
-      right: 9px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 16px;
-      cursor: pointer;
-      padding: 2px;
-      display: none;
-    }
-
-    .search-clear.visible {
-      display: block;
-    }
-
-    .filter-chips {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .filter-chips::-webkit-scrollbar {
-      display: none;
-    }
-
-    .chip {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
-      color: var(--text-muted);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      padding: 4px 10px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .chip:hover {
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    .chip.active {
-      background: var(--gold-dim);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    .chip.active.danger-chip {
-      background: var(--danger-dim);
-      border-color: rgba(192, 57, 43, 0.4);
-      color: #e74c3c;
-    }
-
-    .chip.active.success-chip {
-      background: var(--success-dim);
-      border-color: rgba(39, 174, 96, 0.4);
-      color: var(--success);
-    }
-
-    .chip.active.purple-chip {
-      background: var(--purple-dim);
-      border-color: var(--purple-border);
-      color: var(--purple);
-    }
-
-    .chip.active.warn-chip {
-      background: var(--warn-dim);
-      border-color: rgba(230, 126, 34, 0.4);
-      color: var(--warn);
-    }
-
-    /* MAIN */
     .main {
-      padding-top: calc(var(--header-h) + var(--filter-h) + 12px);
-      padding-bottom: 110px;
-      max-width: 900px;
+      max-width: 620px;
       margin: 0 auto;
-      padding-left: 12px;
-      padding-right: 12px;
+      padding: 20px 16px 110px;
     }
 
-    .id-note {
-      color: var(--text-muted);
-      font-size: 10px;
-      margin-left: auto;
-      letter-spacing: 0.3px;
+    /* === TABS (exact from Toy Vault) === */
+    .tabs {
+      display: flex; background: var(--glass); border-radius: 9999px;
+      padding: 4px; margin-bottom: 20px; border: 1px solid var(--border);
     }
-
-    /* VIEW SELECTOR */
-    .view-selector {
-      display: flex;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 3px;
-      margin-bottom: 16px;
-      gap: 4px;
-    }
-
-    .view-opt {
-      flex: 1;
-      padding: 7px 5px;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-radius: 9px;
-      transition: var(--transition);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .view-opt:hover {
-      color: var(--text-primary);
-    }
-
-    .view-opt.active {
-      background: var(--gold-dim);
-      color: var(--gold);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    /* View Mode Logic */
-    body.view-me .theirs { display: none !important; }
-    body.view-partner .mine { display: none !important; }
-    body.view-me .response-grid, 
-    body.view-partner .response-grid { 
-      grid-template-columns: 1fr !important; 
-    }
-
-    /* Hide partner side of status pair in Me mode */
-    body.view-me .sp-side.them, 
-    body.view-me .sp-divider { display: none !important; }
-    
-    /* Hide my side of status pair in Partner mode */
-    body.view-partner .sp-side.me, 
-    body.view-partner .sp-divider { display: none !important; }
-
-    body.view-me .sp-side.me,
-    body.view-partner .sp-side.them {
-      border-radius: 4px !important;
-    }
-
-    /* TABS */
-    .tab-bar {
-      display: flex;
-      gap: 5px;
-      padding: 8px 0 14px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .tab-bar::-webkit-scrollbar {
-      display: none;
-    }
-
     .tab-btn {
-      position: relative;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      color: var(--text-secondary);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      padding: 6px 13px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: var(--transition);
-      flex-shrink: 0;
+      flex: 1; padding: 10px; text-align: center; font-size: 13px;
+      font-weight: 600; letter-spacing: 0.5px; color: #aaa;
+      border-radius: 9999px; transition: all .2s; cursor: pointer;
+    }
+    .tab-btn.active { background: var(--gold); color: #051024; font-weight: 700; }
+
+    /* === GLASS CARD (exact from Toy Vault) === */
+    .glass-card {
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: 20px; padding: 20px; margin-bottom: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
 
-    .tab-btn:hover {
-      background: var(--gold-dim);
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    .tab-btn.active {
-      background: var(--gold-dim);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    /* STATS */
-    .status-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .stat-card {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .stat-card:hover {
-      background: var(--gold-dim);
-      border-color: var(--gold-border);
-    }
-
-    .stat-card:active {
-      transform: scale(0.96);
-    }
-
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      color: var(--gold);
-      display: block;
-    }
-
-    .stat-lbl {
-      font-size: 10px;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    /* PANELS */
-    .section-panel {
-      display: none;
-    }
-
-    .section-panel.active {
-      display: block;
-    }
-
-    /* SEARCH RESULTS PANEL */
-    .search-results-panel {
-      display: none;
-    }
-
-    .search-results-panel.active {
-      display: block;
-    }
-
-    .search-empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    /* SHOW UNSET toggle */
-    .unset-toggle-bar {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-bottom: 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 34px;
-      height: 18px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 9px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .toggle-slider:before {
-      content: '';
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      left: 2px;
-      top: 2px;
-      background: var(--text-muted);
-      border-radius: 50%;
-      transition: var(--transition);
-    }
-
-    .toggle-switch input:checked+.toggle-slider {
-      background: var(--gold-dim);
-      border: 1px solid var(--gold-border);
-    }
-
-    .toggle-switch input:checked+.toggle-slider:before {
-      transform: translateX(16px);
-      background: var(--gold);
-    }
-
-    /* ADD BUTTON */
-    .add-bar {
-      margin-bottom: 10px;
-    }
-
-    .add-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--glass);
-      border: 1px dashed var(--gold-border);
-      border-radius: 8px;
-      color: var(--gold);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      padding: 7px 13px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .add-btn:hover {
-      background: var(--gold-dim);
-    }
-
-    .add-btn .plus {
-      font-size: 15px;
-    }
-
-    /* ACTIVITY CARD */
+    /* === ACTIVITY CARD (styled like Toy Row + enhanced for checklist) === */
     .activity-card {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      margin-bottom: 8px;
+      background: var(--glass2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 10px;
       overflow: hidden;
-      transition: border-color var(--transition);
+      transition: all .2s;
+      cursor: pointer;
     }
-
-    .activity-card:hover {
-      border-color: rgba(212, 175, 55, 0.18);
-    }
-
-    .activity-card.hard-limit {
-      border-left: 3px solid var(--danger);
-    }
-
-    .activity-card.fetish-flag {
-      border-left: 3px solid var(--gold);
-    }
-
-    .activity-card.loved-both {
-      border-left: 3px solid var(--success);
-    }
-
-    .activity-card.custom-item {
-      border-left: 3px solid var(--blue);
-    }
-
-    .activity-card.scene-flagged {
-      border-left: 3px solid var(--purple);
-    }
-
-    .activity-card.hidden-card {
-      display: none;
-    }
+    .activity-card:active { transform: scale(0.985); }
+    .activity-card.hard-limit { border-left: 4px solid #c0392b; }
+    .activity-card.fetish-flag { border-left: 4px solid var(--gold); }
+    .activity-card.loved-both { border-left: 4px solid #27ae60; }
+    .activity-card.custom-item { border-left: 4px solid #5dade2; }
+    .activity-card.scene-flagged { border-left: 4px solid #bb8fce; }
 
     .card-header {
-      display: flex;
-      align-items: center;
-      padding: 11px 13px;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; background: rgba(255,255,255,0.02);
     }
-
-    .card-header:hover .activity-name {
-      color: var(--gold);
-    }
-
     .activity-name {
       font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      color: var(--text-primary);
-      flex: 1;
-      transition: color var(--transition);
+      font-size: 15px; color: #ddd; font-weight: 600; flex: 1;
     }
+    .badge-row { display: flex; gap: 6px; align-items: center; }
 
-    .badge-row {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      align-items: center;
+    .status-pair {
+      display: flex; align-items: center; gap: 2px;
+      background: rgba(0,0,0,0.3); border-radius: 9999px; padding: 2px;
     }
+    .sp-side {
+      width: 22px; height: 22px; border-radius: 9999px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .sp-side.me { background: #0a1628; color: var(--gold); }
+    .sp-side.them { background: var(--dom-rose); color: #fff; }
+    .sp-divider { width: 1px; height: 14px; background: #444; margin: 0 2px; }
 
     .badge {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 10px;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
+      font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+      letter-spacing: 0.3px; white-space: nowrap;
     }
+    .badge.loved { background: rgba(39,174,96,0.2); color: #27ae60; border: 1px solid rgba(39,174,96,0.4); }
+    .badge.liked { background: rgba(93,173,226,0.2); color: #5dade2; border: 1px solid rgba(93,173,226,0.4); }
+    .badge.custom { background: rgba(93,173,226,0.15); color: #5dade2; }
+    .badge.scene { background: rgba(187,143,206,0.15); color: #bb8fce; }
 
-    .badge.loved {
-      background: var(--success-dim);
-      color: var(--success);
-      border: 1px solid rgba(39, 174, 96, 0.3);
-    }
-
-    .badge.liked {
-      background: var(--blue-dim);
-      color: var(--blue);
-      border: 1px solid var(--blue-border);
-    }
-
-    .badge.take-it {
-      background: rgba(149, 165, 166, 0.1);
-      color: #95a5a6;
-      border: 1px solid rgba(149, 165, 166, 0.2);
-    }
-
-    .badge.want-to {
-      background: var(--gold-dim);
-      color: var(--gold);
-      border: 1px solid var(--gold-border);
-    }
-
-    .badge.hard {
-      background: var(--danger-dim);
-      color: #e74c3c;
-      border: 1px solid rgba(231, 76, 60, 0.3);
-    }
-
-    .badge.soft {
-      background: var(--warn-dim);
-      color: var(--warn);
-      border: 1px solid rgba(230, 126, 34, 0.3);
-    }
-
-    .badge.fetish {
-      background: var(--purple-dim);
-      color: var(--purple);
-      border: 1px solid var(--purple-border);
-    }
-
-    .badge.yes {
-      background: var(--success-dim);
-      color: var(--success);
-      border: 1px solid rgba(39, 174, 96, 0.3);
-    }
-
-    .badge.no {
-      background: rgba(127, 140, 141, 0.1);
-      color: #7f8c8d;
-      border: 1px solid rgba(127, 140, 141, 0.2);
-    }
-
-    .badge.custom {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
-      border: 1px solid var(--glass-border);
-    }
-
-    .badge.scene {
-      background: var(--purple-dim);
-      color: var(--purple);
-      border: 1px solid var(--purple-border);
-    }
-
-    .badge.giving {
-      background: var(--blue-dim);
-      color: var(--blue);
-      border: 1px solid var(--blue-border);
-    }
-
-    .badge.receiving {
-      background: var(--sub-dim);
-      color: var(--sub-color);
-      border: 1px solid var(--sub-border);
-    }
-
-    .badge.both {
-      background: var(--gold-dim);
-      color: var(--gold);
-      border: 1px solid var(--gold-border);
-    }
-
-    .badge.wearing {
-      background: var(--glass);
-      color: var(--text-secondary);
-      border: 1px solid var(--glass-border);
-    }
-
-    .badge.others {
-      background: var(--glass);
-      color: var(--text-muted);
-      border: 1px solid var(--glass-border);
-    }
-
-    /* STATUS PAIR BADGE */
-    .status-pair {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: 6px;
-      overflow: hidden;
-      height: 22px;
-      margin-right: 4px;
-    }
-
-    .sp-side {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 100%;
-      font-size: 12px;
-      transition: var(--transition);
-    }
-
-    .sp-divider {
-      width: 1px;
-      height: 12px;
-      background: var(--glass-border);
-      opacity: 0.5;
-    }
-
-    .sp-side.me {
-      background: rgba(52, 152, 219, 0.08);
-    }
-
-    .sp-side.them {
-      background: rgba(232, 67, 147, 0.08);
-    }
-
-    .sp-side.st-limit {
-      background: rgba(192, 57, 43, 0.15);
-      color: #e74c3c;
-    }
-
-    .sp-side.st-want {
-      background: rgba(241, 196, 15, 0.1);
-    }
-
-    .sp-side.st-empty {
-      opacity: 0.3;
-    }
-
-    /* FLAG BUTTON */
     .flag-btn {
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 2px 3px;
-      flex-shrink: 0;
-      opacity: 0.35;
-      transition: opacity var(--transition), transform var(--transition);
+      background: none; border: none; color: #555; font-size: 16px;
+      padding: 4px; cursor: pointer; transition: color .2s;
     }
+    .flag-btn.flagged { color: var(--gold); }
 
-    .flag-btn:hover {
-      opacity: 0.8;
-      transform: scale(1.15);
-    }
+    .expand-icon { color: #666; font-size: 14px; margin-left: 4px; transition: transform .2s; }
+    .activity-card.open .expand-icon { transform: rotate(180deg); }
 
-    .flag-btn.flagged {
-      opacity: 1;
-    }
+    .card-body { display: none; padding: 0 16px 16px; }
+    .activity-card.open .card-body { display: block; }
 
-    .del-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 13px;
-      cursor: pointer;
-      padding: 2px 4px;
-      transition: color var(--transition);
-      flex-shrink: 0;
-    }
-
-    .del-btn:hover {
-      color: #e74c3c;
-    }
-
-    .expand-icon {
-      color: var(--text-muted);
-      font-size: 10px;
-      flex-shrink: 0;
-    }
-
-    /* CARD BODY — animated */
-    .card-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.28s ease;
-      border-top: 0px solid var(--glass-border);
-    }
-
-    .activity-card.open .card-body {
-      max-height: 1200px;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .card-body-inner {
-      padding: 0 13px 13px;
-    }
-
-    /* RESPONSE GRID */
     .response-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 11px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
     }
-
     .response-col {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      padding: 10px;
+      background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px;
     }
-
-    .response-col.mine {
-      border-top: 2px solid;
-    }
-
-    .response-col.mine.dom-me {
-      border-top-color: var(--gold);
-    }
-
-    .response-col.mine.sub-me {
-      border-top-color: var(--sub-color);
-    }
-
-    .response-col.theirs {
-      border-top: 2px solid var(--glass-border);
-    }
-
     .col-title {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .dom-me .col-title,
-    .dom-partner .col-title {
-      color: var(--gold);
-    }
-
-    .sub-me .col-title,
-    .sub-partner .col-title {
-      color: var(--sub-color);
-    }
-
-    .field-label {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 4px;
-    }
-
-    .field-row {
-      margin-bottom: 8px;
-    }
-
-    .field-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .field-select {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: 6px;
-      color: var(--text-primary);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      padding: 5px 24px 5px 8px;
-      cursor: pointer;
-      outline: none;
-      transition: var(--transition);
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23D4AF37'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-    }
-
-    .field-select:focus {
-      border-color: var(--gold-border);
-    }
-
-    .field-select option {
-      background: #071830;
-      color: var(--text-primary);
-    }
-
-    .notes-area {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: 6px;
-      color: var(--text-primary);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      line-height: 1.5;
-      padding: 7px 9px;
-      resize: vertical;
-      min-height: 44px;
-      transition: var(--transition);
-      outline: none;
-    }
-
-    .notes-area:focus {
-      border-color: var(--gold-border);
-    }
-
-    .notes-area::placeholder {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    .private-note-label {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 4px;
-    }
-
-    .private-note-label .lock {
-      font-size: 10px;
-    }
-
-    .partner-val {
-      font-size: 12px;
-      color: var(--text-primary);
-    }
-
-    .partner-val.empty {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    .partner-note {
-      font-size: 11px;
-      color: var(--text-secondary);
-      font-style: italic;
-      line-height: 1.5;
-      padding: 6px 8px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: 6px;
-    }
-
-    /* SPECIAL SECTIONS */
-    .special-section {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-
-    .special-section.pub {
-      border-left: 3px solid var(--blue);
-    }
-
-    .special-section.pred {
-      border-left: 3px solid var(--purple);
-    }
-
-    .special-header {
-      display: flex;
-      align-items: center;
-      padding: 13px 15px;
-      gap: 10px;
-      cursor: pointer;
-      user-select: none;
-      transition: background var(--transition);
-    }
-
-    .special-header:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .spec-icon {
-      font-size: 18px;
-    }
-
-    .spec-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      flex: 1;
-    }
-
-    .pub .spec-title {
-      color: var(--blue);
-    }
-
-    .pred .spec-title {
-      color: var(--purple);
-    }
-
-    .spec-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 1px;
-    }
-
-    .special-body {
-      display: none;
-      padding: 14px;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .special-body.open {
-      display: block;
-    }
-
-    .pub-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-      margin-top: 7px;
-    }
-
-    .pub-item {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 10px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-      user-select: none;
-    }
-
-    .pub-item:hover {
-      border-color: var(--blue-border);
-    }
-
-    .pub-item.checked {
-      background: var(--blue-dim);
-      border-color: var(--blue-border);
-    }
-
-    .pub-chk {
-      width: 16px;
-      height: 16px;
-      border: 1.5px solid var(--text-muted);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: var(--blue);
-      flex-shrink: 0;
-      transition: var(--transition);
-    }
-
-    .pub-item.checked .pub-chk {
-      border-color: var(--blue);
-      background: rgba(93, 173, 226, 0.15);
-    }
-
-    .pub-name {
-      font-size: 12px;
-      color: var(--text-secondary);
-      transition: var(--transition);
-    }
-
-    .pub-item.checked .pub-name {
-      color: var(--text-primary);
-    }
-
-    .pred-card {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      padding: 11px;
-      margin-bottom: 7px;
-      cursor: pointer;
-      transition: var(--transition);
-      user-select: none;
-    }
-
-    .pred-card:hover {
-      border-color: var(--purple-border);
-    }
-
-    .pred-card.active {
-      background: rgba(187, 143, 206, 0.08);
-      border-color: var(--purple-border);
-    }
-
-    .pred-toggle {
-      width: 18px;
-      height: 18px;
-      border: 1.5px solid var(--text-muted);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      flex-shrink: 0;
-      margin-top: 1px;
-      transition: var(--transition);
-    }
-
-    .pred-card.active .pred-toggle {
-      border-color: var(--purple);
-      background: rgba(187, 143, 206, 0.2);
-      color: var(--purple);
-    }
-
-    .pred-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 13px;
-      color: var(--text-primary);
-    }
-
-    .pred-card.active .pred-name {
-      color: var(--purple);
-    }
-
-    .pred-desc {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-top: 3px;
-      font-style: italic;
-    }
-
-    /* SHARED FETISHES */
-    .shared-fetish-section {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 14px;
-    }
-
-    .fetish-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--purple-dim);
-      color: var(--purple);
-      border: 1px solid var(--purple-border);
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      cursor: pointer;
-      transition: var(--transition);
-      margin: 3px;
-    }
-
-    .fetish-tag:hover {
-      background: rgba(187, 143, 206, 0.2);
-      border-color: var(--purple);
-    }
-
-    /* SWIPE MODE */
-    .swipe-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--midnight);
-      z-index: 500;
-      flex-direction: column;
-    }
-
-    .swipe-overlay.open {
-      display: flex;
-    }
-
-    .swipe-header {
-      display: flex;
-      align-items: center;
-      padding: 16px;
-      gap: 12px;
-      border-bottom: 1px solid var(--gold-border);
-      flex-shrink: 0;
-    }
-
-    .swipe-title {
-      font-family: 'Great Vibes', cursive;
-      font-size: 22px;
-      color: var(--gold);
-      flex: 1;
-      text-align: center;
-    }
-
-    .swipe-close {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 22px;
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    .swipe-progress-bar {
-      height: 3px;
-      background: rgba(255, 255, 255, 0.06);
-      flex-shrink: 0;
-    }
-
-    .swipe-progress-fill {
-      height: 100%;
-      background: var(--gold);
-      transition: width 0.3s ease;
-    }
-
-    .swipe-counter {
-      text-align: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      padding: 8px;
-      flex-shrink: 0;
-      letter-spacing: 0.5px;
-    }
-
-    .swipe-card-wrap {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-    }
-
-    .swipe-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 18px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .swipe-cat {
-      font-size: 10px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-
-    .swipe-activity {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-      line-height: 1.3;
-    }
-
-    .swipe-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .swipe-col {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      padding: 12px;
-    }
-
-    .swipe-col-name {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .swipe-col.dom-col .swipe-col-name {
-      color: var(--gold);
-    }
-
-    .swipe-col.sub-col .swipe-col-name {
-      color: var(--sub-color);
-    }
-
-    .swipe-field {
-      margin-bottom: 8px;
-    }
-
-    .swipe-field:last-child {
-      margin-bottom: 0;
-    }
-
-    .swipe-field-label {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 3px;
-    }
-
-    .swipe-field-val {
-      font-size: 12px;
-      color: var(--text-primary);
-    }
-
-    .swipe-field-val.empty {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    .swipe-verdict {
-      text-align: center;
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 13px;
-      letter-spacing: 0.3px;
-      margin-bottom: 14px;
-    }
-
-    .swipe-verdict.aligned {
-      background: var(--success-dim);
-      color: var(--success);
-      border: 1px solid rgba(39, 174, 96, 0.3);
-    }
-
-    .swipe-verdict.explore {
-      background: var(--gold-dim);
-      color: var(--gold);
-      border: 1px solid var(--gold-border);
-    }
-
-    .swipe-verdict.discuss {
-      background: var(--warn-dim);
-      color: var(--warn);
-      border: 1px solid rgba(230, 126, 34, 0.3);
-    }
-
-    .swipe-verdict.limit {
-      background: var(--danger-dim);
-      color: #e74c3c;
-      border: 1px solid rgba(231, 76, 60, 0.3);
-    }
-
-    .swipe-nav {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 12px 80px;
-      flex-shrink: 0;
-    }
-
-    .swipe-nav-btn {
-      flex: 1;
-      padding: 13px;
-      border-radius: 10px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      border: none;
-      transition: var(--transition);
-    }
-
-    .swipe-nav-btn.prev {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      color: var(--text-secondary);
-    }
-
-    .swipe-nav-btn.next {
-      background: var(--gold);
-      color: var(--midnight);
-    }
-
-    .swipe-nav-btn:disabled {
-      opacity: 0.4;
-      pointer-events: none;
-    }
-
-    .swipe-filter-bar {
-      display: flex;
-      gap: 6px;
-      padding: 0 12px 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      flex-shrink: 0;
-    }
-
-    .swipe-filter-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    /* MODAL */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.72);
-      z-index: 800;
-      backdrop-filter: blur(4px);
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .modal-overlay.open {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--midnight-mid);
-      border: 1px solid var(--gold-border);
-      border-radius: 16px 16px 0 0;
-      padding: 20px 20px 100px;
-      width: 100%;
-      max-width: 560px;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-
-    .modal-handle {
-      width: 36px;
-      height: 4px;
-      background: var(--gold-border);
-      border-radius: 2px;
-      margin: 0 auto 18px;
-    }
-
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: var(--gold);
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .modal-field {
-      margin-bottom: 13px;
-    }
-
-    .modal-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .modal-input,
-    .modal-select,
-    .modal-textarea {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      padding: 10px 12px;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .modal-input:focus,
-    .modal-select:focus,
-    .modal-textarea:focus {
-      border-color: var(--gold-border);
-    }
-
-    .modal-select option {
-      background: #071830;
-    }
-
-    .modal-textarea {
-      resize: vertical;
-      min-height: 66px;
-      line-height: 1.5;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .modal-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      border: none;
-      transition: var(--transition);
-    }
-
-    .modal-btn.primary {
-      background: var(--gold);
-      color: var(--midnight);
-    }
-
-    .modal-btn.primary:hover {
-      background: var(--gold-light);
-    }
-
-    .modal-btn.secondary {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      color: var(--text-secondary);
-    }
-
-    .modal-btn.secondary:hover {
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 82px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--midnight-mid);
-      border: 1px solid var(--gold-border);
-      border-radius: 20px;
-      color: var(--gold);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 9px 22px;
-      z-index: 999;
-      transition: transform 0.3s ease;
-      pointer-events: none;
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.err {
-      border-color: rgba(192, 57, 43, 0.5);
-      color: #e74c3c;
-    }
-
-    .dsh-more-sheet:not(.open) .dsh-sheet-handle {
-      display: none;
-    }
-
-    /* ── SWITCH ROLE ── */
-    .switch-row {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .switch-opt {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: 7px;
-      color: var(--text-muted);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      padding: 5px 9px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .switch-opt:active {
-      opacity: 0.7;
-    }
-
-    .switch-opt.active-sw {
-      background: var(--gold-dim);
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    /* ── SEGMENTED CONTROL (Tried It?) ── */
-    .seg-control {
-      display: flex;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .seg-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      padding: 7px 4px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      text-align: center;
-      line-height: 1.2;
-    }
-
-    .seg-btn+.seg-btn {
-      border-left: 1px solid var(--glass-border);
-    }
-
-    .seg-btn:active {
-      opacity: 0.7;
-    }
-
-    .seg-btn.active-yes {
-      background: var(--success-dim);
-      color: var(--success);
-    }
-
-    .seg-btn.active-want {
-      background: var(--gold-dim);
-      color: var(--gold);
-    }
-
-    .seg-btn.active-no {
-      background: var(--danger-dim);
-      color: #e74c3c;
-    }
-
-    /* ── RATING ICONS ── */
-    .rating-row {
-      display: flex;
-      gap: 5px;
-    }
-
-    .rating-opt {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      padding: 7px 3px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .rating-opt .r-icon {
-      font-size: 16px;
-      transition: transform 0.18s ease;
-      line-height: 1;
-    }
-
-    .rating-opt .r-lbl {
-      font-size: 9px;
-      color: var(--text-muted);
-      font-weight: 600;
-      letter-spacing: 0.2px;
-      text-align: center;
-      line-height: 1.2;
-      transition: color 0.18s;
-    }
-
-    .rating-opt.active-loved {
-      background: var(--success-dim);
-      border-color: rgba(39, 174, 96, 0.35);
-    }
-
-    .rating-opt.active-loved .r-icon {
-      transform: scale(1.25);
-      filter: drop-shadow(0 0 6px rgba(39, 174, 96, 0.5));
-    }
-
-    .rating-opt.active-loved .r-lbl {
-      color: var(--success);
-    }
-
-    .rating-opt.active-liked {
-      background: var(--blue-dim);
-      border-color: var(--blue-border);
-    }
-
-    .rating-opt.active-liked .r-icon {
-      transform: scale(1.2);
-      filter: drop-shadow(0 0 5px rgba(93, 173, 226, 0.5));
-    }
-
-    .rating-opt.active-liked .r-lbl {
-      color: var(--blue);
-    }
-
-    .rating-opt.active-meh {
-      background: rgba(149, 165, 166, 0.08);
-      border-color: rgba(149, 165, 166, 0.2);
-    }
-
-    .rating-opt.active-meh .r-icon {
-      transform: scale(1.1);
-    }
-
-    .rating-opt.active-meh .r-lbl {
-      color: #95a5a6;
-    }
-
-    .rating-opt.active-na {
-      background: rgba(127, 140, 141, 0.06);
-      border-color: rgba(127, 140, 141, 0.15);
-    }
-
-    .rating-opt.active-na .r-lbl {
-      color: #7f8c8d;
-    }
-
-    /* ── SMART BADGE (Do Again?) ── */
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: #888; margin-bottom: 8px;
+    }
+    .field-row { margin-bottom: 10px; }
+    .field-label { font-size: 10px; color: #888; margin-bottom: 4px; }
+    .partner-val { font-size: 13px; color: #ddd; padding: 6px 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+    .partner-val.empty { color: #555; font-style: italic; }
+    .partner-note { font-size: 12px; color: #aaa; font-style: italic; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+
+    /* === SWITCH / SEG / RATING CONTROLS (refined) === */
+    .switch-row, .seg-control, .rating-row {
+      display: flex; gap: 4px; flex-wrap: wrap;
+    }
+    .switch-opt, .seg-btn, .rating-opt {
+      flex: 1; padding: 6px 8px; font-size: 10px; font-weight: 600;
+      text-align: center; border-radius: 9999px; cursor: pointer;
+      transition: all .15s; border: 1px solid var(--border);
+    }
+    .switch-opt { background: var(--glass); color: #aaa; }
+    .switch-opt.active-sw { background: var(--gold); color: #051024; border-color: var(--gold); }
+
+    .seg-btn { background: var(--glass); color: #aaa; }
+    .seg-btn.active-yes { background: #27ae60; color: #fff; border-color: #27ae60; }
+    .seg-btn.active-want { background: #5dade2; color: #fff; border-color: #5dade2; }
+    .seg-btn.active-no { background: #c0392b; color: #fff; border-color: #c0392b; }
+
+    .rating-opt { flex-direction: column; align-items: center; padding: 8px 4px; font-size: 9px; }
+    .rating-opt .r-icon { font-size: 16px; }
+    .rating-opt.active-loved { background: #27ae60; color: #fff; border-color: #27ae60; }
+    .rating-opt.active-liked { background: #5dade2; color: #fff; border-color: #5dade2; }
+    .rating-opt.active-meh { background: #888; color: #fff; border-color: #888; }
+    .rating-opt.active-na { background: #444; color: #aaa; border-color: #444; }
+
+    /* === SMART BADGE (Again) === */
     .smart-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 16px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--glass); border: 1px solid var(--border); border-radius: 9999px;
+      padding: 8px 14px; font-size: 11px; cursor: pointer;
+    }
+    .smart-badge .sb-label { color: #ddd; }
+    .smart-badge .sb-arrow { color: #666; }
+
+    /* === FILTER CHIPS (now using .filter-pill style) === */
+    .filter-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+    .chip {
+      padding: 6px 14px; border-radius: 9999px; font-size: 11px; font-weight: 600;
+      border: 1px solid var(--border); color: #aaa; background: transparent;
+      white-space: nowrap; transition: all .2s; cursor: pointer;
+    }
+    .chip.active { background: var(--gold); color: #051024; border-color: var(--gold); }
+    .chip.active.danger-chip { background: #c0392b; color: #fff; border-color: #c0392b; }
+    .chip.active.success-chip { background: #27ae60; color: #fff; border-color: #27ae60; }
+    .chip.active.purple-chip { background: #bb8fce; color: #051024; border-color: #bb8fce; }
+
+    /* === SEARCH === */
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-input {
+      width: 100%; background: #0a1224; border: 1px solid var(--border);
+      border-radius: 9999px; padding: 12px 18px 12px 44px; color: #ddd; font-size: 14px;
+    }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #666; }
+
+    /* === VIEW SELECTOR (pill style) === */
+    .view-selector {
+      display: flex; background: var(--glass); border: 1px solid var(--border);
+      border-radius: 9999px; padding: 4px; margin-bottom: 16px;
+    }
+    .view-opt {
+      flex: 1; padding: 8px; text-align: center; font-size: 11px; font-weight: 700;
+      color: #aaa; border-radius: 9999px; cursor: pointer; transition: all .2s;
+    }
+    .view-opt.active { background: var(--gold); color: #051024; }
+
+    /* === STATS === */
+    .status-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
+    .stat-card {
+      background: var(--glass); border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px 8px; text-align: center; cursor: pointer;
+    }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); }
+    .stat-lbl { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* === MODALS (exact from Toy Vault) === */
+    .modal-back {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px); z-index: 300;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .modal-back.open { opacity: 1; pointer-events: all; }
+    .modal-sheet {
+      width: 100%; max-width: 620px; background: var(--glass);
+      border: 1px solid var(--border); border-radius: 24px 24px 0 0;
+      padding: 8px 24px calc(32px + 80px);
+      transform: translateY(100%);
+      transition: transform .35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .modal-back.open .modal-sheet { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; background: #444; border-radius: 2px; margin: 12px auto 16px; }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #ddd; text-align: center; margin-bottom: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: #0a1224; border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; color: #ddd; font-size: 15px;
+    }
+    .form-textarea { min-height: 90px; resize: vertical; }
+
+    .btn {
+      padding: 14px 24px; border-radius: 14px; font-size: 12px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: .2s;
+    }
+    .btn-gold { background: var(--luxury-gradient); color: #051024; border: none; width: 100%; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: #aaa; }
+    .btn-danger { background: transparent; border: 1px solid #F44336; color: #F44336; }
+
+    .btn-icon {
+      background: transparent; border: none; color: var(--gold);
+      padding: 8px 10px; cursor: pointer; display: flex; align-items: center;
+      transition: transform 0.1s ease;
+    }
+    .btn-icon:active { transform: scale(0.9); }
+
+    /* === FLOATING ADD BUTTON (exact from Toy Vault) === */
+    .fab {
+      position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px;
+      background: var(--luxury-gradient); color: #051024; border: none;
+      border-radius: 50%; font-size: 28px; box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+      display: flex; align-items: center; justify-content: center; z-index: 200;
       cursor: pointer;
-      transition: all 0.18s ease;
-      border: 1px solid var(--glass-border);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-muted);
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    .smart-badge:hover {
-      border-color: var(--gold-border);
+    .loading-overlay {
+      position: fixed; inset: 0; background: var(--midnight);
+      display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 16px;
     }
+    .loading-title { font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--gold); }
+    .spinner { width: 32px; height: 32px; border: 2px solid var(--gold-dim); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .smart-badge .sb-arrow {
-      font-size: 9px;
-      opacity: 0.6;
-    }
+    .save-status { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; color: #666; }
+    .save-status.saving { color: var(--gold); }
+    .save-status.saved { color: #27ae60; }
+    .save-status.error { color: #c0392b; }
 
-    .smart-badge.sb-fetish {
-      background: var(--purple-dim);
-      border-color: var(--purple-border);
-      color: var(--purple);
-    }
+    .section-panel { display: none; }
+    .section-panel.active { display: block; }
 
-    .smart-badge.sb-yes {
-      background: var(--success-dim);
-      border-color: rgba(39, 174, 96, 0.3);
-      color: var(--success);
-    }
-
-    .smart-badge.sb-maybe {
-      background: var(--gold-dim);
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    .smart-badge.sb-soft {
-      background: var(--warn-dim);
-      border-color: rgba(230, 126, 34, 0.3);
-      color: var(--warn);
-    }
-
-    .smart-badge.sb-hard {
-      background: var(--danger-dim);
-      border-color: rgba(192, 57, 43, 0.35);
-      color: #e74c3c;
-    }
-
-    .smart-badge.sb-na {
-      background: rgba(127, 140, 141, 0.08);
-      border-color: rgba(127, 140, 141, 0.15);
-      color: #7f8c8d;
-    }
-
-    /* ── AGAIN BOTTOM SHEET ── */
-    .again-sheet-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 860;
-      backdrop-filter: blur(4px);
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .again-sheet-overlay.open {
-      display: flex;
-    }
-
-    .again-sheet {
-      background: var(--midnight-mid);
-      border: 1px solid var(--gold-border);
-      border-radius: 20px 20px 0 0;
-      padding: 14px 16px 100px;
-      width: 100%;
-      max-width: 560px;
-    }
-
-    .again-sheet-handle {
-      width: 36px;
-      height: 4px;
-      background: var(--gold-border);
-      border-radius: 2px;
-      margin: 0 auto 14px;
-    }
-
-    .again-sheet-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 16px;
-      color: var(--gold);
-      text-align: center;
-      margin-bottom: 14px;
-    }
-
-    .again-option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: opacity 0.15s;
-      margin-bottom: 6px;
-      border: 1px solid transparent;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .again-option:active {
-      opacity: 0.75;
-    }
-
-    .again-option:last-child {
-      margin-bottom: 0;
-    }
-
-    .again-option .ao-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .again-option .ao-label {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      flex: 1;
-    }
-
-    .again-option .ao-desc {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .again-option.ao-fetish {
-      background: var(--purple-dim);
-      border-color: var(--purple-border);
-    }
-
-    .again-option.ao-fetish .ao-dot {
-      background: var(--purple);
-    }
-
-    .again-option.ao-fetish .ao-label {
-      color: var(--purple);
-    }
-
-    .again-option.ao-yes {
-      background: var(--success-dim);
-      border-color: rgba(39, 174, 96, 0.2);
-    }
-
-    .again-option.ao-yes .ao-dot {
-      background: var(--success);
-    }
-
-    .again-option.ao-yes .ao-label {
-      color: var(--success);
-    }
-
-    .again-option.ao-maybe {
-      background: var(--gold-dim);
-      border-color: rgba(212, 175, 55, 0.15);
-    }
-
-    .again-option.ao-maybe .ao-dot {
-      background: var(--gold);
-    }
-
-    .again-option.ao-maybe .ao-label {
-      color: var(--gold);
-    }
-
-    .again-option.ao-soft {
-      background: var(--warn-dim);
-      border-color: rgba(230, 126, 34, 0.2);
-    }
-
-    .again-option.ao-soft .ao-dot {
-      background: var(--warn);
-    }
-
-    .again-option.ao-soft .ao-label {
-      color: var(--warn);
-    }
-
-    .again-option.ao-hard {
-      background: var(--danger-dim);
-      border-color: rgba(192, 57, 43, 0.2);
-    }
-
-    .again-option.ao-hard .ao-dot {
-      background: #e74c3c;
-    }
-
-    .again-option.ao-hard .ao-label {
-      color: #e74c3c;
-    }
-
-    .again-option.ao-na {
-      background: rgba(127, 140, 141, 0.06);
-      border-color: rgba(127, 140, 141, 0.1);
-    }
-
-    .again-option.ao-na .ao-dot {
-      background: #7f8c8d;
-    }
-
-    .again-option.ao-na .ao-label {
-      color: #7f8c8d;
-    }
-
-    .again-option.ao-clear {
-      background: rgba(255, 255, 255, 0.02);
-      border-color: var(--glass-border);
-    }
-
-    .again-option.ao-clear .ao-dot {
-      background: var(--text-muted);
-    }
-
-    .again-option.ao-clear .ao-label {
-      color: var(--text-muted);
-    }
-
-    /* ── TAB GRID MODAL ── */
-    .tab-grid-btn {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      color: var(--text-muted);
-      font-size: 14px;
-      padding: 5px 10px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: var(--transition);
-    }
-
-    .tab-grid-btn:hover {
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    .tab-grid-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 850;
-      backdrop-filter: blur(4px);
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .tab-grid-overlay.open {
-      display: flex;
-    }
-
-    .tab-grid-sheet {
-      background: var(--midnight-mid);
-      border: 1px solid var(--gold-border);
-      border-radius: 20px 20px 0 0;
-      padding: 14px 16px 100px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    .tab-grid-handle {
-      width: 36px;
-      height: 4px;
-      background: var(--gold-border);
-      border-radius: 2px;
-      margin: 0 auto 14px;
-    }
-
-    .tab-grid-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 16px;
-      color: var(--gold);
-      text-align: center;
-      margin-bottom: 14px;
-    }
-
-    .tab-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .tab-grid-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      padding: 10px 8px;
-      cursor: pointer;
-      text-align: center;
-      transition: var(--transition);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .tab-grid-item:hover {
-      border-color: var(--gold-border);
-      background: var(--gold-dim);
-    }
-
-    .tgi-name {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      line-height: 1.3;
-    }
-
-    @media (max-width: 500px) {
-      .response-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .pub-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .status-bar {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .swipe-cols {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* === NEW: Z-Pattern Header & Sticky + Recent Updates === */
-    .app-header {
-      height: auto;
-      flex-direction: column;
-      padding: 8px 14px;
-      gap: 8px;
-    }
-
-    .header-top-row {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .filter-group-label {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-right: 6px;
-      flex-shrink: 0;
-      align-self: center;
-    }
-
-    .cat-header-sticky {
-      position: sticky;
-      top: 112px;
-      z-index: 100;
-      background: rgba(7, 24, 48, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--gold-border);
-      color: var(--gold);
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-
-    .update-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--gold-light);
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
-      box-shadow: 0 0 8px var(--gold);
-      animation: pulse-gold 2s infinite;
-      vertical-align: middle;
-    }
-
-    @keyframes pulse-gold {
-      0% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.2); }
-      100% { opacity: 0.4; transform: scale(1); }
-    }
+    .search-empty { text-align: center; padding: 40px 20px; color: #666; font-style: italic; }
   </style>
+  
+  <link rel="stylesheet" href="nav.css">
 </head>
-
 <body data-nav="more">
 
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-title">BDSM Checklist</div>
+  <!-- LOADING -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-title">BDSM Hub</div>
     <div class="spinner"></div>
-    <div class="loading-sub">Loading Checklist…</div>
+    <div style="font-size:11px; color:#666; letter-spacing:1px;">SYNCING CHECKLIST</div>
   </div>
 
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="header-top-row">
-      <div class="user-pill" id="userPill">
-        <div class="role-dot"></div><span id="userPillName">…</span>
+  <!-- TOPBAR (exact Toy Vault style) -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Assessments</div>
+      <div class="topbar-sub">BDSM CHECKLIST &amp; RATINGS</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div id="userPill" class="user-pill" style="background:var(--glass); border:1px solid var(--border); border-radius:20px; padding:4px 10px 4px 6px; font-size:10px; display:flex; align-items:center; gap:6px;">
+        <div class="role-dot" style="width:6px; height:6px; border-radius:50%; background:var(--gold);"></div>
+        <span id="userPillName" style="color:#ddd; font-weight:600;">You</span>
       </div>
-      <div class="header-title">BDSM Checklist</div>
-      <button class="swipe-btn" onclick="openSwipe()" title="Swipe mode">⇄</button>
-      <div class="save-status" id="saveStatus">—</div>
-    </div>
-  </header>
-
-  <!-- FILTER BAR -->
-  <div class="filter-bar">
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" id="searchInput" type="text" placeholder="Search activities…"
-        oninput="onSearch(this.value)">
-      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
-    </div>
-    <div class="filter-chips">
-      <span class="filter-group-label">ALIGNMENT</span>
-      <span class="chip" data-filter="both-tried" onclick="toggleChip(this,'success-chip')">Both Tried</span>
-      <span class="chip" data-filter="my-fetish" onclick="toggleChip(this,'purple-chip')">My Fetish</span>
-      
-      <div style="width: 1px; background: var(--glass-border); margin: 0 8px; align-self: stretch;"></div>
-      
-      <span class="filter-group-label">REVIEW</span>
-      <span class="chip" data-filter="disagreements" onclick="toggleChip(this,'warn-chip')">Conflicts</span>
-      <span class="chip" data-filter="hard-limits" onclick="toggleChip(this,'danger-chip')">Limits</span>
-      
-      <div style="width: 1px; background: var(--glass-border); margin: 0 8px; align-self: stretch;"></div>
-      
-      <span class="chip" data-filter="scene-flagged" onclick="toggleChip(this,'purple-chip')">Scene</span>
-      <span class="chip" data-filter="unset" onclick="toggleChip(this,'')">Unset</span>
+      <div id="saveStatus" class="save-status">—</div>
     </div>
   </div>
 
-  <!-- MAIN -->
-  <main class="main">
+  <div class="main">
 
-    <!-- Stats -->
-    <div class="status-bar">
-      <div class="stat-card" onclick="clearAllFilters()"><span class="stat-num" id="sTotal">—</span>
-        <div class="stat-lbl">Activities</div>
-      </div>
-      <div class="stat-card" onclick="setStatFilter('both-tried')"><span class="stat-num" id="sBoth">—</span>
-        <div class="stat-lbl">Both Tried</div>
-      </div>
-      <div class="stat-card" onclick="setStatFilter('my-fetish')"><span class="stat-num" id="sFetish">—</span>
-        <div class="stat-lbl">My Fetish/Need</div>
-      </div>
-      <div class="stat-card" onclick="setStatFilter('hard-limits')"><span class="stat-num" id="sHard">—</span>
-        <div class="stat-lbl">My Hard Limits</div>
-      </div>
-    </div>
-
-    <!-- Search results panel -->
-    <div class="search-results-panel" id="searchResultsPanel"></div>
-
+    <!-- VIEW SELECTOR (pill tabs) -->
     <div class="view-selector">
-      <div class="view-opt" id="vo_me" data-view="me" onclick="setViewMode('me')">—</div>
-      <div class="view-opt active" id="vo_both" data-view="both" onclick="setViewMode('both')">Both</div>
-      <div class="view-opt" id="vo_partner" data-view="partner" onclick="setViewMode('partner')">—</div>
+      <div class="view-opt active" data-view="both" onclick="setViewMode('both')">Both</div>
+      <div class="view-opt" data-view="me" onclick="setViewMode('me')">Me Only</div>
+      <div class="view-opt" data-view="partner" onclick="setViewMode('partner')">Partner Only</div>
     </div>
 
-    <!-- Tabs -->
-    <div style="display:flex;align-items:flex-start;gap:6px;">
-      <div class="tab-bar" id="tabBar" style="flex:1;">
-        <button class="tab-btn active" data-tab="special" onclick="showTab('special',this)">⭐ Special</button>
-        <button class="tab-btn" data-tab="Bondage" onclick="showTab('Bondage',this)">Bondage</button>
-        <button class="tab-btn" data-tab="Bodily Fluid" onclick="showTab('Bodily Fluid',this)">Bodily Fluid</button>
-        <button class="tab-btn" data-tab="Dominance/submission"
-          onclick="showTab('Dominance/submission',this)">D/s</button>
-        <button class="tab-btn" data-tab="Edge Play" onclick="showTab('Edge Play',this)">Edge Play</button>
-        <button class="tab-btn" data-tab="Humiliation" onclick="showTab('Humiliation',this)">Humiliation</button>
-        <button class="tab-btn" data-tab="Impact Play" onclick="showTab('Impact Play',this)">Impact Play</button>
-        <button class="tab-btn" data-tab="Role Play" onclick="showTab('Role Play',this)">Role Play</button>
-        <button class="tab-btn" data-tab="Sensation Play" onclick="showTab('Sensation Play',this)">Sensation
-          Play</button>
-        <button class="tab-btn" data-tab="Sexual Play" onclick="showTab('Sexual Play',this)">Sexual Play</button>
-        <button class="tab-btn" data-tab="Toys" onclick="showTab('Toys',this)">Toys</button>
-        <button class="tab-btn" data-tab="Voyeurism/Exhibitionism"
-          onclick="showTab('Voyeurism/Exhibitionism',this)">Voyeur/Exhib</button>
-        <button class="tab-btn" data-tab="Service and Restrictive Behaviour"
-          onclick="showTab('Service and Restrictive Behaviour',this)">Service</button>
-        <button class="tab-btn" data-tab="Kinks" onclick="showTab('Kinks',this)">Kinks</button>
+    <!-- STATS -->
+    <div class="status-bar">
+      <div class="stat-card" onclick="showTab('all', this)">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-lbl">Total</div>
       </div>
-      <button class="tab-grid-btn" onclick="openTabGrid()" title="All categories"
-        style="margin-top:8px;flex-shrink:0;">⊞</button>
-    </div>
-
-    <!-- Special panel -->
-    <div class="section-panel active" id="panel-special">
-      <div class="special-section pub">
-        <div class="special-header" onclick="toggleSpecial(this)">
-          <span class="spec-icon">🏛️</span>
-          <div>
-            <div class="spec-title">Public Play</div>
-            <div class="spec-sub">What's on the table outside private spaces</div>
-          </div>
-          <span class="expand-icon">▼</span>
-        </div>
-        <div class="special-body" id="pubBody">
-          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Tap to toggle. Auto-saves.</div>
-          <div style="font-size:11px;color:var(--blue);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">COLLAR
-            &amp; SYMBOLIC WEAR</div>
-          <div class="pub-grid" id="pubCollarGrid"></div>
-          <div style="font-size:11px;color:var(--blue);font-weight:600;letter-spacing:0.5px;margin:12px 0 6px;">
-            BEHAVIOUR &amp; PROTOCOL</div>
-          <div class="pub-grid" id="pubBehaviourGrid"></div>
-          <div style="font-size:11px;color:var(--blue);font-weight:600;letter-spacing:0.5px;margin:12px 0 6px;">PLAY
-            &amp; SCENES</div>
-          <div class="pub-grid" id="pubPlayGrid"></div>
-          <div style="margin-top:14px;">
-            <div class="field-label">Notes on public limits &amp; rules</div>
-            <textarea class="notes-area" id="pubNotes" placeholder="e.g. collar only at kink events…" rows="3"
-              oninput="schedSave()"></textarea>
-          </div>
-        </div>
+      <div class="stat-card" onclick="showTab('loved', this)">
+        <div class="stat-num" id="stat-loved">0</div>
+        <div class="stat-lbl">Loved</div>
       </div>
-      <div class="special-section pred">
-        <div class="special-header" onclick="toggleSpecial(this)">
-          <span class="spec-icon">🔗</span>
-          <div>
-            <div class="spec-title">Predicament Bondage</div>
-            <div class="spec-sub">Scenarios where movement creates consequences</div>
-          </div>
-          <span class="expand-icon">▼</span>
-        </div>
-        <div class="special-body" id="predBody">
-          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Mark scenarios of interest.</div>
-          <div id="predGrid"></div>
-          <div style="margin-top:12px;">
-            <div class="field-label">Notes &amp; limits</div>
-            <textarea class="notes-area" id="predNotes" placeholder="e.g. safeword protocol, time limits…" rows="3"
-              oninput="schedSave()"></textarea>
-          </div>
-        </div>
+      <div class="stat-card" onclick="showTab('hard', this)">
+        <div class="stat-num" id="stat-hard">0</div>
+        <div class="stat-lbl">Hard Limits</div>
       </div>
-      <!-- Shared Fetishes -->
-      <div class="shared-fetish-section">
-        <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:10px;">⚡ Shared
-          Fetish / Need</div>
-        <div id="sharedFetishList"><span style="color:var(--text-muted);font-size:12px;font-style:italic;">Activities
-            both of you mark Fetish/Need appear here.</span></div>
+      <div class="stat-card" onclick="showTab('custom', this)">
+        <div class="stat-num" id="stat-custom">0</div>
+        <div class="stat-lbl">Custom</div>
       </div>
     </div>
 
-    <!-- Category panels injected here -->
+    <!-- SEARCH + FILTERS -->
+    <div class="search-wrap">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search activities..." oninput="onSearch(this.value)">
+      <span class="search-icon">🔍</span>
+      <button onclick="clearSearch()" class="search-clear" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:#666; font-size:18px; display:none;">×</button>
+    </div>
+
+    <div class="filter-chips" style="margin-bottom:16px;">
+      <div class="chip active" onclick="toggleChip(this, '')" data-filter="all">All</div>
+      <div class="chip" onclick="toggleChip(this, 'success-chip')" data-filter="loved">❤️ Loved</div>
+      <div class="chip" onclick="toggleChip(this, 'danger-chip')" data-filter="hard">✕ Hard Limits</div>
+      <div class="chip" onclick="toggleChip(this, 'purple-chip')" data-filter="scene">⚑ Scene</div>
+    </div>
+
+    <!-- CATEGORY TABS (pill style) -->
+    <div class="tabs" id="categoryTabs" style="margin-bottom:16px;"></div>
+
+    <!-- CATEGORY PANELS -->
     <div id="catPanels"></div>
-  </main>
 
-  <!-- SWIPE MODE OVERLAY -->
-  <div class="swipe-overlay" id="swipeOverlay">
-    <div class="swipe-header">
-      <button class="swipe-close" onclick="closeSwipe()">✕</button>
-      <div class="swipe-title">Swipe Mode</div>
-      <div style="width:32px"></div>
-    </div>
-    <div class="swipe-filter-bar" id="swipeFilterBar">
-      <span class="chip active" data-sf="all" onclick="setSwipeFilter('all',this)">All</span>
-      <span class="chip" data-sf="unset" onclick="setSwipeFilter('unset',this)">Unset Only</span>
-      <span class="chip" data-sf="disagree" onclick="setSwipeFilter('disagree',this)">Disagreements</span>
-      <span class="chip" data-sf="fetish" onclick="setSwipeFilter('fetish',this)">Fetish/Need</span>
-    </div>
-    <div class="swipe-progress-bar">
-      <div class="swipe-progress-fill" id="swipeProg"></div>
-    </div>
-    <div class="swipe-counter" id="swipeCounter">— of —</div>
-    <div class="swipe-card-wrap" id="swipeCardWrap"></div>
-    <div class="swipe-nav">
-      <button class="swipe-nav-btn prev" id="swipePrev" onclick="swipeMove(-1)">← Prev</button>
-      <button class="swipe-nav-btn next" id="swipeNext" onclick="swipeMove(1)">Next →</button>
-    </div>
-  </div>
-
-  <!-- Again Bottom Sheet -->
-  <div class="again-sheet-overlay" id="againSheetOverlay" onclick="closeAgainSheet(event)">
-    <div class="again-sheet">
-      <div class="again-sheet-handle"></div>
-      <div class="again-sheet-title">Do Again?</div>
-      <div id="againSheetOptions"></div>
-    </div>
-  </div>
-
-  <!-- Tab Grid Modal -->
-  <div class="tab-grid-overlay" id="tabGridOverlay" onclick="closeTabGrid(event)">
-    <div class="tab-grid-sheet">
-      <div class="tab-grid-handle"></div>
-      <div class="tab-grid-title">All Categories</div>
-      <div class="tab-grid" id="tabGridContent"></div>
-    </div>
-  </div>
-
-  <!-- Add Item Modal -->
-  <div class="modal-overlay" id="addModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <div class="modal-title">Add Activity</div>
-      <div class="modal-field"><label class="modal-label">Category</label><select class="modal-select"
-          id="modalCat"></select></div>
-      <div class="modal-field"><label class="modal-label">Activity Name</label><input class="modal-input" id="modalName"
-          type="text" placeholder="e.g. Sensation hood"></div>
-      <div class="modal-field"><label class="modal-label">Description (optional)</label><textarea class="modal-textarea"
-          id="modalDesc" placeholder="Brief description…" rows="2"></textarea></div>
-      <div class="modal-actions">
-        <button class="modal-btn secondary" onclick="closeAddModal()">Cancel</button>
-        <button class="modal-btn primary" onclick="submitAdd()">Add to Checklist</button>
+    <!-- SEARCH RESULTS -->
+    <div id="searchResults" class="search-results-panel" style="display:none;">
+      <div class="glass-card">
+        <div style="font-size:12px; color:#888; margin-bottom:12px;">SEARCH RESULTS</div>
+        <div id="searchResultsList"></div>
       </div>
     </div>
+
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- FLOATING ADD BUTTON (for custom activities) -->
+  <button onclick="addCustomActivity()" class="fab">+</button>
+
+  <!-- AGAIN SHEET (bottom sheet modal) -->
+  <div id="againSheetOverlay" class="modal-back" onclick="closeAgainSheet(event)">
+    <div class="modal-sheet" onclick="event.stopImmediatePropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Do Again?</div>
+      <div id="againSheetOptions" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <button onclick="closeAgainSheet()" class="btn btn-outline" style="width:100%; margin-top:20px;">Cancel</button>
+    </div>
+  </div>
 
   <script type="module">
-    import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, getRelationship } from './auth.js';
+    import { requireAuth, getMyProfile, getRelationship, getUserProfile } from './auth.js';
+    import { doc, setDoc, deleteDoc, getDocs, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
     import { db } from './firebase-config.js';
-    import { doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    // ═══════════════ BASE DATA ═══════════════
-    const BASE = { "Bondage": [{ "a": "Anal Hook", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Arm Binding", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Receiving" }, { "a": "Bed bondage", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dSwitch": "Both" }, { "a": "Breast", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Cage", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dR": "Take it or leave it", "dSwitch": "Giving" }, { "a": "Chains", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Chair bondage", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Chastity", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dR": "Liked it", "dSwitch": "Giving" }, { "a": "Collars (in Private)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Wearing", "dT": "Yes", "dR": "Liked it", "dSwitch": "Giving" }, { "a": "Collars (in Public)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Wearing", "dT": "No but I want to", "dR": "Take it or leave it", "dSwitch": "Giving" }, { "a": "Corset", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Croch Rope", "sT": "No but I want to", "sR": "Not Applicable", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cuffs - Leather", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Cuffs - Metal", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Gags - Ball", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Gags - Bit", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Gags - Phallic", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Gags - Ring", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Gags - Tape", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Heavy", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Leash", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Maybe", "dT": "Yes", "dR": "Liked it", "dSwitch": "Giving" }, { "a": "Light", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Long-term [Day(s)}", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Manacles & Irons", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Mummification", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Unlikely. Soft Limit", "sSwitch": "Receiving", "dT": "No but I want to", "dR": "Liked it", "dSwitch": "Giving" }, { "a": "One Bar Prison", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Predicament bondage", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Restraints", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Rope - Shibari", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Wearing", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Rope - Simple", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Wearing", "dT": "Yes", "dR": "Liked it", "dSwitch": "Giving" }, { "a": "Sleep sacks", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Unlikely. Soft Limit", "dT": "No and I don't want to", "dSwitch": "Giving" }, { "a": "Spreader Bar", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dSwitch": "Giving" }, { "a": "Stocks", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Straight jacket", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Wearing", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Suspension", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dSwitch": "Giving" }], "Bodily Fluid": [{ "a": "Blood play (cutting)", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Breast milk - Milking", "sT": "Yes", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Chamber pot use", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No and I don't want to", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Cum In - Ass", "sT": "Yes", "sR": "Take it or leave it", "sA": "Maybe", "sSwitch": "Receiving", "dT": "Yes", "dR": "Take it or leave it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cum In - Mouth", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Cum In - Vagina", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cum On - Body", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cum On - Face", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cum On - Food/Drink", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Maybe", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cum in Panties", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Drooling", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Giving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Fake Cum", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Grool", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Rimming (oral anal play)", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Maybe", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Running/Ruined Makeup", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Scat (Poop on)", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "sSwitch": "Both", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Spit for lube", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Spit in", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Liked it", "dA": "Maybe", "dSwitch": "Both" }, { "a": "Spit on", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Liked it", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Swallow - Semen", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Throat Pie" }, { "a": "Urinate in body", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Liked it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Urinate on body", "sT": "Yes", "sR": "Take it or leave it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Liked it", "dA": "Fetish/Need", "dSwitch": "Both" }], "Dominance/submission": [{ "a": "24/7 power exchange", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable" }, { "a": "Behavior correction", "sT": "Yes", "sR": "Liked it", "sA": "Fetish/Need", "sSwitch": "Receiving" }, { "a": "Chastity (behavioral)" }, { "a": "Chastity (physical)" }, { "a": "Collaring (ceremonial)" }, { "a": "Collaring (daily)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Wearing" }, { "a": "Contracts or agreements" }, { "a": "Decision control", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving" }, { "a": "Deepthroat training" }, { "a": "Journaling", "sT": "Yes", "sR": "Liked it", "sA": "Yes" }, { "a": "Limited-time power exchange", "sT": "Yes", "sR": "Loved it", "sA": "Yes" }, { "a": "Mind Fucking", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Obedience training", "sT": "Yes", "sR": "Loved it", "sA": "Yes" }, { "a": "Pet names" }, { "a": "Praise/punishment cycles" }, { "a": "Protocol (high protocol)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving" }, { "a": "Protocol (low protocol)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving" }, { "a": "Protocol (medium protocol)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving" }, { "a": "Ritualistic dominance" }, { "a": "Rituals (bedtime)" }, { "a": "Rituals (collaring)" }, { "a": "Rituals (greetings)" }, { "a": "Rule enforcement" }, { "a": "Service tasks (domestic)" }, { "a": "Service tasks (personal)" }, { "a": "Submissive postures", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Giving", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Subspace", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Task setting", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Title/Honorific use" }, { "a": "Total Power Exchange (TPE)" }], "Edge Play": [{ "a": "Blood play", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Branding", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Breath play (risky)", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Catheterization", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Clit Pumping", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Consensual non-consent", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Emotional edge play" }, { "a": "Erotic asphyxiation", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Fear play" }, { "a": "Fire play" }, { "a": "Gun play (fantasy only)" }, { "a": "Hypnosis" }, { "a": "Injection (Saline)", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit" }, { "a": "Interrogation scenes" }, { "a": "Knife play", "dT": "No but I want to", "dSwitch": "Giving" }, { "a": "Medical play (needles)", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit" }, { "a": "Medical play (stapling)", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Both" }, { "a": "Penis Pumping", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Receiving" }, { "a": "Pickup Play" }, { "a": "Pissing Panties, Pants etc (In Private)" }, { "a": "Psychological torment" }, { "a": "Public Play", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Pussy Pumping", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Raceplay (negotiated taboo)" }, { "a": "Ripping of clothing", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Sounding", "dT": "No but I want to", "dA": "Maybe", "dSwitch": "Both" }, { "a": "Taser play (high risk)", "sT": "Yes", "sR": "Liked it", "sA": "Yes" }, { "a": "Temperature extremes", "sT": "Yes", "sR": "Liked it", "sA": "Yes" }, { "a": "Trampling" }, { "a": "Waterboarding" }, { "a": "Watersports", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Wrestling" }], "Humiliation": [{ "a": "Being ignored", "dT": "No and I don't want to", "dA": "Never. Hard Limit", "dSwitch": "Giving" }, { "a": "Being laughed at", "dT": "No and I don't want to", "dA": "Never. Hard Limit", "dSwitch": "Giving" }, { "a": "Being made to beg", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Being made to crawl", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Being mocked", "dT": "No and I don't want to", "dA": "Never. Hard Limit", "dSwitch": "Giving" }, { "a": "Being treated like furniture", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Comparison to others", "dT": "No and I don't want to", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Cuckold humiliation", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Giving" }, { "a": "Dom Shaving Sub", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Erotic embarrassment", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Giving" }, { "a": "Exposure of fantasies or secrets", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Forced compliments", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Forced dressing", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Forced feminization", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Forced nudity", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Forced public confession", "dT": "No and I don't want to", "dSwitch": "Giving" }, { "a": "Humiliating clothing", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Humiliating selfies/videos", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Masturbation on command", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Name-calling", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Objectification", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Panty Stuffing (Pussy)" }, { "a": "Ridicule of appearance or ability", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Standing in corner", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Sub Shaving Dom", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Receiving" }, { "a": "Verbal degradation", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Writing on the body", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }], "Impact Play": [{ "a": "Breast whipping", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Caning - English", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Caning - Sensation", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Face slapping", "dT": "Yes", "dR": "Take it or leave it", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Kicking", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Punching", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Pussy kicking", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Pussy punching", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }, { "a": "Pussy spanking (smacking)", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Pussy whipping", "sT": "No but I want to", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Riding crops", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Spanking - (OTK) Over The Knee", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Spanking - Hairbrush", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Spanking - Hand", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Spanking - Leather slappers", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Spanking - Lexan paddles", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Spanking - Wooden paddles", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Switching (Cut a switch)", "dT": "No but I want to", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Whipping - Belt", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Whipping - Cat o' 9 tails", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Whipping - Flogger", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Whipping - Single tail", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }], "Role Play": [{ "a": "Abandonment (fantasy)" }, { "a": "Age Play" }, { "a": "Age play (DDLG)" }, { "a": "Auction/slave market" }, { "a": "Auctioned for charity" }, { "a": "Boss/employee" }, { "a": "Camgirl/client" }, { "a": "Celebrity/fan" }, { "a": "Cuckold fantasy" }, { "a": "Doctor/patient" }, { "a": "Feral creature/handler" }, { "a": "Hooker/john" }, { "a": "Human puppy-dog play" }, { "a": "Infantilism (baby play)" }, { "a": "Initiation rites" }, { "a": "Kidnapper/victim" }, { "a": "Kidnapping" }, { "a": "Master/pet" }, { "a": "Medical scenes" }, { "a": "Military/cadet" }, { "a": "Name change" }, { "a": "Pony play" }, { "a": "Priest/confessor" }, { "a": "Prison scenes" }, { "a": "Prostitution fantasy" }, { "a": "Psych ward play" }, { "a": "Public disgrace fantasy" }, { "a": "Religious scenes" }, { "a": "Robot/programmer" }, { "a": "Royalty/servant" }, { "a": "Schoolroom scenes" }, { "a": "Stranger/acquaintance" }, { "a": "Switching roles (Top/bottom)" }, { "a": "Teacher/student" }, { "a": "Vampire/prey" }], "Sensation Play": [{ "a": "Abrasion (scraping)", "dT": "No and I don't want to", "dA": "Unlikely. Soft Limit", "dSwitch": "Both" }, { "a": "Back of Neck, Kiss, Touch, Bitting", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Ball busting", "dT": "No and I don't want to", "dA": "Never. Hard Limit", "dSwitch": "Both" }, { "a": "Ball worship", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Giving", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Receiving" }, { "a": "Biting", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Blindfold", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Breath control - choking", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Breath control - mouth and nose covered", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Clamps - Clit/Labia", "sT": "Yes", "sR": "Take it or leave it", "sA": "Yes", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Clamps - Nipple", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Clothespins", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cock Ring", "sT": "Yes", "sR": "Take it or leave it", "sA": "Yes", "sSwitch": "Others Wearing", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Wearing" }, { "a": "Dilation" }, { "a": "Ear plugs", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Enemas - For cleansing", "dT": "Yes", "dR": "Not Applicable", "dA": "Yes", "dSwitch": "Both" }, { "a": "Enemas - Retention/training", "dT": "No but I want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Not Applicable" }, { "a": "Feather play", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Finger Claws", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Both", "dT": "No but I want to", "dA": "Yes", "dSwitch": "Both" }, { "a": "Fire cupping", "dT": "No but I want to", "dA": "Maybe", "dSwitch": "Both" }, { "a": "Hair pulling", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Hot wax", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Ice", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Kissing", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Knife play (no cutting)", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Nipple play", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Nipple play - Pulls, Tugs, Twists", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Nipple suction cups", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Nipple weights", "dT": "Yes", "dR": "Liked it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Nuru", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Piercing", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Both" }, { "a": "Pinching", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Pleasure Overload", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Prickly (Wartenburg wheel/vampire gloves)", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Skin Sensation Play (Touch)", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Slim" }, { "a": "Slime", "dT": "No but I want to", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Slippery", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Tickling", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Zapping (e.g. electric fly swatter)", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }], "Sexual Play": [{ "a": "Anal sex", "sT": "Yes", "sR": "Take it or leave it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Body Paint", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Breast fucking", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Cuckholding", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Cunnilingus (giving oral to a woman)", "sT": "Yes", "sR": "Take it or leave it", "sA": "Maybe", "sSwitch": "Giving", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Cunnilingus (receiving oral)", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving" }, { "a": "Double penetration", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Face Fucking", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Fantasy gang rape" }, { "a": "Fantasy rape play", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "sSwitch": "Receiving", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Fellatio (oral sex on a penis)", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Giving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Fisting - Anal", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "sSwitch": "Both", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit" }, { "a": "Fisting - Vaginal", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "dT": "Yes", "dR": "Liked it", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Forced homosexuality", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Gagging By Cock or Toy", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Giving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Genital sex", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Gloryhole", "dT": "No and I don't want to" }, { "a": "Group play - Multiple men \"gang bang\"", "sT": "No and I don't want to", "sR": "Not Applicable", "sA": "Never. Hard Limit", "dT": "Yes", "dR": "Liked it", "dA": "Maybe", "dSwitch": "Giving" }, { "a": "Group play - Multiple women & men", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Group play - Orgy", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit" }, { "a": "Hand Job", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Hotwifing" }, { "a": "Marks (non lasting ie bruises", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Masturbation", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Mutual Masterbation", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Orgasm control", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Orgasm denial", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Prostate Massage", "dT": "Yes", "dR": "Liked it", "dA": "Maybe", "dSwitch": "Receiving" }, { "a": "Rimming", "dT": "Yes" }, { "a": "Sexual deprivation" }, { "a": "Shared (given to another only temp)", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Not Applicable" }, { "a": "Swapping (with one other couple)", "dT": "No but I want to", "dR": "Not Applicable", "dA": "Maybe", "dSwitch": "Not Applicable" }, { "a": "Swinging (multiple couples)", "dT": "No but I want to", "dR": "Not Applicable", "dA": "Unlikely. Soft Limit", "dSwitch": "Not Applicable" }, { "a": "Throat Fucking", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Triple penetration", "dT": "Yes", "dR": "Liked it", "dA": "Maybe", "dSwitch": "Giving" }], "Toys": [{ "a": "Anal Beads", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Anal play", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Anal plugs - Large", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Anal plugs - Medium", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Anal plugs - Public, under clothes", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Anal plugs - Small", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Clothes Pin Zipper", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Dildo on a Stick", "dT": "No but I want to", "dR": "Not Applicable", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Dildos - Anal", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Dildos - Oral", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Dildos - Vaginal", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Fuck Machines" }, { "a": "Oviposition" }, { "a": "Ovipositor" }, { "a": "Remote Toys", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Saddle Vibrator (motor bunny)" }, { "a": "Speculums", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Strap-on-dildos (penetrated by)", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Strap-on-dildos (sucking on)", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Strap-on-dildos (wearing)", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Maybe", "dSwitch": "Not Applicable" }, { "a": "Vibrator - Anal", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Vibrator - External genital", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Both" }, { "a": "Vibrator - Internal genital", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Yes", "dSwitch": "Giving" }], "Voyeurism/Exhibitionism": [{ "a": "Chosen clothing for", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Wearing", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Examinations", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Exhibitionism (friends)" }, { "a": "Exhibitionism (strangers)" }, { "a": "Forced nudity (around others)" }, { "a": "Forced nudity (private)", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Modeling for erotic photos", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Outdoor scenes", "sT": "Yes", "sR": "Loved it", "sA": "Yes" }, { "a": "Video (recordings of you for private use)", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Video (recordings of you for public use)", "dT": "No and I don't want to", "dR": "Not Applicable", "dA": "Never. Hard Limit", "dSwitch": "Both" }, { "a": "Video (watching others)", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Voyeurism (watching others)", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need" }, { "a": "Voyeurism (your Dom w/others)", "sT": "No and I don't want to" }, { "a": "Voyeurism (your sub w/others)" }], "Service and Restrictive Behaviour": [{ "a": "Begging", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Eye contact restrictions", "sT": "Yes", "sR": "Liked it", "sA": "Yes", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Following orders", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "sSwitch": "Receiving", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Forced servitude", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Kneeling", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Learned postures", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Massage", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Restrictive rules on behaviour", "sT": "No but I want to", "sR": "Not Applicable", "sA": "Not Applicable", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Rituals", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Speech restrictions (when, what, to whom)", "sT": "Yes", "sR": "Loved it", "sA": "Yes", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Standing in corner", "dT": "Yes", "dR": "Liked it", "dA": "Yes", "dSwitch": "Giving" }, { "a": "Washroom restrictions", "dT": "No and I don't want to", "dR": "Take it or leave it", "dA": "Unlikely. Soft Limit", "dSwitch": "Giving" }], "Kinks": [{ "a": "Being woke up in a sexual way", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both" }, { "a": "Designing & Build BDSM Stuff", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Not Applicable" }, { "a": "Device Bondage", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Exploring new things", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Eye contact", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both" }, { "a": "Foot Job", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Forced Orgasms", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Receiving", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "High Heels", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Others Wearing" }, { "a": "Induced Lactation", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Legs", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Others Wearing" }, { "a": "Lingerie", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Wearing", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Others Wearing" }, { "a": "Messy (drool, cum, WAM (wet and messy), sploshing, etc", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Messy Face during blowjob", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Milk Blowjob", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Receiving" }, { "a": "Pantyhose/Stockings", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Wearing" }, { "a": "Skin on Skin", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both" }, { "a": "Squirting", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Giving" }, { "a": "Stockings/Pantyhose", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Others Wearing" }, { "a": "Teasing", "sT": "Yes", "sR": "Loved it", "sA": "Fetish/Need", "sSwitch": "Both" }, { "a": "Waking Up to Oral Sex", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }, { "a": "Waking Up to Sex", "dT": "Yes", "dR": "Loved it", "dA": "Fetish/Need", "dSwitch": "Both" }] };
-    const ALL_CATS = Object.keys(BASE);
-    const PUB_ITEMS = {
-      collar: ['Collar (discreet/day collar)', 'Symbolic necklace from Dom', 'Cuffs hidden under sleeves', 'Anklet/foot jewellery symbol', 'Leather wristband'],
-      behaviour: ['Title/honorific (whispered)', 'Kneeling on command (private space)', 'Asking permission to eat/drink', 'Eyes-down posture', 'Not straying without permission'],
-      play: ['Remote vibrator (clothing)', 'Subtle touch scenes', 'Whispered commands in public', 'Semi-public flashing (controlled)', 'Voyeurism at kink-friendly venue']
-    };
-    const PRED_SCENARIOS = [
-      { n: 'Standing predicament', d: 'Bound so fatigue creates consequence — arms up; dropping triggers nipple clamp tension.' },
-      { n: 'Crouch hold', d: 'Must maintain a squat; failure activates a stimulus (vibrator intensifies, clamp tightens).' },
-      { n: 'Hitachi predicament', d: 'Forced orgasm creates tension on restraints — forced to the edge with no release.' },
-      { n: 'Spreader bar + plug', d: 'Legs held open; movement against restraint drives plug deeper.' },
-      { n: 'Balance predicament', d: 'Must balance on toes or unstable surface; failure triggers secondary consequence.' },
-      { n: 'Rope tension rig', d: 'Shibari tie where relaxing any muscle pulls on another point (breast, crotch rope, etc.).' },
-      { n: 'Punishment chain', d: 'Arms cuffed above head to fixed point — must stand tiptoe or secondary stimulus activates.' },
-      { n: 'Reverse predicament', d: 'Free to move but every movement produces sensation — no still point to rest in.' },
-    ];
+    // === DATA & STATE ===
+    let myUid = null;
+    let relId = null;
+    let myRole = 'dom';
+    let myName = 'You';
+    let partnerName = 'Partner';
+    let myData = {};
+    let partnerData = {};
+    let template = { base: {}, custom: [] };
+    let customItems = [];
+    let activeFilters = new Set();
+    let activeSearch = '';
+    let currentTab = 'all';
+    let saveTimeout = null;
 
-        // ═══ STATE ═══
-    let myRole = 'sub', myUid = null, partnerUid = null, myName = '', partnerName = '', relId = null;
-    let myData = {}, partnerData = {}, customItems = [], template = null;
-    let saveTimer = null, activeFilters = new Set(), activeSearch = '', showUnsetOnly = false;
-    let swipeList = [], swipeIdx = 0, swipeFilter = 'all';
+    const SEG_NO = "No and I don't want to";
 
-    // ═══ PATH HELPERS ═══
-    function getRespRef(uid) { 
-      return doc(db, 'relationships', relId, 'responses', uid); 
-    }
+    // === FIREBASE PATHS ===
+    function dataCol(path, id) { return collection(db, 'data', id, path); }
 
-    // ═══ MIGRATION ═══
-    async function migrate(uid) {
-      const oldRef = doc(db, 'users', uid, 'checklist', 'responses');
-      const snap = await getDoc(oldRef);
-      if (snap.exists()) {
-        await setDoc(getRespRef(uid), snap.data(), { merge: true });
-      }
-    }
-
-    // ═══ HELPERS ═══
-    function v(x) { if (!x) return ''; if (x === 'Not Applicable') return ''; return x.replace(' it', '').replace(' but I want to', '').replace(' and I don\'t want to', ''); }
-
-    function getStatusIcon(t, r, a) {
-      if (a?.includes('Hard Limit')) return { i: '🚫', c: 'st-limit' };
-      if (a?.includes('Fetish')) return { i: '⚡', c: 'st-fetish' };
-      if (t === 'Yes') {
-        const opt = RATING_OPTS.find(o => o.val === r);
-        return { i: opt ? opt.icon : '✓', c: 'st-yes' };
-      }
-      if (t?.includes('want to')) return { i: '✨', c: 'st-want' };
-      if (t === SEG_NO) return { i: '✕', c: 'st-no' };
-      return { i: '—', c: 'st-empty' };
-    }
-
-    function bCls(x) {
-      if (!x) return ''; const l = x.toLowerCase();
-      if (l.includes('loved')) return 'loved'; if (l.includes('liked')) return 'liked';
-      if (l.includes('take it')) return 'take-it'; if (l.includes('no but i want')) return 'want-to';
-      if (l.includes('hard limit')) return 'hard'; if (l.includes('soft limit') || l.includes('unlikely')) return 'soft';
-      if (l.includes('fetish')) return 'fetish'; if (l === 'yes') return 'yes';
-      if (l.includes('no and')) return 'no';
-      if (l === 'giving') return 'giving';
-      if (l === 'receiving') return 'receiving';
-      if (l === 'both') return 'both';
-      if (l === 'wearing') return 'wearing';
-      if (l.includes('others wearing')) return 'others';
-      return '';
-    }
-    function ik(cat, act) { return `${cat}||${act}`; }
-    function bv(item, role, f) {
-      const p = role === 'dom' ? 'd' : 's';
-      if (f === 'S') return item[p + 'Switch'] ?? '';
-      return item[p + f] ?? '';
-    }
-    function toast(msg, err) {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.className = 'toast' + (err ? ' err' : '') + ' show';
-      setTimeout(() => t.classList.remove('show'), 2800);
-    }
-    function setSaveStatus(s, msg) {
-      const el = document.getElementById('saveStatus');
-      el.textContent = msg; el.className = 'save-status ' + s;
-    }
-
-    // ═══ AUTOSAVE ═══
-    window.schedSave = function () {
-      setSaveStatus('saving', '● Saving…');
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(doSave, 450);
-    };
-    async function doSave() {
-      const now = Date.now();
-      
-      // Attach timestamp to any changed note (and mark item as recently updated)
-      document.querySelectorAll('textarea[data-sk]').forEach(el => {
-        const key = el.dataset.sk;
-        if (myData[key] !== el.value) {
-          myData[key] = el.value;
-          myData[key.replace('.ns', '') + '.ts'] = now; // timestamp the parent item
-        }
-      });
-
-      try {
-        await setDoc(getRespRef(myUid), myData, { merge: true });
-        setSaveStatus('saved', '✓ Saved');
-        setTimeout(() => setSaveStatus('', '—'), 3000);
-      } catch (e) {
-        setSaveStatus('error', '⚠ Error');
-      }
-    }
-
-    // ═══ INIT ═══
     async function init() {
       try {
         const user = await requireAuth();
         myUid = user.uid;
 
-        const [prof, rel, tSnap] = await Promise.all([
-          getMyProfile(), 
-          getRelationship(),
-          getDoc(doc(db, 'system_data', 'checklist_v1'))
-        ]);
+        const profile = await getMyProfile();
+        myRole = profile?.role || 'dom';
+        myName = profile?.displayName || 'You';
 
-        if (!tSnap.exists()) {
-          alert("Cloud template missing! Run the upload button once.");
-          return;
-        }
-        template = tSnap.data();
+        const rel = await getRelationship();
+        relId = rel?.id || myUid;
 
-        relId = rel?.id || "solo_" + myUid;
-        myRole = prof?.role ?? 'sub';
-        myName = prof?.displayName ?? (myRole === 'sub' ? 'Sub' : 'Dom');
-
-        partnerUid = await getPartnerUid();
-        if (partnerUid) {
-          const pp = await getUserProfile(partnerUid);
-          partnerName = pp?.displayName ?? (myRole === 'dom' ? 'Sub' : 'Dom');
+        if (rel) {
+          const partnerUid = rel.domId === myUid ? rel.subId : rel.domId;
+          const partnerProfile = await getUserProfile(partnerUid);
+          partnerName = partnerProfile?.displayName || 'Partner';
         }
 
-        if (rel?.id) {
-          await migrate(myUid);
-          if (partnerUid) await migrate(partnerUid);
+        // Load template (embedded for now — in real app this would come from Firestore or CDN)
+        template = {
+          base: {
+            "Sensation Play": [
+              { a: "Blindfold", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Ice Play", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Wax Play", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
+              { a: "Feather / Sensation", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
+            ],
+            "Impact Play": [
+              { a: "Hand Spanking", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Paddle", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Maybe" } },
+              { a: "Cane", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
+              { a: "Flogger", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
+            ],
+            "Bondage & Restraint": [
+              { a: "Wrist Cuffs", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Ankle Cuffs", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Rope Bondage", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Collar & Leash", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } }
+            ],
+            "Power Exchange": [
+              { a: "Orgasm Control", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Service Submission", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Humiliation Play", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
+              { a: "Praise Kink", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } }
+            ]
+          }
+        };
+
+        // Load user data
+        const mySnap = await getDocs(dataCol('checklist', myUid));
+        myData = {};
+        mySnap.docs.forEach(d => myData[d.id] = d.data().v);
+
+        if (relId && relId !== myUid) {
+          const partnerSnap = await getDocs(dataCol('checklist', relId));
+          partnerData = {};
+          partnerSnap.docs.forEach(d => partnerData[d.id] = d.data().v);
         }
 
-        const mySnap = await getDoc(getRespRef(myUid));
-        myData = mySnap.exists() ? mySnap.data() : {};
-
-        if (partnerUid) {
-          onSnapshot(getRespRef(partnerUid), snap => {
-            partnerData = snap.exists() ? snap.data() : {};
-            refreshAll();
-          });
-        }
-        
+        // Load custom items
         if (relId && relId !== "solo_" + myUid) {
-          onSnapshot(collection(db, 'relationships', relId, 'checklistCustom'), snap => {
-            customItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            renderCustomItems(); 
-            rebuildCustomTabs(); 
-            buildStats();
-          });
+          const customSnap = await getDocs(dataCol('checklistCustom', relId));
+          customItems = customSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
 
         setupIdentity();
@@ -2612,38 +499,92 @@
 
         const savedView = localStorage.getItem('checklist_view_mode') || 'both';
         setViewMode(savedView);
+
+        // Real-time sync
+        onSnapshot(dataCol('checklist', myUid), snap => {
+          myData = {};
+          snap.docs.forEach(d => myData[d.id] = d.data().v);
+          refreshAll();
+        });
+
+        if (relId && relId !== myUid) {
+          onSnapshot(dataCol('checklist', relId), snap => {
+            partnerData = {};
+            snap.docs.forEach(d => partnerData[d.id] = d.data().v);
+            refreshAll();
+          });
+        }
+
       } catch (e) {
         console.error("Init failed:", e);
+        document.getElementById('loadingOverlay').classList.add('hidden');
       }
     }
 
     function setupIdentity() {
-      const pill = document.getElementById('userPill'); 
+      const pill = document.getElementById('userPill');
       if (pill) pill.classList.add(myRole);
       const pillName = document.getElementById('userPillName');
       if (pillName) pillName.textContent = myName;
-      
-      const voMe = document.getElementById('vo_me');
-      const voPartner = document.getElementById('vo_partner');
-      if (voMe) voMe.textContent = myName;
-      if (voPartner) voPartner.textContent = partnerName || 'Partner';
     }
 
     function refreshAll() {
-      buildStats(); buildSharedFetishes(); updateAllCardAccents();
+      buildStats();
+      updateAllCardAccents();
     }
 
-    // ═══ BUILD ALL ═══
     function buildAll() {
-      buildSpecial();
-      // Use template.base instead of local constant
+      buildCategoryTabs();
       Object.keys(template.base).forEach(cat => buildCatPanel(cat, template.base[cat]));
-      populateModalCats();
-      buildStats(); buildSharedFetishes();
+      renderCustomItems();
+      buildStats();
       setSaveStatus('', '—');
     }
 
-    // ═══ CARD BUILDER ═══
+    function buildCategoryTabs() {
+      const container = document.getElementById('categoryTabs');
+      container.innerHTML = '';
+      
+      const allTab = document.createElement('div');
+      allTab.className = 'tab-btn active';
+      allTab.textContent = 'All';
+      allTab.onclick = () => showTab('all', allTab);
+      container.appendChild(allTab);
+
+      Object.keys(template.base).forEach(cat => {
+        const btn = document.createElement('div');
+        btn.className = 'tab-btn';
+        btn.textContent = cat.split(' ')[0];
+        btn.onclick = () => showTab(cat, btn);
+        container.appendChild(btn);
+      });
+
+      if (customItems.length > 0) {
+        const customBtn = document.createElement('div');
+        customBtn.className = 'tab-btn';
+        customBtn.textContent = 'Custom';
+        customBtn.onclick = () => showTab('custom', customBtn);
+        container.appendChild(customBtn);
+      }
+    }
+
+    function showTab(cat, btn) {
+      document.querySelectorAll('#categoryTabs .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+      
+      if (cat === 'all') {
+        document.querySelectorAll('.section-panel').forEach(p => p.classList.add('active'));
+      } else if (cat === 'custom') {
+        const customPanel = document.getElementById('panel-custom');
+        if (customPanel) customPanel.classList.add('active');
+      } else {
+        const panel = document.getElementById('panel-' + cat);
+        if (panel) panel.classList.add('active');
+      }
+    }
+
     function buildCard(cat, item, isCustom = false) {
       const activity = item.a || item.activity;
       const key = ik(cat, activity);
@@ -2662,84 +603,115 @@
       const pSw = partnerData[key + '.sw'] ?? bv(item, pPfx, 'S') ?? '';
       const pNs = partnerData[key + '.ns'] ?? '';
 
-      const s1 = getStatusIcon(myT, myR, myA), s2 = getStatusIcon(pT, pR, pA);
+      const s1 = getStatusIcon(myT, myR, myA);
+      const s2 = getStatusIcon(pT, pR, pA);
       const statusPair = `<div class="status-pair"><div class="sp-side me ${s1.c}">${s1.i}</div><div class="sp-divider"></div><div class="sp-side them ${s2.c}">${s2.i}</div></div>`;
 
       const accent = getAccent(myA, pA, myR, pR, isCustom, myData[key + '.flagged']);
       const cBadge = isCustom ? `<span class="badge custom">Custom</span>` : '';
       const sBadge = myData[key + '.flagged'] ? `<span class="badge scene">⚑ Scene</span>` : '';
-      const delBtn = isCustom ? `<button class="del-btn" onclick="event.stopPropagation();delCustom('${item.id}')">✕</button>` : '';
-      const flagged = myData[key + '.flagged'] ? 'flagged' : '';
+      const delBtn = isCustom ? `<button class="btn-icon" style="margin-left:auto;" onclick="event.stopPropagation();delCustom('${item.id}')">✕</button>` : '';
 
-      // Check if updated in last 24 hours (by you or partner)
       const lastUpdate = myData[key + '.ts'] || partnerData[key + '.ts'] || 0;
       const isRecent = (Date.now() - lastUpdate) < (24 * 60 * 60 * 1000);
-      const updateIndicator = isRecent ? '<span class="update-dot"></span>' : '';
+      const updateIndicator = isRecent ? '<span style="color:#D4AF37; font-size:10px; margin-right:4px;">●</span>' : '';
 
       return `
-<div class="activity-card ${accent}" id="c_${sid}" data-cat="${cat}" data-act="${activity}">
-  <div class="card-header" onclick="toggleCard(this)">
+<div class="activity-card ${accent}" id="c_${sid}" data-cat="${cat}" data-act="${activity}" onclick="toggleCard(this)">
+  <div class="card-header">
     <div class="activity-name">${updateIndicator}${activity}</div>
     <div class="badge-row">${statusPair}${cBadge}${sBadge}</div>
     ${delBtn}
-    <button class="flag-btn ${flagged}" onclick="event.stopPropagation();toggleFlag('${key}')">⚑</button>
-    <span class="expand-icon">▼</span>
+    <button class="flag-btn ${myData[key + '.flagged'] ? 'flagged' : ''}" onclick="event.stopPropagation();toggleFlag('${key}')">⚑</button>
+    <span class="expand-icon">▾</span>
   </div>
-  <div class="card-body"><div class="card-body-inner">
-      <div class="response-grid">
-        <div class="response-col mine ${myRole}-me">
-          <div class="col-title">${myName} (you)</div>
-          <div class="field-row"><div class="field-label">My role</div>${switchRow(key + '.sw', mySw)}</div>
-          <div class="field-row"><div class="field-label">Tried it?</div>${segControl(key + '.t', myT)}</div>
-          <div class="field-row"><div class="field-label">Rating</div>${ratingIcons(key + '.r', myR)}</div>
-          <div class="field-row"><div class="field-label">Do again?</div>${smartBadgeHtml(key + '.a', myA)}</div>
-          <div class="field-row"><div class="field-label">💬 Note to partner</div><textarea class="notes-area" rows="2" data-sk="${key}.ns" oninput="schedSave()">${myNs}</textarea></div>
+  <div class="card-body">
+    <div class="response-grid">
+      <div class="response-col">
+        <div class="col-title">${myName} (you)</div>
+        <div class="field-row">
+          <div class="field-label">My role</div>
+          ${switchRow(key + '.sw', mySw)}
         </div>
-        <div class="response-col theirs ${pPfx}-partner">
-          <div class="col-title">${partnerName || 'Partner'}</div>
-          <div class="field-row"><div class="field-label">Their role</div><div class="partner-val ${!v(pSw) ? 'empty' : ''}">${v(pSw) || '—'}</div></div>
-          <div class="field-row"><div class="field-label">Tried it?</div><div class="partner-val ${!v(pT) ? 'empty' : ''}">${v(pT) || '—'}</div></div>
-          <div class="field-row"><div class="field-label">Rating</div><div class="partner-val ${!v(pR) ? 'empty' : ''}">${v(pR) || '—'}</div></div>
-          <div class="field-row"><div class="field-label">Do again?</div><div class="partner-val ${!v(pA) ? 'empty' : ''}">${v(pA) || '—'}</div></div>
-          ${v(pNs) ? `<div class="field-row"><div class="field-label">💬 Their note</div><div class="partner-note">${pNs}</div></div>` : ''}
+        <div class="field-row">
+          <div class="field-label">Tried it?</div>
+          ${segControl(key + '.t', myT)}
+        </div>
+        <div class="field-row">
+          <div class="field-label">Rating</div>
+          ${ratingIcons(key + '.r', myR)}
+        </div>
+        <div class="field-row">
+          <div class="field-label">Do again?</div>
+          ${smartBadgeHtml(key + '.a', myA)}
+        </div>
+        <div class="field-row">
+          <div class="field-label">💬 Note to partner</div>
+          <textarea class="form-textarea" rows="2" data-sk="${key}.ns" oninput="schedSave()" style="font-size:12px; padding:8px;">${myNs}</textarea>
         </div>
       </div>
-  </div></div>
+      <div class="response-col">
+        <div class="col-title">${partnerName}</div>
+        <div class="field-row">
+          <div class="field-label">Their role</div>
+          <div class="partner-val ${!v(pSw) ? 'empty' : ''}">${v(pSw) || '—'}</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Tried it?</div>
+          <div class="partner-val ${!v(pT) ? 'empty' : ''}">${v(pT) || '—'}</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Rating</div>
+          <div class="partner-val ${!v(pR) ? 'empty' : ''}">${v(pR) || '—'}</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Do again?</div>
+          <div class="partner-val ${!v(pA) ? 'empty' : ''}">${v(pA) || '—'}</div>
+        </div>
+        ${v(pNs) ? `<div class="field-row"><div class="field-label">💬 Their note</div><div class="partner-note">${pNs}</div></div>` : ''}
+      </div>
+    </div>
+  </div>
 </div>`;
     }
 
-    const SWITCH_OPTS = ['Giving', 'Receiving', 'Both', 'Wearing', 'Others Wearing', 'Not Applicable'];
-    function switchRow(sk, val) { return `<div class="switch-row">${SWITCH_OPTS.map(o => `<div class="switch-opt${val === o ? ' active-sw' : ''}" onclick="setSwitchOpt(this,'${sk}','${o}')">${o}</div>`).join('')}</div>`; }
-
-    const SEG_NO = "No and I don't want to";
-    function segControl(sk, val) {
-      const isYes = val === 'Yes', isWant = val === 'No but I want to', isNo = val === SEG_NO;
-      return `<div class="seg-control">
-        <button class="seg-btn${isYes ? ' active-yes' : ''}" onclick="setSeg(this,'${sk}','Yes')">Yes</button>
-        <button class="seg-btn${isWant ? ' active-want' : ''}" onclick="setSeg(this,'${sk}','No but I want to')">Want to</button>
-        <button class="seg-btn${isNo ? ' active-no' : ''}" onclick="setSeg(this,'${sk}',SEG_NO)">No</button>
-      </div>`;
+    function buildCatPanel(cat, items) {
+      const div = document.createElement('div');
+      div.className = 'section-panel glass-card';
+      div.id = 'panel-' + cat;
+      div.innerHTML = items.map(i => buildCard(cat, i)).join('');
+      document.getElementById('catPanels').appendChild(div);
     }
 
-    const RATING_OPTS = [
-      { val: 'Loved it', icon: '❤️', lbl: 'Loved', cls: 'active-loved' },
-      { val: 'Liked it', icon: '👍', lbl: 'Liked', cls: 'active-liked' },
-      { val: 'Take it or leave it', icon: '😐', lbl: 'Neutral', cls: 'active-meh' },
-      { val: 'Not Applicable', icon: '—', lbl: 'N/A', cls: 'active-na' },
-    ];
-    function ratingIcons(sk, val) { return `<div class="rating-row">${RATING_OPTS.map(o => `<div class="rating-opt${val === o.val ? ' ' + o.cls : ''}" onclick="setRating(this,'${sk}','${o.val}')"><span class="r-icon">${o.icon}</span><span class="r-lbl">${o.lbl}</span></div>`).join('')}</div>`; }
+    function renderCustomItems() {
+      const existing = document.getElementById('panel-custom');
+      if (existing) existing.remove();
 
-    const AGAIN_OPTS = [
-      { val: 'Fetish/Need', cls: 'sb-fetish', label: '⚡ Fetish/Need' },
-      { val: 'Yes', cls: 'sb-yes', label: '✓ Yes' },
-      { val: 'Maybe', cls: 'sb-maybe', label: '~ Maybe' },
-      { val: 'Unlikely. Soft Limit', cls: 'sb-soft', label: '⚠ Soft Limit' },
-      { val: 'Never. Hard Limit', cls: 'sb-hard', label: '✕ Hard Limit' },
-      { val: 'Not Applicable', cls: 'sb-na', label: '— N/A' },
-    ];
-    function smartBadgeHtml(sk, val) {
-      const opt = AGAIN_OPTS.find(o => o.val === val);
-      return `<div class="smart-badge ${opt ? opt.cls : ''}" onclick="openAgainSheet('${sk}')" data-sk-again="${sk}"><span class="sb-label">${opt ? opt.label : 'Tap to set…'}</span><span class="sb-arrow">▾</span></div>`;
+      if (customItems.length === 0) return;
+
+      const div = document.createElement('div');
+      div.className = 'section-panel glass-card';
+      div.id = 'panel-custom';
+      div.innerHTML = customItems.map(item => buildCard('Custom', item, true)).join('');
+      document.getElementById('catPanels').appendChild(div);
+    }
+
+    // === HELPER FUNCTIONS (kept from original) ===
+    function ik(cat, act) { return cat.toLowerCase().replace(/\s+/g,'_') + '|' + act.toLowerCase().replace(/\s+/g,'_'); }
+    function v(val) { return val && val !== '' ? val : ''; }
+    function bv(item, role, field) {
+      if (!item[role]) return '';
+      const map = { T: 't', R: 'r', A: 'a', S: 'sw' };
+      return item[role][map[field]] || '';
+    }
+
+    function getStatusIcon(t, r, a) {
+      if (a.includes('Hard Limit')) return { i: '✕', c: 'danger' };
+      if (a.includes('Fetish')) return { i: '⚡', c: 'gold' };
+      if (r.includes('Loved')) return { i: '❤️', c: 'success' };
+      if (r.includes('Liked')) return { i: '👍', c: 'blue' };
+      if (t === 'Yes') return { i: '✓', c: '' };
+      return { i: '—', c: '' };
     }
 
     function getAccent(myA, pA, myR, pR, isCustom, flagged) {
@@ -2757,35 +729,56 @@
         const cat = card.dataset.cat, act = card.dataset.act, key = ik(cat, act);
         const myA = myData[key + '.a'] ?? '', pA = partnerData[key + '.a'] ?? '';
         const myR = myData[key + '.r'] ?? '', pR = partnerData[key + '.r'] ?? '';
-        card.classList.remove('hard-limit', 'fetish-flag', 'loved-both', 'scene-flagged');
+        card.classList.remove('hard-limit', 'fetish-flag', 'loved-both', 'scene-flagged', 'custom-item');
         const accent = getAccent(myA, pA, myR, pR, card.classList.contains('custom-item'), myData[key + '.flagged']);
         if (accent) card.classList.add(accent);
       });
-      applyFilters();
     }
 
-    window.setSwitchOpt = function (el, sk, val) {
-      const isActive = el.classList.contains('active-sw');
-      myData[sk] = isActive ? '' : val; schedSave();
-      el.closest('.switch-row').querySelectorAll('.switch-opt').forEach(o => o.classList.toggle('active-sw', o === el && !isActive));
-    };
+    const SWITCH_OPTS = ['Giving', 'Receiving', 'Both', 'Wearing', 'Others Wearing', 'Not Applicable'];
+    function switchRow(sk, val) {
+      return `<div class="switch-row">${SWITCH_OPTS.map(o => 
+        `<div class="switch-opt${val === o ? ' active-sw' : ''}" onclick="setSwitchOpt(this,'${sk}','${o}')">${o}</div>`
+      ).join('')}</div>`;
+    }
 
-    window.setSeg = function (btn, sk, val) {
-      myData[sk] = val; schedSave();
-      btn.closest('.seg-control').querySelectorAll('.seg-btn').forEach(b => b.className = 'seg-btn');
-      btn.className = 'seg-btn ' + (val === 'Yes' ? 'active-yes' : val === SEG_NO ? 'active-no' : 'active-want');
-      onFCKey(sk);
-    };
+    function segControl(sk, val) {
+      const isYes = val === 'Yes', isWant = val === 'No but I want to', isNo = val === SEG_NO;
+      return `<div class="seg-control">
+        <button class="seg-btn${isYes ? ' active-yes' : ''}" onclick="setSeg(this,'${sk}','Yes')">Yes</button>
+        <button class="seg-btn${isWant ? ' active-want' : ''}" onclick="setSeg(this,'${sk}','No but I want to')">Want to</button>
+        <button class="seg-btn${isNo ? ' active-no' : ''}" onclick="setSeg(this,'${sk}',SEG_NO)">No</button>
+      </div>`;
+    }
 
-    window.setRating = function (el, sk, val) {
-      myData[sk] = val; schedSave();
-      el.closest('.rating-row').querySelectorAll('.rating-opt').forEach(o => o.classList.remove('active-loved', 'active-liked', 'active-meh', 'active-na'));
-      el.classList.add(RATING_OPTS.find(o => o.val === val).cls);
-      onFCKey(sk);
-    };
+    const RATING_OPTS = [
+      { val: 'Loved it', icon: '❤️', lbl: 'Loved', cls: 'active-loved' },
+      { val: 'Liked it', icon: '👍', lbl: 'Liked', cls: 'active-liked' },
+      { val: 'Take it or leave it', icon: '😐', lbl: 'Neutral', cls: 'active-meh' },
+      { val: 'Not Applicable', icon: '—', lbl: 'N/A', cls: 'active-na' },
+    ];
+    function ratingIcons(sk, val) {
+      return `<div class="rating-row">${RATING_OPTS.map(o => 
+        `<div class="rating-opt${val === o.val ? ' ' + o.cls : ''}" onclick="setRating(this,'${sk}','${o.val}')"><span class="r-icon">${o.icon}</span><span class="r-lbl">${o.lbl}</span></div>`
+      ).join('')}</div>`;
+    }
+
+    const AGAIN_OPTS = [
+      { val: 'Fetish/Need', cls: 'sb-fetish', label: '⚡ Fetish/Need' },
+      { val: 'Yes', cls: 'sb-yes', label: '✓ Yes' },
+      { val: 'Maybe', cls: 'sb-maybe', label: '~ Maybe' },
+      { val: 'Unlikely. Soft Limit', cls: 'sb-soft', label: '⚠ Soft Limit' },
+      { val: 'Never. Hard Limit', cls: 'sb-hard', label: '✕ Hard Limit' },
+      { val: 'Not Applicable', cls: 'sb-na', label: '— N/A' },
+    ];
+
+    function smartBadgeHtml(sk, val) {
+      const opt = AGAIN_OPTS.find(o => o.val === val);
+      return `<div class="smart-badge" onclick="openAgainSheet('${sk}')" data-sk-again="${sk}"><span class="sb-label">${opt ? opt.label : 'Tap to set…'}</span><span class="sb-arrow">▾</span></div>`;
+    }
 
     let againSheetKey = null;
-    window.openAgainSheet = function (sk) {
+    window.openAgainSheet = function(sk) {
       againSheetKey = sk;
       const current = myData[sk] ?? '';
       const SHEET_OPTS = [
@@ -2797,17 +790,47 @@
         { val: 'Not Applicable', cls: 'ao-na', label: '— N/A' },
         { val: '', cls: 'ao-clear', label: 'Clear' },
       ];
-      document.getElementById('againSheetOptions').innerHTML = SHEET_OPTS.map(o => `<div class="again-option ${o.cls}" onclick="pickAgain('${o.val}')"><div class="ao-dot"></div><div class="ao-label">${o.label}</div></div>`).join('');
+      document.getElementById('againSheetOptions').innerHTML = SHEET_OPTS.map(o => 
+        `<div class="smart-badge" style="margin:4px 0;" onclick="pickAgain('${o.val}')"><span class="sb-label">${o.label}</span></div>`
+      ).join('');
       document.getElementById('againSheetOverlay').classList.add('open');
     };
 
-    window.pickAgain = function (val) {
+    window.pickAgain = function(val) {
       myData[againSheetKey] = val; schedSave();
       const badge = document.querySelector(`[data-sk-again="${againSheetKey}"]`);
       const opt = AGAIN_OPTS.find(o => o.val === val);
-      if (badge) { badge.className = 'smart-badge ' + (opt ? opt.cls : ''); badge.querySelector('.sb-label').textContent = opt ? opt.label : 'Tap to set…'; }
+      if (badge) {
+        badge.querySelector('.sb-label').textContent = opt ? opt.label : 'Tap to set…';
+      }
       onFCKey(againSheetKey);
       document.getElementById('againSheetOverlay').classList.remove('open');
+    };
+
+    window.closeAgainSheet = function(e) {
+      if (!e || e.target.id === 'againSheetOverlay') {
+        document.getElementById('againSheetOverlay').classList.remove('open');
+      }
+    };
+
+    window.setSwitchOpt = function(el, sk, val) {
+      const isActive = el.classList.contains('active-sw');
+      myData[sk] = isActive ? '' : val; schedSave();
+      el.closest('.switch-row').querySelectorAll('.switch-opt').forEach(o => o.classList.toggle('active-sw', o === el && !isActive));
+    };
+
+    window.setSeg = function(btn, sk, val) {
+      myData[sk] = val; schedSave();
+      btn.closest('.seg-control').querySelectorAll('.seg-btn').forEach(b => b.className = 'seg-btn');
+      btn.className = 'seg-btn ' + (val === 'Yes' ? 'active-yes' : val === SEG_NO ? 'active-no' : 'active-want');
+      onFCKey(sk);
+    };
+
+    window.setRating = function(el, sk, val) {
+      myData[sk] = val; schedSave();
+      el.closest('.rating-row').querySelectorAll('.rating-opt').forEach(o => o.classList.remove('active-loved', 'active-liked', 'active-meh', 'active-na'));
+      el.classList.add(RATING_OPTS.find(o => o.val === val).cls);
+      onFCKey(sk);
     };
 
     function onFCKey(sk) {
@@ -2822,70 +845,183 @@
         const accent = getAccent(myA, pA, myR, pR, card.classList.contains('custom-item'), myData[key + '.flagged']);
         if (accent) card.classList.add(accent);
       }
-      buildStats(); buildSharedFetishes(); applyFilters();
+      buildStats();
+      applyFilters();
     }
 
-    window.toggleFlag = function (key) {
+    window.toggleFlag = function(key) {
       myData[key + '.flagged'] = !myData[key + '.flagged']; schedSave();
       const sid = key.replace(/[^a-z0-9]/gi, '_');
       const card = document.getElementById('c_' + sid);
-      if (card) { card.querySelector('.flag-btn').classList.toggle('flagged', myData[key + '.flagged']); onFCKey(key + '.f'); }
+      if (card) {
+        card.querySelector('.flag-btn').classList.toggle('flagged', myData[key + '.flagged']);
+        onFCKey(key + '.f');
+      }
     };
 
-    window.showTab = function (cat, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-      const p = document.getElementById('panel-' + cat); if (p) p.classList.add('active');
+    window.toggleCard = function(h) {
+      h.closest('.activity-card').classList.toggle('open');
     };
 
-    window.toggleCard = h => h.closest('.activity-card').classList.toggle('open');
-
-    window.setViewMode = mode => {
+    window.setViewMode = function(mode) {
       document.body.classList.remove('view-me', 'view-partner', 'view-both');
       document.body.classList.add('view-' + mode);
       document.querySelectorAll('.view-opt').forEach(opt => opt.classList.toggle('active', opt.dataset.view === mode));
       localStorage.setItem('checklist_view_mode', mode);
     };
 
-    // Missing close function
-    window.closeAgainSheet = e => { if (!e || e.target.id === 'againSheetOverlay') document.getElementById('againSheetOverlay').classList.remove('open'); };
+    // === STATS ===
+    function buildStats() {
+      let total = 0, loved = 0, hard = 0, custom = customItems.length;
 
-    // Boilerplate for search/stats
-    window.onSearch = val => { activeSearch = val.toLowerCase(); applyFilters(); };
-    window.clearSearch = () => { document.getElementById('searchInput').value = ''; activeSearch = ''; applyFilters(); };
-    window.toggleChip = (el, cls) => { const f = el.dataset.filter; if (activeFilters.has(f)) { activeFilters.delete(f); el.className = 'chip'; } else { activeFilters.add(f); el.className = 'chip active ' + cls; } applyFilters(); };
-    
-    function applyFilters() {
-        // (Minimal logic to keep it running)
-        document.querySelectorAll('.activity-card[data-cat]').forEach(card => {
-            const act = card.dataset.act.toLowerCase();
-            const visible = (!activeSearch || act.includes(activeSearch));
-            card.style.display = visible ? 'block' : 'none';
+      Object.keys(template.base).forEach(cat => {
+        template.base[cat].forEach(item => {
+          total++;
+          const key = ik(cat, item.a);
+          const myA = myData[key + '.a'] || '';
+          const myR = myData[key + '.r'] || '';
+          if (myA.includes('Fetish') || myR.includes('Loved')) loved++;
+          if (myA.includes('Hard Limit')) hard++;
         });
+      });
+
+      document.getElementById('stat-total').textContent = total + custom;
+      document.getElementById('stat-loved').textContent = loved;
+      document.getElementById('stat-hard').textContent = hard;
+      document.getElementById('stat-custom').textContent = custom;
     }
 
-    function buildCatPanel(cat, items) {
-      const div = document.createElement('div');
-      div.className = 'section-panel'; div.id = 'panel-' + cat;
-      div.innerHTML = items.map(i => buildCard(cat, i)).join('');
-      document.getElementById('catPanels').appendChild(div);
+    // === FILTERS ===
+    window.onSearch = function(val) {
+      activeSearch = val.toLowerCase();
+      applyFilters();
+    };
+
+    window.clearSearch = function() {
+      document.getElementById('searchInput').value = '';
+      activeSearch = '';
+      applyFilters();
+    };
+
+    window.toggleChip = function(el, cls) {
+      const f = el.dataset.filter;
+      if (activeFilters.has(f)) {
+        activeFilters.delete(f);
+        el.classList.remove('active', cls);
+      } else {
+        activeFilters.add(f);
+        el.classList.add('active', cls);
+      }
+      applyFilters();
+    };
+
+    function applyFilters() {
+      const searchTerm = activeSearch;
+      const hasFilters = activeFilters.size > 0 && !activeFilters.has('all');
+
+      document.querySelectorAll('.activity-card[data-cat]').forEach(card => {
+        const act = card.dataset.act.toLowerCase();
+        const cat = card.dataset.cat;
+        const key = ik(cat, card.dataset.act);
+        const myA = myData[key + '.a'] || '';
+        const myR = myData[key + '.r'] || '';
+
+        let visible = true;
+
+        if (searchTerm && !act.includes(searchTerm)) visible = false;
+
+        if (hasFilters) {
+          let match = false;
+          if (activeFilters.has('loved') && (myA.includes('Fetish') || myR.includes('Loved'))) match = true;
+          if (activeFilters.has('hard') && myA.includes('Hard Limit')) match = true;
+          if (activeFilters.has('scene') && myData[key + '.flagged']) match = true;
+          if (!match && !activeFilters.has('all')) visible = false;
+        }
+
+        card.style.display = visible ? 'block' : 'none';
+      });
     }
 
-    function buildSpecial() { /* Simplified placeholder */ }
-    function populateModalCats() { /* Simplified placeholder */ }
-    function buildStats() { /* Simplified placeholder */ }
-    function buildSharedFetishes() { /* Simplified placeholder */ }
-    function renderCustomItems() {}
-    function rebuildCustomTabs() {}
+    // === CUSTOM ACTIVITIES ===
+    window.addCustomActivity = function() {
+      const name = prompt("Enter custom activity name:");
+      if (!name || !name.trim()) return;
 
+      const cat = prompt("Category (e.g. Sensation Play, Impact Play, etc.):", "Custom");
+      if (!cat) return;
+
+      const id = 'custom_' + Date.now();
+      const newItem = {
+        id,
+        activity: name.trim(),
+        category: cat.trim(),
+        owner: myRole,
+        added: Date.now()
+      };
+
+      customItems.push(newItem);
+      renderCustomItems();
+      buildStats();
+
+      // Save to Firestore
+      if (relId) {
+        setDoc(doc(dataCol('checklistCustom', relId), id), newItem);
+      }
+
+      showToast("Custom activity added", "success");
+    };
+
+    window.delCustom = async function(id) {
+      if (!confirm("Delete this custom activity?")) return;
+      customItems = customItems.filter(i => i.id !== id);
+      renderCustomItems();
+      buildStats();
+
+      if (relId) {
+        await deleteDoc(doc(dataCol('checklistCustom', relId), id));
+      }
+    };
+
+    // === SAVE ===
+    function schedSave() {
+      if (saveTimeout) clearTimeout(saveTimeout);
+      setSaveStatus('Saving…', 'saving');
+      
+      saveTimeout = setTimeout(async () => {
+        try {
+          const updates = [];
+          Object.keys(myData).forEach(sk => {
+            if (sk.endsWith('.ts')) return;
+            updates.push(setDoc(doc(dataCol('checklist', myUid), sk), { v: myData[sk], ts: Date.now() }));
+          });
+          await Promise.all(updates);
+          setSaveStatus('Saved', 'saved');
+          setTimeout(() => setSaveStatus('', '—'), 2000);
+        } catch (e) {
+          setSaveStatus('Error', 'error');
+        }
+      }, 800);
+    }
+
+    function setSaveStatus(text, cls) {
+      const el = document.getElementById('saveStatus');
+      if (!el) return;
+      el.textContent = text;
+      el.className = 'save-status ' + cls;
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.createElement('div');
+      toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#27ae60' : '#c0392b'}; color:white; padding:12px 24px; border-radius:30px; font-size:13px; font-weight:700; z-index:9999; box-shadow:0 8px 25px rgba(0,0,0,0.3);`;
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2200);
+    }
+
+    // === INIT ===
     init();
-</script>
+  </script>
 
-
-  <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
   <script src="nav.js"></script>
-
 </body>
-
 </html>
