@@ -622,7 +622,10 @@
     function renderWishlist() {
       const container = document.getElementById('wish-list');
       container.innerHTML = wishes.map(w => {
-        const addedBy = (w.owner?.toLowerCase() === myRole) ? "Added by Me" : `Added by ${partnerName}`;
+        // Handle old items without owner field (default to current user)
+        const itemOwner = w.owner ? w.owner.toLowerCase() : myRole;
+        const addedBy = (itemOwner === myRole) ? "Added by Me" : `Added by ${partnerName}`;
+        
         return `
           <div class="menu-card" onclick="openWishModal('${w.id}')">
             <div class="menu-card-title">${w.name}</div>
