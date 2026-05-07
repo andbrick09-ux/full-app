@@ -292,6 +292,21 @@
       <div id="raw-data-container" style="max-height:400px; overflow-y:auto; background:#0a1224; border-radius:8px; padding:8px;"></div>
     </div>
 
+    <!-- IMPORT FROM EXCEL -->
+    <div class="glass-card">
+      <div class="section-title">📤 Import from Excel File</div>
+      <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
+        Upload your original Excel file (like the one you pasted) and import all activities + ratings into Firestore in one click.
+      </p>
+      
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+        <input type="file" id="excel-file" accept=".xlsx,.xls" style="flex:1; background:#0a1224; border:1px solid var(--border); padding:10px; border-radius:8px; color:#ddd;">
+        <button onclick="importFromExcel()" class="btn btn-gold">Import Excel</button>
+      </div>
+      
+      <div id="excel-status" style="margin-top:8px; font-size:12px; display:none;"></div>
+    </div>
+
   </div>
 
   <script type="module">
@@ -731,6 +746,99 @@
         console.error(e);
         statusEl.style.color = '#c0392b';
         statusEl.textContent = 'Import failed: ' + (e.message || e);
+      }
+    };
+
+    // ==================== IMPORT FROM EXCEL ====================
+    window.importFromExcel = async function() {
+      const fileInput = document.getElementById('excel-file');
+      const statusEl = document.getElementById('excel-status');
+      
+      if (!fileInput.files.length) {
+        alert("Please select an Excel file first");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#D4AF37';
+      statusEl.textContent = 'Reading Excel file...';
+
+      try {
+        // Load SheetJS from CDN
+        if (typeof XLSX === 'undefined') {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+          document.head.appendChild(script);
+          await new Promise(resolve => script.onload = resolve);
+        }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          // Find header row
+          let headerRow = 0;
+          let headers = jsonData[0];
+          
+          // Parse rows (skip header)
+          let imported = 0;
+          for (let i = 1; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (!row[0] || !row[1]) continue; // Skip empty rows
+
+            const category = row[0];
+            const activity = row[1];
+            const andyTried = row[3] || '';
+            const andyRating = row[4] || '';
+            const andyLimit = row[5] || '';
+            const beccaTried = row[9] || '';
+            const beccaRating = row[10] || '';
+            const beccaLimit = row[11] || '';
+
+            const baseKey = category.toLowerCase().replace(/\s+/g, '_') + '|' + activity.toLowerCase().replace(/\s+/g, '_');
+
+            // Write to template
+            const templateItem = {
+              category,
+              a: activity,
+              dom: { t: andyTried, r: andyRating, a: andyLimit },
+              sub: { t: beccaTried, r: beccaRating, a: beccaLimit },
+              imported: true,
+              added: Date.now()
+            };
+
+            const id = 'tpl_excel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            await setDoc(doc(checklistTemplateCol(relId), id), templateItem);
+
+            // Write ratings to checklist collection
+            await setDoc(doc(checklistCol(relId), `${baseKey}.t`), { v: andyTried, ts: Date.now() });
+            await setDoc(doc(checklistCol(relId), `${baseKey}.r`), { v: andyRating, ts: Date.now() });
+            await setDoc(doc(checklistCol(relId), `${baseKey}.a`), { v: andyLimit, ts: Date.now() });
+            await setDoc(doc(checklistCol(relId), `${baseKey}.ts`), { v: Date.now(), ts: Date.now() });
+
+            imported++;
+          }
+
+          statusEl.style.color = '#27ae60';
+          statusEl.textContent = `Successfully imported ${imported} activities from Excel!`;
+          
+          setTimeout(() => {
+            statusEl.style.display = 'none';
+            renderTemplateList();
+            document.getElementById('template-count').textContent = templateItems.length;
+          }, 3000);
+        };
+
+        reader.readAsArrayBuffer(file);
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Import failed: ' + e.message;
       }
     };
 
