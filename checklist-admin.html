@@ -420,46 +420,55 @@
         const existingData = {};
         snap.docs.forEach(d => existingData[d.id] = d.data().v);
 
+        // Group by base key (e.g. "sensation_play|blindfold")
+        const activityMap = {};
+        
+        Object.keys(existingData).forEach(key => {
+          if (!key.includes('|')) return;
+          
+          const baseKey = key.replace(/\.[tra]$/, '');
+          if (!activityMap[baseKey]) {
+            activityMap[baseKey] = { t: '', r: '', a: '' };
+          }
+          
+          if (key.endsWith('.t')) activityMap[baseKey].t = existingData[key];
+          if (key.endsWith('.r')) activityMap[baseKey].r = existingData[key];
+          if (key.endsWith('.a')) activityMap[baseKey].a = existingData[key];
+        });
+
+        const baseKeys = Object.keys(activityMap);
         let imported = 0;
 
-        // We need to know which activities exist. For now we'll create template entries
-        // based on keys that have data. In a real app you'd have a master list.
-        // For this demo we'll just create a few example entries with the saved values.
+        for (const baseKey of baseKeys) {
+          const [catPart, actPart] = baseKey.split('|');
+          if (!catPart || !actPart) continue;
 
-        // Better approach: Ask user for the list of activities they want to import ratings for.
-        // For now, create template items from keys that have "t" or "r" values.
+          const category = catPart.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          const activity = actPart.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-        const keysWithData = Object.keys(existingData).filter(k => k.includes('|') && (k.endsWith('.t') || k.endsWith('.r')));
+          const data = activityMap[baseKey];
 
-        for (const key of keysWithData) {
-          const baseKey = key.replace(/\.[tra]$/, '');
-          if (existingData[baseKey + '.t'] || existingData[baseKey + '.r']) {
-            const [catPart, actPart] = baseKey.split('|');
-            const category = catPart.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-            const activity = actPart.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          const newItem = {
+            category,
+            a: activity,
+            dom: {
+              T: data.t || '',
+              R: data.r || '',
+              A: data.a || ''
+            },
+            sub: {
+              T: data.t || '',
+              R: data.r || '',
+              A: data.a || ''
+            },
+            imported: true,
+            added: Date.now()
+          };
 
-            const newItem = {
-              category,
-              a: activity,
-              dom: {
-                T: existingData[baseKey + '.t'] || '',
-                R: existingData[baseKey + '.r'] || '',
-                A: existingData[baseKey + '.a'] || ''
-              },
-              sub: {
-                T: existingData[baseKey + '.t'] || '',
-                R: existingData[baseKey + '.r'] || '',
-                A: existingData[baseKey + '.a'] || ''
-              },
-              imported: true,
-              added: Date.now()
-            };
-
-            const id = 'tpl_import_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-            await setDoc(doc(checklistTemplateCol(relId), id), newItem);
-            templateItems.push({ id, ...newItem });
-            imported++;
-          }
+          const id = 'tpl_import_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+          await setDoc(doc(checklistTemplateCol(relId), id), newItem);
+          templateItems.push({ id, ...newItem });
+          imported++;
         }
 
         statusEl.style.color = '#27ae60';
@@ -472,8 +481,9 @@
         }, 2500);
 
       } catch (e) {
+        console.error(e);
         statusEl.style.color = '#c0392b';
-        statusEl.textContent = 'Import failed: ' + e.message;
+        statusEl.textContent = 'Import failed: ' + (e.message || e);
       }
     };
 
