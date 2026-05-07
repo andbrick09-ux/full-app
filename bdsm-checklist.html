@@ -462,6 +462,9 @@
     function checklistCustomCol(id) {
       return collection(db, 'relationships', id, 'checklistCustom');
     }
+    function checklistTemplateCol(id) {
+      return collection(db, 'relationships', id, 'checklistTemplate');
+    }
 
     async function init() {
       try {
@@ -481,35 +484,105 @@
           partnerName = partnerProfile?.displayName || 'Partner';
         }
 
-        // Load template (embedded for now — in real app this would come from Firestore or CDN)
-        template = {
-          base: {
+        // Load template from Firestore, or fall back to full original list
+        const templateSnap = await getDocs(checklistTemplateCol(relId));
+        
+        if (!templateSnap.empty) {
+          template.base = {};
+          templateSnap.docs.forEach(d => {
+            const cat = d.data().category;
+            if (!template.base[cat]) template.base[cat] = [];
+            template.base[cat].push(d.data());
+          });
+        } else {
+          // Full original template (all items & categories)
+          template.base = {
             "Sensation Play": [
               { a: "Blindfold", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
               { a: "Ice Play", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
               { a: "Wax Play", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
-              { a: "Feather / Sensation", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
+              { a: "Feather / Sensation", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Temperature Play", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Maybe" } },
+              { a: "Vampire Gloves", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
+              { a: "Pinwheel / Wartenberg", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } }
             ],
             "Impact Play": [
               { a: "Hand Spanking", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
               { a: "Paddle", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Maybe" } },
               { a: "Cane", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
-              { a: "Flogger", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
+              { a: "Flogger", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Crop", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Maybe" } },
+              { a: "Belt / Strap", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Slapper", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Paddle - Wooden", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
             ],
             "Bondage & Restraint": [
               { a: "Wrist Cuffs", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
               { a: "Ankle Cuffs", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
               { a: "Rope Bondage", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
-              { a: "Collar & Leash", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } }
+              { a: "Collar & Leash", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Spread Bar", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Hogtie", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Shibari / Kinbaku", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Mummification", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } }
             ],
             "Power Exchange": [
               { a: "Orgasm Control", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
               { a: "Service Submission", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
               { a: "Humiliation Play", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
-              { a: "Praise Kink", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } }
+              { a: "Praise Kink", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Chastity", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Protocol / Rules", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "24/7 D/s", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } }
+            ],
+            "Roleplay & Fantasy": [
+              { a: "Teacher / Student", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Doctor / Patient", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Boss / Secretary", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Master / Slave", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Pet Play", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
+              { a: "Age Play", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } }
+            ],
+            "Toys & Tools": [
+              { a: "Vibrator", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Dildo", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Butt Plug", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Nipple Clamps", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Cock Ring", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Magic Wand", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Hitachi Wand", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
+            ],
+            "Anal Play": [
+              { a: "Anal Fingering", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Anal Beads", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Prostate Massager", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "No but I want to", R: "", A: "Maybe" } },
+              { a: "Strap-on", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Anal Hook", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } }
+            ],
+            "Breath & Edge Play": [
+              { a: "Breath Play", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } },
+              { a: "Choking", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Edge Play", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Orgasm Denial", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Forced Orgasm", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } }
+            ],
+            "Service & Domestic": [
+              { a: "Domestic Service", dom: { T: "Yes", R: "Loved it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Foot Worship", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Maid / Butler", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Cooking / Cleaning", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Loved it", A: "Yes" } },
+              { a: "Personal Assistant", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } }
+            ],
+            "Fetish & Kink": [
+              { a: "Latex / Rubber", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Leather", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "PVC / Vinyl", dom: { T: "No but I want to", R: "", A: "Maybe" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "High Heels / Boots", dom: { T: "Yes", R: "Loved it", A: "Fetish/Need" }, sub: { T: "Yes", R: "Loved it", A: "Fetish/Need" } },
+              { a: "Corset / Waist Training", dom: { T: "Yes", R: "Liked it", A: "Yes" }, sub: { T: "Yes", R: "Liked it", A: "Yes" } },
+              { a: "Smoking Fetish", dom: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" }, sub: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" } }
             ]
-          }
-        };
+          };
+        }
 
         // Load user data
         const mySnap = await getDocs(checklistCol(relId));
