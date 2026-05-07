@@ -410,6 +410,14 @@
     };
 
     window.importFromExistingData = async function() {
+      if (!relId) {
+        const statusEl = document.getElementById('importStatus');
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Error: No relationship ID found. Please make sure you are logged in and paired.';
+        return;
+      }
+
       const statusEl = document.getElementById('importStatus');
       statusEl.style.display = 'block';
       statusEl.style.color = '#D4AF37';
@@ -424,6 +432,7 @@
         const activityMap = {};
         
         Object.keys(existingData).forEach(key => {
+          if (!key || typeof key !== 'string') return;
           if (!key.includes('|')) return;
           
           const baseKey = key.replace(/\.[tra]$/, '');
