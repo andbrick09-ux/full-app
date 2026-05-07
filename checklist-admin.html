@@ -579,14 +579,14 @@
               category,
               a: defaultItem.a,
               dom: {
-                T: saved.t || defaultItem.dom?.T || '',
-                R: saved.r || defaultItem.dom?.R || '',
-                A: saved.a || defaultItem.dom?.A || ''
+                t: saved.t || defaultItem.dom?.t || '',
+                r: saved.r || defaultItem.dom?.r || '',
+                a: saved.a || defaultItem.dom?.a || ''
               },
               sub: {
-                T: saved.t || defaultItem.sub?.T || '',
-                R: saved.r || defaultItem.sub?.R || '',
-                A: saved.a || defaultItem.sub?.A || ''
+                t: saved.t || defaultItem.sub?.t || '',
+                r: saved.r || defaultItem.sub?.r || '',
+                a: saved.a || defaultItem.sub?.a || ''
               },
               imported: true,
               added: Date.now()
@@ -596,11 +596,23 @@
             await setDoc(doc(checklistTemplateCol(relId), id), newItem);
             templateItems.push({ id, ...newItem });
             imported++;
+
+            // ALSO write the ratings directly to the checklist collection
+            // so they appear immediately in the main checklist
+            const checklistDoc = doc(checklistCol(relId), baseKey);
+            await setDoc(checklistDoc, {
+              v: {
+                [`${baseKey}.t`]: saved.t || defaultItem.dom?.t || '',
+                [`${baseKey}.r`]: saved.r || defaultItem.dom?.r || '',
+                [`${baseKey}.a`]: saved.a || defaultItem.dom?.a || '',
+                [`${baseKey}.ts`]: Date.now()
+              }
+            }, { merge: true });
           }
         }
 
         statusEl.style.color = '#27ae60';
-        statusEl.textContent = `Imported ${imported} activities (original list + your current ratings)!`;
+        statusEl.textContent = `Imported ${imported} activities (original list + ratings written to Firestore)!`;
         
         setTimeout(() => {
           statusEl.style.display = 'none';
