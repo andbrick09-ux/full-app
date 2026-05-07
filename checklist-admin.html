@@ -332,6 +332,7 @@
     let myRole = 'dom';
     let myName = 'You';
     let templateItems = [];
+    let selectedItems = new Set();
 
     // Full default template (the "original" master list)
     const DEFAULT_TEMPLATE = {
@@ -509,16 +510,29 @@
         groups[item.category].push(item);
       });
 
-      let html = '';
+      let html = `
+        <div style="margin-bottom:12px; display:flex; align-items:center; gap:12px; padding:8px; background:#0a1224; border-radius:8px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <input type="checkbox" id="select-all-template" onchange="toggleSelectAll()" style="width:16px; height:16px;">
+            <span style="font-size:12px; color:#aaa;">Select All (${templateItems.length})</span>
+          </label>
+          <button onclick="deleteSelectedItems()" class="btn btn-danger" style="padding:6px 14px; font-size:11px; margin-left:auto; display:${selectedItems.size > 0 ? 'block' : 'none'};">
+            Delete Selected (${selectedItems.size})
+          </button>
+        </div>
+      `;
+
       Object.keys(groups).forEach(cat => {
         html += `<div style="margin-bottom:20px;">
           <div style="font-family:'Playfair Display',serif; font-size:16px; color:var(--gold); margin-bottom:8px;">${cat}</div>`;
         
         groups[cat].forEach(item => {
           const addedDate = item.added ? new Date(item.added).toLocaleString() : '—';
+          const isChecked = selectedItems.has(item.id) ? 'checked' : '';
           html += `
-            <div class="template-item">
-              <div>
+            <div class="template-item" style="display:flex; align-items:center; gap:12px;">
+              <input type="checkbox" ${isChecked} onchange="toggleItemSelection('${item.id}', this.checked)" style="width:16px; height:16px; flex-shrink:0;">
+              <div style="flex:1;">
                 <div class="template-item-name">${item.a || item.activity}</div>
                 <div class="rating-preview">
                   <span>Dom: ${item.dom?.t || item.dom?.T || '—'} / ${item.dom?.r || item.dom?.R || '—'}</span>
@@ -526,7 +540,7 @@
                 </div>
                 <div style="font-size:10px; color:#666; margin-top:4px;">Added: ${addedDate}</div>
               </div>
-              <button onclick="deleteTemplateItem('${item.id}')" class="btn btn-danger" style="padding:8px 14px; font-size:10px;">Delete</button>
+              <button onclick="deleteTemplateItem('${item.id}'); event.stopImmediatePropagation();" class="btn btn-danger" style="padding:8px 14px; font-size:10px;">Delete</button>
             </div>
           `;
         });
@@ -535,7 +549,48 @@
       });
 
       container.innerHTML = html;
+
+      // Update select all checkbox state
+      const selectAll = document.getElementById('select-all-template');
+      if (selectAll) {
+        selectAll.checked = selectedItems.size === templateItems.length && templateItems.length > 0;
+        selectAll.indeterminate = selectedItems.size > 0 && selectedItems.size < templateItems.length;
+      }
     }
+
+    window.toggleSelectAll = function() {
+      const selectAll = document.getElementById('select-all-template');
+      if (!selectAll) return;
+
+      if (selectAll.checked) {
+        templateItems.forEach(item => selectedItems.add(item.id));
+      } else {
+        selectedItems.clear();
+      }
+      renderTemplateList();
+    };
+
+    window.toggleItemSelection = function(id, checked) {
+      if (checked) {
+        selectedItems.add(id);
+      } else {
+        selectedItems.delete(id);
+      }
+      renderTemplateList();
+    };
+
+    window.deleteSelectedItems = async function() {
+      if (selectedItems.size === 0) return;
+      
+      if (!confirm(`Delete ${selectedItems.size} selected items?`)) return;
+
+      for (const id of selectedItems) {
+        await deleteDoc(doc(checklistTemplateCol(relId), id));
+      }
+
+      selectedItems.clear();
+      await loadTemplate();
+    };
 
     // ==================== RAW FIRESTORE DATA SECTION ====================
     window.loadRawFirestoreData = async function() {
