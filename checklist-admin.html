@@ -513,10 +513,32 @@
       
       statusEl.style.display = 'block';
       statusEl.style.color = '#D4AF37';
-      statusEl.textContent = 'Loading raw Firestore data...';
+      statusEl.textContent = 'Loading raw Firestore data + categories...';
       container.innerHTML = '';
 
       try {
+        // 1. Load template to get category names
+        let keyToCategory = {};
+        
+        // Try Firestore template first
+        const templateSnap = await getDocs(checklistTemplateCol(relId));
+        if (!templateSnap.empty) {
+          templateSnap.docs.forEach(d => {
+            const data = d.data();
+            const baseKey = data.category.toLowerCase().replace(/\s+/g, '_') + '|' + data.a.toLowerCase().replace(/\s+/g, '_');
+            keyToCategory[baseKey] = data.category;
+          });
+        } else {
+          // Fall back to DEFAULT_TEMPLATE
+          Object.entries(DEFAULT_TEMPLATE).forEach(([cat, items]) => {
+            items.forEach(item => {
+              const baseKey = cat.toLowerCase().replace(/\s+/g, '_') + '|' + item.a.toLowerCase().replace(/\s+/g, '_');
+              keyToCategory[baseKey] = cat;
+            });
+          });
+        }
+
+        // 2. Load raw checklist data
         const snap = await getDocs(checklistCol(relId));
         const rawData = [];
         
@@ -534,25 +556,29 @@
           return;
         }
 
-        // Group by base activity
+        // 3. Group by base activity
         const grouped = {};
         rawData.forEach(item => {
           const baseKey = item.id.replace(/\.[tra]$/, '');
-          if (!grouped[baseKey]) grouped[baseKey] = {};
+          if (!grouped[baseKey]) grouped[baseKey] = { category: keyToCategory[baseKey] || 'Unknown' };
           if (item.id.endsWith('.t')) grouped[baseKey].t = item.v;
           if (item.id.endsWith('.r')) grouped[baseKey].r = item.v;
           if (item.id.endsWith('.a')) grouped[baseKey].a = item.v;
           if (item.id.endsWith('.ts')) grouped[baseKey].ts = item.v;
         });
 
+        // 4. Render table with category column
         let html = '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
-        html += '<tr style="background:#0a1224;"><th style="padding:8px; text-align:left; border-bottom:1px solid var(--border);">Activity Key</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Tried (t)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Rating (r)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Do Again (a)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Last Updated</th></tr>';
+        html += '<tr style="background:#0a1224;"><th style="padding:8px; text-align:left; border-bottom:1px solid var(--border);">Category</th><th style="padding:8px; text-align:left; border-bottom:1px solid var(--border);">Activity</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Tried (t)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Rating (r)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Do Again (a)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Updated</th></tr>';
 
         Object.keys(grouped).sort().forEach(baseKey => {
           const data = grouped[baseKey];
+          const [catSlug, actSlug] = baseKey.split('|');
+          const activityName = actSlug ? actSlug.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : baseKey;
           const date = data.ts ? new Date(data.ts).toLocaleString() : '—';
           html += `<tr style="border-bottom:1px solid #222;">
-            <td style="padding:6px 8px; font-family:monospace; font-size:11px;">${baseKey}</td>
+            <td style="padding:6px 8px; font-size:11px; color:#D4AF37;">${data.category}</td>
+            <td style="padding:6px 8px; font-family:monospace; font-size:11px;">${activityName}</td>
             <td style="padding:6px 8px; text-align:center;">${data.t || '—'}</td>
             <td style="padding:6px 8px; text-align:center;">${data.r || '—'}</td>
             <td style="padding:6px 8px; text-align:center;">${data.a || '—'}</td>
