@@ -279,6 +279,19 @@
       <div id="template-list"></div>
     </div>
 
+    <!-- RAW FIRESTORE DATA -->
+    <div class="glass-card">
+      <div class="section-title">🔍 Raw Firestore Data</div>
+      <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
+        View all raw saved data from Firestore for this relationship (you + your partner). This shows exactly what's stored in the database.
+      </p>
+      <button onclick="loadRawFirestoreData()" class="btn btn-gold" style="width:100%; margin-bottom:12px;">
+        Load Raw Firestore Data
+      </button>
+      <div id="raw-data-status" style="margin-bottom:8px; font-size:12px; display:none;"></div>
+      <div id="raw-data-container" style="max-height:400px; overflow-y:auto; background:#0a1224; border-radius:8px; padding:8px;"></div>
+    </div>
+
   </div>
 
   <script type="module">
@@ -491,6 +504,74 @@
       container.innerHTML = html;
     }
 
+    // ==================== RAW FIRESTORE DATA SECTION ====================
+    window.loadRawFirestoreData = async function() {
+      const container = document.getElementById('raw-data-container');
+      const statusEl = document.getElementById('raw-data-status');
+      
+      if (!container) return;
+      
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#D4AF37';
+      statusEl.textContent = 'Loading raw Firestore data...';
+      container.innerHTML = '';
+
+      try {
+        const snap = await getDocs(checklistCol(relId));
+        const rawData = [];
+        
+        snap.docs.forEach(d => {
+          rawData.push({
+            id: d.id,
+            v: d.data().v,
+            ts: d.data().ts || 0
+          });
+        });
+
+        if (rawData.length === 0) {
+          container.innerHTML = '<div style="color:#666; padding:20px; text-align:center;">No data found in Firestore for this relationship.</div>';
+          statusEl.style.display = 'none';
+          return;
+        }
+
+        // Group by base activity
+        const grouped = {};
+        rawData.forEach(item => {
+          const baseKey = item.id.replace(/\.[tra]$/, '');
+          if (!grouped[baseKey]) grouped[baseKey] = {};
+          if (item.id.endsWith('.t')) grouped[baseKey].t = item.v;
+          if (item.id.endsWith('.r')) grouped[baseKey].r = item.v;
+          if (item.id.endsWith('.a')) grouped[baseKey].a = item.v;
+          if (item.id.endsWith('.ts')) grouped[baseKey].ts = item.v;
+        });
+
+        let html = '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
+        html += '<tr style="background:#0a1224;"><th style="padding:8px; text-align:left; border-bottom:1px solid var(--border);">Activity Key</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Tried (t)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Rating (r)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Do Again (a)</th><th style="padding:8px; text-align:center; border-bottom:1px solid var(--border);">Last Updated</th></tr>';
+
+        Object.keys(grouped).sort().forEach(baseKey => {
+          const data = grouped[baseKey];
+          const date = data.ts ? new Date(data.ts).toLocaleString() : '—';
+          html += `<tr style="border-bottom:1px solid #222;">
+            <td style="padding:6px 8px; font-family:monospace; font-size:11px;">${baseKey}</td>
+            <td style="padding:6px 8px; text-align:center;">${data.t || '—'}</td>
+            <td style="padding:6px 8px; text-align:center;">${data.r || '—'}</td>
+            <td style="padding:6px 8px; text-align:center;">${data.a || '—'}</td>
+            <td style="padding:6px 8px; text-align:center; font-size:10px; color:#888;">${date}</td>
+          </tr>`;
+        });
+
+        html += '</table>';
+        container.innerHTML = html;
+        statusEl.style.color = '#27ae60';
+        statusEl.textContent = `Loaded ${rawData.length} raw documents (${Object.keys(grouped).length} activities)`;
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Error loading data: ' + e.message;
+      }
+    };
+
     window.addNewTemplateItem = async function() {
       const cat = document.getElementById('new-cat').value.trim();
       const name = document.getElementById('new-name').value.trim();
@@ -598,16 +679,16 @@
             imported++;
 
             // ALSO write the ratings directly to the checklist collection
-            // so they appear immediately in the main checklist
-            const checklistDoc = doc(checklistCol(relId), baseKey);
-            await setDoc(checklistDoc, {
-              v: {
-                [`${baseKey}.t`]: saved.t || defaultItem.dom?.t || '',
-                [`${baseKey}.r`]: saved.r || defaultItem.dom?.r || '',
-                [`${baseKey}.a`]: saved.a || defaultItem.dom?.a || '',
-                [`${baseKey}.ts`]: Date.now()
-              }
-            }, { merge: true });
+            // (one document per field, matching how the checklist saves data)
+            const tKey = `${baseKey}.t`;
+            const rKey = `${baseKey}.r`;
+            const aKey = `${baseKey}.a`;
+            const tsKey = `${baseKey}.ts`;
+
+            await setDoc(doc(checklistCol(relId), tKey), { v: saved.t || defaultItem.dom?.t || '', ts: Date.now() });
+            await setDoc(doc(checklistCol(relId), rKey), { v: saved.r || defaultItem.dom?.r || '', ts: Date.now() });
+            await setDoc(doc(checklistCol(relId), aKey), { v: saved.a || defaultItem.dom?.a || '', ts: Date.now() });
+            await setDoc(doc(checklistCol(relId), tsKey), { v: Date.now(), ts: Date.now() });
           }
         }
 
