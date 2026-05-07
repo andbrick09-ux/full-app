@@ -292,6 +292,133 @@
     let myName = 'You';
     let templateItems = [];
 
+    // Full default template (the "original" master list)
+    const DEFAULT_TEMPLATE = {
+      "Bondage": [
+        { a: "Anal Hook", dom: { T: "No and I don't want to", R: "Liked it", A: "" }, sub: { T: "No but I want to", R: "", A: "" } },
+        { a: "Arm Binding", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Bed bondage", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Breast Bondage", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Cage", dom: { T: "No and I don't want to", R: "Take it or leave it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Chains", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Chair bondage", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Chastity", dom: { T: "No and I don't want to", R: "Liked it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Collars (in Private)", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No but I want to", R: "", A: "" } },
+        { a: "Collars (in Public)", dom: { T: "No and I don't want to", R: "Take it or leave it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Corset", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Crotch Rope", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Cuffs - Leather", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Cuffs - Metal", dom: { T: "No and I don't want to", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Gags - Ball", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Gags - Phallic", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Heavy Bondage", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Light Bondage", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Mummification", dom: { T: "No and I don't want to", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Restraints", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Rope - Shibari", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Rope - Simple", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Sleep sacks", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Spreader Bar", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } }
+      ],
+      "Bodily Fluid": [
+        { a: "Blood play (cutting)", dom: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Breast milk - Milking", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Chamber pot use", dom: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Cum in Panties", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Cum In Ass", dom: { T: "Yes", R: "Take it or leave it", A: "" }, sub: { T: "Yes", R: "Take it or leave it", A: "" } },
+        { a: "Cum In Mouth", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Cum In Vagina", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Cum On Body", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Cum On Face", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Drooling", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Fake Cum", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Grool", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Scat (Poop on)", dom: { T: "No and I don't want to", R: "", A: "Never. Hard Limit" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Spit for lube", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Spit in", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Spit on", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Urinate on body", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "Take it or leave it", A: "" } }
+      ],
+      "Dominance/submission": [
+        { a: "24/7 power exchange", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Behavior correction", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Decision control", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Journaling", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Mind Fucking", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Subspace", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Task setting", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } }
+      ],
+      "Edge Play": [
+        { a: "Clit Pumping", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Consensual non-consent", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Public Play", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Temperature extremes", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Exposure", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Writing on the body", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } }
+      ],
+      "Impact Play": [
+        { a: "Breast whipping", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Caning - Sensation", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Pussy spanking", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Pussy whipping", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Riding crops", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Spanking (OTK)", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Spanking-Hand", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Whipping - Flogger", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } }
+      ],
+      "Sensation Play": [
+        { a: "Blindfold", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Breath control-choking", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Cock Ring", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "Take it or leave it", A: "" } },
+        { a: "Ear plugs", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Enemas", dom: { T: "Yes", R: "", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Finger Claws", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Hair pulling", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Hot wax", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Ice", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Kissing", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Nipple play", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Nipple suction", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Nuru", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Skin Sensation Play", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Neck Kiss/Touch/Bite", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } }
+      ],
+      "Sexual Play": [
+        { a: "Anal sex", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "Take it or leave it", A: "" } },
+        { a: "Body Paint", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Face Fucking", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Mutual Masterbation", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Forced Orgasms", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Fellatio", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Cunnilingus", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "Take it or leave it", A: "" } },
+        { a: "Prostate Massage", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } }
+      ],
+      "Toys": [
+        { a: "Anal plugs - Medium", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Remote Toys", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Vibrator - External genital", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Vibrator - Internal genital", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } }
+      ],
+      "Voyeurism": [
+        { a: "Exhibitionism", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Voyeurism", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } }
+      ],
+      "Service": [
+        { a: "Following orders", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Learned postures", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Massage", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "Liked it", A: "" } },
+        { a: "Kneeling", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Rituals", dom: { T: "Yes", R: "Liked it", A: "" }, sub: { T: "Yes", R: "", A: "" } }
+      ],
+      "Kinks": [
+        { a: "Lingerie", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Pantyhose/Stockings", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Waking Up to Sex", dom: { T: "Yes", R: "Loved it", A: "" }, sub: { T: "No and I don't want to", R: "", A: "" } },
+        { a: "Teasing", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "", A: "" } },
+        { a: "Skin on Skin", dom: { T: "No and I don't want to", R: "", A: "" }, sub: { T: "Yes", R: "", A: "" } }
+      ]
+    };
+
     function checklistTemplateCol(id) {
       return collection(db, 'relationships', id, 'checklistTemplate');
     }
@@ -421,67 +548,59 @@
       const statusEl = document.getElementById('importStatus');
       statusEl.style.display = 'block';
       statusEl.style.color = '#D4AF37';
-      statusEl.textContent = 'Reading existing checklist data...';
+      statusEl.textContent = 'Importing original template + your current ratings...';
 
       try {
+        // 1. Load existing ratings
         const snap = await getDocs(checklistCol(relId));
         const existingData = {};
         snap.docs.forEach(d => existingData[d.id] = d.data().v);
 
-        // Group by base key (e.g. "sensation_play|blindfold")
-        const activityMap = {};
-        
+        // 2. Build a map of saved ratings by baseKey
+        const savedRatings = {};
         Object.keys(existingData).forEach(key => {
-          if (!key || typeof key !== 'string') return;
-          if (!key.includes('|')) return;
-          
+          if (!key || typeof key !== 'string' || !key.includes('|')) return;
           const baseKey = key.replace(/\.[tra]$/, '');
-          if (!activityMap[baseKey]) {
-            activityMap[baseKey] = { t: '', r: '', a: '' };
-          }
-          
-          if (key.endsWith('.t')) activityMap[baseKey].t = existingData[key];
-          if (key.endsWith('.r')) activityMap[baseKey].r = existingData[key];
-          if (key.endsWith('.a')) activityMap[baseKey].a = existingData[key];
+          if (!savedRatings[baseKey]) savedRatings[baseKey] = { t: '', r: '', a: '' };
+          if (key.endsWith('.t')) savedRatings[baseKey].t = existingData[key];
+          if (key.endsWith('.r')) savedRatings[baseKey].r = existingData[key];
+          if (key.endsWith('.a')) savedRatings[baseKey].a = existingData[key];
         });
 
-        const baseKeys = Object.keys(activityMap);
         let imported = 0;
 
-        for (const baseKey of baseKeys) {
-          const [catPart, actPart] = baseKey.split('|');
-          if (!catPart || !actPart) continue;
+        // 3. Go through the DEFAULT_TEMPLATE and merge with saved ratings
+        for (const [category, items] of Object.entries(DEFAULT_TEMPLATE)) {
+          for (const defaultItem of items) {
+            const baseKey = category.toLowerCase().replace(/\s+/g, '_') + '|' + defaultItem.a.toLowerCase().replace(/\s+/g, '_');
+            const saved = savedRatings[baseKey] || { t: '', r: '', a: '' };
 
-          const category = catPart.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-          const activity = actPart.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            const newItem = {
+              category,
+              a: defaultItem.a,
+              dom: {
+                T: saved.t || defaultItem.dom?.T || '',
+                R: saved.r || defaultItem.dom?.R || '',
+                A: saved.a || defaultItem.dom?.A || ''
+              },
+              sub: {
+                T: saved.t || defaultItem.sub?.T || '',
+                R: saved.r || defaultItem.sub?.R || '',
+                A: saved.a || defaultItem.sub?.A || ''
+              },
+              imported: true,
+              added: Date.now()
+            };
 
-          const data = activityMap[baseKey];
-
-          const newItem = {
-            category,
-            a: activity,
-            dom: {
-              T: data.t || '',
-              R: data.r || '',
-              A: data.a || ''
-            },
-            sub: {
-              T: data.t || '',
-              R: data.r || '',
-              A: data.a || ''
-            },
-            imported: true,
-            added: Date.now()
-          };
-
-          const id = 'tpl_import_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-          await setDoc(doc(checklistTemplateCol(relId), id), newItem);
-          templateItems.push({ id, ...newItem });
-          imported++;
+            const id = 'tpl_import_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            await setDoc(doc(checklistTemplateCol(relId), id), newItem);
+            templateItems.push({ id, ...newItem });
+            imported++;
+          }
         }
 
         statusEl.style.color = '#27ae60';
-        statusEl.textContent = `Imported ${imported} activities with their current ratings!`;
+        statusEl.textContent = `Imported ${imported} activities (original list + your current ratings)!`;
         
         setTimeout(() => {
           statusEl.style.display = 'none';
