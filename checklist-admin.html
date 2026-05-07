@@ -307,6 +307,19 @@
       <div id="excel-status" style="margin-top:8px; font-size:12px; display:none;"></div>
     </div>
 
+    <!-- DANGER ZONE -->
+    <div class="glass-card" style="border:2px solid #c0392b;">
+      <div class="section-title" style="color:#c0392b;">⚠️ Danger Zone</div>
+      <p style="margin-bottom:12px; color:#f5b7b1; font-size:13px;">
+        <strong>Warning:</strong> These actions will permanently delete data from Firestore. This cannot be undone.
+      </p>
+      
+      <button onclick="deleteAllFirestoreData()" class="btn" style="width:100%; background:#c0392b; color:white; border:none; padding:14px; border-radius:14px; font-weight:700;">
+        🗑️ Delete ALL Firestore Data
+      </button>
+      <div style="font-size:10px; color:#888; text-align:center; margin-top:8px;">This will delete checklist, template, and custom items</div>
+    </div>
+
   </div>
 
   <script type="module">
@@ -452,6 +465,9 @@
     }
     function checklistCol(id) {
       return collection(db, 'relationships', id, 'checklist');
+    }
+    function checklistCustomCol(id) {
+      return collection(db, 'relationships', id, 'checklistCustom');
     }
 
     async function init() {
@@ -803,10 +819,10 @@
 
             const baseKey = category.toLowerCase().replace(/\s+/g, '_') + '|' + activity.toLowerCase().replace(/\s+/g, '_');
 
-            // Write to template
+            // Write to template with category explicitly set
             const templateItem = {
-              category,
-              a: activity,
+              category: String(category).trim(),
+              a: String(activity).trim(),
               dom: { t: andyTried, r: andyRating, a: andyLimit },
               sub: { t: beccaTried, r: beccaRating, a: beccaLimit },
               imported: true,
@@ -841,6 +857,53 @@
         console.error(e);
         statusEl.style.color = '#c0392b';
         statusEl.textContent = 'Import failed: ' + e.message;
+      }
+    };
+
+    window.deleteAllFirestoreData = async function() {
+      if (!confirm("⚠️ WARNING: This will PERMANENTLY DELETE all checklist ratings from Firestore.\n\nThis will NOT delete your template/master list.\n\nThis CANNOT be undone.\n\nAre you absolutely sure?")) {
+        return;
+      }
+      
+      if (!confirm("FINAL WARNING: Type 'DELETE' in the next prompt to confirm.")) {
+        return;
+      }
+      
+      const confirmText = prompt("Type DELETE to confirm:");
+      if (confirmText !== "DELETE") {
+        alert("Deletion cancelled.");
+        return;
+      }
+
+      const statusEl = document.createElement('div');
+      statusEl.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#c0392b; color:white; padding:12px 24px; border-radius:8px; z-index:1000;';
+      statusEl.textContent = 'Deleting all Firestore data...';
+      document.body.appendChild(statusEl);
+
+      try {
+        // Only delete from checklist (the actual ratings)
+        // This keeps the template/master list intact
+        const checklistSnap = await getDocs(checklistCol(relId));
+        let deletedCount = 0;
+        
+        for (const docSnap of checklistSnap.docs) {
+          await deleteDoc(doc(checklistCol(relId), docSnap.id));
+          deletedCount++;
+        }
+
+        statusEl.style.background = '#27ae60';
+        statusEl.textContent = `✅ Deleted ${deletedCount} items from checklist!`;
+        
+        setTimeout(() => {
+          document.body.removeChild(statusEl);
+          location.reload();
+        }, 2000);
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.background = '#c0392b';
+        statusEl.textContent = 'Error: ' + e.message;
+        setTimeout(() => document.body.removeChild(statusEl), 5000);
       }
     };
 
