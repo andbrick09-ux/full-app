@@ -152,6 +152,14 @@
     .response-col {
       background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px;
     }
+
+    /* View mode hiding (from original checklist) */
+    body.view-me .theirs { display: none !important; }
+    body.view-partner .mine { display: none !important; }
+    body.view-me .response-grid, 
+    body.view-partner .response-grid { 
+      grid-template-columns: 1fr !important; 
+    }
     .col-title {
       font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
       color: #888; margin-bottom: 8px;
@@ -609,7 +617,7 @@
   </div>
   <div class="card-body">
     <div class="response-grid">
-      <div class="response-col">
+      <div class="response-col mine ${myRole}-me">
         <div class="col-title">${myName} (you)</div>
         <div class="field-row">
           <div class="field-label">My role</div>
@@ -632,7 +640,7 @@
           <textarea class="form-textarea" rows="2" data-sk="${key}.ns" oninput="schedSave()" style="font-size:12px; padding:8px;">${myNs}</textarea>
         </div>
       </div>
-      <div class="response-col">
+      <div class="response-col theirs ${pPfx}-partner">
         <div class="col-title">${partnerName}</div>
         <div class="field-row">
           <div class="field-label">Their role</div>
