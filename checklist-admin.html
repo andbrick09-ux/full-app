@@ -292,9 +292,9 @@
       <div id="raw-data-container" style="max-height:400px; overflow-y:auto; background:#0a1224; border-radius:8px; padding:8px;"></div>
     </div>
 
-    <!-- IMPORT FROM EXCEL -->
+    <!-- IMPORT FROM EXCEL (Legacy - single file) -->
     <div class="glass-card">
-      <div class="section-title">📤 Import from Excel File</div>
+      <div class="section-title">📤 Import from Excel File (Legacy)</div>
       <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
         Upload your original Excel file (like the one you pasted) and import all activities + ratings into Firestore in one click.
       </p>
@@ -305,6 +305,43 @@
       </div>
       
       <div id="excel-status" style="margin-top:8px; font-size:12px; display:none;"></div>
+    </div>
+
+    <!-- NEW: SEPARATE UPLOADS -->
+    <div class="glass-card">
+      <div class="section-title">📋 1. Upload Base Template (Category + Activity)</div>
+      <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
+        Upload a file with <strong>Category</strong> and <strong>Activity</strong> columns. This creates the master list.
+      </p>
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+        <input type="file" id="base-file" accept=".xlsx,.xls,.csv" style="flex:1; background:#0a1224; border:1px solid var(--border); padding:10px; border-radius:8px; color:#ddd;">
+        <button onclick="uploadBaseTemplate()" class="btn btn-gold">Upload Base</button>
+      </div>
+      <div id="base-status" style="margin-top:8px; font-size:12px; display:none;"></div>
+    </div>
+
+    <div class="glass-card">
+      <div class="section-title">👤 2. Upload Dom Ratings (Andy)</div>
+      <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
+        Upload Dom's ratings. Expected columns: <strong>Category | Activity | Tried | Rating | Limit</strong>
+      </p>
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+        <input type="file" id="dom-file" accept=".xlsx,.xls,.csv" style="flex:1; background:#0a1224; border:1px solid var(--border); padding:10px; border-radius:8px; color:#ddd;">
+        <button onclick="uploadDomRatings()" class="btn btn-gold">Upload Dom Ratings</button>
+      </div>
+      <div id="dom-status" style="margin-top:8px; font-size:12px; display:none;"></div>
+    </div>
+
+    <div class="glass-card">
+      <div class="section-title">👤 3. Upload Sub Ratings (Becca)</div>
+      <p style="margin-bottom:12px; color:#aaa; font-size:13px;">
+        Upload Sub's ratings. Expected columns: <strong>Category | Activity | Tried | Rating | Limit</strong>
+      </p>
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+        <input type="file" id="sub-file" accept=".xlsx,.xls,.csv" style="flex:1; background:#0a1224; border:1px solid var(--border); padding:10px; border-radius:8px; color:#ddd;">
+        <button onclick="uploadSubRatings()" class="btn btn-gold">Upload Sub Ratings</button>
+      </div>
+      <div id="sub-status" style="margin-top:8px; font-size:12px; display:none;"></div>
     </div>
 
     <!-- DANGER ZONE -->
@@ -912,6 +949,198 @@
         console.error(e);
         statusEl.style.color = '#c0392b';
         statusEl.textContent = 'Import failed: ' + e.message;
+      }
+    };
+
+    // ==================== NEW SEPARATE UPLOAD FUNCTIONS ====================
+
+    // Helper to load SheetJS
+    async function loadSheetJS() {
+      if (typeof XLSX === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        document.head.appendChild(script);
+        await new Promise(resolve => script.onload = resolve);
+      }
+    }
+
+    // Helper to parse Excel/CSV file into array of objects
+    async function parseFileToRows(file) {
+      await loadSheetJS();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+            resolve(json);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // Upload Base Template (Category + Activity only)
+    window.uploadBaseTemplate = async function() {
+      const fileInput = document.getElementById('base-file');
+      const statusEl = document.getElementById('base-status');
+
+      if (!fileInput.files.length) {
+        alert("Please select a file first");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#D4AF37';
+      statusEl.textContent = 'Uploading base template...';
+
+      try {
+        const rows = await parseFileToRows(file);
+        let count = 0;
+
+        for (const row of rows) {
+          const category = row.Category || row.category || row[0];
+          const activity = row.Activity || row.activity || row[1];
+          if (!category || !activity) continue;
+
+          const baseKey = String(category).toLowerCase().replace(/\s+/g, '_') + '|' + String(activity).toLowerCase().replace(/\s+/g, '_');
+
+          const templateItem = {
+            category: String(category).trim(),
+            a: String(activity).trim(),
+            dom: { t: '', r: '', a: '' },
+            sub: { t: '', r: '', a: '' },
+            imported: true,
+            added: Date.now()
+          };
+
+          const id = 'tpl_' + baseKey + '_' + Date.now();
+          await setDoc(doc(checklistTemplateCol(relId), id), templateItem);
+          count++;
+        }
+
+        statusEl.style.color = '#27ae60';
+        statusEl.textContent = `✅ Base template uploaded: ${count} items`;
+
+        setTimeout(() => {
+          statusEl.style.display = 'none';
+          renderTemplateList();
+        }, 2500);
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Upload failed: ' + e.message;
+      }
+    };
+
+    // Upload Dom Ratings
+    window.uploadDomRatings = async function() {
+      const fileInput = document.getElementById('dom-file');
+      const statusEl = document.getElementById('dom-status');
+
+      if (!fileInput.files.length) {
+        alert("Please select a file first");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#D4AF37';
+      statusEl.textContent = 'Uploading Dom ratings...';
+
+      try {
+        const rows = await parseFileToRows(file);
+        let count = 0;
+
+        for (const row of rows) {
+          const category = row.Category || row.category || row[0];
+          const activity = row.Activity || row.activity || row[1];
+          const tried = row.Tried || row.tried || row[2] || '';
+          const rating = row.Rating || row.rating || row[3] || '';
+          const limit = row.Limit || row.limit || row[4] || '';
+
+          if (!category || !activity) continue;
+
+          const baseKey = String(category).toLowerCase().replace(/\s+/g, '_') + '|' + String(activity).toLowerCase().replace(/\s+/g, '_');
+
+          // Write to checklist collection (Dom side)
+          await setDoc(doc(checklistCol(relId), `${baseKey}.t`), { v: tried, ts: Date.now() });
+          await setDoc(doc(checklistCol(relId), `${baseKey}.r`), { v: rating, ts: Date.now() });
+          await setDoc(doc(checklistCol(relId), `${baseKey}.a`), { v: limit, ts: Date.now() });
+
+          count++;
+        }
+
+        statusEl.style.color = '#27ae60';
+        statusEl.textContent = `✅ Dom ratings uploaded: ${count} items`;
+
+        setTimeout(() => {
+          statusEl.style.display = 'none';
+        }, 2500);
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Upload failed: ' + e.message;
+      }
+    };
+
+    // Upload Sub Ratings
+    window.uploadSubRatings = async function() {
+      const fileInput = document.getElementById('sub-file');
+      const statusEl = document.getElementById('sub-status');
+
+      if (!fileInput.files.length) {
+        alert("Please select a file first");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#D4AF37';
+      statusEl.textContent = 'Uploading Sub ratings...';
+
+      try {
+        const rows = await parseFileToRows(file);
+        let count = 0;
+
+        for (const row of rows) {
+          const category = row.Category || row.category || row[0];
+          const activity = row.Activity || row.activity || row[1];
+          const tried = row.Tried || row.tried || row[2] || '';
+          const rating = row.Rating || row.rating || row[3] || '';
+          const limit = row.Limit || row.limit || row[4] || '';
+
+          if (!category || !activity) continue;
+
+          const baseKey = String(category).toLowerCase().replace(/\s+/g, '_') + '|' + String(activity).toLowerCase().replace(/\s+/g, '_');
+
+          // Write to checklist collection (Sub side) — we use the same keys, the UI handles dom vs sub
+          await setDoc(doc(checklistCol(relId), `${baseKey}.t`), { v: tried, ts: Date.now() });
+          await setDoc(doc(checklistCol(relId), `${baseKey}.r`), { v: rating, ts: Date.now() });
+          await setDoc(doc(checklistCol(relId), `${baseKey}.a`), { v: limit, ts: Date.now() });
+
+          count++;
+        }
+
+        statusEl.style.color = '#27ae60';
+        statusEl.textContent = `✅ Sub ratings uploaded: ${count} items`;
+
+        setTimeout(() => {
+          statusEl.style.display = 'none';
+        }, 2500);
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Upload failed: ' + e.message;
       }
     };
 
