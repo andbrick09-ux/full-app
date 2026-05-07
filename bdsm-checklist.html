@@ -289,6 +289,12 @@
     .loading-overlay {
       position: fixed; inset: 0; background: var(--midnight);
       display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 16px;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
     .loading-title { font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--gold); }
     .spinner { width: 32px; height: 32px; border: 2px solid var(--gold-dim); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
