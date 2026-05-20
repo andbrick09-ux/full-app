@@ -13,63 +13,494 @@
   <link rel="stylesheet" href="styles.css" />
 
   <style>
-    /* Header matching screenshot */
-    .page-hero {
-      text-align: center; padding: 20px 0 12px;
+    /* ── Safe body ── */
+    body { min-height: 100dvh; overflow-x: hidden; }
+
+    /* ── Ambient glow (matches index) ── */
+    .glow-orb {
+      position: fixed; width: 460px; height: 460px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%);
+      top: -120px; left: 50%; transform: translateX(-50%);
+      pointer-events: none; z-index: 0;
+      animation: orbFloat 8s ease-in-out infinite;
     }
-    .page-title {
-      font-family: 'Great Vibes', cursive;
-      font-size: clamp(42px, 12vw, 58px);
-      background: linear-gradient(135deg, #D4AF37, #F5E6A3, #D4AF37);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 0; line-height: 1;
+    @keyframes orbFloat {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(28px); }
+    }
+
+    /* ── Page container ── */
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 600px; margin: 0 auto;
+      padding: 20px 20px calc(120px + var(--safe-b));
+    }
+
+    /* ── Page heading strip ── */
+    .page-hero {
+      text-align: center;
+      padding: 18px 0 10px;
+      animation: fadeUp 0.4s ease both;
     }
     .page-eyebrow {
-      font-size: 10px; font-weight: 700; letter-spacing: 3px;
-      color: #D4AF37; opacity: 0.6; margin-bottom: 2px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 4px; color: var(--gold); opacity: 0.45; margin-bottom: 4px;
+    }
+    .page-title {
+      font-family: 'Great Vibes', cursive; font-size: clamp(38px,11vw,56px);
+      background: linear-gradient(135deg,#D4AF37 0%,#F5E6A3 40%,#D4AF37 70%,#c9a227 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; margin: 0; line-height: 1.1;
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      50%  { background-position: 100% center; }
+      100% { background-position: 0% center; }
     }
 
-    /* New Note button - big & gold like screenshot */
-    .new-note-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 0 20px; height: 46px;
-      background: linear-gradient(135deg, #D4AF37, #f0d060);
-      color: #051024; border: none; border-radius: 9999px;
-      font-family: 'Montserrat', sans-serif; font-weight: 700;
-      font-size: 13px; letter-spacing: 1px; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(212,175,55,0.4);
+    /* ── Ornament divider ── */
+    .ornament-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 10px 0 20px;
+      animation: fadeUp 0.4s ease 0.05s both;
     }
-    .new-note-btn:hover { transform: translateY(-1px); }
-    .new-note-btn:active { transform: scale(0.96); }
+    .ornament-line { flex:1; height:1px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.2), transparent); }
+    .ornament-icon { color: var(--gold); font-size: 13px; opacity: 0.4; }
 
-    /* Rich body (bullets work) */
+    /* ── Search ── */
+    .search-wrap {
+      position: relative; margin-bottom: 14px;
+      animation: fadeUp 0.4s ease 0.08s both;
+    }
+    .search-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: rgba(212,175,55,0.4); font-size: 18px; pointer-events: none;
+    }
+    .search-input {
+      width: 100%; background: var(--glass2);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 14px 16px 14px 44px;
+      color: #ddd; font-family: 'Montserrat', sans-serif; font-size: 13px;
+      font-weight: 400; outline: none; transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.2); }
+    .search-input:focus {
+      border-color: rgba(212,175,55,0.4);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.08);
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex; gap: 8px; margin-bottom: 14px;
+      animation: fadeUp 0.4s ease 0.12s both;
+    }
+    .filter-btn {
+      flex: 1; padding: 10px 8px; border-radius: 25px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #888; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
+      cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .filter-btn.active {
+      background: var(--luxury-gradient); color: var(--midnight);
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(212,175,55,0.3);
+    }
+
+    /* ── Sort + Export row ── */
+    .controls-row {
+      display: flex; gap: 10px; margin-bottom: 20px;
+      animation: fadeUp 0.4s ease 0.15s both;
+    }
+    .sort-select {
+      flex: 1; background: var(--glass2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 16px;
+      color: #bbb; font-family: 'Montserrat', sans-serif; font-size: 11px;
+      font-weight: 500; outline: none; cursor: pointer;
+    }
+    .export-btn {
+      padding: 0 20px; border-radius: 14px;
+      background: transparent; border: 1px solid var(--border);
+      color: rgba(212,175,55,0.6);
+      font-family: 'Montserrat', sans-serif; font-size: 9px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .export-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .export-btn:active { transform: scale(0.96); }
+
+    /* ── Section label ── */
+    .notes-section-label {
+      font-size: 8px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 3px; color: #444; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .notes-section-label::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05);
+    }
+
+    /* ── Note cards ── */
+    #notes-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .note-card {
+      position: relative; overflow: hidden;
+      background: var(--glass2); backdrop-filter: blur(14px);
+      border: 1px solid var(--border); border-radius: 18px;
+      padding: 18px 18px 18px 24px;
+      cursor: pointer; transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      opacity: 0; animation: cardSlideIn 0.5s ease forwards;
+    }
+    .note-card:hover {
+      border-color: rgba(212,175,55,0.35);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 0 16px rgba(212,175,55,0.07);
+    }
+    .note-card:active { transform: translateY(0) scale(0.98); }
+
+    /* Colored left accent bar */
+    .note-accent {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      border-radius: 18px 0 0 18px;
+    }
+    .accent-gold   { background: var(--luxury-gradient); }
+    .accent-rose   { background: linear-gradient(180deg,#F44336,#FF6B6B); }
+    .accent-blue   { background: linear-gradient(180deg,#64B5F6,#42A5F5); }
+    .accent-purple { background: linear-gradient(180deg,#BA68C8,#9C27B0); }
+    .accent-green  { background: linear-gradient(180deg,#4CAF50,#66BB6A); }
+
+    /* Top bar: title + badges */
+    .note-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 10px; margin-bottom: 8px;
+    }
+    .note-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 600; color: var(--gold); line-height: 1.3;
+      flex: 1; min-width: 0;
+    }
+    .note-badges { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    .note-badge {
+      font-size: 8px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; padding: 3px 9px; border-radius: 20px;
+      display: inline-flex; align-items: center; line-height: 1; white-space: nowrap;
+    }
+    .badge-private  { background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.2); }
+    .badge-shared   { background: rgba(100,181,246,0.1); color: #64B5F6; border: 1px solid rgba(100,181,246,0.2); }
+    .badge-archived { background: rgba(255,255,255,0.06); color: #666; border: 1px solid rgba(255,255,255,0.08); }
+    .badge-partner  { background: rgba(76,175,80,0.1); color: #4CAF50; border: 1px solid rgba(76,175,80,0.2); }
+
+    /* Body text */
     .note-body {
-      font-size: 14px; line-height: 1.6; color: #ccc;
-      white-space: normal;
-      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+      font-size: 12px; font-weight: 300; color: #999;
+      line-height: 1.65; white-space: pre-wrap;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .note-body ul, .note-body ol { padding-left: 20px; margin: 8px 0; }
-    .note-body li { margin-bottom: 4px; }
+
+    /* Footer: tags + date */
+    .note-footer {
+      display: flex; align-items: center; gap: 8px; margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .note-tag {
+      font-size: 8px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; padding: 3px 10px; border-radius: 20px;
+      color: var(--midnight);
+    }
+    .note-date {
+      margin-left: auto; font-size: 9px; color: #555; letter-spacing: 0.5px;
+      font-family: 'Playfair Display', serif; font-style: italic;
+    }
+
+    /* Stagger card animations */
+    .note-card:nth-child(1) { animation-delay: 0.05s; }
+    .note-card:nth-child(2) { animation-delay: 0.12s; }
+    .note-card:nth-child(3) { animation-delay: 0.19s; }
+    .note-card:nth-child(4) { animation-delay: 0.26s; }
+    .note-card:nth-child(5) { animation-delay: 0.33s; }
+    .note-card:nth-child(6) { animation-delay: 0.40s; }
+    @keyframes cardSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Empty state ── */
+    #empty-state {
+      display: none; text-align: center; padding: 60px 24px;
+      background: var(--glass2); border: 1px solid var(--border);
+      border-radius: 20px; margin-top: 8px;
+    }
+    .empty-ornament { font-size: 2.5rem; margin-bottom: 16px; opacity: 0.4; }
+    .empty-title {
+      font-family: 'Playfair Display', serif; font-size: 18px;
+      color: var(--gold); margin-bottom: 8px; font-style: italic;
+    }
+    .empty-sub { font-size: 11px; color: #555; letter-spacing: 0.5px; }
+
+    /* ── Modal overlay ── */
+    .modal-back {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.82); backdrop-filter: blur(10px);
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-back.open { opacity: 1; pointer-events: all; }
+
+    .modal-sheet {
+      background: rgba(5,16,36,0.97); backdrop-filter: blur(24px);
+      border: 1px solid var(--border); border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 600px;
+      padding: 12px 22px calc(60px + var(--safe-b));   /* Increased bottom padding for nav bar */
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
+      max-height: 92vh; overflow-y: auto;
+    }
+    .modal-back.open .modal-sheet { transform: translateY(0); }
+
+    .modal-handle {
+      width: 36px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.1); margin: 14px auto 20px;
+    }
+    .modal-heading {
+      font-family: 'Great Vibes', cursive; font-size: 32px;
+      background: var(--luxury-gradient);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+    .modal-subheading {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 3px; color: rgba(212,175,55,0.4); margin-bottom: 22px;
+    }
+
+    /* Modal inputs */
+    .field-label {
+      font-size: 8px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: rgba(212,175,55,0.5); margin-bottom: 8px; display: block;
+    }
+    .field-input, .field-textarea, .field-select {
+      width: 100%; background: var(--glass2);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 13px 16px; color: #ddd;
+      font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 400;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 18px;
+    }
+    .field-textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+    .field-input:focus, .field-textarea:focus, .field-select:focus {
+      border-color: rgba(212,175,55,0.4);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.07);
+    }
+    .field-input::placeholder, .field-textarea::placeholder { color: rgba(255,255,255,0.18); }
+
+    /* Tag accent picker */
+    .accent-picker { display: flex; gap: 10px; margin-bottom: 20px; }
+    .accent-dot {
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .accent-dot.selected { border-color: rgba(255,255,255,0.6); transform: scale(1.18); }
+
+    /* Visibility toggle */
+    .vis-toggle { display: flex; gap: 8px; margin-bottom: 22px; }
+    .vis-btn {
+      flex: 1; padding: 10px; border-radius: 25px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      color: #777; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .vis-btn.active {
+      background: rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.35);
+      color: var(--gold);
+    }
+
+    /* Modal action row */
+    .modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .modal-cancel {
+      flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03); color: #666;
+      font-family: 'Montserrat', sans-serif; font-size: 10px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-save {
+      flex: 2; padding: 14px; border-radius: 14px; border: none;
+      background: var(--luxury-gradient); color: var(--midnight);
+      font-family: 'Montserrat', sans-serif; font-size: 10px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212,175,55,0.25); transition: all 0.2s;
+    }
+    .modal-save:active { transform: scale(0.97); }
+    .modal-cancel:active { transform: scale(0.97); }
+
+    /* ── View note modal ── */
+    .view-modal-back {
+      position: fixed; inset: 0; z-index: 310;
+      background: rgba(0,0,0,0.88); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+      padding: 20px;
+    }
+    .view-modal-back.open { opacity: 1; pointer-events: all; }
+    .view-modal-card {
+      background: rgba(5,16,36,0.97); border: 1px solid var(--border);
+      border-radius: 24px; width: 100%; max-width: 480px; max-height: 82vh;
+      overflow-y: auto; padding: 28px 24px calc(40px + var(--safe-b));   /* Safer bottom padding */
+      transform: scale(0.9) translateY(16px);
+      transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
+      position: relative;
+    }
+    .view-modal-back.open .view-modal-card { transform: scale(1) translateY(0); }
+    .view-top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .view-close-btn {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07);
+      color: #888; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .view-close-btn:hover { background: rgba(212,175,55,0.08); color: var(--gold); border-color: rgba(212,175,55,0.2); }
+    .view-note-title {
+      font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;
+      color: var(--gold); margin-bottom: 12px; line-height: 1.3;
+    }
+    .view-note-meta {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: #555; margin-bottom: 18px;
+    }
+    .view-note-body {
+      font-size: 13px; font-weight: 300; color: #bbb; line-height: 1.85;
+      white-space: pre-wrap; margin-bottom: 22px;
+    }
+    .view-note-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .view-actions { display: flex; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .view-edit-btn {
+      flex: 1; padding: 12px; border-radius: 12px;
+      background: var(--luxury-gradient); color: var(--midnight); border: none;
+      font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.2s;
+    }
+    .view-delete-btn {
+      padding: 12px 16px; border-radius: 12px;
+      background: rgba(244,67,54,0.07); border: 1px solid rgba(244,67,54,0.2);
+      color: #F44336;
+      font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.2s;
+    }
+    .view-edit-btn:active, .view-delete-btn:active { transform: scale(0.97); }
+
+    /* ── Note count badge ── */
+    .note-count {
+      font-size: 10px; font-weight: 700; color: #555;
+      letter-spacing: 1px; text-align: right; margin-bottom: 14px;
+      font-family: 'Playfair Display', serif; font-style: italic;
+    }
   </style>
+<link rel="stylesheet" href="nav.css" />
 
-  <link rel="stylesheet" href="nav.css" />
-
-  <!-- Quill -->
+  <!-- Quill Rich Text Editor -->
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <style>
+    /* Quill toolbar styled to match Dom Sub Hub theme */
+    .ql-toolbar.ql-snow {
+      background: rgba(5,16,36,0.95);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      padding: 8px 12px;
+    }
+    .ql-toolbar.ql-snow .ql-stroke {
+      stroke: #D4AF37;
+    }
+    .ql-toolbar.ql-snow .ql-fill {
+      fill: #D4AF37;
+    }
+    .ql-toolbar.ql-snow .ql-picker-label {
+      color: #D4AF37;
+    }
+    .ql-container.ql-snow {
+      background: var(--glass2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      color: #ddd;
+      min-height: 180px;
+    }
+    .ql-editor {
+      min-height: 160px;
+      padding: 14px 16px;
+      line-height: 1.7;
+    }
+    .ql-editor.ql-blank::before {
+      color: rgba(255,255,255,0.25);
+      font-style: normal;
+    }
+    /* Make Quill feel native */
+    .ql-snow .ql-tooltip {
+      background: #051024;
+      border: 1px solid var(--gold);
+      color: #ddd;
+    }
+
+    /* === New Note Button (matches theme) === */
+    .new-note-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 18px;
+      height: 42px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #D4AF37, #f0d060);
+      color: #051024;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(212,175,55,0.35);
+      white-space: nowrap;
+    }
+    .new-note-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(212,175,55,0.45);
+    }
+    .new-note-btn:active {
+      transform: scale(0.96);
+    }
+    .new-note-btn .material-symbols-rounded {
+      font-size: 18px;
+      margin-top: -1px;
+    }
+  </style>
 </head>
 
 <body data-nav="more">
   <div class="glow-orb"></div>
 
-  <!-- Hero Header (matches screenshot) -->
-  <div class="page-hero">
-    <div class="page-eyebrow">OUR THOUGHTS</div>
-    <h1 class="page-title">Notes</h1>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-center">
+      <div class="topbar-title">Notes</div>
+      <div class="topbar-sub">Our Thoughts</div>
+    </div>
   </div>
 
+  <!-- Main -->
   <div class="page-wrap">
 
     <!-- Search -->
@@ -78,15 +509,15 @@
       <input id="search-input" class="search-input" type="text" placeholder="Search notes…" oninput="renderNotes()" />
     </div>
 
-    <!-- Filters -->
+    <!-- Filter bar -->
     <div class="filter-bar">
-      <button class="filter-btn active" id="filter-all" onclick="setFilter('all')">All</button>
-      <button class="filter-btn" id="filter-shared" onclick="setFilter('shared')">Shared</button>
-      <button class="filter-btn" id="filter-private" onclick="setFilter('private')">Private</button>
-      <button class="filter-btn" id="filter-archived" onclick="setFilter('archived')">Archived</button>
+      <button class="filter-btn active" id="filter-all"      onclick="setFilter('all')">All</button>
+      <button class="filter-btn"        id="filter-shared"   onclick="setFilter('shared')">Shared</button>
+      <button class="filter-btn"        id="filter-private"  onclick="setFilter('private')">Private</button>
+      <button class="filter-btn"        id="filter-archived" onclick="setFilter('archived')">Archived</button>
     </div>
 
-    <!-- Controls + Add Note -->
+    <!-- Sort + Export + New Note -->
     <div class="controls-row">
       <select id="sort-select" class="sort-select" onchange="renderNotes()">
         <option value="newest">Newest First</option>
@@ -94,38 +525,507 @@
         <option value="az">A – Z</option>
         <option value="za">Z – A</option>
       </select>
+
+      <!-- Prominent New Note button -->
       <button class="new-note-btn" onclick="openNewNoteModal()">
         <span class="material-symbols-rounded">add</span>
-        New Note
+        <span>New Note</span>
       </button>
     </div>
 
+    <!-- Count -->
     <div class="note-count" id="note-count"></div>
+
+    <!-- Section label -->
     <div class="notes-section-label">Your Notes</div>
 
+    <!-- Notes list -->
     <div id="notes-list"></div>
-    <div id="empty-state">...</div>
+
+    <!-- Empty state -->
+    <div id="empty-state">
+      <div class="empty-ornament">✦</div>
+      <div class="empty-title">No notes found</div>
+      <div class="empty-sub">Try a different filter, or tap the New Note button above.</div>
+    </div>
+
   </div>
 
-  <!-- Modals and rest of your existing HTML stay the same -->
-  <!-- (New/Edit Modal, View Modal, Toast) -->
+  <!-- ══ New / Edit Note Modal ══ -->
+  <div id="note-modal" class="modal-back" onclick="handleModalBackdropClick(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <div class="modal-heading" id="modal-heading">New Note</div>
+      <div class="modal-subheading" id="modal-subheading">Add to your note</div>
+
+      <label class="field-label">Title</label>
+      <input id="note-title-input" class="field-input" type="text" placeholder="Note heading…" />
+
+      <label class="field-label">Content</label>
+      <div id="quill-editor" style="min-height: 140px;"></div>   <!-- Slightly shorter for better modal fit -->
+      <!-- Hidden fallback for old notes -->
+      <textarea id="note-body-input" style="display:none;"></textarea>
+
+      <label class="field-label">Tags (comma-separated)</label>
+      <input id="note-tags-input" class="field-input" type="text" placeholder="e.g. scene, reflection, rule" />
+
+      <label class="field-label">Accent Colour</label>
+      <div class="accent-picker" id="accent-picker">
+        <div class="accent-dot accent-gold selected"   data-accent="gold"   style="background:linear-gradient(135deg,#D4AF37,#F5E6A3);" onclick="selectAccent(this,'gold')"></div>
+        <div class="accent-dot accent-rose"            data-accent="rose"   style="background:linear-gradient(135deg,#F44336,#FF6B6B);" onclick="selectAccent(this,'rose')"></div>
+        <div class="accent-dot accent-blue"            data-accent="blue"   style="background:linear-gradient(135deg,#64B5F6,#42A5F5);" onclick="selectAccent(this,'blue')"></div>
+        <div class="accent-dot accent-purple"          data-accent="purple" style="background:linear-gradient(135deg,#BA68C8,#9C27B0);" onclick="selectAccent(this,'purple')"></div>
+        <div class="accent-dot accent-green"           data-accent="green"  style="background:linear-gradient(135deg,#4CAF50,#66BB6A);" onclick="selectAccent(this,'green')"></div>
+      </div>
+
+      <label class="field-label">Visibility</label>
+      <div class="vis-toggle">
+        <button class="vis-btn active" id="vis-private"  onclick="setVisibility('private')">🔒 Private</button>
+        <button class="vis-btn"        id="vis-shared"   onclick="setVisibility('shared')">🔗 Shared</button>
+        <button class="vis-btn"        id="vis-archived" onclick="setVisibility('archived')">📦 Archived</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-save"   onclick="saveNote()">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ View Note Modal ══ -->
+  <div id="view-modal" class="view-modal-back" onclick="handleViewBackdropClick(event)">
+    <div class="view-modal-card">
+      <div class="view-top-bar">
+        <div class="view-note-badges" id="view-badges"></div>
+        <button class="view-close-btn" onclick="closeViewModal()">✕</button>
+      </div>
+      <div class="view-note-title" id="view-title"></div>
+      <div class="view-note-meta"  id="view-meta"></div>
+      <div class="view-note-body"  id="view-body"></div>
+      <div class="view-note-footer" id="view-tags"></div>
+      <div class="view-actions">
+        <button class="view-edit-btn"   onclick="editCurrentNote()">Edit Note</button>
+        <button class="view-delete-btn" onclick="deleteCurrentNote()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
   <script type="module">
-    // Your full script from before (imports, init, noteCardHTML with rich text, etc.)
-    // ... keep everything you had in the working version ...
+    import { requireAuth, dataCol, getPartnerUid, partnerDataCol, getUserProfile } from './auth.js';
+    import {
+      getDocs, doc, setDoc, deleteDoc, onSnapshot, addDoc, serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { auth } from './firebase-config.js';
 
-    function noteCardHTML(n) {
-      // ... your current noteCardHTML with sanitizeHTML and rich text support ...
-      // (the one that already shows bullets correctly)
+    /* ── Auth guard ── */
+    let currentUser;
+    let notesCol;
+    let partnerUid = null;
+    let partnerNotesCol = null;
+    let partnerName = 'Partner';
+
+    /* ── State ── */
+    let notes = [];
+    let ownNotes = [];
+    let partnerSharedNotes = [];
+    let activeFilter = 'all';
+    let selectedAccent = 'gold';
+    let selectedVisibility = 'private';
+    let editingId = null;
+    let viewingId = null;
+    let quill = null; // Quill rich text editor instance
+
+    async function init() {
+      currentUser = await requireAuth();
+      notesCol = dataCol('notes');
+
+      // Check for partner
+      partnerUid = await getPartnerUid();
+      if (partnerUid) {
+        partnerNotesCol = await partnerDataCol('notes');
+        const partnerProfile = await getUserProfile(partnerUid);
+        if (partnerProfile?.displayName) partnerName = partnerProfile.displayName;
+      }
+
+      // Real-time listener for YOUR notes
+      onSnapshot(notesCol, snap => {
+        ownNotes = snap.docs.map(d => ({
+          ...d.data(),
+          isOwn: true,
+          ownerUid: currentUser.uid
+        }));
+        combineNotes();
+      });
+
+      // Real-time listener for PARTNER'S shared notes (if paired)
+      if (partnerNotesCol) {
+        onSnapshot(partnerNotesCol, snap => {
+          partnerSharedNotes = snap.docs
+            .map(d => d.data())
+            .filter(n => n.visibility === 'shared')
+            .map(n => ({
+              ...n,
+              isOwn: false,
+              ownerUid: partnerUid
+            }));
+          combineNotes();
+        });
+      } else {
+        combineNotes(); // no partner → just render your own
+      }
     }
 
-    // Make sure these are exposed:
-    window.openNewNoteModal = openNewNoteModal;
-    window.setFilter = setFilter;
-    // ... other window. assignments ...
+    function combineNotes() {
+      notes = [...ownNotes, ...partnerSharedNotes];
+      renderNotes();
+    }
+
+    /* ── Utilities ── */
+    function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+    async function persist(note) {
+      const ref = doc(notesCol, note.id);
+      await setDoc(ref, note);
+    }
+
+    async function deleteNote(id) {
+      await deleteDoc(doc(notesCol, id));
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    /* ── Filter ── */
+    function setFilter(f) {
+      activeFilter = f;
+      ['all','shared','private','archived'].forEach(k => {
+        document.getElementById('filter-'+k).classList.toggle('active', k === f);
+      });
+      renderNotes();
+    }
+
+    /* ── Render ── */
+    function renderNotes() {
+      const q     = document.getElementById('search-input').value.toLowerCase().trim();
+      const sort  = document.getElementById('sort-select').value;
+      const list  = document.getElementById('notes-list');
+      const empty = document.getElementById('empty-state');
+      const count = document.getElementById('note-count');
+
+      let filtered = notes.filter(n => {
+        if (activeFilter !== 'all' && n.visibility !== activeFilter) return false;
+        if (q && !n.title.toLowerCase().includes(q) && !n.body.toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      filtered.sort((a,b) => {
+        if (sort === 'newest') return b.created - a.created;
+        if (sort === 'oldest') return a.created - b.created;
+        if (sort === 'az')     return a.title.localeCompare(b.title);
+        if (sort === 'za')     return b.title.localeCompare(a.title);
+      });
+
+      if (!filtered.length) {
+        list.innerHTML = ''; empty.style.display = 'block';
+        count.textContent = 'No notes'; return;
+      }
+      empty.style.display = 'none';
+      count.textContent = filtered.length + ' note' + (filtered.length !== 1 ? 's' : '');
+
+      list.innerHTML = filtered.map(n => noteCardHTML(n)).join('');
+    }
+
+    function noteCardHTML(n) {
+      const date = new Date(n.created).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+
+      let badgeHTML;
+      if (!n.isOwn) {
+        badgeHTML = `<span class="note-badge badge-partner">🔗 Shared by ${escHtml(partnerName)}</span>`;
+      } else if (n.visibility === 'private') {
+        badgeHTML = `<span class="note-badge badge-private">🔒 Private</span>`;
+      } else if (n.visibility === 'shared') {
+        badgeHTML = `<span class="note-badge badge-shared">🔗 Shared</span>`;
+      } else {
+        badgeHTML = `<span class="note-badge badge-archived">📦 Archived</span>`;
+      }
+
+      const tagColors = { gold:'#D4AF37', rose:'#F44336', blue:'#64B5F6', purple:'#BA68C8', green:'#4CAF50' };
+      const tagBg     = (tagColors[n.accent] || '#D4AF37') + '22';
+      const tagCol    = tagColors[n.accent] || '#D4AF37';
+      const tagHTML   = (n.tags||[]).map(t =>
+        `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
+      ).join('');
+
+      return `
+        <div class="note-card" onclick="openViewModal('${n.id}')">
+          <div class="note-accent accent-${n.accent}"></div>
+          <div class="note-top">
+            <div class="note-title">${escHtml(n.title)}</div>
+            <div class="note-badges">${badgeHTML}</div>
+          </div>
+          <div class="note-body">${escHtml(n.body)}</div>
+          <div class="note-footer">
+            ${tagHTML}
+            <div class="note-date">${date}</div>
+          </div>
+        </div>`;
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── New note modal ── */
+    function openNewNoteModal() {
+      editingId = null;
+      document.getElementById('modal-heading').textContent   = 'New Note';
+      document.getElementById('modal-subheading').textContent = 'Add to your private record';
+      document.getElementById('note-title-input').value = '';
+      document.getElementById('note-tags-input').value  = '';
+      selectAccent(document.querySelector('[data-accent="gold"]'), 'gold');
+      setVisibility('private');
+
+      // Initialize Quill and clear it
+      const q = initQuill();
+      q.setText('');
+
+      document.getElementById('note-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('note-modal').classList.remove('open');
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target === document.getElementById('note-modal')) closeModal();
+    }
+
+    /* ── Initialize Quill Rich Text Editor (once) ── */
+    function initQuill() {
+      if (quill) return quill;
+      quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Write your thoughts, protocols, reflections…',
+        modules: {
+          toolbar: [
+            [{ 'header': [2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['clean']
+          ]
+        }
+      });
+      return quill;
+    }
+
+    /* ── Accent / visibility ── */
+    function selectAccent(el, accent) {
+      selectedAccent = accent;
+      document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function setVisibility(v) {
+      selectedVisibility = v;
+      ['private','shared','archived'].forEach(k => {
+        document.getElementById('vis-'+k).classList.toggle('active', k === v);
+      });
+    }
+
+    /* ── Save with Activity Logging ── */
+    async function saveNote() {
+      const title = document.getElementById('note-title-input').value.trim();
+      const q = initQuill();
+      const body = q.root.innerHTML.trim();   // Save as rich HTML
+      if (!title) { showToast('Please add a title'); return; }
+
+      const tags = document.getElementById('note-tags-input').value
+        .split(',').map(t => t.trim()).filter(Boolean);
+
+      const isNewNote = !editingId;
+
+      if (editingId) {
+        const idx = notes.findIndex(n => n.id === editingId);
+        if (idx > -1) {
+          const updated = { ...notes[idx], title, body, tags, accent: selectedAccent, visibility: selectedVisibility };
+          await persist(updated);
+        }
+        showToast('Note updated');
+      } else {
+        const note = { 
+          id: uid(), 
+          title, 
+          body, 
+          tags, 
+          accent: selectedAccent, 
+          visibility: selectedVisibility, 
+          created: Date.now() 
+        };
+        await persist(note);
+
+        // === ACTIVITY LOGGING FOR DOM & SUB ===
+        try {
+          if (partnerUid) {
+            // Log to partner's notes collection so it appears in their activity feed
+            const activityCol = partnerDataCol('notes', partnerUid);
+            await addDoc(activityCol, {
+              content: `New note from ${currentUser.uid === partnerUid ? 'partner' : 'you'}: ${title}`,
+              type: 'note',
+              timestamp: serverTimestamp(),
+              from: currentUser.uid
+            });
+          }
+        } catch (e) {
+          console.log('Activity log (non-critical):', e);
+        }
+
+        showToast('Note saved');
+      }
+
+      closeModal();
+    }
+
+    /* ── View modal ── */
+    function openViewModal(id) {
+      const n = notes.find(n => n.id === id);
+      if (!n) return;
+      viewingId = id;
+
+      const date = new Date(n.created).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      const tagColors = { gold:'#D4AF37', rose:'#F44336', blue:'#64B5F6', purple:'#BA68C8', green:'#4CAF50' };
+      const tagBg = (tagColors[n.accent]||'#D4AF37') + '22';
+      const tagCol = tagColors[n.accent]||'#D4AF37';
+
+      let badgeHTML;
+      if (!n.isOwn) {
+        badgeHTML = `<span class="note-badge badge-partner">🔗 Shared by ${escHtml(partnerName)}</span>`;
+      } else if (n.visibility === 'private') {
+        badgeHTML = `<span class="note-badge badge-private">🔒 Private</span>`;
+      } else if (n.visibility === 'shared') {
+        badgeHTML = `<span class="note-badge badge-shared">🔗 Shared</span>`;
+      } else {
+        badgeHTML = `<span class="note-badge badge-archived">📦 Archived</span>`;
+      }
+
+      document.getElementById('view-badges').innerHTML = badgeHTML;
+      document.getElementById('view-title').textContent = n.title;
+      document.getElementById('view-meta').textContent  = date;
+
+      // Render rich text if it contains HTML tags, otherwise plain text (backward compat)
+      const viewBodyEl = document.getElementById('view-body');
+      if (n.body && (n.body.includes('<p>') || n.body.includes('<strong>') || n.body.includes('<em>'))) {
+        viewBodyEl.innerHTML = n.body;
+        viewBodyEl.style.whiteSpace = 'normal';
+      } else {
+        viewBodyEl.textContent = n.body || '';
+        viewBodyEl.style.whiteSpace = 'pre-wrap';
+      }
+      document.getElementById('view-tags').innerHTML = (n.tags||[]).map(t =>
+        `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
+      ).join('');
+
+      // Read-only handling for partner's notes
+      const editBtn = document.querySelector('.view-edit-btn');
+      const deleteBtn = document.querySelector('.view-delete-btn');
+
+      if (n.isOwn) {
+        editBtn.style.display = '';
+        deleteBtn.style.display = '';
+        editBtn.disabled = false;
+        deleteBtn.disabled = false;
+      } else {
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        // Add read-only notice
+        const existingNotice = document.getElementById('readonly-notice');
+        if (existingNotice) existingNotice.remove();
+        const notice = document.createElement('div');
+        notice.id = 'readonly-notice';
+        notice.style.cssText = 'font-size:9px;color:#4CAF50;margin-top:12px;text-align:center;';
+        notice.textContent = `🔗 Shared by ${partnerName} — read only`;
+        document.getElementById('view-tags').after(notice);
+      }
+
+      document.getElementById('view-modal').classList.add('open');
+    }
+
+    function closeViewModal() {
+      // clean up notice
+      const notice = document.getElementById('readonly-notice');
+      if (notice) notice.remove();
+      document.getElementById('view-modal').classList.remove('open');
+      viewingId = null;
+    }
+
+    function handleViewBackdropClick(e) {
+      if (e.target === document.getElementById('view-modal')) closeViewModal();
+    }
+
+    function editCurrentNote() {
+      if (!viewingId) return;
+      const n = notes.find(nn => nn.id === viewingId);
+      if (!n || !n.isOwn) {
+        showToast("You can only edit your own notes");
+        return;
+      }
+      closeViewModal();
+      editingId = n.id;
+      document.getElementById('modal-heading').textContent    = 'Edit Note';
+      document.getElementById('modal-subheading').textContent = 'Update your record';
+      document.getElementById('note-title-input').value = n.title;
+      document.getElementById('note-tags-input').value  = (n.tags||[]).join(', ');
+      const dot = document.querySelector(`[data-accent="${n.accent}"]`);
+      if (dot) selectAccent(dot, n.accent);
+      setVisibility(n.visibility || 'private');
+
+      // Load into Quill (backward compatible with old plain-text notes)
+      const q = initQuill();
+      if (n.body && (n.body.includes('<') || n.body.includes('</'))) {
+        q.root.innerHTML = n.body;           // rich text
+      } else {
+        q.setText(n.body || '');             // old plain text
+      }
+
+      document.getElementById('note-modal').classList.add('open');
+    }
+
+    async function deleteCurrentNote() {
+      if (!viewingId) return;
+      const n = notes.find(nn => nn.id === viewingId);
+      if (!n || !n.isOwn) {
+        showToast("You can only delete your own notes");
+        return;
+      }
+      await deleteNote(viewingId);
+      closeViewModal();
+      showToast('Note deleted');
+    }
+
+    /* ── Init ── */
+    // Expose all functions called from inline HTML onclick handlers
+    window.saveNote          = saveNote;
+    window.deleteCurrentNote = deleteCurrentNote;
+    window.setFilter         = setFilter;
+    window.setVisibility     = setVisibility;
+    window.openViewModal     = openViewModal;
+    window.closeViewModal    = closeViewModal;
+    window.editCurrentNote   = editCurrentNote;
+    window.handleViewBackdropClick = handleViewBackdropClick;
+    window.openNewNoteModal  = openNewNoteModal;
+    window.selectAccent      = selectAccent;
+    window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
+    window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
 
     init();
   </script>
-  <script src="nav.js"></script>
+<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+<script src="nav.js"></script>
 </body>
 </html>
