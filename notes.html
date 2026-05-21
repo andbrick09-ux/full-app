@@ -193,10 +193,10 @@
     .badge-archived { background: rgba(255,255,255,0.06); color: #666; border: 1px solid rgba(255,255,255,0.08); }
     .badge-partner  { background: rgba(76,175,80,0.1); color: #4CAF50; border: 1px solid rgba(76,175,80,0.2); }
 
-    /* Body text */
+    /* Body text — FIX: removed white-space:pre-wrap so stripped plain text wraps cleanly */
     .note-body {
       font-size: 12px; font-weight: 300; color: #999;
-      line-height: 1.65; white-space: pre-wrap;
+      line-height: 1.65;
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -258,7 +258,7 @@
       background: rgba(5,16,36,0.97); backdrop-filter: blur(24px);
       border: 1px solid var(--border); border-radius: 28px 28px 0 0;
       width: 100%; max-width: 600px;
-      padding: 12px 22px calc(60px + var(--safe-b));   /* Increased bottom padding for nav bar */
+      padding: 12px 22px calc(60px + var(--safe-b));
       transform: translateY(100%);
       transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
       max-height: 92vh; overflow-y: auto;
@@ -355,7 +355,7 @@
     .view-modal-card {
       background: rgba(5,16,36,0.97); border: 1px solid var(--border);
       border-radius: 24px; width: 100%; max-width: 480px; max-height: 82vh;
-      overflow-y: auto; padding: 28px 24px calc(40px + var(--safe-b));   /* Safer bottom padding */
+      overflow-y: auto; padding: 28px 24px calc(40px + var(--safe-b));
       transform: scale(0.9) translateY(16px);
       transition: transform 0.35s cubic-bezier(0.22,0.68,0,1.2);
       position: relative;
@@ -379,8 +379,16 @@
     }
     .view-note-body {
       font-size: 13px; font-weight: 300; color: #bbb; line-height: 1.85;
-      white-space: pre-wrap; margin-bottom: 22px;
+      margin-bottom: 22px;
     }
+    /* Style rich text content rendered inside view-note-body */
+    .view-note-body p { margin-bottom: 0.6em; }
+    .view-note-body ul, .view-note-body ol { padding-left: 1.4em; margin-bottom: 0.6em; }
+    .view-note-body li { margin-bottom: 0.25em; }
+    .view-note-body strong { color: #ddd; font-weight: 600; }
+    .view-note-body em { color: rgba(212,175,55,0.8); }
+    .view-note-body h2, .view-note-body h3 { color: var(--gold); font-family: 'Playfair Display', serif; margin-bottom: 0.4em; }
+
     .view-note-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .view-actions { display: flex; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.05); }
     .view-edit-btn {
@@ -436,10 +444,10 @@
       font-family: 'Montserrat', sans-serif;
       font-size: 14px;
       color: #ddd;
-      min-height: 180px;
+      min-height: 120px;
     }
     .ql-editor {
-      min-height: 160px;
+      min-height: 120px;
       padding: 14px 16px;
       line-height: 1.7;
     }
@@ -517,7 +525,7 @@
       <button class="filter-btn"        id="filter-archived" onclick="setFilter('archived')">Archived</button>
     </div>
 
-    <!-- Sort + Export + New Note -->
+    <!-- Sort + New Note -->
     <div class="controls-row">
       <select id="sort-select" class="sort-select" onchange="renderNotes()">
         <option value="newest">Newest First</option>
@@ -563,11 +571,11 @@
       <input id="note-title-input" class="field-input" type="text" placeholder="Note heading…" />
 
       <label class="field-label">Content</label>
-      <div id="quill-editor" style="min-height: 140px;"></div>   <!-- Slightly shorter for better modal fit -->
+      <div id="quill-editor"></div>
       <!-- Hidden fallback for old notes -->
       <textarea id="note-body-input" style="display:none;"></textarea>
 
-      <label class="field-label">Tags (comma-separated)</label>
+      <label class="field-label" style="margin-top:18px;">Tags (comma-separated)</label>
       <input id="note-tags-input" class="field-input" type="text" placeholder="e.g. scene, reflection, rule" />
 
       <label class="field-label">Accent Colour</label>
@@ -637,13 +645,12 @@
     let selectedVisibility = 'private';
     let editingId = null;
     let viewingId = null;
-    let quill = null; // Quill rich text editor instance
+    let quill = null;
 
     async function init() {
       currentUser = await requireAuth();
       notesCol = dataCol('notes');
 
-      // Check for partner
       partnerUid = await getPartnerUid();
       if (partnerUid) {
         partnerNotesCol = await partnerDataCol('notes');
@@ -651,7 +658,6 @@
         if (partnerProfile?.displayName) partnerName = partnerProfile.displayName;
       }
 
-      // Real-time listener for YOUR notes
       onSnapshot(notesCol, snap => {
         ownNotes = snap.docs.map(d => ({
           ...d.data(),
@@ -661,7 +667,6 @@
         combineNotes();
       });
 
-      // Real-time listener for PARTNER'S shared notes (if paired)
       if (partnerNotesCol) {
         onSnapshot(partnerNotesCol, snap => {
           partnerSharedNotes = snap.docs
@@ -675,7 +680,7 @@
           combineNotes();
         });
       } else {
-        combineNotes(); // no partner → just render your own
+        combineNotes();
       }
     }
 
@@ -702,6 +707,17 @@
       setTimeout(() => t.classList.remove('show'), 2200);
     }
 
+    /**
+     * FIX: Strip HTML tags to get plain text for card previews and search.
+     * Uses a temporary DOM element so it handles all HTML entities correctly.
+     */
+    function stripHtml(html) {
+      if (!html) return '';
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    }
+
     /* ── Filter ── */
     function setFilter(f) {
       activeFilter = f;
@@ -721,7 +737,8 @@
 
       let filtered = notes.filter(n => {
         if (activeFilter !== 'all' && n.visibility !== activeFilter) return false;
-        if (q && !n.title.toLowerCase().includes(q) && !n.body.toLowerCase().includes(q)) return false;
+        // FIX: strip HTML before searching so rich-text content is matched correctly
+        if (q && !n.title.toLowerCase().includes(q) && !stripHtml(n.body).toLowerCase().includes(q)) return false;
         return true;
       });
 
@@ -759,9 +776,14 @@
       const tagColors = { gold:'#D4AF37', rose:'#F44336', blue:'#64B5F6', purple:'#BA68C8', green:'#4CAF50' };
       const tagBg     = (tagColors[n.accent] || '#D4AF37') + '22';
       const tagCol    = tagColors[n.accent] || '#D4AF37';
+
+      // FIX: corrected template literal interpolation for tag styles
       const tagHTML   = (n.tags||[]).map(t =>
-        `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
+        `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${escHtml(t)}</span>`
       ).join('');
+
+      // FIX: use stripHtml so the card preview shows clean plain text, not raw HTML tags
+      const previewText = escHtml(stripHtml(n.body));
 
       return `
         <div class="note-card" onclick="openViewModal('${n.id}')">
@@ -770,7 +792,7 @@
             <div class="note-title">${escHtml(n.title)}</div>
             <div class="note-badges">${badgeHTML}</div>
           </div>
-          <div class="note-body">${escHtml(n.body)}</div>
+          <div class="note-body">${previewText}</div>
           <div class="note-footer">
             ${tagHTML}
             <div class="note-date">${date}</div>
@@ -792,7 +814,6 @@
       selectAccent(document.querySelector('[data-accent="gold"]'), 'gold');
       setVisibility('private');
 
-      // Initialize Quill and clear it
       const q = initQuill();
       q.setText('');
 
@@ -801,13 +822,14 @@
 
     function closeModal() {
       document.getElementById('note-modal').classList.remove('open');
+      editingId = null;
     }
 
     function handleModalBackdropClick(e) {
       if (e.target === document.getElementById('note-modal')) closeModal();
     }
 
-    /* ── Initialize Quill Rich Text Editor (once) ── */
+    /* ── Initialize Quill (once) ── */
     function initQuill() {
       if (quill) return quill;
       quill = new Quill('#quill-editor', {
@@ -839,17 +861,15 @@
       });
     }
 
-    /* ── Save with Activity Logging ── */
+    /* ── Save ── */
     async function saveNote() {
       const title = document.getElementById('note-title-input').value.trim();
       const q = initQuill();
-      const body = q.root.innerHTML.trim();   // Save as rich HTML
+      const body = q.root.innerHTML.trim();
       if (!title) { showToast('Please add a title'); return; }
 
       const tags = document.getElementById('note-tags-input').value
         .split(',').map(t => t.trim()).filter(Boolean);
-
-      const isNewNote = !editingId;
 
       if (editingId) {
         const idx = notes.findIndex(n => n.id === editingId);
@@ -859,24 +879,24 @@
         }
         showToast('Note updated');
       } else {
-        const note = { 
-          id: uid(), 
-          title, 
-          body, 
-          tags, 
-          accent: selectedAccent, 
-          visibility: selectedVisibility, 
-          created: Date.now() 
+        const note = {
+          id: uid(),
+          title,
+          body,
+          tags,
+          accent: selectedAccent,
+          visibility: selectedVisibility,
+          created: Date.now()
         };
         await persist(note);
 
-        // === ACTIVITY LOGGING FOR DOM & SUB ===
+        // Activity logging (non-critical)
         try {
           if (partnerUid) {
-            // Log to partner's notes collection so it appears in their activity feed
-            const activityCol = partnerDataCol('notes', partnerUid);
+            // FIX: partnerDataCol only takes one argument; removed stray second arg
+            const activityCol = await partnerDataCol('activity');
             await addDoc(activityCol, {
-              content: `New note from ${currentUser.uid === partnerUid ? 'partner' : 'you'}: ${title}`,
+              content: `New note: ${title}`,
               type: 'note',
               timestamp: serverTimestamp(),
               from: currentUser.uid
@@ -900,6 +920,7 @@
 
       const date = new Date(n.created).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
       const tagColors = { gold:'#D4AF37', rose:'#F44336', blue:'#64B5F6', purple:'#BA68C8', green:'#4CAF50' };
+      // FIX: corrected template literal interpolation for tag styles
       const tagBg = (tagColors[n.accent]||'#D4AF37') + '22';
       const tagCol = tagColors[n.accent]||'#D4AF37';
 
@@ -918,21 +939,23 @@
       document.getElementById('view-title').textContent = n.title;
       document.getElementById('view-meta').textContent  = date;
 
-      // Render rich text if it contains HTML tags, otherwise plain text (backward compat)
+      // Render rich HTML in the view modal — safe because this is your own/partner's stored content
       const viewBodyEl = document.getElementById('view-body');
-      if (n.body && (n.body.includes('<p>') || n.body.includes('<strong>') || n.body.includes('<em>'))) {
+      if (n.body && n.body.includes('<')) {
         viewBodyEl.innerHTML = n.body;
         viewBodyEl.style.whiteSpace = 'normal';
       } else {
+        // Backward compat: old plain-text notes
         viewBodyEl.textContent = n.body || '';
         viewBodyEl.style.whiteSpace = 'pre-wrap';
       }
+
+      // FIX: corrected template literal interpolation for tag styles
       document.getElementById('view-tags').innerHTML = (n.tags||[]).map(t =>
-        `<span class="note-tag" style="background:\( {tagBg};color: \){tagCol};">${t}</span>`
+        `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${escHtml(t)}</span>`
       ).join('');
 
-      // Read-only handling for partner's notes
-      const editBtn = document.querySelector('.view-edit-btn');
+      const editBtn   = document.querySelector('.view-edit-btn');
       const deleteBtn = document.querySelector('.view-delete-btn');
 
       if (n.isOwn) {
@@ -940,10 +963,11 @@
         deleteBtn.style.display = '';
         editBtn.disabled = false;
         deleteBtn.disabled = false;
+        const existingNotice = document.getElementById('readonly-notice');
+        if (existingNotice) existingNotice.remove();
       } else {
         editBtn.style.display = 'none';
         deleteBtn.style.display = 'none';
-        // Add read-only notice
         const existingNotice = document.getElementById('readonly-notice');
         if (existingNotice) existingNotice.remove();
         const notice = document.createElement('div');
@@ -957,7 +981,6 @@
     }
 
     function closeViewModal() {
-      // clean up notice
       const notice = document.getElementById('readonly-notice');
       if (notice) notice.remove();
       document.getElementById('view-modal').classList.remove('open');
@@ -985,12 +1008,11 @@
       if (dot) selectAccent(dot, n.accent);
       setVisibility(n.visibility || 'private');
 
-      // Load into Quill (backward compatible with old plain-text notes)
       const q = initQuill();
-      if (n.body && (n.body.includes('<') || n.body.includes('</'))) {
-        q.root.innerHTML = n.body;           // rich text
+      if (n.body && n.body.includes('<')) {
+        q.root.innerHTML = n.body;
       } else {
-        q.setText(n.body || '');             // old plain text
+        q.setText(n.body || '');
       }
 
       document.getElementById('note-modal').classList.add('open');
@@ -1008,8 +1030,7 @@
       showToast('Note deleted');
     }
 
-    /* ── Init ── */
-    // Expose all functions called from inline HTML onclick handlers
+    /* ── Expose to inline onclick handlers ── */
     window.saveNote          = saveNote;
     window.deleteCurrentNote = deleteCurrentNote;
     window.setFilter         = setFilter;
@@ -1020,12 +1041,14 @@
     window.handleViewBackdropClick = handleViewBackdropClick;
     window.openNewNoteModal  = openNewNoteModal;
     window.selectAccent      = selectAccent;
-    window.openModal         = typeof openModal  === 'function' ? openModal  : () => document.getElementById('note-modal').classList.add('open');
-    window.closeModal        = typeof closeModal === 'function' ? closeModal : () => { document.getElementById('note-modal').classList.remove('open'); editingId = null; };
+    window.closeModal        = closeModal;
+    window.handleModalBackdropClick = handleModalBackdropClick;
+    window.renderNotes       = renderNotes;
 
     init();
   </script>
-<!-- nav.js injects the nav bar, overlay and More sheet automatically -->
-<script src="nav.js"></script>
+
+  <!-- nav.js injects the nav bar, overlay and More sheet automatically -->
+  <script src="nav.js"></script>
 </body>
 </html>
