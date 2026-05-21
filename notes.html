@@ -619,25 +619,6 @@
     </div>
   </div>
 
-  <!-- ══ Delete Confirmation Modal ══ -->
-  <div id="delete-modal" class="modal-back" onclick="handleDeleteBackdropClick(event)">
-    <div class="modal-sheet" style="padding-bottom: calc(40px + var(--safe-b));">
-      <div class="modal-handle"></div>
-      <div class="modal-heading" style="font-size:26px;">Delete Note</div>
-      <div class="modal-subheading">This cannot be undone</div>
-      <p style="font-size:13px;color:#888;line-height:1.6;margin-bottom:28px;">
-        Are you sure you want to permanently delete this note?
-      </p>
-      <div class="modal-actions">
-        <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
-        <button class="modal-save" onclick="confirmDelete()"
-          style="background:linear-gradient(135deg,#c0392b,#e74c3c);box-shadow:0 6px 20px rgba(231,76,60,0.3);">
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -728,18 +709,13 @@
 
     /**
      * FIX: Strip HTML tags to get plain text for card previews and search.
-     * Inserts a space before block-level elements first so list items and
-     * paragraphs don't run together (e.g. "Item 1Item 2" → "Item 1 Item 2").
+     * Uses a temporary DOM element so it handles all HTML entities correctly.
      */
     function stripHtml(html) {
       if (!html) return '';
-      // Add a space for line breaks and after block-level closing tags
-      const spaced = html
-        .replace(/<br\s*\/?>/gi, ' ')
-        .replace(/<\/(p|li|h[1-6]|div)>/gi, '</$1> ');
       const tmp = document.createElement('div');
-      tmp.innerHTML = spaced;
-      return (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
     }
 
     /* ── Filter ── */
@@ -1042,38 +1018,21 @@
       document.getElementById('note-modal').classList.add('open');
     }
 
-    function deleteCurrentNote() {
+    async function deleteCurrentNote() {
       if (!viewingId) return;
       const n = notes.find(nn => nn.id === viewingId);
       if (!n || !n.isOwn) {
         showToast("You can only delete your own notes");
         return;
       }
-      // Show confirmation sheet instead of deleting immediately
-      document.getElementById('delete-modal').classList.add('open');
-    }
-
-    async function confirmDelete() {
-      closeDeleteModal();
       await deleteNote(viewingId);
       closeViewModal();
       showToast('Note deleted');
     }
 
-    function closeDeleteModal() {
-      document.getElementById('delete-modal').classList.remove('open');
-    }
-
-    function handleDeleteBackdropClick(e) {
-      if (e.target === document.getElementById('delete-modal')) closeDeleteModal();
-    }
-
     /* ── Expose to inline onclick handlers ── */
     window.saveNote          = saveNote;
     window.deleteCurrentNote = deleteCurrentNote;
-    window.confirmDelete     = confirmDelete;
-    window.closeDeleteModal  = closeDeleteModal;
-    window.handleDeleteBackdropClick = handleDeleteBackdropClick;
     window.setFilter         = setFilter;
     window.setVisibility     = setVisibility;
     window.openViewModal     = openViewModal;
