@@ -709,16 +709,13 @@
 
     /**
      * FIX: Strip HTML tags to get plain text for card previews and search.
-     * Inserts a space before block-level elements first so list items and
-     * paragraphs don't run together (e.g. "Item 1Item 2" → "Item 1 Item 2").
+     * Uses a temporary DOM element so it handles all HTML entities correctly.
      */
     function stripHtml(html) {
       if (!html) return '';
-      // Add a space before block-level tags so content doesn't collide when tags are removed
-      const spaced = html.replace(/<\/(p|li|h[1-6]|div|br)>/gi, '</$1> ');
       const tmp = document.createElement('div');
-      tmp.innerHTML = spaced;
-      return (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
     }
 
     /* ── Filter ── */
