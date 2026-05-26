@@ -66,6 +66,7 @@
     { href: 'notes.html', icon: '📝', label: 'Notes' },
     { href: 'calendar.html', icon: '📅', label: 'Calendar' },
   /*  { href: 'protocol-daily.html', icon: '📅', label: 'Daily Protocol' },*/
+    { href: 'public-game.html', icon: '🎲', label: 'Public Fun' },
     { href: 'help.html', icon: '❓', label: 'Help &amp; Info' },
     { href: 'settings.html', icon: '⚙️', label: 'Settings' }
 
