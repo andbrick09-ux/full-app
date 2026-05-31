@@ -15,6 +15,22 @@
  */
 (function () {
 
+  /* ── Apply Global Theme & Font Size Synchronously ── */
+  try {
+    var savedTheme = localStorage.getItem('dsh-theme') || 'midnight';
+    var savedSize = localStorage.getItem('dsh-font-size') || 'fs-medium';
+    
+    // Apply theme class
+    document.body.classList.remove('theme-midnight', 'theme-rose', 'theme-obsidian', 'theme-light');
+    document.body.classList.add('theme-' + savedTheme);
+    
+    // Apply font size class
+    document.body.classList.remove('fs-small', 'fs-medium', 'fs-large');
+    document.body.classList.add(savedSize);
+  } catch (e) {
+    console.error('Failed to load global preferences:', e);
+  }
+
   /* ── 1. Nav link definitions ─────────────────────────────
      To add/remove/reorder tabs: edit NAV_TABS.
      To add/remove More sheet links: edit MORE_ITEMS.

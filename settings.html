@@ -255,8 +255,9 @@
   <script type="module">
     import { requireAuth, getMyProfile, logOut, dataRef,
              getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile } from './auth.js';
-    import { getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { getDoc, setDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
     import { updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { db } from './firebase-config.js';
 
     let settingsCache = {};
     let currentUser   = null;
@@ -326,6 +327,16 @@
       return settingsCache;
     }
 
+    function applySettings(theme, size) {
+      // Apply theme class
+      document.body.classList.remove('theme-midnight', 'theme-rose', 'theme-obsidian', 'theme-light');
+      document.body.classList.add('theme-' + theme);
+
+      // Apply font size class
+      document.body.classList.remove('fs-small', 'fs-medium', 'fs-large');
+      document.body.classList.add(size);
+    }
+
     async function loadSettings() {
       const s = await fetchSettings();
 
@@ -344,6 +355,11 @@
       document.querySelectorAll('.training-toggle').forEach(chk =>
         chk.checked = activeTs.includes(chk.value));
 
+      // Cache globally and apply immediately
+      localStorage.setItem('dsh-theme', theme);
+      localStorage.setItem('dsh-font-size', size);
+      applySettings(theme, size);
+
       renderLimitsList();
       setSaveState('idle');
     }
@@ -357,11 +373,14 @@
       const activeTs   = Array.from(document.querySelectorAll('.training-toggle:checked')).map(c => c.value);
       const newUsername = document.getElementById('settingName').value.trim();
 
+      const theme = themeEl ? themeEl.dataset.theme : 'midnight';
+      const size = sizeEl ? sizeEl.dataset.size : 'fs-medium';
+
       const s = {
         ...settingsCache,
         name:            newUsername,
-        theme:           themeEl ? themeEl.dataset.theme : 'midnight',
-        fontSize:        sizeEl  ? sizeEl.dataset.size   : 'fs-medium',
+        theme:           theme,
+        fontSize:        size,
         activeTrainings: activeTs,
       };
 
@@ -369,6 +388,10 @@
         // Write to Firestore settings doc
         await setDoc(dataRef('settings'), s, { merge:true });
         settingsCache = s;
+
+        // Cache globally for instant load
+        localStorage.setItem('dsh-theme', theme);
+        localStorage.setItem('dsh-font-size', size);
 
         // Write displayName back to Firebase Auth profile
         if (newUsername && newUsername !== currentUser.displayName) {
@@ -378,20 +401,20 @@
             '<span style="font-size:11px;color:var(--cream-mute)">Username:</span> ' + newUsername;
         }
 
-        // Also write to user profile doc if your auth.js maintains one
+        // Write to persistent user profile doc
         try {
-          await setDoc(dataRef('profile'), { displayName: newUsername }, { merge:true });
+          await setDoc(doc(db, 'users', currentUser.uid), { displayName: newUsername }, { merge:true });
         } catch(e) { /* profile doc optional */ }
 
         setSaveState('saved');
-        showToast('Settings saved \u2736');
+        showToast('Settings saved ✦');
         setTimeout(() => setSaveState('idle'), 1500);
 
       } catch(ex) {
         console.error('Save error:', ex);
-        let msg = 'Save failed \u2014 check your connection';
-        if (ex.message?.includes('permission'))    msg = 'Permission denied \u2014 check Firestore rules';
-        if (ex.message?.includes('authenticated')) msg = 'Not logged in \u2014 please log in again';
+        let msg = 'Save failed — check your connection';
+        if (ex.message?.includes('permission'))    msg = 'Permission denied — check Firestore rules';
+        if (ex.message?.includes('authenticated')) msg = 'Not logged in — please log in again';
         showToast(msg);
         setSaveState('dirty');
       }
@@ -401,11 +424,21 @@
     function selectTheme(el) {
       document.querySelectorAll('.theme-option').forEach(p => p.classList.remove('selected'));
       el.classList.add('selected');
+      const theme = el.dataset.theme;
+      const sizeEl = document.querySelector('.dynamic-pill.selected');
+      const size = sizeEl ? sizeEl.dataset.size : 'fs-medium';
+      applySettings(theme, size);
+      markDirty();
     }
 
     function selectFontSize(el) {
       document.querySelectorAll('#fontSizePills .dynamic-pill').forEach(p => p.classList.remove('selected'));
       el.classList.add('selected');
+      const themeEl = document.querySelector('.theme-option.selected');
+      const theme = themeEl ? themeEl.dataset.theme : 'midnight';
+      const size = el.dataset.size;
+      applySettings(theme, size);
+      markDirty();
     }
 
     // ── Limits ───────────────────────────────────────────────
