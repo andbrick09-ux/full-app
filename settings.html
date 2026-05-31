@@ -194,15 +194,6 @@
         </div>
       </div>
 
-      <!-- HARD LIMITS -->
-      <div class="settings-group">
-        <span class="settings-group-label">Hard Limits</span>
-        <div class="limits-input-row">
-          <input class="settings-input" id="limitInput" type="text" maxlength="40" placeholder="Add a hard limit..." onkeydown="if(event.key==='Enter') addLimit()"/>
-          <button class="limits-add-btn" onclick="addLimit()"><span class="material-symbols-rounded">add</span></button>
-        </div>
-        <div class="limits-list" id="limitsList"></div>
-      </div>
 
       <!-- TYPOGRAPHY -->
       <div class="settings-group">
@@ -331,7 +322,6 @@
       localStorage.setItem('dsh-font-size', size);
       applySettings(theme, size);
 
-      renderLimitsList();
       setSaveState('idle');
     }
 
@@ -410,46 +400,7 @@
       markDirty();
     }
 
-    // ── Limits ───────────────────────────────────────────────
-    function renderLimitsList() {
-      const list   = document.getElementById('limitsList');
-      const limits = settingsCache.limits || [];
-      if (!limits.length) {
-        list.innerHTML = '<div class="limits-empty">No hard limits active. Sir will have full creative freedom.</div>';
-        return;
-      }
-      list.innerHTML = limits.map((l,i) =>
-        '<div class="limits-item">' +
-          '<span class="material-symbols-rounded" style="font-size:18px;color:rgba(244,67,54,.8);flex-shrink:0">block</span>' +
-          '<span class="limits-item-text">' + l + '</span>' +
-          '<button class="limits-item-del" onclick="removeLimit(' + i + ')">' +
-            '<span class="material-symbols-rounded" style="font-size:20px;">close</span>' +
-          '</button>' +
-        '</div>'
-      ).join('');
-    }
 
-    async function addLimit() {
-      const input = document.getElementById('limitInput');
-      const val   = (input.value || '').trim();
-      if (!val) return;
-      const limits = settingsCache.limits || [];
-      if (!limits.includes(val)) {
-        limits.push(val);
-        settingsCache.limits = limits;
-        await setDoc(dataRef('settings'), { limits }, { merge:true });
-      }
-      input.value = '';
-      renderLimitsList();
-    }
-
-    async function removeLimit(i) {
-      const limits = settingsCache.limits || [];
-      limits.splice(i,1);
-      settingsCache.limits = limits;
-      await setDoc(dataRef('settings'), { limits }, { merge:true });
-      renderLimitsList();
-    }
 
     async function clearHistory() {
       if (confirm('Are you absolutely sure you want to clear ALL your Firestore data? This cannot be undone.')) {
@@ -567,10 +518,7 @@
     window.saveSettings     = saveSettings;
     window.selectTheme      = selectTheme;
     window.selectFontSize   = selectFontSize;
-    window.addLimit         = addLimit;
-    window.removeLimit      = removeLimit;
     window.clearHistory     = clearHistory;
-    window.renderLimitsList = renderLimitsList;
     window.loadRelationship = loadRelationship;
 
     init();
