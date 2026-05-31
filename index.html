@@ -151,63 +151,33 @@ let partnerUid = null;
 let partnerDisplayName = null;
 
 async function init() {
-  try {
-    const user = await requireAuth();
-    currentRole = await getMyRole();
-    currentProfile = await getMyProfile();
+  const user = await requireAuth();
+  currentRole = await getMyRole();
+  currentProfile = await getMyProfile();
 
-    // Get partner UID and display name if paired
-    if (currentProfile?.relationshipId) {
-      try {
-        partnerUid = await getPartnerUid();
-        if (partnerUid) {
-          const partnerProfile = await getUserProfile(partnerUid);
-          partnerDisplayName = partnerProfile?.displayName || null;
-        }
-      } catch (e) { console.log('No partner relationship found'); }
-    }
-
-    document.body.dataset.role = currentRole;
-
-    // Render the appropriate dashboard
-    if (currentRole === 'dom') {
-      renderDomDashboard();
-    } else {
-      renderSubDashboard();
-    }
-
-    // Always init live week tracker
-    initLiveWeekTracker();
-  } catch (error) {
-    console.error("Database connection failed:", error);
-    renderErrorScreen(error.message || error);
+  // Get partner UID and display name if paired
+  if (currentProfile?.relationshipId) {
+    try {
+      partnerUid = await getPartnerUid();
+      if (partnerUid) {
+        const partnerProfile = await getUserProfile(partnerUid);
+        partnerDisplayName = partnerProfile?.displayName || null;
+      }
+    } catch (e) { console.log('No partner relationship found'); }
   }
-}
 
-function renderErrorScreen(message) {
-  const container = document.getElementById('dashboard');
-  if (container) {
-    container.innerHTML = `
-      <header class="hdr">
-        <span class="app-name">DOM SUB HUB v1</span>
-        <span class="app-sub">Connection Error</span>
-      </header>
-      
-      <div class="card" style="margin-top: 32px; padding: 28px 20px; border-color: var(--crimson); text-align: center; animation: fadeU 0.4s ease both;">
-        <div style="font-size: 44px; margin-bottom: 16px; filter: drop-shadow(0 0 10px rgba(139, 34, 48, 0.3));">⚠️</div>
-        <div style="font-family: 'Playfair Display', serif; font-size: 18px; color: #e07585; font-weight: 600; margin-bottom: 8px;">Database Offline</div>
-        <div style="font-size: 11px; color: var(--muted2); line-height: 1.6; margin-bottom: 24px; font-family: 'Raleway', sans-serif;">
-          Unable to establish a secure connection with Firestore database. Please verify your internet connection or Firestore rules configuration.<br>
-          <span style="display:block; margin-top:8px; font-size:9.5px; font-family:monospace; color:rgba(255,255,255,0.45); word-break:break-all;">Error: ${message}</span>
-        </div>
-        <button onclick="window.location.reload()" style="width: 100%; padding: 12px 0; border-radius: 999px; background: linear-gradient(135deg, var(--gold), var(--gold-l)); color: #080c14; border: none; font-size: 11px; letter-spacing: 1.5px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(201, 168, 76, 0.25);">
-          RETRY CONNECTION
-        </button>
-      </div>
-    `;
+  document.body.dataset.role = currentRole;
+
+  // Render the appropriate dashboard
+  if (currentRole === 'dom') {
+    renderDomDashboard();
+  } else {
+    renderSubDashboard();
   }
-}
 
+  // Always init live week tracker
+  initLiveWeekTracker();
+}
 
 function renderDomDashboard() {
   const container = document.getElementById('dashboard');
