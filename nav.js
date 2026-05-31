@@ -19,11 +19,11 @@
   try {
     var savedTheme = localStorage.getItem('dsh-theme') || 'midnight';
     var savedSize = localStorage.getItem('dsh-font-size') || 'fs-medium';
-    
+
     // Apply theme class
     document.body.classList.remove('theme-midnight', 'theme-rose', 'theme-obsidian', 'theme-light');
     document.body.classList.add('theme-' + savedTheme);
-    
+
     // Apply font size class
     document.body.classList.remove('fs-small', 'fs-medium', 'fs-large');
     document.body.classList.add(savedSize);
@@ -77,13 +77,14 @@
   var MORE_ITEMS = [
     { href: 'toy-vault.html', icon: '🔒', label: 'Toy Vault' },
     { href: 'bdsm-checklist.html', icon: '✅', label: 'Assessments &amp; Ratings' },
-   /* { href: 'sirs-protocol.html', icon: '📜', label: 'Dom\u2019s Protocol' }, */
+    /* { href: 'sirs-protocol.html', icon: '📜', label: 'Dom\u2019s Protocol' }, */
     { href: 'song-vault.html', icon: '🎵', label: 'Song Vault' },
     { href: 'notes.html', icon: '📝', label: 'Notes' },
     { href: 'calendar.html', icon: '📅', label: 'Calendar' },
-  /*  { href: 'protocol-daily.html', icon: '📅', label: 'Daily Protocol' },*/
+    /*  { href: 'protocol-daily.html', icon: '📅', label: 'Daily Protocol' },*/
     { href: 'public-game.html', icon: '🎲', label: 'Public Fun' },
-    { href: 'help.html', icon: '❓', label: 'Help &amp; Info' },
+    /*        { href: 'help.html', icon: '❓', label: 'Help &amp; Info' },*/
+    { href: 'admin.html', icon: '🛠️', label: 'Admin Panel' },
     { href: 'settings.html', icon: '⚙️', label: 'Settings' }
 
   ];
