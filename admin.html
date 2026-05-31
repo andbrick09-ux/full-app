@@ -88,16 +88,9 @@
   <div class="orb2"></div>
 
   <div class="page">
-    <div class="header">
-    <div>
+    <div class="header" style="justify-content:center; margin-bottom:28px">
       <span class="brand">Dom Sub Hub</span>
-      <span class="admin-badge">ADMIN</span>
     </div>
-    <div>
-      <span id="current-user" style="color:var(--muted);font-size:13px"></span>
-      <a href="index.html" style="color:var(--gold);text-decoration:none;margin-left:16px">← Back</a>
-    </div>
-  </div>
 
   <div id="admin-content">
     <!-- Populated by JS -->
@@ -118,8 +111,6 @@
       await requireAuth();
       
       const profile = await getMyProfile();
-      const userEl = document.getElementById('current-user');
-      userEl.innerHTML = `${profile.displayName} <span style="color:#e05268">(${profile.role})</span>`;
 
       if (!profile.isAdmin && profile.role !== 'admin') {
         document.getElementById('admin-content').innerHTML = `
