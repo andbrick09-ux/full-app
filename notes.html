@@ -196,18 +196,17 @@
     /* Body text — FIX: removed white-space:pre-wrap so stripped plain text wraps cleanly */
     .note-body {
       font-size: 12px; font-weight: 300; color: #999;
-      line-height: 1.65;
+      line-height: 1.5;
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .note-body p { display: inline; }
-    .note-body p:not(:last-child)::after { content: ' '; }
-    .note-body ul, .note-body ol { display: inline; padding: 0; margin: 0; }
-    .note-body li { display: inline; }
-    .note-body li:not(:last-child)::after { content: ' \2022  '; }
+    .note-body p { margin: 0 0 3px 0; }
+    .note-body p:last-child { margin-bottom: 0; }
+    .note-body ul, .note-body ol { padding-left: 1.2rem; margin: 0 0 3px 0; }
+    .note-body li { margin-bottom: 2px; }
     .note-body strong { color: #ccc; font-weight: 600; }
     .note-body em { color: rgba(212,175,55,0.75); }
-    .note-body h2, .note-body h3 { font-size: 12px; font-weight: 600; color: var(--gold); display: inline; }
+    .note-body h2, .note-body h3 { font-size: 12px; font-weight: 600; color: var(--gold); margin: 0 0 3px 0; }
 
     /* Footer: tags + date */
     .note-footer {
