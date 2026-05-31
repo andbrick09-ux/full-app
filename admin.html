@@ -19,7 +19,14 @@
     }
     body{
       min-height:100dvh;background:var(--bg);color:var(--text);
-      font-family:'Raleway',sans-serif;padding:20px 20px 80px;
+      font-family:'Raleway',sans-serif;
+    }
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:480px;
+      margin:0 auto;
+      padding:20px 16px 120px;
     }
     .orb{position:fixed;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 68%);top:-160px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;animation:floatA 9s ease-in-out infinite}
     .orb2{position:fixed;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(139,34,48,0.05) 0%,transparent 70%);bottom:80px;right:-60px;pointer-events:none;z-index:0;animation:floatB 11s ease-in-out infinite}
@@ -54,6 +61,25 @@
     .btn-primary{background:linear-gradient(135deg,#c9a84c,#e2c47a);color:#06090f;border:none;font-weight:600}
     .btn-secondary{background:none;border:1px solid var(--gold-b);color:var(--gold)}
     .btn:hover{transform:translateY(-1px)}
+
+    #pairs-table-container, #users-table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 480px) {
+      .page {
+        padding: 16px 12px 100px;
+      }
+      .card {
+        padding: 16px;
+        border-radius: 16px;
+      }
+      th, td {
+        padding: 10px 8px;
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 <body data-nav="more">
@@ -61,7 +87,8 @@
   <div class="orb"></div>
   <div class="orb2"></div>
 
-  <div class="header">
+  <div class="page">
+    <div class="header">
     <div>
       <span class="brand">Dom Sub Hub</span>
       <span class="admin-badge">ADMIN</span>
@@ -74,6 +101,7 @@
 
   <div id="admin-content">
     <!-- Populated by JS -->
+  </div>
   </div>
 
   <script type="module">
@@ -242,7 +270,7 @@
       `;
 
       users.forEach(user => {
-        const roleColor = user.role === 'dom' ? '#c9a84c' : user.role === 'sub' ? '#e05268' : '#68707f';
+        const roleColor = user.role === 'dom' ? '#e05268' : user.role === 'sub' ? '#4fc38a' : '#68707f';
         const paired = user.relationshipId ? 'Yes' : 'No';
 
         html += `
