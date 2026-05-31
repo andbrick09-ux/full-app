@@ -319,6 +319,13 @@
         <select id="w-cat" class="form-select"></select>
       </div>
       
+      <!-- NEW: Website field -->
+      <div class="form-group">
+        <label class="form-label">Website / Link (optional)</label>
+        <input type="url" id="w-website" class="form-input" 
+               placeholder="https://example.com/product">
+      </div>
+      
       <input type="hidden" id="w-id">
       
       <div style="display:flex; gap:12px; margin-top:24px;">
@@ -626,10 +633,22 @@
         const itemOwner = w.owner ? w.owner.toLowerCase() : myRole;
         const addedBy = (itemOwner === myRole) ? "Added by Me" : `Added by ${partnerName}`;
         
+        let linkHtml = '';
+        if (w.website) {
+          linkHtml = `
+            <div style="margin-top:8px;">
+              <a href="${w.website}" target="_blank" style="color:var(--gold); font-size:12px; text-decoration:underline; display:inline-flex; align-items:center; gap:4px;" onclick="event.stopPropagation();">
+                🔗 View Product
+              </a>
+            </div>
+          `;
+        }
+        
         return `
           <div class="menu-card" onclick="openWishModal('${w.id}')">
             <div class="menu-card-title">${w.name}</div>
             <div class="menu-card-meta">${w.category || 'Uncategorized'} • ${addedBy}</div>
+            ${linkHtml}
           </div>
         `;
       }).join('');
@@ -766,13 +785,13 @@
         document.getElementById('w-id').value = id;
         document.getElementById('w-name').value = w.name;
         document.getElementById('w-cat').value = w.category || 'Other';
+        document.getElementById('w-website').value = w.website || '';
         
-        const canDelete = true; // Wishlist items are personal
-        deleteBtn.style.display = canDelete ? 'block' : 'none';
+        deleteBtn.style.display = 'block';
         deleteBtn.onclick = () => deleteWish(id);
       } else {
         document.getElementById('wish-modal-title').textContent = 'Add New Desire';
-        ['w-name','w-id'].forEach(f => document.getElementById(f).value = '');
+        ['w-name','w-id','w-website'].forEach(f => document.getElementById(f).value = '');
         document.getElementById('w-cat').value = 'Vibration';
         deleteBtn.style.display = 'none';
       }
@@ -797,6 +816,7 @@
         id,
         name,
         category: document.getElementById('w-cat').value,
+        website: document.getElementById('w-website').value.trim() || null,
         owner: myRole,
         added: Date.now()
       };
