@@ -64,7 +64,7 @@ export async function signIn(email, password) {
 
 export async function signUp(email, password, displayName, role) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
-  const uid  = cred.user.uid;
+  const uid = cred.user.uid;
 
   // Write user profile doc
   await setDoc(doc(db, 'users', uid), {
@@ -148,7 +148,7 @@ export async function sendPairingInvite(subEmail) {
   const snap = await getDocs(q);
   if (snap.empty) throw new Error('No account found with that email. Ask your Sub to create an account first.');
 
-  const subDoc  = snap.docs[0];
+  const subDoc = snap.docs[0];
   const subData = subDoc.data();
 
   if (subData.role !== 'sub') throw new Error('That account is not registered as a Sub.');
@@ -156,9 +156,9 @@ export async function sendPairingInvite(subEmail) {
 
   // Create relationship
   const relRef = await addDoc(collection(db, 'relationships'), {
-    domId:     dom.uid,
-    subId:     subDoc.id,
-    status:    'pending',
+    domId: dom.uid,
+    subId: subDoc.id,
+    status: 'pending',
     createdAt: serverTimestamp()
   });
 
@@ -172,11 +172,11 @@ export async function sendPairingInvite(subEmail) {
  * Sub accepts a pending pairing invite.
  */
 export async function acceptPairingInvite() {
-  const sub     = auth.currentUser;
+  const sub = auth.currentUser;
   const profile = await getMyProfile();
 
   // Find pending relationship for this sub
-  const q    = query(collection(db, 'relationships'), where('subId', '==', sub.uid), where('status', '==', 'pending'));
+  const q = query(collection(db, 'relationships'), where('subId', '==', sub.uid), where('status', '==', 'pending'));
   const snap = await getDocs(q);
   if (snap.empty) throw new Error('No pending invite found.');
 
