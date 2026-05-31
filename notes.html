@@ -200,6 +200,14 @@
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    .note-body p { display: inline; }
+    .note-body p:not(:last-child)::after { content: ' '; }
+    .note-body ul, .note-body ol { display: inline; padding: 0; margin: 0; }
+    .note-body li { display: inline; }
+    .note-body li:not(:last-child)::after { content: ' \2022  '; }
+    .note-body strong { color: #ccc; font-weight: 600; }
+    .note-body em { color: rgba(212,175,55,0.75); }
+    .note-body h2, .note-body h3 { font-size: 12px; font-weight: 600; color: var(--gold); display: inline; }
 
     /* Footer: tags + date */
     .note-footer {
@@ -782,8 +790,14 @@
         `<span class="note-tag" style="background:${tagBg};color:${tagCol};">${escHtml(t)}</span>`
       ).join('');
 
-      // FIX: use stripHtml so the card preview shows clean plain text, not raw HTML tags
-      const previewText = escHtml(stripHtml(n.body));
+      let previewText;
+      if (n.body && n.body.includes('<')) {
+        // If it is rich HTML, render it directly to preserve formatting (bold, italics, lists, etc.)
+        previewText = n.body;
+      } else {
+        // Fallback for old plain-text notes
+        previewText = escHtml(n.body || '');
+      }
 
       return `
         <div class="note-card" onclick="openViewModal('${n.id}')">
