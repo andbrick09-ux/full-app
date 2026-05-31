@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -16,18 +16,12 @@
   <link rel="stylesheet" href="styles.css"/>
     <style>
         body {
-            font-family: 'Montserrat', sans-serif !important;
-            background-color: var(--midnight) !important;
-            background-image: 
-                linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px) !important;
-            background-size: 30px 30px !important;
-            color: #f0f0f0 !important;
-            overscroll-behavior: none;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--midnight);
+            color: #ccc;
         }
 
-        .serif { font-family: 'Playfair Display', serif !important; }
+        .serif { font-family: 'Playfair Display', serif; }
 
         /* Animations */
         @keyframes nerve-fire {
@@ -48,8 +42,8 @@
         }
 
         @keyframes card-pulse {
-            0%, 100% { box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-            50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); border-color: var(--gold); }
+            0%, 100% { box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+            50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.35); border-color: var(--gold); }
         }
 
         @keyframes splash-ripple {
@@ -58,44 +52,19 @@
             100% { transform: scale(4); opacity: 0; border-radius: 50%; }
         }
 
-        /* Unified Component Overrides */
-        .glass-card {
-            background: var(--glass) !important;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1.5px solid var(--border) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5) !important;
-            transition: 0.5s all ease;
-        }
-        .glass-card:hover {
-            border-color: var(--gold) !important;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 25px rgba(212, 175, 55, 0.15) !important;
-            transform: translateY(-2px);
-        }
-        .glass-card:active {
-            transform: scale(0.98) translateY(0);
-        }
         .card-soaked { animation: card-pulse 2s infinite ease-in-out; }
-
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(2, 8, 20, 0.95) !important;
-            backdrop-filter: blur(25px);
-            border-bottom: 1px solid var(--border) !important;
-        }
-
-        button { font-family: 'Montserrat', sans-serif !important; border-radius: 50px !important; }
 
         .liquid-btn {
             position: relative;
             overflow: hidden;
-            background: rgba(2, 8, 20, 0.5) !important;
-            border: 1px solid var(--border) !important;
+            background: rgba(2, 8, 20, 0.5);
+            border: 1px solid var(--border);
             transition: all 0.3s;
-            color: #888 !important;
+            color: #888;
+            padding: 10px;
+            font-family: 'Montserrat', sans-serif;
+            border-radius: 9999px;
+            cursor: pointer;
         }
 
         .ripple {
@@ -108,17 +77,18 @@
         }
 
         /* Levels Logic applied to unified theme */
-        .lvl-none.active { background: rgba(255,255,255,0.05) !important; border-color: var(--border) !important; color: #fff !important; }
-        .lvl-tingle.active { background: rgba(212, 175, 55, 0.1) !important; border-color: var(--gold) !important; color: var(--gold) !important; }
-        .lvl-dripping.active { background: rgba(212, 175, 55, 0.25) !important; border-color: var(--gold) !important; color: #fff !important; }
+        .lvl-none.active { background: rgba(255,255,255,0.05); border-color: var(--border); color: #fff; }
+        .lvl-tingle.active { background: rgba(212, 175, 55, 0.1); border-color: var(--gold); color: var(--gold); }
+        .lvl-dripping.active { background: rgba(212, 175, 55, 0.25); border-color: var(--gold); color: #fff; }
         .lvl-soaked.active { 
-            background: var(--luxury-gradient) !important; 
-            border-color: transparent !important;
-            color: var(--midnight) !important;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5) !important;
+            background: var(--luxury-gradient); 
+            border-color: transparent;
+            color: var(--midnight);
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
         /* Update animation colors for dark text on soaked */
-        .lvl-soaked.active .drip-drop-heavy { background: linear-gradient(to bottom, #fff, var(--midnight)) !important; }
+        .lvl-soaked.active .drip-drop-heavy { background: linear-gradient(to bottom, #fff, var(--midnight)); }
 
         .anim-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -138,36 +108,16 @@
         .drip-drop-medium { width: 4px; height: 12px; animation: drip-medium 1.5s infinite linear; }
         .drip-drop-heavy { width: 8px; height: 18px; animation: drip-fast 0.7s infinite linear; filter: brightness(1.3); }
 
-        .gold-btn {
-            background: var(--luxury-gradient) !important;
-            color: var(--midnight) !important;
-            font-weight: 700 !important;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            border: none !important;
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
-        }
-
-        .nav-tab { color: rgba(212, 175, 55, 0.3) !important; font-weight: 600 !important; transition: 0.3s; letter-spacing: 1.5px; position: relative; border-top: none !important; }
-        .nav-tab.active { color: var(--gold) !important; font-weight: 700 !important; }
-        .nav-tab.active::after { content: ''; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
-
         textarea {
-            background: rgba(255,255,255,0.03) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 12px !important;
-            color: #ddd !important;
-            font-size: 13px !important;
-            font-family: 'Montserrat', sans-serif !important;
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #ddd;
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
             resize: none;
         }
-
-        /* Specific Tailwind Overrides to match theme */
-        .bg-\[\#01040a\], .bg-slate-800 { background-color: var(--midnight) !important; }
-        .border-amber-500\/50 { border-color: var(--gold) !important; }
-        .text-amber-500, .text-\[\#D4AF37\] { color: var(--gold) !important; }
-        .border-champagne { border-color: var(--gold) !important; }
-        .bg-black\/98 { background-color: rgba(5, 16, 36, 0.95) !important; backdrop-filter: blur(12px); }
     </style>
 <link rel="stylesheet" href="nav.css" />
 </head>
@@ -181,55 +131,72 @@
     </div>
   </div>
 
-    <section class="max-w-md mx-auto px-8 pt-10 pb-4">
-        <p class="text-[14px] leading-relaxed text-[#d0d0d0] font-light italic mb-6">
+  <div class="main">
+    <div class="glass-card" style="padding: 24px; margin-bottom: 20px;">
+        <p class="serif" style="font-size: 14px; line-height: 1.8; color: var(--cream-dim); font-style: italic; margin-bottom: 16px;">
             Explore the edges of your arousal under my watchful eye. Show me where you’re tingling, where you’re dripping, and what scares you in the best way. Sir is your guide and your "remote" for our filthy public fun.
         </p>
-        <div class="border-l-2 border-champagne pl-6 py-2">
-            <p class="text-[12px] text-[#D4AF37] font-semibold uppercase tracking-widest leading-relaxed">
+        <div style="border-left: 2px solid var(--gold); padding-left: 16px; margin-top: 12px;">
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); font-weight: 600; line-height: 1.6;">
                 Rate each protocol. Use 'Tweak' for Sir’s guidance, and propose your own naughty ideas at the bottom of each tab.
             </p>
         </div>
-    </section>
-
-    <main id="content-area" class="px-6 pt-10 pb-64"></main>
-
-    <div class="fixed bottom-0 left-0 right-0 z-[110] bg-[#01040a]/95 backdrop-blur-3xl border-t border-white/10" style="background: rgba(2, 8, 20, 0.88) !important; border-top: 1px solid var(--border) !important;">
-        <nav class="flex w-full">
-            <button onclick="switchTab(0)" class="nav-tab active py-8 text-[10px] uppercase flex-1">Foundation</button>
-            <button onclick="switchTab(1)" class="nav-tab py-8 text-[10px] uppercase flex-1">Tasks</button>
-            <button onclick="switchTab(2)" class="nav-tab py-8 text-[10px] uppercase flex-1">Rewards</button>
-            <button onclick="switchTab(3)" class="nav-tab py-8 text-[10px] uppercase flex-1">Punishments</button>
-        </nav>
-        <div class="p-6 bg-transparent">
-            <button onclick="openReportModal()" class="gold-btn w-full py-6 rounded-2xl active:scale-95 transition-all text-[11px]">Transmit Briefing to Sir</button>
-        </div>
     </div>
 
-    <div id="tweak-modal" class="fixed inset-0 bg-black/98 hidden z-[150] flex items-center justify-center p-8">
-        <div class="glass-card w-full max-w-sm p-10 border-amber-500/50 text-center">
-            <h3 class="serif text-amber-500 text-2xl mb-4 italic uppercase">Tweak for Sir</h3>
-            <p id="tweak-item-name" class="text-[11px] uppercase tracking-widest text-[#d0d0d0] mb-8 font-bold"></p>
-            <textarea id="tweak-input" class="w-full h-48 p-6 mb-8"></textarea>
-            <div class="flex gap-4 flex-col">
-                <button onclick="closeTweakModal(true)" class="w-full py-5 gold-btn rounded-xl font-bold uppercase text-[10px]">Save Note</button>
-                <button onclick="closeTweakModal(false)" class="w-full py-4 text-[10px] font-bold uppercase" style="background: transparent; border: 1px solid var(--border); color: var(--gold);">Cancel</button>
-            </div>
-        </div>
+    <!-- Tabs (Native styling matching collection V2) -->
+    <div class="tabs" style="margin-bottom: 24px;">
+      <div class="tab-btn active" onclick="switchTab(0, this)">Foundation</div>
+      <div class="tab-btn" onclick="switchTab(1, this)">Tasks</div>
+      <div class="tab-btn" onclick="switchTab(2, this)">Rewards</div>
+      <div class="tab-btn" onclick="switchTab(3, this)">Punishments</div>
     </div>
 
-    <div id="report-modal" class="fixed inset-0 hidden z-[200] overflow-y-auto" style="background: var(--paper-dark) !important;">
-        <div class="max-w-lg mx-auto p-10 pb-40">
-            <h3 class="serif text-3xl text-[#D4AF37] text-center italic mb-4 uppercase">Final Briefing</h3>
-            <p class="text-center text-[#888] uppercase tracking-widest text-[10px] mb-12 font-semibold">Confidential // For Sir Only</p>
-            <div id="summary-list" class="space-y-6 mb-12 text-[12px] text-[#ddd] font-mono leading-relaxed"></div>
-            <textarea id="report-text" readonly class="w-full h-96 p-6 font-mono text-[11px]"></textarea>
-            <div class="fixed bottom-10 left-10 right-10 flex gap-4 max-w-lg mx-auto">
-                <button onclick="closeReportModal()" class="flex-1 py-5 rounded-2xl uppercase font-bold text-[10px]" style="background: transparent; border: 1px solid var(--border); color: var(--gold);">Edit</button>
-                <button onclick="copyReport()" class="flex-1 py-5 gold-btn rounded-2xl text-[10px]">Copy for Sir</button>
-            </div>
-        </div>
+    <!-- Content Area -->
+    <div id="content-area"></div>
+
+    <!-- Transmit Briefing Action Card -->
+    <div class="glass-card" style="margin-top: 24px; text-align: center;">
+      <button onclick="openReportModal()" class="btn-gold" style="width: 100%; padding: 16px; border-radius: 14px; border: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: .2s ease; box-shadow: 0 6px 20px rgba(212,175,55,0.25);">
+        Transmit Briefing to Sir
+      </button>
     </div>
+  </div>
+
+  <!-- Tweak Modal (Glass style) -->
+  <div id="tweak-modal" class="modal-back" onclick="closeTweakModal(false)">
+    <div class="modal-sheet" onclick="event.stopImmediatePropagation()" style="max-width: 440px; border-radius: 24px 24px 24px 24px; padding: 24px; margin: auto;">
+      <div class="modal-handle"></div>
+      <h3 class="serif" style="font-size: 20px; color: var(--gold); text-align: center; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px;">Tweak for Sir</h3>
+      <p id="tweak-item-name" style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; text-align: center; color: #888; margin-bottom: 20px; font-weight: bold;"></p>
+      
+      <div class="form-group">
+        <textarea id="tweak-input" class="form-textarea" rows="4" placeholder="Add specific adjustments or notes for Sir..."></textarea>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+        <button onclick="closeTweakModal(true)" class="btn-gold" style="padding: 14px; border-radius: 12px; border: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;">Save Note</button>
+        <button onclick="closeTweakModal(false)" class="btn-outline" style="padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Modal (Premium style) -->
+  <div id="report-modal" class="modal-back" onclick="closeReportModal()">
+    <div class="modal-sheet" onclick="event.stopImmediatePropagation()" style="max-width: 520px; max-height: 90vh; overflow-y: auto; border-radius: 24px 24px 0 0;">
+      <div class="modal-handle"></div>
+      <h3 class="serif" style="font-size: 24px; color: var(--gold); text-align: center; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;">Final Briefing</h3>
+      <p style="text-align: center; color: #666; text-transform: uppercase; letter-spacing: 2px; font-size: 9px; margin-bottom: 20px; font-weight: 700;">Confidential // For Sir Only</p>
+      
+      <div class="form-group">
+        <textarea id="report-text" readonly class="form-textarea" rows="12" style="font-family: monospace; font-size: 11px; padding: 12px; background: rgba(0,0,0,0.3); border-color: rgba(212,175,55,0.1);"></textarea>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button onclick="closeReportModal()" class="btn-outline" style="flex: 1; padding: 14px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;">Edit</button>
+        <button onclick="copyReport()" class="btn-gold" style="flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;">Copy for Sir</button>
+      </div>
+    </div>
+  </div>
 
     <script>
         const protocolData = [
@@ -277,24 +244,25 @@
             protocolData[currentTab].items.forEach(item => {
                 const isSoaked = ratings[item.id].exc === 'Soaked';
                 const card = document.createElement('div');
-                card.className = `glass-card p-10 mb-12 ${isSoaked ? 'card-soaked' : ''}`;
+                card.className = `glass-card ${isSoaked ? 'card-soaked' : ''}`;
+                card.style.marginBottom = '20px';
                 card.innerHTML = `
-                    <div class="mb-8">
-                        <div class="flex justify-between items-start border-b border-[#d4af37]/10 pb-3 mb-4">
-                            <h3 class="serif text-xl text-[#d4af37] uppercase tracking-wider font-bold">${item.name}</h3>
-                            <span class="text-[9px] uppercase tracking-widest text-[#888] px-2 py-1 rounded-full border border-[#d4af37]/20">${item.diff}</span>
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 1px solid rgba(212,175,55,0.15); padding-bottom: 8px; margin-bottom: 12px;">
+                            <h3 class="serif" style="font-size: 17px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">${item.name}</h3>
+                            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #888; padding: 3px 8px; border-radius: 9999px; border: 1px solid var(--border);">${item.diff}</span>
                         </div>
-                        <p class="text-[13px] text-[#ddd] leading-relaxed">"${item.desc}"</p>
+                        <p style="font-size: 13px; color: #ccc; line-height: 1.6; font-style: italic;">"${item.desc}"</p>
                     </div>
 
-                    <div class="space-y-10">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
                         <div>
-                            <label class="text-[9px] uppercase tracking-[0.2em] text-[#d4af37] block mb-4 font-bold opacity-80">Physical Excitement</label>
-                            <div class="flex flex-wrap gap-2">
+                            <label style="font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); display: block; margin-bottom: 8px; font-weight: 600; opacity: 0.8;">Physical Excitement</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                 ${['None', 'Tingle', 'Dripping', 'Soaked'].map(lvl => `
                                     <button onmousedown="handleRipple(event)" onclick="updateExc(${item.id}, '${lvl}')" 
                                             id="exc-${item.id}-${lvl}" 
-                                            class="liquid-btn flex-1 min-w-[70px] py-4 rounded-2xl text-[9px] uppercase font-bold lvl-${lvl.toLowerCase()} ${ratings[item.id].exc === lvl ? 'active' : ''}">
+                                            class="liquid-btn" style="flex: 1; min-width: 70px; padding: 10px 4px; font-size: 9px; text-transform: uppercase; font-weight: 700;">
                                         ${lvl}
                                         <div class="anim-layer">${getAtmosphere(lvl)}</div>
                                     </button>
@@ -302,23 +270,51 @@
                             </div>
                         </div>
                         <div>
-                            <label class="text-[9px] uppercase tracking-[0.2em] text-[#d4af37] block mb-4 font-bold opacity-80">Comfort Verdict</label>
-                            <div class="flex gap-2">
-                                <button onclick="updateStat(${item.id}, 'G')" class="flex-1 py-4 text-[9px] font-bold uppercase transition-all ${ratings[item.id].stat === 'G' ? '!bg-[#4CAF50] !text-black !border-transparent' : 'bg-transparent text-[#4CAF50]'}" style="border: 1px solid rgba(76, 175, 80, 0.3);">Hell Yes</button>
-                                <button onclick="updateStat(${item.id}, 'Y')" class="flex-1 py-4 text-[9px] font-bold uppercase transition-all ${ratings[item.id].stat === 'Y' ? '!bg-[#FFC107] !text-black !border-transparent' : 'bg-transparent text-[#FFC107]'}" style="border: 1px solid rgba(255, 193, 7, 0.3);">Tweak</button>
-                                <button onclick="updateStat(${item.id}, 'R')" class="flex-1 py-4 text-[9px] font-bold uppercase transition-all ${ratings[item.id].stat === 'R' ? '!bg-[#F44336] !text-white !border-transparent' : 'bg-transparent text-[#F44336]'}" style="border: 1px solid rgba(244, 67, 54, 0.3);">Limit</button>
+                            <label style="font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); display: block; margin-bottom: 8px; font-weight: 600; opacity: 0.8;">Comfort Verdict</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="updateStat(${item.id}, 'G')" class="liquid-btn" style="flex: 1; padding: 10px 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #4CAF50; border-color: rgba(76, 175, 80, 0.3); background: transparent;">Hell Yes</button>
+                                <button onclick="updateStat(${item.id}, 'Y')" class="liquid-btn" style="flex: 1; padding: 10px 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #FFC107; border-color: rgba(255, 193, 7, 0.3); background: transparent;">Tweak</button>
+                                <button onclick="updateStat(${item.id}, 'R')" class="liquid-btn" style="flex: 1; padding: 10px 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #F44336; border-color: rgba(244, 67, 54, 0.3); background: transparent;">Limit</button>
                             </div>
                         </div>
                     </div>
                 `;
+                
+                // Highlight the active Comfort Verdict button
+                const gBtn = card.querySelector(`button[onclick="updateStat(${item.id}, 'G')"]`);
+                const yBtn = card.querySelector(`button[onclick="updateStat(${item.id}, 'Y')"]`);
+                const rBtn = card.querySelector(`button[onclick="updateStat(${item.id}, 'R')"]`);
+                if (ratings[item.id].stat === 'G') {
+                    gBtn.style.background = '#4CAF50';
+                    gBtn.style.color = '#051024';
+                    gBtn.style.borderColor = 'transparent';
+                } else if (ratings[item.id].stat === 'Y') {
+                    yBtn.style.background = '#FFC107';
+                    yBtn.style.color = '#051024';
+                    yBtn.style.borderColor = 'transparent';
+                } else if (ratings[item.id].stat === 'R') {
+                    rBtn.style.background = '#F44336';
+                    rBtn.style.color = '#ffffff';
+                    rBtn.style.borderColor = 'transparent';
+                }
+                
+                // Highlight active excitement levels
+                const activeExc = ratings[item.id].exc;
+                if (activeExc) {
+                    const btn = card.querySelector(`#exc-${item.id}-${activeExc}`);
+                    if (btn) btn.classList.add('active');
+                }
+
                 container.appendChild(card);
             });
 
             const customBox = document.createElement('div');
-            customBox.className = 'glass-card p-8 mb-24';
+            customBox.className = 'glass-card';
+            customBox.style.padding = '20px';
+            customBox.style.marginBottom = '20px';
             customBox.innerHTML = `
-                <h3 class="serif text-center text-[#d4af37] text-[13px] mb-4 uppercase tracking-widest border-b border-[#d4af37]/20 pb-3">Proposals for Sir</h3>
-                <textarea onchange="updateCustomIdea(${currentTab}, this.value)" class="w-full h-32 p-4" placeholder="Whisper your idea to Sir here...">${customIdeas[currentTab]}</textarea>
+                <h3 class="serif" style="text-align: center; color: var(--gold); font-size: 13px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">Proposals for Sir</h3>
+                <textarea onchange="updateCustomIdea(${currentTab}, this.value)" class="form-textarea" rows="4" placeholder="Whisper your proposal to Sir here...">${customIdeas[currentTab]}</textarea>
             `;
             container.appendChild(customBox);
         }
@@ -352,9 +348,9 @@
             return '';
         }
 
-        function switchTab(idx) {
+        function switchTab(idx, btn) {
             currentTab = idx;
-            document.querySelectorAll('.nav-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.toggle('active', t === btn));
             renderTab();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -370,7 +366,7 @@
                 activeTweakId = id;
                 document.getElementById('tweak-item-name').innerText = protocolData.flatMap(c => c.items).find(i => i.id === id).name;
                 document.getElementById('tweak-input').value = ratings[id].note;
-                document.getElementById('tweak-modal').classList.remove('hidden');
+                document.getElementById('tweak-modal').classList.add('open');
             } else {
                 ratings[id].note = '';
                 renderTab();
@@ -379,7 +375,7 @@
 
         function closeTweakModal(save) {
             if(save) ratings[activeTweakId].note = document.getElementById('tweak-input').value;
-            document.getElementById('tweak-modal').classList.add('hidden');
+            document.getElementById('tweak-modal').classList.remove('open');
             renderTab();
         }
 
@@ -387,8 +383,6 @@
 
         function openReportModal() {
             let report = "PUBLIC PLAY BRIEFING // Submitted to Sir\n==================================\n\n";
-            const summary = document.getElementById('summary-list');
-            summary.innerHTML = '';
             protocolData.forEach((cat, idx) => {
                 let catAdded = false;
                 cat.items.forEach(item => {
@@ -405,10 +399,10 @@
                 if(customIdeas[idx].trim()) report += `PROPOSAL FOR SIR:\n"${customIdeas[idx]}"\n\n`;
             });
             document.getElementById('report-text').value = report + "==================================\nSIGNAL: Earlobe // RED: Sparkling Water";
-            document.getElementById('report-modal').classList.remove('hidden');
+            document.getElementById('report-modal').classList.add('open');
         }
 
-        function closeReportModal() { document.getElementById('report-modal').classList.add('hidden'); }
+        function closeReportModal() { document.getElementById('report-modal').classList.remove('open'); }
         function copyReport() {
             const el = document.getElementById('report-text');
             el.select();
@@ -419,7 +413,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.register('sw.js').catch(e => console.error(e));
             });
         }
     </script>
