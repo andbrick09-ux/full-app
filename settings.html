@@ -215,6 +215,11 @@
         <span class="material-symbols-rounded">check_circle</span>All Saved
       </button>
 
+      <!-- TEMPORARY ADMIN PROMOTION BUTTON -->
+      <button id="adminPromoBtn" class="settings-action-btn full" onclick="makeMeAdmin()" style="display:none; margin: 16px 0 8px 0; background:linear-gradient(135deg,#c9a84c,#e2c47a); color:#06090f;">
+        <span class="material-symbols-rounded">admin_panel_settings</span>Promote to Admin (Keep Dom Role)
+      </button>
+
       <button class="settings-danger-btn" onclick="clearHistory()">Clear All App Data</button>
 
     </div>
@@ -280,6 +285,12 @@
       await loadSettings();
       await loadRelationship();
       attachDirtyListeners();
+
+      // Show admin promotion button only for doms
+      if (myProfile?.role === 'dom') {
+        const promoBtn = document.getElementById('adminPromoBtn');
+        if (promoBtn) promoBtn.style.display = 'block';
+      }
     }
 
     // ── Load settings ────────────────────────────────────────
@@ -513,6 +524,16 @@
 
     window.handleSignOut = async function() {
       if (confirm('Sign out of Dom Sub Hub?')) await logOut();
+    };
+
+    window.makeMeAdmin = async function() {
+      try {
+        await setDoc(doc(db, 'users', currentUser.uid), { isAdmin: true }, { merge: true });
+        showToast('You are now an ADMIN & DOM! Please refresh.');
+        location.reload();
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
     };
 
     window.saveSettings     = saveSettings;

@@ -91,12 +91,12 @@
       const userEl = document.getElementById('current-user');
       userEl.innerHTML = `\( {profile.displayName} <span style="color:#e05268">( \){profile.role})</span>`;
 
-      if (profile.role !== 'admin') {
+      if (!profile.isAdmin && profile.role !== 'admin') {
         document.getElementById('admin-content').innerHTML = `
           <div class="card" style="text-align:center">
             <h2 style="color:#e05268;margin-bottom:12px">Access Denied</h2>
-            <p style="color:var(--muted)">This page requires the <strong>admin</strong> role.</p>
-            <p style="margin-top:20px;font-size:13px">Set your role to "admin" in Firestore → users/{uid} → role</p>
+            <p style="color:var(--muted)">This page requires <strong>admin</strong> privileges.</p>
+            <p style="margin-top:20px;font-size:13px">Set <strong>isAdmin: true</strong> in Firestore → users/{uid}</p>
           </div>
         `;
         return;
