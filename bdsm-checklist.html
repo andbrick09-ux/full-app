@@ -125,6 +125,16 @@
     .sp-side.them { background: var(--dom-rose); color: #fff; }
     .sp-divider { width: 1px; height: 14px; background: #444; margin: 0 2px; }
 
+    /* Hide partner side of status-pair in Me Only mode */
+    body.view-me .sp-side.them,
+    body.view-me .sp-divider { display: none; }
+    /* Hide my side of status-pair in Partner Only mode */
+    body.view-partner .sp-side.me,
+    body.view-partner .sp-divider { display: none; }
+    /* Remove background pill styling when only one side visible */
+    body.view-me .status-pair,
+    body.view-partner .status-pair { background: transparent; padding: 0; }
+
     .badge {
       font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
       letter-spacing: 0.3px; white-space: nowrap;
@@ -451,6 +461,7 @@
     let activeFilters = new Set();
     let activeSearch = '';
     let currentTab = 'all';
+    let currentViewMode = 'both';
     let saveTimeout = null;
 
     const SEG_NO = "No and I don't want to";
@@ -1000,10 +1011,13 @@
     };
 
     window.setViewMode = function(mode) {
+      currentViewMode = mode;
       document.body.classList.remove('view-me', 'view-partner', 'view-both');
       document.body.classList.add('view-' + mode);
       document.querySelectorAll('.view-opt').forEach(opt => opt.classList.toggle('active', opt.dataset.view === mode));
       localStorage.setItem('checklist_view_mode', mode);
+      // Re-apply filters so card display states stay correct
+      applyFilters();
     };
 
     // === STATS ===
@@ -1061,6 +1075,8 @@
         const key = ik(cat, card.dataset.act);
         const myA = myData[key + '.a'] || '';
         const myR = myData[key + '.r'] || '';
+        const pA = partnerData[key + '.a'] || '';
+        const pR = partnerData[key + '.r'] || '';
 
         let visible = true;
 
@@ -1068,13 +1084,17 @@
 
         if (hasFilters) {
           let match = false;
-          if (activeFilters.has('loved') && (myA.includes('Fetish') || myR.includes('Loved'))) match = true;
-          if (activeFilters.has('hard') && myA.includes('Hard Limit')) match = true;
+          // In partner-only mode, filter against partner data; otherwise use my data
+          const filterA = currentViewMode === 'partner' ? pA : myA;
+          const filterR = currentViewMode === 'partner' ? pR : myR;
+          if (activeFilters.has('loved') && (filterA.includes('Fetish') || filterR.includes('Loved'))) match = true;
+          if (activeFilters.has('hard') && filterA.includes('Hard Limit')) match = true;
           if (activeFilters.has('scene') && myData[key + '.flagged']) match = true;
           if (!match && !activeFilters.has('all')) visible = false;
         }
 
-        card.style.display = visible ? 'block' : 'none';
+        // Use empty string to unset inline style so CSS view-mode rules still apply
+        card.style.display = visible ? '' : 'none';
       });
     }
 
