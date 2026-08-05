@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#080c14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Dom Sub Hub — Item Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+<style>
+  .topbar{display:flex;align-items:center;gap:12px}
+  .back-btn{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,.08);border:1px solid var(--border);text-decoration:none;cursor:pointer}
+  .back-btn .material-symbols-rounded{font-size:20px;color:var(--gold)}
+  .text-input{width:100%;padding:12px;background:var(--glass2);border:1.5px solid var(--border);border-radius:10px;color:#eee;font-size:13px;font-family:'Montserrat',sans-serif;margin-bottom:12px}
+  textarea.text-input{min-height:60px;resize:vertical}
+  select.text-input{appearance:none}
+  .field-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px;display:block}
+  .form-card{padding:20px;margin-bottom:20px}
+  .form-row{display:flex;gap:10px}
+  .form-row .text-input{flex:1}
+  .dyn-list-row{display:flex;gap:8px;margin-bottom:8px}
+  .dyn-list-row .text-input{margin-bottom:0}
+  .remove-row-btn{width:38px;flex-shrink:0;background:transparent;border:1px solid var(--border);border-radius:10px;color:#F44336;cursor:pointer}
+  .action-row{display:flex;gap:10px;margin-top:16px}
+  .action-row button{flex:1}
+</style>
+</head>
+<body data-nav="more">
+
+<div class="topbar">
+  <a class="back-btn" id="backLink" href="tm-admin.html"><span class="material-symbols-rounded">arrow_back</span></a>
+  <div class="topbar-center">
+    <div class="topbar-title" style="font-size:18px;">Item Editor</div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div style="text-align:center;padding:60px;color:#777;">Loading…</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { requireAuth, getMyProfile } from './auth.js';
+  import {
+    collection, doc, setDoc, getDoc
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+
+  const params = new URLSearchParams(window.location.search);
+  const existingItemId = params.get('item');
+  let topicId = params.get('topic');
+  let subcategoryId = params.get('sub');
+  let itemId = existingItemId; // set once saved, for new items
+
+  const TYPES = [
+    'flashcard', 'multiple_choice', 'true_false', 'fill_blank',
+    'error_identification', 'transition', 'sequence', 'scenario',
+    'hold_practice', 'reflection',
+  ];
+  const TYPE_LABELS = {
+    flashcard: 'Flashcard', multiple_choice: 'Multiple Choice', true_false: 'True / False',
+    fill_blank: 'Fill in the Blank', error_identification: 'Error Identification',
+    transition: 'Transition', sequence: 'Sequence', scenario: 'Scenario / Application',
+    hold_practice: 'Hold Practice', reflection: 'Reflection Prompt',
+  };
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function slugify(s) {
+    return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  // ── Dynamic list widget (used for MC options + hold checklist) ──────────────
+  function renderDynList(container, values, placeholder) {
+    container.innerHTML = '';
+    const rows = [];
+    function addRow(val) {
+      const row = document.createElement('div');
+      row.className = 'dyn-list-row';
+      row.innerHTML = `<input class="text-input" value="${(val || '').replace(/"/g, '&quot;')}" placeholder="${placeholder}"/><button type="button" class="remove-row-btn">✕</button>`;
+      row.querySelector('.remove-row-btn').onclick = () => { row.remove(); };
+      container.insertBefore(row, addBtn);
+      rows.push(row);
+    }
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'outline-btn';
+    addBtn.textContent = '+ Add';
+    addBtn.onclick = () => addRow('');
+    container.appendChild(addBtn);
+    (values && values.length ? values : ['', '']).forEach(addRow);
+    container.getValues = () => [...container.querySelectorAll('.dyn-list-row input')].map(i => i.value.trim()).filter(Boolean);
+  }
+
+  // ── Type-specific field rendering ────────────────────────────────────────
+  function renderTypeFields(type, data) {
+    const wrap = document.getElementById('typeFields');
+    wrap.innerHTML = '';
+
+    if (type === 'flashcard') {
+      wrap.innerHTML = `
+        <span class="field-label">Front</span>
+        <input class="text-input" id="f_front" value="${data.front || ''}"/>
+        <span class="field-label">Back</span>
+        <textarea class="text-input" id="f_back">${data.back || ''}</textarea>
+      `;
+      return;
+    }
+
+    if (type === 'hold_practice') {
+      wrap.innerHTML = `
+        <span class="field-label">Position Name</span>
+        <input class="text-input" id="f_positionName" value="${data.positionName || ''}"/>
+        <span class="field-label">Recommended Hold Seconds</span>
+        <input class="text-input" id="f_recSeconds" type="number" value="${data.recommendedHoldSeconds ?? ''}"/>
+        <span class="field-label">Form Checklist</span>
+        <div id="f_checklist"></div>
+      `;
+      renderDynList(document.getElementById('f_checklist'), data.formChecklist, 'Checklist point');
+      return;
+    }
+
+    if (type === 'reflection') {
+      wrap.innerHTML = `
+        <span class="field-label">Prompt</span>
+        <textarea class="text-input" id="f_question">${data.question || ''}</textarea>
+        <span class="field-label">Model Answer (shown after submission, no single "correct" answer)</span>
+        <textarea class="text-input" id="f_modelAnswer">${data.modelAnswer || ''}</textarea>
+      `;
+      return;
+    }
+
+    // Everything else shares question / correctAnswer / explanation
+    let extra = '';
+    if (type === 'multiple_choice') {
+      extra = `<span class="field-label">Options</span><div id="f_options"></div>`;
+    }
+    if (type === 'transition') {
+      extra = `
+        <div class="form-row">
+          <div style="flex:1;"><span class="field-label">From Position</span><input class="text-input" id="f_from" value="${data.fromPosition || ''}"/></div>
+          <div style="flex:1;"><span class="field-label">To Position</span><input class="text-input" id="f_to" value="${data.toPosition || ''}"/></div>
+        </div>`;
+    }
+    if (type === 'sequence') {
+      extra = `<span class="field-label">Sequence Steps</span><div id="f_steps"></div>`;
+    }
+
+    wrap.innerHTML = `
+      <span class="field-label">Question</span>
+      <textarea class="text-input" id="f_question">${data.question || ''}</textarea>
+      ${extra}
+      <span class="field-label">Correct Answer</span>
+      <textarea class="text-input" id="f_correctAnswer">${data.correctAnswer || ''}</textarea>
+      <span class="field-label">Explanation</span>
+      <textarea class="text-input" id="f_explanation">${data.explanation || ''}</textarea>
+    `;
+    if (type === 'multiple_choice') renderDynList(document.getElementById('f_options'), data.options, 'Option text');
+    if (type === 'sequence') renderDynList(document.getElementById('f_steps'), data.sequenceSteps, 'Step (position name)');
+  }
+
+  function collectTypeFields(type) {
+    if (type === 'flashcard') {
+      return { front: val('f_front'), back: val('f_back') };
+    }
+    if (type === 'hold_practice') {
+      return {
+        positionName: val('f_positionName'),
+        recommendedHoldSeconds: parseInt(val('f_recSeconds'), 10) || 0,
+        formChecklist: document.getElementById('f_checklist').getValues(),
+      };
+    }
+    if (type === 'reflection') {
+      return { question: val('f_question'), modelAnswer: val('f_modelAnswer') };
+    }
+    const out = {
+      question: val('f_question'),
+      correctAnswer: val('f_correctAnswer'),
+      explanation: val('f_explanation'),
+    };
+    if (type === 'multiple_choice') out.options = document.getElementById('f_options').getValues();
+    if (type === 'transition') { out.fromPosition = val('f_from'); out.toPosition = val('f_to'); }
+    if (type === 'sequence') out.sequenceSteps = document.getElementById('f_steps').getValues();
+    return out;
+  }
+
+  function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+  async function renderForm(data) {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = `
+      <div class="glass-card form-card">
+        <span class="field-label">Item Type</span>
+        <select class="text-input" id="f_type">
+          ${TYPES.map(t => `<option value="${t}" ${t === (data.type || 'flashcard') ? 'selected' : ''}>${TYPE_LABELS[t]}</option>`).join('')}
+        </select>
+
+        <span class="field-label">Title</span>
+        <input class="text-input" id="f_title" value="${data.title || ''}"/>
+
+        <div id="typeFields"></div>
+
+        <div class="form-row">
+          <div style="flex:1;">
+            <span class="field-label">Difficulty</span>
+            <select class="text-input" id="f_difficulty">
+              <option value="beginner" ${data.difficulty === 'beginner' ? 'selected' : ''}>Beginner</option>
+              <option value="intermediate" ${data.difficulty === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+              <option value="advanced" ${data.difficulty === 'advanced' ? 'selected' : ''}>Advanced</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <span class="field-label">Order</span>
+            <input class="text-input" id="f_order" type="number" value="${data.order ?? 1}"/>
+          </div>
+        </div>
+
+        <span class="field-label">Tags (comma-separated)</span>
+        <input class="text-input" id="f_tags" value="${(data.tags || []).join(', ')}"/>
+
+        <label style="font-size:12px;color:#ccc;display:block;margin-bottom:6px;">
+          <input type="checkbox" id="f_active" ${data.isActive !== false ? 'checked' : ''}/> Active
+        </label>
+
+        <div class="action-row">
+          <button class="outline-btn" id="previewBtn" ${itemId ? '' : 'disabled'}>Preview</button>
+          <button class="gold-btn" id="saveBtn">Save Item</button>
+        </div>
+      </div>
+    `;
+
+    const typeSelect = document.getElementById('f_type');
+    renderTypeFields(typeSelect.value, data);
+    typeSelect.onchange = () => renderTypeFields(typeSelect.value, {});
+
+    document.getElementById('previewBtn').onclick = () => {
+      if (!itemId) return;
+      window.open(`tm-session.html?item=${encodeURIComponent(itemId)}&preview=1`, '_blank');
+    };
+
+    document.getElementById('saveBtn').onclick = async () => {
+      const title = val('f_title');
+      if (!title) { showToast('Title is required.'); return; }
+      const type = typeSelect.value;
+
+      if (!itemId) {
+        itemId = doc(collection(db, 'trainingItems')).id;
+      }
+      const tags = val('f_tags').split(',').map(t => t.trim()).filter(Boolean);
+
+      const payload = {
+        topicId, subcategoryId, type,
+        title,
+        difficulty: document.getElementById('f_difficulty').value,
+        order: parseInt(document.getElementById('f_order').value, 10) || 1,
+        tags,
+        isActive: document.getElementById('f_active').checked,
+        ...collectTypeFields(type),
+      };
+
+      await setDoc(doc(db, 'trainingItems', itemId), payload, { merge: false });
+      showToast('Item saved.');
+      document.getElementById('previewBtn').disabled = false;
+      history.replaceState(null, '', `tm-admin-item.html?item=${encodeURIComponent(itemId)}`);
+    };
+  }
+
+  async function init() {
+    await requireAuth();
+    const profile = await getMyProfile();
+    if (profile?.role !== 'admin' && profile?.isAdmin !== true) {
+      document.getElementById('mainContent').innerHTML = `<div style="text-align:center;padding:60px;color:#888;">Admin access required.</div>`;
+      return;
+    }
+
+    let data = {};
+    if (existingItemId) {
+      const snap = await getDoc(doc(db, 'trainingItems', existingItemId));
+      if (!snap.exists()) { showToast('Item not found.'); return; }
+      data = snap.data();
+      topicId = data.topicId;
+      subcategoryId = data.subcategoryId;
+    } else if (!topicId || !subcategoryId) {
+      showToast('Missing topic/subcategory for a new item.');
+      return;
+    }
+
+    document.getElementById('backLink').href = `tm-admin-topic.html?topic=${encodeURIComponent(topicId)}`;
+    await renderForm(data);
+  }
+
+  init().catch(err => { console.error(err); showToast('Failed to load item editor.'); });
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

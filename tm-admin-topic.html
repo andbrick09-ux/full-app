@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#080c14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Dom Sub Hub — Manage Topic</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+<style>
+  .topbar{display:flex;align-items:center;gap:12px}
+  .back-btn{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,.08);border:1px solid var(--border);text-decoration:none;cursor:pointer}
+  .back-btn .material-symbols-rounded{font-size:20px;color:var(--gold)}
+  .text-input{width:100%;padding:12px;background:var(--glass2);border:1.5px solid var(--border);border-radius:10px;color:#eee;font-size:13px;font-family:'Montserrat',sans-serif;margin-bottom:12px}
+  textarea.text-input{min-height:60px;resize:vertical}
+  .field-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px;display:block}
+  .form-card{padding:20px;margin-bottom:20px}
+  .form-row{display:flex;gap:10px}
+  .form-row .text-input{flex:1}
+  .section-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:700;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .sub-card{padding:16px 18px;margin-bottom:14px}
+  .sub-card-head{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .sub-card-title{flex:1;font-family:'Playfair Display',serif;font-size:14px;color:#eee}
+  .sub-card-meta{font-size:10px;color:#888}
+  .chip{display:inline-block;font-size:8px;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:10px;background:rgba(212,175,55,.1);color:var(--gold);margin-right:4px}
+  .item-list{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:none}
+  .item-list.open{display:block}
+  .item-row-admin{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+  .item-row-admin:last-child{border-bottom:none}
+  .item-row-admin .grow{flex:1;min-width:0;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .item-row-admin .diff-tag{font-size:8px;color:#888;text-transform:uppercase}
+  .inactive{opacity:.4}
+  .small-btn{font-size:9px;padding:6px 10px;border-radius:8px;background:transparent;border:1px solid var(--border);color:#aaa;cursor:pointer;flex-shrink:0}
+  .add-sub-btn{margin-top:6px}
+</style>
+</head>
+<body data-nav="more">
+
+<div class="topbar">
+  <a class="back-btn" href="tm-admin.html"><span class="material-symbols-rounded">arrow_back</span></a>
+  <div class="topbar-center">
+    <div class="topbar-title" id="topicTitleBar" style="font-size:18px;">Manage Topic</div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div style="text-align:center;padding:60px;color:#777;">Loading…</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { requireAuth, getMyProfile } from './auth.js';
+  import {
+    collection, doc, setDoc, getDoc, getDocs, query, where
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+
+  const params = new URLSearchParams(window.location.search);
+  const topicId = params.get('topic');
+  const TYPE_LABELS = {
+    flashcard: 'Flashcard', multiple_choice: 'Multiple Choice', true_false: 'True/False',
+    fill_blank: 'Fill Blank', error_identification: 'Error ID', transition: 'Transition',
+    sequence: 'Sequence', scenario: 'Scenario', hold_practice: 'Hold Practice', reflection: 'Reflection',
+  };
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function slugify(s) {
+    return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `sub-${Date.now()}`;
+  }
+
+  async function loadSubcategoryItems(subId, container) {
+    const itemsSnap = await getDocs(query(collection(db, 'trainingItems'), where('subcategoryId', '==', subId)));
+    const items = itemsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    container.innerHTML = '';
+    if (items.length === 0) {
+      container.innerHTML = `<div style="font-size:11px;color:#777;padding:8px 0;">No items yet.</div>`;
+    }
+    for (const item of items) {
+      const row = document.createElement('div');
+      row.className = `item-row-admin ${item.isActive ? '' : 'inactive'}`;
+      row.innerHTML = `
+        <span class="grow">${item.title} <span class="diff-tag">· ${TYPE_LABELS[item.type] || item.type} · ${item.difficulty}</span></span>
+        <button class="small-btn" data-action="edit">Edit</button>
+        <button class="small-btn" data-action="toggle">${item.isActive ? 'Deactivate' : 'Activate'}</button>
+      `;
+      row.querySelector('.grow').onclick = () => { window.location.href = `tm-admin-item.html?item=${encodeURIComponent(item.id)}`; };
+      row.querySelector('[data-action="edit"]').onclick = () => { window.location.href = `tm-admin-item.html?item=${encodeURIComponent(item.id)}`; };
+      row.querySelector('[data-action="toggle"]').onclick = async () => {
+        await setDoc(doc(db, 'trainingItems', item.id), { isActive: !item.isActive }, { merge: true });
+        loadSubcategoryItems(subId, container);
+      };
+      container.appendChild(row);
+    }
+    const addBtn = document.createElement('button');
+    addBtn.className = 'outline-btn add-sub-btn';
+    addBtn.textContent = '+ Add Item';
+    addBtn.onclick = () => {
+      window.location.href = `tm-admin-item.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subId)}`;
+    };
+    container.appendChild(addBtn);
+  }
+
+  async function renderSubcategories(container) {
+    const subsSnap = await getDocs(query(collection(db, 'trainingSubcategories'), where('topicId', '==', topicId)));
+    const subs = subsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    container.innerHTML = '';
+
+    for (const sub of subs) {
+      const card = document.createElement('div');
+      card.className = 'glass-card sub-card';
+      card.innerHTML = `
+        <div class="sub-card-head">
+          <div style="flex:1;">
+            <div class="sub-card-title">${sub.title}</div>
+            <div class="sub-card-meta">${(sub.availableDifficulties || []).map(d => `<span class="chip">${d}</span>`).join('')} ${sub.isActive ? '' : '<span class="chip" style="background:rgba(244,67,54,.1);color:#F44336;">inactive</span>'}</div>
+          </div>
+          <span class="material-symbols-rounded" style="color:#888;">expand_more</span>
+        </div>
+        <div class="item-list"></div>
+      `;
+      const itemListEl = card.querySelector('.item-list');
+      let loaded = false;
+      card.querySelector('.sub-card-head').onclick = async () => {
+        itemListEl.classList.toggle('open');
+        if (itemListEl.classList.contains('open') && !loaded) {
+          loaded = true;
+          await loadSubcategoryItems(sub.id, itemListEl);
+        }
+      };
+      container.appendChild(card);
+    }
+
+    const addForm = document.createElement('div');
+    addForm.className = 'glass-card form-card';
+    addForm.innerHTML = `
+      <span class="field-label">Add Subcategory</span>
+      <input class="text-input" id="newSubTitle" placeholder="Title"/>
+      <textarea class="text-input" id="newSubDesc" placeholder="Description"></textarea>
+      <div class="form-row">
+        <input class="text-input" id="newSubOrder" type="number" placeholder="Order" value="${subs.length + 1}"/>
+      </div>
+      <span class="field-label">Available Difficulties</span>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;color:#ccc;margin-right:14px;"><input type="checkbox" value="beginner" checked/> Beginner</label>
+        <label style="font-size:11px;color:#ccc;margin-right:14px;"><input type="checkbox" value="intermediate" checked/> Intermediate</label>
+        <label style="font-size:11px;color:#ccc;"><input type="checkbox" value="advanced" checked/> Advanced</label>
+      </div>
+      <button class="gold-btn" id="addSubBtn">Add Subcategory</button>
+    `;
+    addForm.querySelector('#addSubBtn').onclick = async () => {
+      const title = addForm.querySelector('#newSubTitle').value.trim();
+      if (!title) { showToast('Title is required.'); return; }
+      const diffs = [...addForm.querySelectorAll('input[type=checkbox]:checked')].map(c => c.value);
+      const id = slugify(title);
+      await setDoc(doc(db, 'trainingSubcategories', id), {
+        topicId,
+        title,
+        description: addForm.querySelector('#newSubDesc').value.trim(),
+        order: parseInt(addForm.querySelector('#newSubOrder').value, 10) || 1,
+        availableDifficulties: diffs,
+        isActive: true,
+      }, { merge: true });
+      showToast('Subcategory added.');
+      renderSubcategories(container);
+      container.parentNode.insertBefore(addForm, container.nextSibling);
+    };
+    container.parentNode.appendChild(addForm);
+  }
+
+  async function renderTopicForm(topic) {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = `
+      <div class="glass-card form-card">
+        <span class="field-label">Title</span>
+        <input class="text-input" id="editTitle" value="${topic.title || ''}"/>
+        <span class="field-label">Description</span>
+        <textarea class="text-input" id="editDesc">${topic.description || ''}</textarea>
+        <div class="form-row">
+          <div style="flex:1;">
+            <span class="field-label">Icon</span>
+            <input class="text-input" id="editIcon" value="${topic.icon || ''}"/>
+          </div>
+          <div style="flex:1;">
+            <span class="field-label">Order</span>
+            <input class="text-input" id="editOrder" type="number" value="${topic.order ?? 1}"/>
+          </div>
+        </div>
+        <label style="font-size:12px;color:#ccc;display:block;margin-bottom:14px;">
+          <input type="checkbox" id="editPublished" ${topic.isPublished ? 'checked' : ''}/> Published (visible to submissives)
+        </label>
+        <button class="gold-btn" id="saveTopicBtn">Save Topic</button>
+      </div>
+      <div class="section-label">Subcategories</div>
+      <div id="subsContainer"></div>
+    `;
+    document.getElementById('saveTopicBtn').onclick = async () => {
+      await setDoc(doc(db, 'trainingTopics', topicId), {
+        title: document.getElementById('editTitle').value.trim(),
+        description: document.getElementById('editDesc').value.trim(),
+        icon: document.getElementById('editIcon').value.trim(),
+        order: parseInt(document.getElementById('editOrder').value, 10) || 1,
+        isPublished: document.getElementById('editPublished').checked,
+      }, { merge: true });
+      document.getElementById('topicTitleBar').textContent = document.getElementById('editTitle').value.trim();
+      showToast('Topic saved.');
+    };
+    await renderSubcategories(document.getElementById('subsContainer'));
+  }
+
+  async function init() {
+    if (!topicId) { showToast('No topic specified.'); return; }
+    await requireAuth();
+    const profile = await getMyProfile();
+    if (profile?.role !== 'admin' && profile?.isAdmin !== true) {
+      document.getElementById('mainContent').innerHTML = `<div style="text-align:center;padding:60px;color:#888;">Admin access required.</div>`;
+      return;
+    }
+    const topicSnap = await getDoc(doc(db, 'trainingTopics', topicId));
+    if (!topicSnap.exists()) { showToast('Topic not found.'); return; }
+    const topic = topicSnap.data();
+    document.getElementById('topicTitleBar').textContent = topic.title;
+    await renderTopicForm(topic);
+  }
+
+  init().catch(err => { console.error(err); showToast('Failed to load topic.'); });
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

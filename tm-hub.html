@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#080c14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Dom Sub Hub — Training Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+<style>
+  .topic-card{display:block;position:relative;padding:24px 22px;background:var(--glass);backdrop-filter:blur(16px);border:1.5px solid var(--border);border-radius:20px;text-decoration:none;color:#ccc;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer;margin-bottom:18px;transition:.3s}
+  .topic-card:active{transform:scale(.98)}
+  .topic-icon{font-size:1.8rem;margin-bottom:8px;display:block}
+  .topic-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);margin-bottom:6px;font-weight:600}
+  .topic-desc{font-size:11px;color:#999;line-height:1.6;margin-bottom:14px}
+  .tm-progress-row{display:flex;align-items:center;gap:10px}
+  .tm-progress-bar{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+  .tm-progress-fill{height:100%;background:var(--luxury-gradient);border-radius:3px;transition:width .5s ease}
+  .tm-progress-pct{font-size:11px;color:var(--gold);font-weight:700;min-width:36px;text-align:right}
+  .empty-state{text-align:center;padding:60px 20px;color:#777}
+  .empty-state .material-symbols-rounded{font-size:40px;color:var(--gold-dim);margin-bottom:12px;display:block}
+  .role-note{background:rgba(212,175,55,.06);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;font-size:11px;color:#aaa;line-height:1.6}
+</style>
+</head>
+<body data-nav="more">
+
+<div class="topbar">
+  <div class="topbar-center">
+    <div class="topbar-title">Training</div>
+    <div class="topbar-sub">Body Positions &amp; Protocol</div>
+  </div>
+</div>
+
+<div class="main">
+  <div id="roleNote"></div>
+  <a href="tm-my-assignments.html" style="display:block;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);text-decoration:none;margin-bottom:20px;padding:10px;border:1px solid var(--border);border-radius:12px;">My Assignments →</a>
+  <div id="topicList"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { requireAuth, getMyRole } from './auth.js';
+  import {
+    getFirestore, collection, query, where, getDocs
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+  import { calculateTopicMastery } from './training.js';
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function loadTopics(user, isAdminOrDom) {
+    const listEl = document.getElementById('topicList');
+    listEl.innerHTML = '';
+
+    // Sub sees only published topics; Admin/Dom preview sees everything.
+    const topicsQ = isAdminOrDom
+      ? collection(db, 'trainingTopics')
+      : query(collection(db, 'trainingTopics'), where('isPublished', '==', true));
+    const topicsSnap = await getDocs(topicsQ);
+
+    if (topicsSnap.empty) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <span class="material-symbols-rounded">school</span>
+          No training topics available yet.
+        </div>`;
+      return;
+    }
+
+    const topics = topicsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    // For each topic, pull its active items + this sub's progress to compute mastery %.
+    for (const topic of topics) {
+      const itemsSnap = await getDocs(query(
+        collection(db, 'trainingItems'),
+        where('topicId', '==', topic.id),
+        where('isActive', '==', true)
+      ));
+      const itemIds = itemsSnap.docs.map(d => d.id);
+
+      const progressSnap = await getDocs(query(
+        collection(db, 'userTrainingProgress'),
+        where('submissiveId', '==', user.uid),
+        where('topicId', '==', topic.id)
+      ));
+      const progressByItemId = {};
+      progressSnap.forEach(d => { progressByItemId[d.data().itemId] = d.data(); });
+
+      const masteryPct = calculateTopicMastery(itemIds, progressByItemId);
+
+      const card = document.createElement('div');
+      card.className = 'topic-card';
+      card.innerHTML = `
+        <span class="topic-icon material-symbols-rounded">${topic.icon === 'body' ? 'self_improvement' : 'menu_book'}</span>
+        <div class="topic-title">${topic.title}${!topic.isPublished ? ' <span style="font-size:9px;color:#F59E0B;text-transform:uppercase;letter-spacing:1px;">(unpublished)</span>' : ''}</div>
+        <div class="topic-desc">${topic.description || ''}</div>
+        <div class="tm-progress-row">
+          <div class="tm-progress-bar"><div class="tm-progress-fill" style="width:${masteryPct}%"></div></div>
+          <div class="tm-progress-pct">${masteryPct}%</div>
+        </div>
+      `;
+      card.onclick = () => { window.location.href = `tm-topic.html?topic=${encodeURIComponent(topic.id)}`; };
+      listEl.appendChild(card);
+    }
+  }
+
+  async function init() {
+    const user = await requireAuth();
+    const role = await getMyRole();
+
+    const roleNoteEl = document.getElementById('roleNote');
+    if (role !== 'sub') {
+      roleNoteEl.innerHTML = `
+        <div class="role-note">
+          You're viewing the Training Module as ${role === 'admin' ? 'an Admin' : 'a Dominant'} —
+          this is the submissive-facing learning view (preview mode). Completing items here
+          writes progress under your own account. Dominant oversight and Admin content
+          management screens are a separate build step.
+        </div>`;
+    }
+
+    await loadTopics(user, role === 'admin' || role === 'dom');
+  }
+
+  init().catch(err => {
+    console.error(err);
+    showToast('Failed to load training topics.');
+  });
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

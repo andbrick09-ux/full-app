@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#080c14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Dom Sub Hub — Submissive Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+<style>
+  .topbar{display:flex;align-items:center;gap:12px}
+  .back-btn{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,.08);border:1px solid var(--border);text-decoration:none;cursor:pointer}
+  .back-btn .material-symbols-rounded{font-size:20px;color:var(--gold)}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto}
+  .tab-btn{flex-shrink:0;background:transparent;border:1px solid var(--border);border-radius:20px;color:rgba(212,175,55,.6);font-size:10px;font-weight:600;padding:9px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
+  .tab-btn.active{background:var(--luxury-gradient);color:var(--midnight);border-color:transparent;font-weight:700}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+  .topic-mastery-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .topic-mastery-row:last-child{border-bottom:none}
+  .tmr-title{flex:1;font-size:13px;color:#ddd}
+  .tmr-bar{width:80px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+  .tmr-fill{height:100%;background:var(--luxury-gradient)}
+  .tmr-pct{font-size:12px;color:var(--gold);font-weight:700;width:34px;text-align:right}
+  .activity-row{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:#ccc}
+  .activity-row:last-child{border-bottom:none}
+  .activity-time{font-size:9px;color:#777;margin-top:2px}
+  .assignment-card{padding:16px 18px;margin-bottom:12px}
+  .assignment-title{font-family:'Playfair Display',serif;font-size:14px;color:#eee;margin-bottom:4px}
+  .assignment-meta{font-size:10px;color:#888;margin-bottom:8px}
+  .assignment-status{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:10px;display:inline-block;margin-bottom:8px}
+  .status-active{background:rgba(59,130,246,.15);color:#60A5FA}
+  .status-completed{background:rgba(34,197,94,.15);color:#4ADE80}
+  .status-overdue{background:rgba(244,67,54,.15);color:#F44336}
+  .text-input{width:100%;padding:12px;background:var(--glass2);border:1.5px solid var(--border);border-radius:10px;color:#eee;font-size:13px;font-family:'Montserrat',sans-serif;margin-bottom:12px}
+  textarea.text-input{min-height:70px;resize:vertical}
+  .note-card{padding:14px 16px;margin-bottom:10px}
+  .note-meta{font-size:9px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+  .note-text{font-size:12px;color:#ccc;line-height:1.6}
+  .visible-tag{color:var(--gold)}
+  .small-btn{font-size:9px;padding:6px 10px;border-radius:8px;background:transparent;border:1px solid var(--border);color:#aaa;cursor:pointer}
+</style>
+</head>
+<body data-nav="more">
+
+<div class="topbar">
+  <a class="back-btn" href="tm-dom-overview.html"><span class="material-symbols-rounded">arrow_back</span></a>
+  <div class="topbar-center">
+    <div class="topbar-title" id="subName" style="font-size:18px;">Submissive</div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div style="text-align:center;padding:60px;color:#777;">Loading…</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { requireAuth, getMyProfile, getUserProfile } from './auth.js';
+  import {
+    collection, doc, addDoc, setDoc, getDoc, getDocs, query, where, orderBy, limit, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+  import { calculateTopicMastery } from './training.js';
+
+  const params = new URLSearchParams(window.location.search);
+  const subUid = params.get('sub');
+  let me;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function fmtDate(ts) {
+    const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+    return d ? d.toLocaleDateString() : '';
+  }
+
+  async function renderProgressTab(container) {
+    const topicsSnap = await getDocs(collection(db, 'trainingTopics'));
+    const topics = topicsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    const progressSnap = await getDocs(query(collection(db, 'userTrainingProgress'), where('submissiveId', '==', subUid)));
+    const progressByItemId = {};
+    progressSnap.forEach(d => { progressByItemId[d.data().itemId] = d.data(); });
+
+    container.innerHTML = '<div class="glass-card" style="padding:16px 20px;" id="topicRows"></div>';
+    const rowsEl = document.getElementById('topicRows');
+
+    if (topics.length === 0) {
+      rowsEl.innerHTML = '<div style="color:#777;font-size:12px;">No topics yet.</div>';
+      return;
+    }
+
+    for (const topic of topics) {
+      const itemsSnap = await getDocs(query(collection(db, 'trainingItems'), where('topicId', '==', topic.id), where('isActive', '==', true)));
+      const itemIds = itemsSnap.docs.map(d => d.id);
+      const pct = calculateTopicMastery(itemIds, progressByItemId);
+      const row = document.createElement('div');
+      row.className = 'topic-mastery-row';
+      row.innerHTML = `
+        <div class="tmr-title">${topic.title}</div>
+        <div class="tmr-bar"><div class="tmr-fill" style="width:${pct}%"></div></div>
+        <div class="tmr-pct">${pct}%</div>
+      `;
+      rowsEl.appendChild(row);
+    }
+  }
+
+  async function renderActivityTab(container) {
+    const snap = await getDocs(query(
+      collection(db, 'trainingActivityLog'),
+      where('submissiveId', '==', subUid),
+      orderBy('createdAt', 'desc'),
+      limit(25)
+    ));
+    container.innerHTML = '<div class="glass-card" style="padding:16px 20px;" id="activityRows"></div>';
+    const rowsEl = document.getElementById('activityRows');
+    if (snap.empty) { rowsEl.innerHTML = '<div style="color:#777;font-size:12px;">No activity yet.</div>'; return; }
+    snap.forEach(d => {
+      const a = d.data();
+      const row = document.createElement('div');
+      row.className = 'activity-row';
+      const resultText = a.result?.score != null ? `Score: ${a.result.score}%`
+        : a.result?.holdSeconds != null ? `Held ${a.result.holdSeconds}s`
+        : a.result?.knownFlag ? 'Marked known'
+        : a.result?.reflectionSubmitted ? 'Reflection submitted'
+        : 'Attempted';
+      row.innerHTML = `
+        <div>${a.itemType.replace('_', ' ')} — ${resultText}</div>
+        <div class="activity-time">${a.createdAt?.toDate ? a.createdAt.toDate().toLocaleString() : ''}</div>
+      `;
+      rowsEl.appendChild(row);
+    });
+  }
+
+  async function renderAssignmentsTab(container) {
+    container.innerHTML = `
+      <button class="gold-btn" id="createAssignBtn" style="margin-bottom:16px;">+ Create Assignment</button>
+      <div id="assignList"></div>
+    `;
+    document.getElementById('createAssignBtn').onclick = () => {
+      window.location.href = `tm-dom-assign.html?sub=${encodeURIComponent(subUid)}`;
+    };
+    const snap = await getDocs(query(collection(db, 'trainingAssignments'), where('submissiveIds', 'array-contains', subUid)));
+    const assignments = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+    const listEl = document.getElementById('assignList');
+    if (assignments.length === 0) { listEl.innerHTML = '<div style="color:#777;font-size:12px;text-align:center;padding:20px;">No assignments yet.</div>'; return; }
+
+    const now = new Date();
+    for (const a of assignments) {
+      const due = a.dueDate ? new Date(a.dueDate) : null;
+      const isOverdue = a.status === 'active' && due && due < now;
+      const displayStatus = isOverdue ? 'overdue' : a.status;
+      const card = document.createElement('div');
+      card.className = 'glass-card assignment-card';
+      card.innerHTML = `
+        <div class="assignment-status status-${displayStatus}">${displayStatus}</div>
+        <div class="assignment-title">${a.title}</div>
+        <div class="assignment-meta">${due ? `Due ${due.toLocaleDateString()}` : 'No due date'}</div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:10px;">${a.instructions || ''}</div>
+        ${a.status === 'active' ? `<button class="small-btn" data-id="${a.id}">Mark Complete</button>` : ''}
+      `;
+      const btn = card.querySelector('[data-id]');
+      if (btn) btn.onclick = async () => {
+        await setDoc(doc(db, 'trainingAssignments', a.id), { status: 'completed', completedAt: serverTimestamp() }, { merge: true });
+        renderAssignmentsTab(container);
+      };
+      listEl.appendChild(card);
+    }
+  }
+
+  async function renderNotesTab(container) {
+    container.innerHTML = `
+      <div class="glass-card" style="padding:18px;margin-bottom:16px;">
+        <span style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px;display:block;">New Note</span>
+        <textarea class="text-input" id="noteText" placeholder="Coaching note..."></textarea>
+        <label style="font-size:11px;color:#ccc;display:block;margin-bottom:12px;">
+          <input type="checkbox" id="noteVisible"/> Visible to submissive
+        </label>
+        <button class="gold-btn" id="addNoteBtn">Add Note</button>
+      </div>
+      <div id="noteList"></div>
+    `;
+    document.getElementById('addNoteBtn').onclick = async () => {
+      const text = document.getElementById('noteText').value.trim();
+      if (!text) { showToast('Write something first.'); return; }
+      await addDoc(collection(db, 'trainingNotes'), {
+        dominantId: me.uid,
+        submissiveId: subUid,
+        noteText: text,
+        visibleToSub: document.getElementById('noteVisible').checked,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      showToast('Note added.');
+      renderNotesTab(container);
+    };
+
+    const snap = await getDocs(query(collection(db, 'trainingNotes'), where('submissiveId', '==', subUid)));
+    const notes = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+    const listEl = document.getElementById('noteList');
+    if (notes.length === 0) { listEl.innerHTML = '<div style="color:#777;font-size:12px;text-align:center;">No notes yet.</div>'; return; }
+    for (const n of notes) {
+      const card = document.createElement('div');
+      card.className = 'glass-card note-card';
+      card.innerHTML = `
+        <div class="note-meta">${fmtDate(n.createdAt)} ${n.visibleToSub ? '· <span class="visible-tag">Visible to sub</span>' : ''}</div>
+        <div class="note-text">${n.noteText}</div>
+      `;
+      listEl.appendChild(card);
+    }
+  }
+
+  const TABS = {
+    progress: renderProgressTab,
+    activity: renderActivityTab,
+    assignments: renderAssignmentsTab,
+    notes: renderNotesTab,
+  };
+
+  async function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
+    const panel = document.querySelector(`.tab-panel[data-tab="${name}"]`);
+    if (!panel.dataset.loaded) {
+      panel.dataset.loaded = '1';
+      await TABS[name](panel);
+    }
+  }
+
+  async function init() {
+    if (!subUid) { showToast('No submissive specified.'); return; }
+    me = await requireAuth();
+    const profile = await getMyProfile();
+    if (profile?.role !== 'dom' && profile?.role !== 'admin' && profile?.isAdmin !== true) {
+      document.getElementById('mainContent').innerHTML = `<div style="text-align:center;padding:60px;color:#888;">This view is for Dominants/Admins.</div>`;
+      return;
+    }
+
+    const subProfile = await getUserProfile(subUid);
+    document.getElementById('subName').textContent = subProfile?.displayName || 'Submissive';
+
+    const main = document.getElementById('mainContent');
+    main.innerHTML = `
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="progress">Progress</button>
+        <button class="tab-btn" data-tab="activity">Recent Activity</button>
+        <button class="tab-btn" data-tab="assignments">Assignments</button>
+        <button class="tab-btn" data-tab="notes">Notes</button>
+      </div>
+      <div class="tab-panel active" data-tab="progress"></div>
+      <div class="tab-panel" data-tab="activity"></div>
+      <div class="tab-panel" data-tab="assignments"></div>
+      <div class="tab-panel" data-tab="notes"></div>
+    `;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => switchTab(btn.dataset.tab);
+    });
+
+    await switchTab('progress');
+  }
+
+  init().catch(err => { console.error(err); showToast('Failed to load submissive detail.'); });
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

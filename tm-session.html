@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#080c14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Dom Sub Hub — Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+<style>
+  .topbar{display:flex;align-items:center;gap:12px}
+  .close-btn{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,.08);border:1px solid var(--border);text-decoration:none;cursor:pointer}
+  .close-btn .material-symbols-rounded{font-size:20px;color:var(--gold)}
+
+  /* Flashcard */
+  .flip-card{perspective:1200px;height:280px;margin-bottom:24px}
+  .flip-card-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+  .flip-card-inner.flipped{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;background:var(--glass);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  .flip-face.back{transform:rotateY(180deg)}
+  .flip-face-text{font-family:'Playfair Display',serif;font-size:16px;color:#eee;line-height:1.6;white-space:pre-line}
+  .flip-face.front .flip-face-text{font-size:26px;color:var(--gold)}
+  .flip-hint{text-align:center;font-size:9px;color:#777;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:20px}
+  .flashcard-controls{display:flex;gap:10px}
+  .flashcard-controls button{flex:1}
+
+  /* Quiz */
+  .question-text{font-family:'Playfair Display',serif;font-size:17px;color:#eee;line-height:1.6;margin-bottom:22px}
+  .option-btn{display:block;width:100%;text-align:left;padding:14px 16px;margin-bottom:10px;background:var(--glass2);border:1.5px solid var(--border);border-radius:14px;color:#ccc;font-size:13px;cursor:pointer;transition:.2s}
+  .option-btn:active{transform:scale(.98)}
+  .option-btn.selected{border-color:var(--gold)}
+  .option-btn.correct{border-color:#4CAF50;background:rgba(76,175,80,.1);color:#8BE29A}
+  .option-btn.incorrect{border-color:#F44336;background:rgba(244,67,54,.1);color:#F49B94}
+  .tf-row{display:flex;gap:10px;margin-bottom:20px}
+  .tf-row button{flex:1;padding:20px;font-family:'Playfair Display',serif;font-size:16px}
+  .text-input{width:100%;padding:14px;background:var(--glass2);border:1.5px solid var(--border);border-radius:12px;color:#eee;font-size:13px;font-family:'Montserrat',sans-serif;margin-bottom:16px}
+  textarea.text-input{min-height:100px;resize:vertical}
+  .feedback-panel{padding:18px;border-radius:14px;margin:18px 0;font-size:12px;line-height:1.7}
+  .feedback-panel.correct{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.3);color:#a8e6b0}
+  .feedback-panel.incorrect{background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);color:#f0a89e}
+  .feedback-panel.neutral{background:rgba(212,175,55,.06);border:1px solid var(--border);color:#ccc}
+  .self-assess-row{display:flex;gap:8px;margin:16px 0}
+  .self-assess-row button{flex:1;padding:12px 6px;font-size:9px}
+
+  /* Hold practice */
+  .hold-timer{text-align:center;padding:30px 0}
+  .hold-timer-val{font-family:'Playfair Display',serif;font-size:52px;color:var(--gold);font-weight:700}
+  .hold-recommended{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px}
+  .checklist-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .checklist-item:last-child{border-bottom:none}
+  .check-box{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:12px;color:transparent;transition:.2s}
+  .check-box.checked{background:var(--gold);border-color:var(--gold);color:var(--midnight)}
+  .checklist-label{font-size:12px;color:#ccc}
+  .rating-row{display:flex;gap:8px;justify-content:center;margin:20px 0}
+  .rating-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:#888;font-size:14px;font-weight:700;cursor:pointer}
+  .rating-btn.selected{background:var(--luxury-gradient);color:var(--midnight);border-color:transparent}
+
+  .hidden{display:none !important}
+  .mastered-flash{text-align:center;padding:16px;color:var(--gold);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px}
+</style>
+</head>
+<body data-nav="more">
+
+<div class="topbar">
+  <a class="close-btn" id="closeLink" href="tm-hub.html"><span class="material-symbols-rounded">close</span></a>
+  <div class="topbar-center">
+    <div class="topbar-title" id="itemTitle" style="font-size:18px;">Session</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="glass-card" style="padding:24px;" id="sessionCard"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { requireAuth, getMyDominant } from './auth.js';
+  import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+  import {
+    evaluateAttempt, markFlashcardViewed, updateSpacedRepetition,
+    defaultSpacedRepetitionFields, STATUS
+  } from './training.js';
+
+  const params = new URLSearchParams(window.location.search);
+  let topicId = params.get('topic');
+  let subcategoryId = params.get('sub');
+  const itemId = params.get('item');
+  const PREVIEW_MODE = params.get('preview') === '1';
+
+  let user, item, progress, dominantUid;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function backToList() {
+    if (PREVIEW_MODE) { window.close(); return; }
+    window.location.href = `tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}`;
+  }
+
+  // ── Firestore write helpers ──────────────────────────────────────────────
+
+  async function saveProgress(fields) {
+    if (PREVIEW_MODE) return;
+    const ref = doc(db, 'userTrainingProgress', `${user.uid}_${itemId}`);
+    await setDoc(ref, {
+      submissiveId: user.uid,
+      dominantId: dominantUid ?? null,
+      topicId, subcategoryId, itemId,
+      lastAttemptAt: serverTimestamp(),
+      ...fields,
+    }, { merge: true });
+  }
+
+  async function logActivity(result) {
+    if (PREVIEW_MODE) return;
+    await addDoc(collection(db, 'trainingActivityLog'), {
+      submissiveId: user.uid,
+      dominantId: dominantUid ?? null,
+      topicId, subcategoryId, itemId,
+      itemType: item.type,
+      result,
+      createdAt: serverTimestamp(),
+    });
+  }
+
+  async function applySpacedRepetition(performancePct) {
+    if (PREVIEW_MODE) return {};
+    const current = {
+      easeFactor: progress?.easeFactor ?? defaultSpacedRepetitionFields().easeFactor,
+      intervalDays: progress?.intervalDays ?? defaultSpacedRepetitionFields().intervalDays,
+    };
+    return updateSpacedRepetition(current, performancePct);
+  }
+
+  // ── Renderers ─────────────────────────────────────────────────────────────
+
+  async function renderFlashcard() {
+    const card = document.getElementById('sessionCard');
+    let flipped = false;
+    let linkedMastered = false;
+    if (item.linkedItemId) {
+      const linkedProg = await getDoc(doc(db, 'userTrainingProgress', `${user.uid}_${item.linkedItemId}`));
+      linkedMastered = linkedProg.exists() && linkedProg.data().status === STATUS.MASTERED;
+    }
+    const knownCount = progress?.knownCount ?? 0;
+
+    card.innerHTML = `
+      <div class="flip-hint">Tap card to flip</div>
+      <div class="flip-card"><div class="flip-card-inner" id="flipInner">
+        <div class="flip-face front"><div class="flip-face-text">${item.front}</div></div>
+        <div class="flip-face back"><div class="flip-face-text">${item.back}</div></div>
+      </div></div>
+      <div class="flashcard-controls">
+        <button class="outline-btn" id="stillLearningBtn">Still Learning</button>
+        <button class="gold-btn" id="knownBtn">Mark as Known</button>
+      </div>
+      <div id="masteredNote"></div>
+    `;
+
+    document.getElementById('flipInner').onclick = async () => {
+      flipped = !flipped;
+      document.getElementById('flipInner').classList.toggle('flipped', flipped);
+      if (flipped && (!progress || progress.status === STATUS.NOT_STARTED)) {
+        await saveProgress({ status: markFlashcardViewed(STATUS.NOT_STARTED) });
+      }
+    };
+
+    document.getElementById('stillLearningBtn').onclick = async () => {
+      await saveProgress({ status: STATUS.IN_PROGRESS });
+      await logActivity({ knownFlag: false });
+      backToList();
+    };
+
+    document.getElementById('knownBtn').onclick = async () => {
+      const newKnownCount = knownCount + 1;
+      const evalResult = evaluateAttempt('flashcard', { knownCount: newKnownCount, linkedItemMastered: linkedMastered });
+      const sr = await applySpacedRepetition(evalResult.mastered ? 90 : 75);
+      await saveProgress({ status: evalResult.status, knownCount: newKnownCount, ...sr });
+      await logActivity({ knownFlag: true });
+      if (evalResult.mastered) {
+        document.getElementById('masteredNote').innerHTML = `<div class="mastered-flash">✨ Mastered</div>`;
+        setTimeout(backToList, 900);
+      } else {
+        backToList();
+      }
+    };
+  }
+
+  const QUIZ_CHOICE_TYPES = ['multiple_choice', 'true_false'];
+  const AUTO_TEXT_TYPES = ['fill_blank'];
+  const SELF_ASSESS_TYPES = ['error_identification', 'transition', 'sequence', 'scenario', 'comparison'];
+
+  async function submitQuizResult(isCorrect, correctAnswerText, explanation) {
+    const scorePct = isCorrect ? 100 : 0;
+    const recentScores = [...(progress?.recentScores ?? []), scorePct].slice(-3);
+    const evalResult = evaluateAttempt(item.type === 'true_false' ? 'true_false' : 'multiple_choice', { scorePct, recentScores });
+    const sr = await applySpacedRepetition(scorePct);
+    const attempts = (progress?.attempts ?? 0) + 1;
+    await saveProgress({ status: evalResult.status, score: scorePct, recentScores, attempts, ...sr });
+    await logActivity({ score: scorePct, correct: isCorrect });
+    renderFeedback(isCorrect, correctAnswerText, explanation, evalResult.mastered);
+  }
+
+  async function submitSelfAssessed(level) {
+    // level: 'got_it' | 'partial' | 'missed' -> approximate score
+    const scorePct = level === 'got_it' ? 95 : level === 'partial' ? 70 : 40;
+    const recentScores = [...(progress?.recentScores ?? []), scorePct].slice(-3);
+    const evalResult = evaluateAttempt('multiple_choice', { scorePct, recentScores }); // quiz-style rules apply uniformly
+    const sr = await applySpacedRepetition(scorePct);
+    const attempts = (progress?.attempts ?? 0) + 1;
+    await saveProgress({ status: evalResult.status, score: scorePct, recentScores, attempts, ...sr });
+    await logActivity({ score: scorePct, selfAssessed: level });
+    renderFeedback(scorePct >= 70, item.correctAnswer, item.explanation, evalResult.mastered);
+  }
+
+  function renderFeedback(isCorrect, correctAnswerText, explanation, mastered) {
+    const card = document.getElementById('sessionCard');
+    const panel = document.createElement('div');
+    panel.className = `feedback-panel ${isCorrect ? 'correct' : 'incorrect'}`;
+    panel.innerHTML = `
+      <strong>${isCorrect ? 'Correct' : 'Not quite'}</strong> — ${correctAnswerText}
+      ${explanation ? `<div style="margin-top:8px;opacity:.85;">${explanation}</div>` : ''}
+      ${mastered ? `<div class="mastered-flash" style="margin-top:10px;">✨ Mastered</div>` : ''}
+    `;
+    card.appendChild(panel);
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'gold-btn';
+    nextBtn.style.marginTop = '14px';
+    nextBtn.textContent = 'Continue';
+    nextBtn.onclick = backToList;
+    card.appendChild(nextBtn);
+  }
+
+  async function renderMultipleChoice() {
+    const card = document.getElementById('sessionCard');
+    card.innerHTML = `
+      <div class="question-text">${item.question}</div>
+      <div id="optionsWrap"></div>
+    `;
+    const wrap = document.getElementById('optionsWrap');
+    (item.options || []).forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => {
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+        const isCorrect = opt.trim().toLowerCase() === (item.correctAnswer || '').trim().toLowerCase();
+        btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+        if (!isCorrect) {
+          document.querySelectorAll('.option-btn').forEach(b => {
+            if (b.textContent.trim().toLowerCase() === (item.correctAnswer || '').trim().toLowerCase()) b.classList.add('correct');
+          });
+        }
+        submitQuizResult(isCorrect, item.correctAnswer, item.explanation);
+      };
+      wrap.appendChild(btn);
+    });
+  }
+
+  async function renderTrueFalse() {
+    const card = document.getElementById('sessionCard');
+    card.innerHTML = `
+      <div class="question-text">${item.question}</div>
+      <div class="tf-row">
+        <button class="gold-btn" id="trueBtn">True</button>
+        <button class="outline-btn" id="falseBtn">False</button>
+      </div>
+    `;
+    const correct = (item.correctAnswer || '').trim().toLowerCase();
+    document.getElementById('trueBtn').onclick = () => {
+      document.getElementById('trueBtn').disabled = true;
+      document.getElementById('falseBtn').disabled = true;
+      submitQuizResult(correct === 'true', item.correctAnswer, item.explanation);
+    };
+    document.getElementById('falseBtn').onclick = () => {
+      document.getElementById('trueBtn').disabled = true;
+      document.getElementById('falseBtn').disabled = true;
+      submitQuizResult(correct === 'false', item.correctAnswer, item.explanation);
+    };
+  }
+
+  async function renderFillBlank() {
+    const card = document.getElementById('sessionCard');
+    card.innerHTML = `
+      <div class="question-text">${item.question}</div>
+      <input class="text-input" id="fillInput" type="text" placeholder="Your answer"/>
+      <button class="gold-btn" id="fillSubmit">Check Answer</button>
+    `;
+    document.getElementById('fillSubmit').onclick = () => {
+      const val = document.getElementById('fillInput').value.trim().toLowerCase();
+      const accepted = (item.correctAnswer || '').split('/').map(s => s.trim().toLowerCase());
+      const isCorrect = accepted.some(a => a && (val === a || val.includes(a) || a.includes(val)));
+      document.getElementById('fillSubmit').disabled = true;
+      document.getElementById('fillInput').disabled = true;
+      submitQuizResult(isCorrect, item.correctAnswer, item.explanation);
+    };
+  }
+
+  async function renderSelfAssessed() {
+    const card = document.getElementById('sessionCard');
+    card.innerHTML = `
+      <div class="question-text">${item.question}</div>
+      <textarea class="text-input" id="ownAnswer" placeholder="Your answer (optional — for your own thinking)"></textarea>
+      <button class="outline-btn" id="revealBtn">Reveal Answer</button>
+      <div id="revealArea"></div>
+    `;
+    document.getElementById('revealBtn').onclick = () => {
+      document.getElementById('revealBtn').classList.add('hidden');
+      document.getElementById('revealArea').innerHTML = `
+        <div class="feedback-panel neutral"><strong>Answer:</strong> ${item.correctAnswer}
+        ${item.explanation && item.explanation !== item.correctAnswer ? `<div style="margin-top:8px;">${item.explanation}</div>` : ''}
+        </div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin:14px 0 8px;text-align:center;">How did you do?</div>
+        <div class="self-assess-row">
+          <button class="outline-btn" data-level="missed">Missed It</button>
+          <button class="outline-btn" data-level="partial">Partially</button>
+          <button class="gold-btn" data-level="got_it">Got It</button>
+        </div>
+      `;
+      document.querySelectorAll('[data-level]').forEach(b => {
+        b.onclick = () => {
+          document.querySelectorAll('[data-level]').forEach(x => x.disabled = true);
+          submitSelfAssessed(b.dataset.level);
+        };
+      });
+    };
+  }
+
+  async function renderReflection() {
+    const card = document.getElementById('sessionCard');
+    card.innerHTML = `
+      <div class="question-text">${item.question}</div>
+      <textarea class="text-input" id="reflectionText" placeholder="Write your reflection..."></textarea>
+      <button class="gold-btn" id="submitReflection">Submit Reflection</button>
+    `;
+    document.getElementById('submitReflection').onclick = async () => {
+      const text = document.getElementById('reflectionText').value.trim();
+      if (!text) { showToast('Write a few words first.'); return; }
+      const evalResult = evaluateAttempt('reflection', { hasSubmitted: true });
+      const sr = await applySpacedRepetition(90);
+      await saveProgress({ status: evalResult.status, notesFromSub: text, ...sr });
+      await logActivity({ reflectionSubmitted: true });
+      const card2 = document.getElementById('sessionCard');
+      card2.innerHTML = `<div class="mastered-flash">✨ Reflection Saved</div>`;
+      setTimeout(backToList, 900);
+    };
+  }
+
+  async function renderHoldPractice() {
+    const card = document.getElementById('sessionCard');
+    const checklist = item.formChecklist || [];
+    card.innerHTML = `
+      <div class="hold-timer">
+        <div class="hold-timer-val" id="timerVal">00:00</div>
+        <div class="hold-recommended">Recommended: ${item.recommendedHoldSeconds}s${item.recommendedHoldSecondsRange ? ` (${item.recommendedHoldSecondsRange[0]}\u2013${item.recommendedHoldSecondsRange[1]}s)` : ''}</div>
+      </div>
+      <div id="checklistWrap"></div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button class="outline-btn" id="startBtn">Start</button>
+        <button class="gold-btn" id="finishBtn" disabled>Finish</button>
+      </div>
+      <div id="ratingArea"></div>
+    `;
+    const checklistWrap = document.getElementById('checklistWrap');
+    checklist.forEach((point, i) => {
+      const row = document.createElement('div');
+      row.className = 'checklist-item';
+      row.innerHTML = `<div class="check-box" data-i="${i}"><span class="material-symbols-rounded" style="font-size:14px;">check</span></div><div class="checklist-label">${point}</div>`;
+      checklistWrap.appendChild(row);
+    });
+    checklistWrap.addEventListener('click', (e) => {
+      const box = e.target.closest('.check-box');
+      if (box) box.classList.toggle('checked');
+    });
+
+    let seconds = 0, timerHandle = null, running = false;
+    function fmt(s) { const m = Math.floor(s / 60); const r = s % 60; return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`; }
+
+    document.getElementById('startBtn').onclick = () => {
+      if (!running) {
+        running = true;
+        document.getElementById('startBtn').textContent = 'Pause';
+        document.getElementById('finishBtn').disabled = false;
+        timerHandle = setInterval(() => { seconds++; document.getElementById('timerVal').textContent = fmt(seconds); }, 1000);
+      } else {
+        running = false;
+        document.getElementById('startBtn').textContent = 'Resume';
+        clearInterval(timerHandle);
+      }
+    };
+
+    document.getElementById('finishBtn').onclick = () => {
+      clearInterval(timerHandle);
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('finishBtn').disabled = true;
+      const checkedCount = document.querySelectorAll('.check-box.checked').length;
+      document.getElementById('ratingArea').innerHTML = `
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin:16px 0 8px;text-align:center;">Self-Rating</div>
+        <div class="rating-row">
+          ${[1,2,3,4,5].map(n => `<button class="rating-btn" data-r="${n}">${n}</button>`).join('')}
+        </div>
+        <button class="gold-btn" id="submitHold" disabled>Submit</button>
+      `;
+      let selectedRating = null;
+      document.querySelectorAll('.rating-btn').forEach(b => {
+        b.onclick = () => {
+          document.querySelectorAll('.rating-btn').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+          selectedRating = parseInt(b.dataset.r, 10);
+          document.getElementById('submitHold').disabled = false;
+        };
+      });
+      document.getElementById('submitHold').onclick = async () => {
+        const bestHoldSeconds = Math.max(progress?.bestHoldSeconds ?? 0, seconds);
+        const evalResult = evaluateAttempt('hold_practice', {
+          bestHoldSeconds, recommendedHoldSeconds: item.recommendedHoldSeconds, selfRating: selectedRating,
+        });
+        const sr = await applySpacedRepetition(evalResult.mastered ? 95 : 65);
+        const attempts = (progress?.attempts ?? 0) + 1;
+        await saveProgress({ status: evalResult.status, bestHoldSeconds, attempts, ...sr });
+        await logActivity({ holdSeconds: seconds, checklistChecked: checkedCount, checklistTotal: checklist.length, selfRating: selectedRating });
+        const card2 = document.getElementById('sessionCard');
+        card2.innerHTML = `
+          <div class="feedback-panel ${evalResult.mastered ? 'correct' : 'neutral'}">
+            Held for ${fmt(seconds)}. Best: ${fmt(bestHoldSeconds)}.
+            ${evalResult.mastered ? '<div class="mastered-flash" style="margin-top:8px;">✨ Mastered</div>' : ''}
+          </div>
+          <button class="gold-btn" id="doneBtn">Continue</button>
+        `;
+        document.getElementById('doneBtn').onclick = backToList;
+      };
+    };
+  }
+
+  async function render() {
+    document.getElementById('itemTitle').textContent = item.title;
+    document.getElementById('closeLink').href = PREVIEW_MODE
+      ? `tm-admin-item.html?item=${encodeURIComponent(itemId)}`
+      : `tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}`;
+
+    if (PREVIEW_MODE) {
+      const banner = document.createElement('div');
+      banner.className = 'feedback-panel neutral';
+      banner.style.marginBottom = '16px';
+      banner.textContent = 'Preview mode — nothing you do here is saved.';
+      document.querySelector('.main').insertBefore(banner, document.getElementById('sessionCard'));
+    }
+
+    if (item.type === 'flashcard') return renderFlashcard();
+    if (item.type === 'multiple_choice') return renderMultipleChoice();
+    if (item.type === 'true_false') return renderTrueFalse();
+    if (item.type === 'fill_blank') return renderFillBlank();
+    if (item.type === 'hold_practice') return renderHoldPractice();
+    if (item.type === 'reflection') return renderReflection();
+    if (SELF_ASSESS_TYPES.includes(item.type)) return renderSelfAssessed();
+
+    document.getElementById('sessionCard').innerHTML = `<div class="feedback-panel neutral">Unsupported item type: ${item.type}</div>`;
+  }
+
+  async function init() {
+    if (!itemId) { showToast('Missing item.'); return; }
+    if (!PREVIEW_MODE && (!topicId || !subcategoryId)) { showToast('Missing item.'); return; }
+    user = await requireAuth();
+
+    const itemSnap = await getDoc(doc(db, 'trainingItems', itemId));
+    if (!itemSnap.exists()) { showToast('Item not found.'); return; }
+    item = itemSnap.data();
+    if (!topicId) topicId = item.topicId;
+    if (!subcategoryId) subcategoryId = item.subcategoryId;
+
+    if (PREVIEW_MODE) {
+      progress = null;
+    } else {
+      const progressSnap = await getDoc(doc(db, 'userTrainingProgress', `${user.uid}_${itemId}`));
+      progress = progressSnap.exists() ? progressSnap.data() : null;
+    }
+
+    const dom = await getMyDominant();
+    dominantUid = dom?.uid ?? null;
+
+    await render();
+  }
+
+  init().catch(err => { console.error(err); showToast('Failed to load session.'); });
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

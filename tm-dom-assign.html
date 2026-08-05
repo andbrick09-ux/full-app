@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#080c14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Dom Sub Hub — Create Assignment</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" href="icon-512.png"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="nav.css"/>
+<style>
+  .topbar{display:flex;align-items:center;gap:12px}
+  .back-btn{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,.08);border:1px solid var(--border);text-decoration:none;cursor:pointer}
+  .back-btn .material-symbols-rounded{font-size:20px;color:var(--gold)}
+  .text-input{width:100%;padding:12px;background:var(--glass2);border:1.5px solid var(--border);border-radius:10px;color:#eee;font-size:13px;font-family:'Montserrat',sans-serif;margin-bottom:14px}
+  textarea.text-input{min-height:70px;resize:vertical}
+  .field-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px;display:block}
+  .form-card{padding:20px}
+  .sub-check-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .sub-check-row:last-child{border-bottom:none}
+</style>
+</head>
+<body data-nav="more">
+
+<div class="topbar">
+  <a class="back-btn" id="backLink" href="tm-dom-overview.html"><span class="material-symbols-rounded">arrow_back</span></a>
+  <div class="topbar-center">
+    <div class="topbar-title" style="font-size:18px;">Create Assignment</div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div style="text-align:center;padding:60px;color:#777;">Loading…</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { requireAuth, getMyProfile, getMySubmissives } from './auth.js';
+  import {
+    collection, doc, addDoc, getDocs, query, where, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+
+  const params = new URLSearchParams(window.location.search);
+  const preselectedSub = params.get('sub');
+  const preselectedTopic = params.get('topic');
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function init() {
+    const me = await requireAuth();
+    const profile = await getMyProfile();
+    if (profile?.role !== 'dom' && profile?.role !== 'admin' && profile?.isAdmin !== true) {
+      document.getElementById('mainContent').innerHTML = `<div style="text-align:center;padding:60px;color:#888;">This view is for Dominants/Admins.</div>`;
+      return;
+    }
+
+    if (preselectedSub) document.getElementById('backLink').href = `tm-dom-detail.html?sub=${encodeURIComponent(preselectedSub)}`;
+
+    const [subs, topicsSnap] = await Promise.all([
+      getMySubmissives(),
+      getDocs(collection(db, 'trainingTopics')),
+    ]);
+    const topics = topicsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    const main = document.getElementById('mainContent');
+    if (subs.length === 0) {
+      main.innerHTML = `<div style="text-align:center;padding:60px;color:#777;">No paired submissives to assign to.</div>`;
+      return;
+    }
+
+    main.innerHTML = `
+      <div class="glass-card form-card">
+        <span class="field-label">Title</span>
+        <input class="text-input" id="f_title" placeholder="e.g. Focus on Kneeling Positions This Week"/>
+
+        <span class="field-label">Assign To</span>
+        <div id="subsList" style="margin-bottom:16px;"></div>
+
+        <span class="field-label">Topic</span>
+        <select class="text-input" id="f_topic">
+          <option value="">— Select a topic —</option>
+          ${topics.map(t => `<option value="${t.id}">${t.title}</option>`).join('')}
+        </select>
+
+        <span class="field-label">Subcategory (optional — leave blank for whole topic)</span>
+        <select class="text-input" id="f_sub"><option value="">— Any —</option></select>
+
+        <span class="field-label">Difficulty (optional)</span>
+        <select class="text-input" id="f_difficulty">
+          <option value="">— Any —</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+
+        <span class="field-label">Instructions</span>
+        <textarea class="text-input" id="f_instructions" placeholder="What should they focus on?"></textarea>
+
+        <span class="field-label">Due Date (optional)</span>
+        <input class="text-input" id="f_dueDate" type="date"/>
+
+        <button class="gold-btn" id="saveBtn">Assign</button>
+      </div>
+    `;
+
+    const subsListEl = document.getElementById('subsList');
+    subs.forEach(s => {
+      const row = document.createElement('label');
+      row.className = 'sub-check-row';
+      row.innerHTML = `<input type="checkbox" value="${s.uid}" ${s.uid === preselectedSub || subs.length === 1 ? 'checked' : ''}/> <span style="font-size:13px;color:#ccc;">${s.displayName}</span>`;
+      subsListEl.appendChild(row);
+    });
+
+    document.getElementById('f_topic').onchange = async (e) => {
+      const topicId = e.target.value;
+      const subSelect = document.getElementById('f_sub');
+      subSelect.innerHTML = '<option value="">— Any —</option>';
+      if (!topicId) return;
+      const subsSnap = await getDocs(query(collection(db, 'trainingSubcategories'), where('topicId', '==', topicId)));
+      subsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.textContent = s.title;
+        subSelect.appendChild(opt);
+      });
+    };
+
+    if (preselectedTopic) {
+      document.getElementById('f_topic').value = preselectedTopic;
+      document.getElementById('f_topic').dispatchEvent(new Event('change'));
+    }
+
+    document.getElementById('saveBtn').onclick = async () => {
+      const title = document.getElementById('f_title').value.trim();
+      const topicId = document.getElementById('f_topic').value;
+      const selectedSubUids = [...subsListEl.querySelectorAll('input:checked')].map(i => i.value);
+
+      if (!title) { showToast('Title is required.'); return; }
+      if (!topicId) { showToast('Select a topic.'); return; }
+      if (selectedSubUids.length === 0) { showToast('Select at least one submissive.'); return; }
+
+      await addDoc(collection(db, 'trainingAssignments'), {
+        dominantId: me.uid,
+        submissiveIds: selectedSubUids,
+        topicId,
+        subcategoryId: document.getElementById('f_sub').value || null,
+        itemIds: [],
+        difficulty: document.getElementById('f_difficulty').value || null,
+        title,
+        instructions: document.getElementById('f_instructions').value.trim(),
+        dueDate: document.getElementById('f_dueDate').value || null,
+        status: 'active',
+        createdAt: serverTimestamp(),
+        completedAt: null,
+      });
+
+      showToast('Assignment created.');
+      setTimeout(() => {
+        window.location.href = selectedSubUids.length === 1
+          ? `tm-dom-detail.html?sub=${encodeURIComponent(selectedSubUids[0])}`
+          : 'tm-dom-overview.html';
+      }, 600);
+    };
+  }
+
+  init().catch(err => { console.error(err); showToast('Failed to load assignment form.'); });
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

@@ -108,18 +108,24 @@ textarea{min-height:80px;resize:vertical}
   <button class="btn" id="assignBtn">ASSIGN TO SUB</button>
 
   <div id="successMsg" class="success" style="display:none"></div>
+
+  <div style="margin-top:36px;padding-top:24px;border-top:1px solid var(--gold-b);">
+    <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-l);text-align:center;margin-bottom:6px;">Training Module <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">(Beta)</span></div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:16px;">Flashcards, quizzes & spaced repetition — a separate, richer system from the legacy trainings above.</div>
+    <div class="training-list" id="tmTopicList"></div>
+  </div>
 </div>
 
 <script type="module">
 import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, partnerDataRef } from './auth.js';
-import { setDoc, serverTimestamp, doc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { setDoc, serverTimestamp, doc, deleteDoc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
 const trainings = [
   { id: 'deepthroat', name: 'Deepthroat', desc: 'Oral training & control' },
   { id: 'heel', name: 'Heel Training', desc: 'Posture, grace & walking' },
   { id: 'kegel', name: 'Kegel', desc: 'Pelvic floor strength' },
-  { id: 'positions', name: 'Positions', desc: 'Formal & service positions' },
+  { id: 'positions', name: 'Positions (Legacy)', desc: 'Formal & service positions — simple tracker. See Training Module below for the full flashcard/quiz version.' },
   { id: 'anal-plug', name: 'Anal Plug', desc: 'Anal training & endurance' },
   { id: 'the-5', name: 'The 5 Training', desc: 'Core 5-step program' }
 ];
@@ -141,6 +147,40 @@ async function init() {
   document.getElementById('subName').textContent = subDisplayName;
 
   await renderTrainingList();
+  await renderTrainingModuleTopics();
+}
+
+async function renderTrainingModuleTopics() {
+  const container = document.getElementById('tmTopicList');
+  if (!partnerUid) {
+    container.innerHTML = `<div style="font-size:11px;color:var(--muted);text-align:center;">No partner paired.</div>`;
+    return;
+  }
+  const topicsSnap = await getDocs(query(collection(db, 'trainingTopics'), where('isPublished', '==', true)));
+  const topics = topicsSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  if (topics.length === 0) {
+    container.innerHTML = `<div style="font-size:11px;color:var(--muted);text-align:center;">No published Training Module topics yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  topics.forEach(topic => {
+    const div = document.createElement('div');
+    div.className = 'training-item';
+    div.style.cursor = 'pointer';
+    div.innerHTML = `
+      <div class="training-info">
+        <div class="training-name">${topic.title}</div>
+        <div class="training-desc">${topic.description || ''}</div>
+      </div>
+      <span style="color:var(--gold);font-size:12px;">Assign →</span>
+    `;
+    div.onclick = () => {
+      window.location.href = `tm-dom-assign.html?topic=${encodeURIComponent(topic.id)}&sub=${encodeURIComponent(partnerUid)}`;
+    };
+    container.appendChild(div);
+  });
 }
 
 async function renderTrainingList() {
