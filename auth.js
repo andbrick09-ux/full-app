@@ -140,11 +140,43 @@ export async function getUserProfile(uid) {
  * Returns 'dom' | 'sub' | null
  */
 export async function getMyRole() {
-  const profile = await getMyProfile();
-  return profile?.role ?? null;
+  const p = await getMyProfile();
+  return p?.role || null;
 }
 
-// ── Relationship pairing ──────────────────────────────────────────────────────
+// ── Backwards Compatibility for TM Pages ──────────────────────────────────
+export async function getMyDominant() {
+  const rel = await getRelationship();
+  if (rel && rel.status === 'active') {
+    const pUid = await getPartnerUid();
+    if (!pUid) return null;
+    const p = await getUserProfile(pUid);
+    return {
+      uid: pUid,
+      displayName: p?.displayName || p?.name || 'Dominant',
+      email: p?.email || ''
+    };
+  }
+  return null;
+}
+
+export async function getMySubmissives() {
+  const roster = await getDomRoster();
+  const subs = [];
+  for (const rel of roster) {
+    if (rel.status === 'active') {
+      const p = await getUserProfile(rel.subId);
+      subs.push({
+        uid: rel.subId,
+        displayName: p?.displayName || p?.name || 'Unknown',
+        email: p?.email || ''
+      });
+    }
+  }
+  return subs;
+}
+
+// ── Relationships ──────────────────────────────────────────────────────────────
 
 /**
  * Dom sends a pairing invite to Sub's email.
