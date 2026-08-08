@@ -81,6 +81,7 @@
     { href: 'song-vault.html', icon: '🎵', label: 'Song Vault' },
     { href: 'notes.html', icon: '📝', label: 'Notes' },
     { href: 'calendar.html', icon: '📅', label: 'Calendar' },
+    { href: 'roster.html', icon: '👥', label: 'Sub Roster' },
     /*  { href: 'protocol-daily.html', icon: '📅', label: 'Daily Protocol' },*/
     { href: 'public-game.html', icon: '🎲', label: 'Public Fun' },
     /*        { href: 'help.html', icon: '❓', label: 'Help &amp; Info' },*/

@@ -21,7 +21,9 @@ import {
   where,
   getDocs,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  arrayUnion,
+  arrayRemove
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ── Auth state ────────────────────────────────────────────────────────────────
@@ -101,8 +103,10 @@ export async function getMyProfile() {
  */
 export async function getRelationship() {
   const profile = await getMyProfile();
-  if (!profile?.relationshipId) return null;
-  const snap = await getDoc(doc(db, 'relationships', profile.relationshipId));
+  if (!profile?.relationshipId && !profile?.activeRelationshipId) return null;
+  const relId = profile.activeRelationshipId || profile.relationshipId;
+  if (!relId) return null;
+  const snap = await getDoc(doc(db, 'relationships', relId));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
@@ -162,8 +166,13 @@ export async function sendPairingInvite(subEmail) {
     createdAt: serverTimestamp()
   });
 
-  // Mark Dom as pending
-  await updateDoc(doc(db, 'users', dom.uid), { relationshipId: relRef.id });
+  // Add to Dom's array and set active if none exists
+  const domProfile = await getMyProfile();
+  const updates = { relationshipIds: arrayUnion(relRef.id) };
+  if (!domProfile?.activeRelationshipId) {
+    updates.activeRelationshipId = relRef.id;
+  }
+  await updateDoc(doc(db, 'users', dom.uid), updates);
 
   return relRef.id;
 }
@@ -192,22 +201,27 @@ export async function acceptPairingInvite() {
  * Sets the relationship status to 'inactive' and clears relationshipId
  * on both users' profiles.
  */
-export async function unpair() {
+export async function unpair(specificRelId = null) {
   const me = auth.currentUser;
   if (!me) throw new Error('Not signed in');
 
   const profile = await getMyProfile();
-  if (!profile?.relationshipId) {
+  const relId = specificRelId || profile?.activeRelationshipId || profile?.relationshipId;
+  
+  if (!relId) {
     throw new Error('You are not currently paired with anyone.');
   }
 
-  const relId = profile.relationshipId;
-
-  // Load the relationship to know who the partner is
   const relSnap = await getDoc(doc(db, 'relationships', relId));
   if (!relSnap.exists()) {
-    // Clean up orphaned reference
-    await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
+    if (profile.role === 'dom') {
+      await updateDoc(doc(db, 'users', me.uid), { 
+        relationshipIds: arrayRemove(relId),
+        activeRelationshipId: profile.activeRelationshipId === relId ? null : profile.activeRelationshipId
+      });
+    } else {
+      await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
+    }
     throw new Error('Relationship record not found. Cleared stale reference.');
   }
 
@@ -220,12 +234,50 @@ export async function unpair() {
     unpairedAt: serverTimestamp()
   });
 
-  // Clear relationshipId on both sides
-  await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
-  if (partnerUid) {
-    await updateDoc(doc(db, 'users', partnerUid), { relationshipId: null });
+  // Clear relationship IDs on both sides
+  if (profile.role === 'dom') {
+    await updateDoc(doc(db, 'users', me.uid), { 
+      relationshipIds: arrayRemove(relId),
+      activeRelationshipId: profile.activeRelationshipId === relId ? null : profile.activeRelationshipId
+    });
+  } else {
+    await updateDoc(doc(db, 'users', me.uid), { relationshipId: null });
   }
 
+  if (partnerUid) {
+    const pSnap = await getDoc(doc(db, 'users', partnerUid));
+    if (pSnap.exists()) {
+      const pData = pSnap.data();
+      if (pData.role === 'dom') {
+        await updateDoc(doc(db, 'users', partnerUid), { 
+          relationshipIds: arrayRemove(relId),
+          activeRelationshipId: pData.activeRelationshipId === relId ? null : pData.activeRelationshipId
+        });
+      } else {
+        await updateDoc(doc(db, 'users', partnerUid), { relationshipId: null });
+      }
+    }
+  }
+
+  return true;
+}
+
+// ── Roster & Switching (for Doms) ──────────────────────────────────────────────
+
+export async function getDomRoster() {
+  const me = auth.currentUser;
+  if (!me) return [];
+  const q = query(collection(db, 'relationships'), where('domId', '==', me.uid));
+  const snap = await getDocs(q);
+  return snap.docs
+    .map(doc => ({ id: doc.id, ...doc.data() }))
+    .filter(r => r.status !== 'inactive');
+}
+
+export async function switchActiveSub(relId) {
+  const me = auth.currentUser;
+  if (!me) throw new Error('Not signed in');
+  await updateDoc(doc(db, 'users', me.uid), { activeRelationshipId: relId });
   return true;
 }
 
