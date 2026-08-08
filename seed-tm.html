@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Seed Training Modules</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  body { padding: 40px; }
+  textarea { width: 100%; height: 400px; background: rgba(0,0,0,0.3); color: #fff; font-family: monospace; padding: 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; }
+  button { padding: 12px 24px; font-size: 16px; font-weight: bold; background: var(--gold); border: none; border-radius: 8px; cursor: pointer; color: #111; }
+  button:hover { filter: brightness(1.1); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #log { margin-top: 20px; color: #ccc; white-space: pre-wrap; font-family: monospace; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1 style="color:var(--gold); font-family: 'Playfair Display'">Training Module Data Seeder</h1>
+<p style="color:#aaa">Paste your full JSON object below and click Seed. It should contain a <code>topic</code> object, a <code>subcategories</code> array, and a <code>trainingItems</code> array.</p>
+
+<textarea id="jsonInput" placeholder='{
+  "topic": {
+    "id": "positions",
+    "title": "Body Positions & Protocol Postures",
+    ...
+  },
+  "subcategories": [ ... ],
+  "trainingItems": [ ... ]
+}'></textarea>
+
+<br/>
+<button id="seedBtn">Parse & Seed Database</button>
+
+<div id="log"></div>
+
+<script type="module">
+  import { requireAuth } from './auth.js';
+  import { setDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { db } from './firebase-config.js';
+
+  function log(msg) {
+    const l = document.getElementById('log');
+    l.textContent += msg + '\n';
+  }
+
+  document.getElementById('seedBtn').addEventListener('click', async () => {
+    document.getElementById('log').textContent = '';
+    const btn = document.getElementById('seedBtn');
+    btn.disabled = true;
+    
+    try {
+      log('Authenticating...');
+      await requireAuth();
+      
+      const raw = document.getElementById('jsonInput').value;
+      if (!raw) throw new Error('No JSON provided.');
+      
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (e) {
+        throw new Error('Invalid JSON format: ' + e.message);
+      }
+      
+      if (!data.topic || !data.subcategories || !data.trainingItems) {
+        throw new Error('JSON is missing topic, subcategories, or trainingItems keys.');
+      }
+      
+      log('Seeding Topic: ' + data.topic.title);
+      await setDoc(doc(db, 'trainingTopics', data.topic.id), data.topic);
+      log('  -> Topic seeded successfully.');
+      
+      log(`Seeding ${data.subcategories.length} subcategories...`);
+      for (const sub of data.subcategories) {
+        await setDoc(doc(db, 'trainingSubcategories', sub.id), sub);
+      }
+      log('  -> Subcategories seeded successfully.');
+      
+      log(`Seeding ${data.trainingItems.length} training items...`);
+      for (const item of data.trainingItems) {
+        await setDoc(doc(db, 'trainingItems', item.id), item);
+      }
+      log('  -> Training items seeded successfully.');
+      
+      log('\n\u2728 SEEDING COMPLETE! You can safely close this page and check the TM Dashboard.');
+      
+    } catch (err) {
+      log('\nERROR: ' + err.message);
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
