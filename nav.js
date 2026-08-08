@@ -52,11 +52,11 @@
       svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>'
     },
     {
-      page: 'scenes',
-      href: 'scene-menu.html',
-      label: 'Scenes',
+      page: 'training',
+      href: 'training-menu.html',
+      label: 'Training',
       isButton: false,
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>'
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4H3zM19 10a2 2 0 1 0 0 4h2a2 2 0 1 0 0-4h-2zM7 12h10M5 8v8M19 8v8"/></svg>'
     },
     {
       page: 'learning',
@@ -82,6 +82,7 @@
   ];
 
   var MORE_ITEMS = [
+    { href: 'scene-menu.html', icon: '🎭', label: 'Scenes' },
     { href: 'toy-vault.html', icon: '🔒', label: 'Toy Vault' },
     { href: 'bdsm-checklist.html', icon: '✅', label: 'Assessments &amp; Ratings' },
     /* { href: 'sirs-protocol.html', icon: '📜', label: 'Dom\u2019s Protocol' }, */
