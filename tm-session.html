@@ -89,6 +89,7 @@
     evaluateAttempt, markFlashcardViewed, updateSpacedRepetition,
     defaultSpacedRepetitionFields, STATUS
   } from './training.js';
+  import { logTrainingCompletion } from './training-log.js';
 
   const params = new URLSearchParams(window.location.search);
   let topicId = params.get('topic');
@@ -98,6 +99,7 @@
 
   let user, item, progress, dominantUid, itemId;
   let sessionQueue = [];
+  let sessionStats = { quizTotal: 0, quizCorrect: 0, holds: 0, other: 0 };
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -115,14 +117,7 @@
     if (PREVIEW_MODE) { backToList(); return; }
     
     if (sessionQueue.length === 0) {
-      document.getElementById('sessionCard').innerHTML = `
-        <div style="text-align:center; padding: 30px 10px;">
-          <div style="font-size:40px; margin-bottom:10px;">✨</div>
-          <h2 style="color:var(--gold); font-family:'Playfair Display',serif;">Session Complete</h2>
-          <p style="color:var(--cream-mute); font-size:13px; margin: 15px 0 25px;">You have completed all items in your review queue.</p>
-          <button class="gold-btn" onclick="window.location.href='tm-topic.html?topic=${encodeURIComponent(topicId)}'">Back to Category</button>
-        </div>
-      `;
+      showCompletionScreen();
       return;
     }
 
@@ -174,7 +169,55 @@
     });
   }
 
-  async function applySpacedRepetition(performancePct) {
+  async function showCompletionScreen() {
+    const card = document.getElementById('sessionCard');
+    
+    let scoreText = 'N/A';
+    let scorePct = 100;
+    if (sessionStats.quizTotal > 0) {
+      scorePct = Math.round((sessionStats.quizCorrect / sessionStats.quizTotal) * 100);
+      scoreText = `${scorePct}% (${sessionStats.quizCorrect}/${sessionStats.quizTotal})`;
+    }
+
+    let statsHtml = '';
+    if (sessionStats.quizTotal > 0) statsHtml += `<div><span style="color:#4fc38a">✔</span> Knowledge Checks: ${sessionStats.quizCorrect}/${sessionStats.quizTotal}</div>`;
+    if (sessionStats.holds > 0) statsHtml += `<div><span style="color:#4fc38a">✔</span> Hold Practices: ${sessionStats.holds}</div>`;
+    if (sessionStats.other > 0) statsHtml += `<div><span style="color:#4fc38a">✔</span> Self-Assessments: ${sessionStats.other}</div>`;
+
+    card.innerHTML = `
+      <div style="text-align:center; padding: 30px 10px;">
+        <div style="font-size:40px; margin-bottom:10px;">${scorePct >= 80 ? '🎖️' : '📋'}</div>
+        <h2 style="color:var(--gold); font-family:'Playfair Display',serif;">Module Complete</h2>
+        
+        <div style="background: rgba(255,255,255,0.03); border-radius:12px; padding:20px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="font-size:32px; color:var(--gold); font-weight:700; font-family:'Playfair Display',serif; margin-bottom:10px;">${scoreText}</div>
+          <div style="font-size:13px; color:#aaa; line-height:1.7; text-align:left; max-width:200px; margin:0 auto;">
+            ${statsHtml || 'No scorable items completed.'}
+          </div>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <button class="gold-btn" onclick="window.location.href='tm-topic.html?topic=${encodeURIComponent(topicId)}'">Return to Topic</button>
+          <button class="outline-btn" onclick="sessionStorage.removeItem('tm_queue'); window.location.reload();">Retake Section</button>
+        </div>
+      </div>
+    `;
+
+    try {
+      let message = `Completed training module (${topicId || 'Assessment'}).`;
+      if (sessionStats.quizTotal > 0) {
+        message = `Completed Assessment with ${scorePct}% score.`;
+      }
+      if (sessionStats.holds > 0) {
+        message += ` (Includes ${sessionStats.holds} physical practice${sessionStats.holds > 1 ? 's' : ''})`;
+      }
+      await logTrainingCompletion(topicId || 'tm_module', scorePct, message);
+    } catch (e) {
+      console.error('Failed to log completion for Dom', e);
+    }
+  }
+
+  function applySpacedRepetition(scorePct) {
     if (PREVIEW_MODE) return {};
     const current = {
       easeFactor: progress?.easeFactor ?? defaultSpacedRepetitionFields().easeFactor,
@@ -242,6 +285,8 @@
   const SELF_ASSESS_TYPES = ['error_identification', 'transition', 'sequence', 'scenario', 'comparison'];
 
   async function submitQuizResult(isCorrect, correctAnswerText, explanation) {
+    sessionStats.quizTotal++;
+    if (isCorrect) sessionStats.quizCorrect++;
     const scorePct = isCorrect ? 100 : 0;
     const recentScores = [...(progress?.recentScores ?? []), scorePct].slice(-3);
     const evalResult = evaluateAttempt(item.type === 'true_false' ? 'true_false' : 'multiple_choice', { scorePct, recentScores });
@@ -253,6 +298,7 @@
   }
 
   async function submitSelfAssessed(level) {
+    sessionStats.other++;
     // level: 'got_it' | 'partial' | 'missed' -> approximate score
     const scorePct = level === 'got_it' ? 95 : level === 'partial' ? 70 : 40;
     const recentScores = [...(progress?.recentScores ?? []), scorePct].slice(-3);
@@ -387,6 +433,7 @@
     document.getElementById('submitReflection').onclick = async () => {
       const text = document.getElementById('reflectionText').value.trim();
       if (!text) { showToast('Write a few words first.'); return; }
+      sessionStats.other++;
       const evalResult = evaluateAttempt('reflection', { hasSubmitted: true });
       const sr = await applySpacedRepetition(90);
       await saveProgress({ status: evalResult.status, notesFromSub: text, ...sr });
@@ -501,6 +548,7 @@
         };
       });
       document.getElementById('submitHold').onclick = async () => {
+        sessionStats.holds++;
         const bestHoldSeconds = Math.max(progress?.bestHoldSeconds ?? 0, seconds);
         const evalResult = evaluateAttempt('hold_practice', {
           bestHoldSeconds, recommendedHoldSeconds: item.recommendedHoldSeconds, selfRating: selectedRating,
