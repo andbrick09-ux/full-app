@@ -344,6 +344,24 @@
       <div id="sub-status" style="margin-top:8px; font-size:12px; display:none;"></div>
     </div>
 
+    <!-- RE-SEED FULL TEMPLATE v2 -->
+    <div class="glass-card" style="border:1px solid rgba(212,175,55,0.4);">
+      <div class="section-title">🔄 Re-seed Full Template (v2 — 218 items)</div>
+      <p style="margin-bottom:8px; color:#aaa; font-size:13px;">
+        Pushes the full 218-item master list into Firestore for your relationship. 
+        Items already in the template are <strong>skipped</strong> (no duplicates). 
+        Your personal ratings are <strong>never touched</strong>.
+      </p>
+      <p style="margin-bottom:16px; color:#888; font-size:12px;">
+        Use this if you or your partner are missing categories like
+        <em>Humiliation & Degradation, Bodily Fluids, Sexual Play, Exhibitionism</em>, etc.
+      </p>
+      <button onclick="reseedFullTemplate()" class="btn btn-gold" style="width:100%;">
+        🚀 Run Full Template Re-seed
+      </button>
+      <div id="reseedStatus" style="margin-top:12px; font-size:12px; display:none;"></div>
+    </div>
+
     <!-- DANGER ZONE -->
     <div class="glass-card" style="border:2px solid #c0392b;">
       <div class="section-title" style="color:#c0392b;">⚠️ Danger Zone</div>
@@ -766,6 +784,309 @@
       templateItems = templateItems.filter(i => i.id !== id);
       renderTemplateList();
       document.getElementById('template-count').textContent = templateItems.length;
+    };
+
+    // ==================== RE-SEED FULL TEMPLATE v2 ====================
+    const FULL_TEMPLATE_V2 = {
+      "Bondage & Restraint": [
+        { a: "Arm Binding", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Bed Bondage", dom: { t: "Yes", r: "Loved it", a: "", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Cage", dom: { t: "No but I want to", r: "Take it or leave it", a: "", sw: "Giving" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Chains", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Chair Bondage", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Chastity", dom: { t: "No but I want to", r: "Liked it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Collars (in Private)", dom: { t: "Yes", r: "Liked it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Wearing" } },
+        { a: "Collars (in Public)", dom: { t: "No but I want to", r: "Take it or leave it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Wearing" } },
+        { a: "Corset", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Wearing" } },
+        { a: "Cuffs - Leather", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Cuffs - Metal", dom: { t: "No but I want to", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Croch Rope", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "", sw: "" } },
+        { a: "Gags - Ball", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Wearing" } },
+        { a: "Gags - Bit", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Gags - Phallic", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Gags - Ring", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Gags - Tape", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Light Bondage", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Heavy Bondage", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Long-term [Day(s)]", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Manacles & Irons", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Mummification", dom: { t: "No but I want to", r: "Liked it", a: "", sw: "Giving" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Unlikely. Soft Limit", sw: "Receiving" } },
+        { a: "One Bar Prison", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Predicament Bondage", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Restraints", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Rope - Shibari", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Wearing" } },
+        { a: "Rope - Simple", dom: { t: "Yes", r: "Liked it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Wearing" } },
+        { a: "Sleep Sacks", dom: { t: "No and I don't want to", r: "", a: "", sw: "Giving" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Unlikely. Soft Limit", sw: "" } },
+        { a: "Spreader Bar", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Stocks", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Straight Jacket", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Wearing" } },
+        { a: "Suspension", dom: { t: "No but I want to", r: "", a: "", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Device Bondage", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Breast Bondage", dom: { t: "Yes", r: "Loved it", a: "", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } }
+      ],
+      "Impact Play": [
+        { a: "Breast Whipping", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Caning - English", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Caning - Sensation", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Face Slapping", dom: { t: "Yes", r: "Take it or leave it", a: "Maybe", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Pussy Spanking (smacking)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Pussy Whipping", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Riding Crops", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Spanking - OTK (Over The Knee)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Spanking - Hand", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Spanking - Hairbrush", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Spanking - Leather Slapper", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Spanking - Lexan Paddle", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Spanking - Wooden Paddle", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Whipping - Belt", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Whipping - Cat o' 9 tails", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Whipping - Flogger", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Whipping - Single Tail", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } }
+      ],
+      "Sensation Play": [
+        { a: "Back of Neck Kiss/Touch/Bite", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Biting", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Blindfold", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Clamps - Clit/Labia", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Take it or leave it", a: "Yes", sw: "Wearing" } },
+        { a: "Clamps - Nipple", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Wearing" } },
+        { a: "Clothespins", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Ear Plugs", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Wearing" } },
+        { a: "Feather Play", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Finger Claws", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Both" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Both" } },
+        { a: "Fire Cupping", dom: { t: "No but I want to", r: "", a: "Maybe", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Hair Pulling", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Hot Wax", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Ice", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Kissing", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Knife Play (no cutting)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Nipple Play", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Nipple Play - Pulls/Tugs/Twists", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Nipple Suction Cups", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Nipple Weights", dom: { t: "Yes", r: "Liked it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Nuru", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Pinching", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Pleasure Overload", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Prickly (Wartenberg/Vampire Gloves)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Skin Sensation Play (Touch)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Slippery", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Tickling", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Zapping (electric fly swatter)", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Taser Play (High Risk)", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } },
+        { a: "Temperature Extremes", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } }
+      ],
+      "Breath & Edge Play": [
+        { a: "Breath Control - Choking", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Breath Control - Mouth & Nose Covered", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Breath Play (Risky)", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Consensual Non-Consent", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Erotic Asphyxiation", dom: { t: "No but I want to", r: "", a: "Maybe", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Fantasy Rape Play", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Public Play", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "" } },
+        { a: "Ripping of Clothing", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } }
+      ],
+      "D/s & Control": [
+        { a: "24/7 Power Exchange", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Behavior Correction", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Liked it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Collaring (Daily)", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Wearing" } },
+        { a: "Decision Control", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Eye Contact", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Eye Contact Restrictions", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } },
+        { a: "Following Orders", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Journaling", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } },
+        { a: "Kneeling", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Learned Postures", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Limited-time Power Exchange", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Mind Fucking", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Obedience Training", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Protocol (Low)", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Protocol (Medium)", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Protocol (High)", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Restrictive Rules on Behaviour", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Rituals", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Speech Restrictions", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Submissive Postures", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" } },
+        { a: "Subspace", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Task Setting", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "" } },
+        { a: "Washroom Restrictions", dom: { t: "No and I don't want to", r: "Take it or leave it", a: "Unlikely. Soft Limit", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } }
+      ],
+      "Sexual Play": [
+        { a: "Anal Sex", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Take it or leave it", a: "Yes", sw: "Receiving" } },
+        { a: "Body Paint", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Breast Fucking", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Cunnilingus (Giving Oral)", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Take it or leave it", a: "Maybe", sw: "Giving" } },
+        { a: "Cunnilingus (Receiving Oral)", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Double Penetration", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Face Fucking", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "Receiving" } },
+        { a: "Fellatio (Oral Sex on Penis)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" } },
+        { a: "Fisting - Anal", dom: { t: "No and I don't want to", r: "Not Applicable", a: "Never. Hard Limit", sw: "" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Never. Hard Limit", sw: "Both" } },
+        { a: "Fisting - Vaginal", dom: { t: "Yes", r: "Liked it", a: "Maybe", sw: "Giving" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Never. Hard Limit", sw: "" } },
+        { a: "Foot Job", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Gagging By Cock or Toy", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" } },
+        { a: "Genital Sex", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Group Play - Multiple Men", dom: { t: "Yes", r: "Liked it", a: "Maybe", sw: "Giving" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Never. Hard Limit", sw: "" } },
+        { a: "Group Play - Multiple Women & Men", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Hand Job", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Masturbation", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Masturbation on Command", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Mutual Masturbation", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Orgasm Control", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Orgasm Denial", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } },
+        { a: "Forced Orgasms", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Prostate Massage", dom: { t: "Yes", r: "Liked it", a: "Maybe", sw: "Receiving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Rimming (Oral Anal Play)", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Both" }, sub: { t: "No and I don't want to", r: "Not Applicable", a: "Maybe", sw: "" } },
+        { a: "Squirting", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Throat Fucking", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Triple Penetration", dom: { t: "Yes", r: "Liked it", a: "Maybe", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Waking Up to Oral Sex", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Waking Up to Sex", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } }
+      ],
+      "Bodily Fluids": [
+        { a: "Cum In - Ass", dom: { t: "Yes", r: "Take it or leave it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Take it or leave it", a: "Maybe", sw: "Receiving" } },
+        { a: "Cum In - Mouth", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Cum In - Vagina", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Cum On - Body", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Cum On - Face", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" } },
+        { a: "Cum in Panties", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Drooling", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" } },
+        { a: "Messy Face During Blowjob", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Running/Ruined Makeup", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Spit for Lube", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Spit In", dom: { t: "Yes", r: "Liked it", a: "Maybe", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Spit On", dom: { t: "Yes", r: "Liked it", a: "Maybe", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" } },
+        { a: "Swallow - Semen", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Urinate on Body", dom: { t: "Yes", r: "Liked it", a: "Fetish/Need", sw: "Both" }, sub: { t: "Yes", r: "Take it or leave it", a: "Yes", sw: "Both" } },
+        { a: "Breast Milk - Milking", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "Yes", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Milk Blowjob", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "", r: "", a: "", sw: "" } }
+      ],
+      "Humiliation & Degradation": [
+        { a: "Being Made to Beg", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Being Made to Crawl", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Being Treated Like Furniture", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Dom Shaving Sub", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Exposure of Fantasies/Secrets", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Forced Compliments", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Forced Dressing", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Forced Nudity", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Humiliating Clothing", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Humiliating Selfies/Videos", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Name-Calling", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Standing in Corner", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Sub Shaving Dom", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Receiving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Writing on the Body", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Begging", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Forced Servitude", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } }
+      ],
+      "Toys & Devices": [
+        { a: "Anal Beads", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Maybe", sw: "" } },
+        { a: "Anal Hook", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Anal Play", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Anal Plugs - Small", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Anal Plugs - Medium", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Anal Plugs - Large", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Anal Plugs - Public (under clothes)", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "No but I want to", r: "Not Applicable", a: "Not Applicable", sw: "" } },
+        { a: "Clit Pumping", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "Receiving" } },
+        { a: "Clothes Pin Zipper", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Cock Ring", dom: { t: "No but I want to", r: "", a: "Yes", sw: "Wearing" }, sub: { t: "Yes", r: "Take it or leave it", a: "Yes", sw: "Others Wearing" } },
+        { a: "Dildos - Vaginal", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } },
+        { a: "Dildos - Anal", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Dildos - Oral", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Nipple Clamps", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Wearing" } },
+        { a: "Pussy Pumping", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } },
+        { a: "Remote Toys", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Speculums", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Strap-on (Penetrated By)", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Strap-on (Sucking On)", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Vibrator - External Genital", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Both" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "" } },
+        { a: "Vibrator - Internal Genital", dom: { t: "Yes", r: "Loved it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Liked it", a: "Yes", sw: "" } }
+      ],
+      "Exhibitionism & Voyeurism": [
+        { a: "Chosen Clothing", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Wearing" } },
+        { a: "Examinations", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "Receiving" } },
+        { a: "Modeling for Erotic Photos", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Outdoor Scenes", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Video (Private Recordings of You)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Video (Watching Others)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } },
+        { a: "Voyeurism (Watching Others)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Yes", sw: "" } }
+      ],
+      "Service & Submission": [
+        { a: "Massage", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Forced Servitude", dom: { t: "Yes", r: "Liked it", a: "Yes", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Domestic Service", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "", r: "", a: "", sw: "" } }
+      ],
+      "Fetish & Kink": [
+        { a: "Being Woke Up Sexually", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Designing & Building BDSM Stuff", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Not Applicable" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Exploring New Things", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Foot Job", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Receiving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "High Heels", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Others Wearing" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Induced Lactation", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Giving" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Legs", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Others Wearing" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Lingerie", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Others Wearing" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Messy (WAM / Wet and Messy)", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Pantyhose/Stockings", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Others Wearing" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Skin on Skin", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } },
+        { a: "Slime", dom: { t: "No but I want to", r: "", a: "Fetish/Need", sw: "Both" }, sub: { t: "", r: "", a: "", sw: "" } },
+        { a: "Stockings/Pantyhose", dom: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Others Wearing" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Wearing" } },
+        { a: "Teasing", dom: { t: "", r: "", a: "", sw: "" }, sub: { t: "Yes", r: "Loved it", a: "Fetish/Need", sw: "Both" } }
+      ]
+    };
+
+    window.reseedFullTemplate = async function() {
+      const statusEl = document.getElementById('reseedStatus');
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#D4AF37';
+      statusEl.textContent = 'Loading existing template to check for duplicates...';
+
+      try {
+        // 1. Load what's already in Firestore to avoid duplicates
+        const existing = await getDocs(checklistTemplateCol(relId));
+        const existingNames = new Set();
+        existing.docs.forEach(d => {
+          const name = (d.data().a || d.data().activity || '').toLowerCase().trim();
+          if (name) existingNames.add(name);
+        });
+
+        statusEl.textContent = `Found ${existingNames.size} existing items. Writing new items...`;
+
+        let added = 0;
+        let skipped = 0;
+
+        for (const [category, items] of Object.entries(FULL_TEMPLATE_V2)) {
+          for (const item of items) {
+            const name = item.a.toLowerCase().trim();
+            if (existingNames.has(name)) {
+              skipped++;
+              continue; // Don't overwrite existing
+            }
+
+            const id = 'tpl_v2_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            await setDoc(doc(checklistTemplateCol(relId), id), {
+              category,
+              a: item.a,
+              dom: item.dom,
+              sub: item.sub,
+              added: Date.now(),
+              source: 'reseed_v2'
+            });
+
+            existingNames.add(name); // Prevent duplicates within this batch
+            added++;
+
+            if (added % 10 === 0) {
+              statusEl.textContent = `Writing... ${added} added so far (${skipped} skipped)`;
+            }
+          }
+        }
+
+        statusEl.style.color = '#27ae60';
+        statusEl.textContent = `✅ Done! Added ${added} new items, skipped ${skipped} already-existing items. Reload the checklist page to see the full list.`;
+        await loadTemplate(); // Refresh the displayed count
+
+      } catch (e) {
+        console.error(e);
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = 'Error: ' + (e.message || e);
+      }
     };
 
     window.importFromExistingData = async function() {
