@@ -459,21 +459,28 @@ async function loadLiveActivityFeedForDom() {
   const feed = document.getElementById('activityFeed');
   if (!partnerUid || !feed) return;
 
-  const notesCol = await partnerDataCol('notes');
-  onSnapshot(query(notesCol, orderBy('timestamp', 'desc'), limit(5)), (snap) => {
+  const activityCol = await partnerDataCol('activity');
+  onSnapshot(query(activityCol, orderBy('timestamp', 'desc'), limit(8)), (snap) => {
     feed.innerHTML = '';
     if (snap.empty) {
       feed.innerHTML = `<div class="empty"><p>No recent activity from your sub yet.</p></div>`;
       return;
     }
-    snap.forEach(doc => {
-      const n = doc.data();
+    snap.forEach(docSnap => {
+      const n = docSnap.data();
       const el = document.createElement('div');
       el.className = 'arow';
+      
+      let icon = '📝';
+      if (n.type === 'correction_ack') icon = '⚠️';
+      if (n.type === 'praise_ack') icon = '💖';
+      if (n.type === 'task') icon = '✅';
+      if (n.type === 'training') icon = '🔥';
+
       el.innerHTML = `
-        <div class="aico">📝</div>
+        <div class="aico">${icon}</div>
         <div style="flex:1">
-          <span class="aname">${n.content || n.text || 'Note added'}</span>
+          <span class="aname">${n.content || n.text || 'Action performed'}</span>
           <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
         </div>
       `;
@@ -686,7 +693,7 @@ async function loadLiveActivityFeedForSub() {
       let btnText = "Acknowledge";
       if (n.type === 'praise') btnText = "Thank you, Sir";
       if (n.type === 'correction') btnText = "Understood, Sir";
-      let ackHtml = `<div style="margin-top:8px;"><button onclick="acknowledgeNote('${docSnap.id}')" style="background:rgba(201,168,76,0.1); border:1px solid var(--gold); color:var(--gold); padding:4px 12px; border-radius:6px; font-size:10px; font-family:'Montserrat',sans-serif; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">${btnText}</button></div>`;
+      let ackHtml = `<div style="margin-top:8px;"><button onclick="acknowledgeNote('${docSnap.id}', '${n.type}')" style="background:rgba(201,168,76,0.1); border:1px solid var(--gold); color:var(--gold); padding:4px 12px; border-radius:6px; font-size:10px; font-family:'Montserrat',sans-serif; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">${btnText}</button></div>`;
       
       let icon = '👑';
       if (n.type === 'praise') icon = '💖';
@@ -796,11 +803,22 @@ window.markServiceComplete = function() {
   // TODO: Write completion to tasks/notes + partner feed
 };
 
-window.acknowledgeNote = async function(noteId) {
+window.acknowledgeNote = async function(noteId, type) {
   try {
     const partnerNotesCol = await partnerDataCol('notes');
     const noteRef = doc(partnerNotesCol, noteId);
     await setDoc(noteRef, { checked: true }, { merge: true });
+    
+    // Log the acknowledgment to the Sub's activity feed so the Dom sees it
+    let activityText = type === 'praise' ? 'Acknowledged praise from Sir' : 'Acknowledged a correction from Sir';
+    let activityType = type === 'praise' ? 'praise_ack' : 'correction_ack';
+    
+    await addDoc(dataCol('activity'), {
+      content: activityText,
+      type: activityType,
+      timestamp: serverTimestamp()
+    });
+    
   } catch (e) {
     console.error("Failed to acknowledge:", e);
   }

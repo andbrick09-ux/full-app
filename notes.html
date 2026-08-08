@@ -906,8 +906,7 @@
         // Activity logging (non-critical)
         try {
           if (partnerUid) {
-            // FIX: partnerDataCol only takes one argument; removed stray second arg
-            const activityCol = await partnerDataCol('activity');
+            const activityCol = dataCol('activity');
             await addDoc(activityCol, {
               content: `New note: ${title}`,
               type: 'note',
