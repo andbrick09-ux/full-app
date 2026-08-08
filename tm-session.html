@@ -445,20 +445,59 @@
       document.getElementById('startBtn').disabled = true;
       document.getElementById('finishBtn').disabled = true;
       const checkedCount = document.querySelectorAll('.check-box.checked').length;
+      const isPositionsTopic = (topicId === 'positions');
+      let proofHtml = '';
+      if (isPositionsTopic) {
+        proofHtml = `
+          <div id="proofArea" style="margin:20px 0;">
+            <div class="checklist-item proof-box" id="photoCheck">
+              <div class="check-box"><span class="material-symbols-rounded" style="font-size:14px;">check</span></div>
+              <div class="checklist-label">📸 I have sent a photo of this hold to Sir</div>
+            </div>
+            <div class="checklist-item proof-box" id="videoCheck">
+              <div class="check-box"><span class="material-symbols-rounded" style="font-size:14px;">check</span></div>
+              <div class="checklist-label">🎥 I have sent a video of this hold to Sir</div>
+            </div>
+          </div>
+        `;
+      }
+
       document.getElementById('ratingArea').innerHTML = `
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin:16px 0 8px;text-align:center;">Self-Rating</div>
         <div class="rating-row">
           ${[1,2,3,4,5].map(n => `<button class="rating-btn" data-r="${n}">${n}</button>`).join('')}
         </div>
+        ${proofHtml}
         <button class="gold-btn" id="submitHold" disabled>Submit</button>
       `;
+
       let selectedRating = null;
+
+      const checkFormState = () => {
+        let proofOk = true;
+        if (isPositionsTopic) {
+          const photoOk = document.querySelector('#photoCheck .check-box').classList.contains('checked');
+          const videoOk = document.querySelector('#videoCheck .check-box').classList.contains('checked');
+          proofOk = photoOk && videoOk;
+        }
+        document.getElementById('submitHold').disabled = !(selectedRating !== null && proofOk);
+      };
+
+      if (isPositionsTopic) {
+        document.querySelectorAll('.proof-box .check-box').forEach(b => {
+          b.onclick = () => {
+            b.classList.toggle('checked');
+            checkFormState();
+          };
+        });
+      }
+
       document.querySelectorAll('.rating-btn').forEach(b => {
         b.onclick = () => {
           document.querySelectorAll('.rating-btn').forEach(x => x.classList.remove('selected'));
           b.classList.add('selected');
           selectedRating = parseInt(b.dataset.r, 10);
-          document.getElementById('submitHold').disabled = false;
+          checkFormState();
         };
       });
       document.getElementById('submitHold').onclick = async () => {
@@ -468,8 +507,15 @@
         });
         const sr = await applySpacedRepetition(evalResult.mastered ? 95 : 65);
         const attempts = (progress?.attempts ?? 0) + 1;
+        let photoSent = false;
+        let videoSent = false;
+        if (isPositionsTopic) {
+          photoSent = document.querySelector('#photoCheck .check-box').classList.contains('checked');
+          videoSent = document.querySelector('#videoCheck .check-box').classList.contains('checked');
+        }
+        
         await saveProgress({ status: evalResult.status, bestHoldSeconds, attempts, ...sr });
-        await logActivity({ holdSeconds: seconds, checklistChecked: checkedCount, checklistTotal: checklist.length, selfRating: selectedRating });
+        await logActivity({ holdSeconds: seconds, checklistChecked: checkedCount, checklistTotal: checklist.length, selfRating: selectedRating, photoSent, videoSent });
         const card2 = document.getElementById('sessionCard');
         card2.innerHTML = `
           <div class="feedback-panel ${evalResult.mastered ? 'correct' : 'neutral'}">
