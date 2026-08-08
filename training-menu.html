@@ -141,7 +141,9 @@
               <select id="subSwitcher" style="appearance:none; -webkit-appearance:none; background:var(--surface); border:1px solid var(--gold-b); color:var(--gold-l); font-family:'Raleway',sans-serif; font-size:13px; font-weight:600; padding:6px 30px 6px 12px; border-radius:8px; cursor:pointer; outline:none; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
                 ${options}
               </select>
-              <span class="material-symbols-rounded" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gold); font-size:16px;">expand_more</span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--gold);">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </div>
           `;
           if (!document.getElementById('selectOptionStyles')) {
