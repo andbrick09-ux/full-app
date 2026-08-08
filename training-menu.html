@@ -87,8 +87,10 @@
   <div id="toast" class="toast"></div>
 
   <script type="module">
-    import { requireAuth, getMyProfile, dataRef, partnerDataRef } from './auth.js';
+    import { requireAuth, getMyProfile, dataRef, partnerDataRef, getDomRoster, getPartnerUid, getUserProfile, switchActiveSub } from './auth.js';
     import { getDoc, setDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    window.activeSubName = 'Sub';
 
     const trainings = [
       { id: 'the-5', name: 'The "5" Training', icon: '🖐️', desc: 'Classical conditioning protocol to cum on Sir\'s command.' },
@@ -105,6 +107,50 @@
       const isDom = profile?.role === 'dom';
       const grid = document.getElementById('trainingGrid');
       grid.innerHTML = '';
+      
+      // Multi-Sub Dropdown Injection
+      if (isDom) {
+        const roster = await getDomRoster();
+        const activePartnerUid = await getPartnerUid();
+        
+        if (activePartnerUid) {
+          const partnerProfile = await getUserProfile(activePartnerUid);
+          window.activeSubName = partnerProfile?.displayName || 'Sub';
+        }
+
+        if (roster.length > 1) {
+          for (let r of roster) {
+            const p = await getUserProfile(r.subId);
+            r.subName = p?.displayName || 'Unknown Sub';
+          }
+          let options = roster.map(r => {
+             const selected = r.subId === activePartnerUid ? 'selected' : '';
+             return `<option value="${r.id}" ${selected}>${r.subName}</option>`;
+          }).join('');
+          
+          const banner = document.createElement('div');
+          banner.style = "background: rgba(201,168,76,0.05); border: 1px solid var(--gold-b); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;";
+          banner.innerHTML = `
+            <div style="font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; font-weight: 600;">Viewing:</div>
+            <select id="subSwitcher" style="background: var(--surface); color: var(--text); border: 1px solid var(--gold-b); border-radius: 6px; padding: 6px 12px; font-family: inherit; font-size: 13px; outline: none; cursor: pointer;">
+              ${options}
+            </select>
+          `;
+          grid.parentNode.insertBefore(banner, grid);
+          
+          setTimeout(() => {
+            const switcher = document.getElementById('subSwitcher');
+            if (switcher) {
+              switcher.addEventListener('change', async (e) => {
+                switcher.disabled = true;
+                showToast('Switching active sub...');
+                await switchActiveSub(e.target.value);
+                window.location.reload();
+              });
+            }
+          }, 0);
+        }
+      }
 
       for (const t of trainings) {
         const card = document.createElement('div');
@@ -159,7 +205,7 @@
           if (isAssigned) {
             html += `<button class="assign-btn" onclick="unassignTraining('${t.id}', this)">Unassign</button>`;
           } else {
-            html += `<button class="assign-btn" onclick="assignTraining('${t.id}', this)">Assign to Sub</button>`;
+            html += `<button class="assign-btn" onclick="assignTraining('${t.id}', this)">Assign to ${window.activeSubName}</button>`;
           }
 
           card.innerHTML = html;
@@ -202,7 +248,9 @@
     // Assign training (Dom only) - with due date and note
     window.assignTraining = async function(trainingId, btn) {
       const dueDate = prompt("Optional due date (YYYY-MM-DD) or leave blank:");
-      const note = prompt("Optional note to your sub (or leave blank):");
+      if (dueDate === null) return; // cancelled
+      const note = prompt(`Optional note to ${window.activeSubName} (or leave blank):`);
+      if (note === null) return; // cancelled
 
       btn.disabled = true;
       btn.textContent = 'Assigning...';
@@ -232,7 +280,7 @@
 
     // Unassign training (Dom only) - simplified for reliability
     window.unassignTraining = async function(trainingId, btn) {
-      if (!confirm('Unassign this training from your sub?')) return;
+      if (!confirm(`Unassign this training from ${window.activeSubName}?`)) return;
 
       btn.disabled = true;
       btn.textContent = 'Removing...';
