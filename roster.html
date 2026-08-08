@@ -7,6 +7,7 @@
 <title>Dom Sub Hub — Sub Roster</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="nav.css">
 <link rel="stylesheet" href="styles.css">
 
 <style>
@@ -192,9 +193,12 @@ async function init() {
   let html = '';
   
   for (const rel of roster) {
-    // Look up the sub's name
     const subProfile = await getUserProfile(rel.subId);
-    const subName = subProfile?.name || subProfile?.username || 'Unknown Sub';
+    let subName = subProfile?.name || subProfile?.username || subProfile?.displayName || subProfile?.email;
+    if (!subName) {
+       // Extract from email if possible, or fallback
+       subName = subProfile?.email ? subProfile.email.split('@')[0] : 'Unknown Sub';
+    }
     const isActive = rel.id === activeRelId;
     const isPending = rel.status === 'pending';
     
