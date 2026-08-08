@@ -134,9 +134,14 @@
           <div style="font-size:11px;letter-spacing:1px;color:var(--gold);margin:4px 0 2px" id="acctRole">&#x2014;</div>
           <div style="font-size:11px;color:var(--cream-mute)" id="acctEmail">&#x2014;</div>
         </div>
-        <button class="settings-danger-btn" onclick="handleSignOut()">
-          <span class="material-symbols-rounded">logout</span>Sign Out
-        </button>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button class="settings-danger-btn" style="margin-top:0;flex:1;color:#f0d060;border-color:rgba(212,175,55,0.4)" onclick="handleResetPassword()">
+            <span class="material-symbols-rounded">key</span>Reset Password
+          </button>
+          <button class="settings-danger-btn" style="margin-top:0;flex:1;" onclick="handleSignOut()">
+            <span class="material-symbols-rounded">logout</span>Sign Out
+          </button>
+        </div>
       </div>
 
       <!-- PERSONALIZATION -->
@@ -145,6 +150,10 @@
         <div class="settings-field">
           <label>Your Username</label>
           <input class="settings-input" id="settingName" type="text" maxlength="30"/>
+        </div>
+        <div class="settings-field">
+          <label>Your Title (e.g. Sir, Pet, Master, Good Girl)</label>
+          <input class="settings-input" id="settingTitle" type="text" maxlength="30" placeholder="What should you be called?"/>
         </div>
       </div>
 
@@ -226,7 +235,7 @@
 
   <script type="module">
     import { requireAuth, getMyProfile, logOut, dataRef,
-             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile, getDomRoster, switchActiveSub } from './auth.js';
+             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile, getDomRoster, switchActiveSub, resetPassword } from './auth.js';
     import { getDoc, setDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
     import { updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { db } from './firebase-config.js';
@@ -266,6 +275,7 @@
 
     function attachDirtyListeners() {
       document.getElementById('settingName').addEventListener('input', markDirty);
+      document.getElementById('settingTitle').addEventListener('input', markDirty);
       document.querySelectorAll('.theme-option').forEach(el => el.addEventListener('click', markDirty));
       document.querySelectorAll('#fontSizePills .dynamic-pill').forEach(el => el.addEventListener('click', markDirty));
     }
@@ -308,6 +318,7 @@
 
       // Populate username from Firebase auth displayName, fall back to settings doc
       document.getElementById('settingName').value = currentUser.displayName || myProfile?.displayName || s.name || s.subName || '';
+      document.getElementById('settingTitle').value = myProfile?.title || s.title || '';
 
       const theme = s.theme || 'midnight';
       document.querySelectorAll('.theme-option').forEach(el =>
@@ -334,6 +345,7 @@
       const themeEl    = document.querySelector('.theme-option.selected');
       const sizeEl     = document.querySelector('.dynamic-pill.selected');
       const newUsername = document.getElementById('settingName').value.trim();
+      const newTitle    = document.getElementById('settingTitle').value.trim();
 
       const theme = themeEl ? themeEl.dataset.theme : 'midnight';
       const size = sizeEl ? sizeEl.dataset.size : 'fs-medium';
@@ -341,6 +353,7 @@
       const s = {
         ...settingsCache,
         name:            newUsername,
+        title:           newTitle,
         theme:           theme,
         fontSize:        size,
       };
@@ -364,7 +377,9 @@
 
         // Write to persistent user profile doc
         try {
-          await setDoc(doc(db, 'users', currentUser.uid), { displayName: newUsername }, { merge:true });
+          await setDoc(doc(db, 'users', currentUser.uid), { displayName: newUsername, title: newTitle }, { merge:true });
+          // Update local profile cache
+          myProfile = { ...myProfile, displayName: newUsername, title: newTitle };
         } catch(e) { /* profile doc optional */ }
 
         setSaveState('saved');
@@ -577,7 +592,17 @@
       if (confirm('Sign out of Dom Sub Hub?')) await logOut();
     };
 
-
+    window.handleResetPassword = async function() {
+      if (confirm('Send a password reset link to your email address?')) {
+        try {
+          await resetPassword(currentUser.email);
+          showToast('Password reset email sent \u2736');
+        } catch (ex) {
+          showToast('Failed to send reset email');
+          console.error(ex);
+        }
+      }
+    };
 
     window.saveSettings     = saveSettings;
     window.selectTheme      = selectTheme;
@@ -585,6 +610,7 @@
     window.clearHistory     = clearHistory;
     window.loadRelationship = loadRelationship;
     window.switchActiveSubFromSettings = switchActiveSubFromSettings;
+    window.handleResetPassword = handleResetPassword;
 
     init();
   </script>
