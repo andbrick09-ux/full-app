@@ -387,7 +387,7 @@ async function initLiveWeekTracker() {
   }, 300);
 }
 
-function loadLiveStatsForDom() {
+async function loadLiveStatsForDom() {
   // Streak + Compliance (from week stats)
   const weekRef = dataRef('stats/week');
   onSnapshot(weekRef, (snap) => {
@@ -423,7 +423,7 @@ function loadLiveStatsForDom() {
 
   // Pending Reports (sub's unchecked notes/tasks)
   if (partnerUid) {
-    const pendingQuery = query(partnerDataCol('notes', partnerUid), where('checked', '==', false));
+    const pendingQuery = query(await partnerDataCol('notes'), where('checked', '==', false));
     onSnapshot(pendingQuery, (snap) => {
       const el = document.getElementById('pendingVal');
       if (el) el.textContent = snap.size || '—';
@@ -436,7 +436,7 @@ function loadLiveStatsForDom() {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     const tasksQuery = query(
-      partnerDataCol('tasks', partnerUid),
+      await partnerDataCol('tasks'),
       where('dueDate', '>=', today.toISOString().slice(0,10)),
       where('dueDate', '<', tomorrow.toISOString().slice(0,10)),
       where('completed', '==', false)
@@ -455,11 +455,11 @@ function loadLiveStatsForDom() {
   loadLiveSubStatus();
 }
 
-function loadLiveActivityFeedForDom() {
+async function loadLiveActivityFeedForDom() {
   const feed = document.getElementById('activityFeed');
   if (!partnerUid || !feed) return;
 
-  const notesCol = partnerDataCol('notes', partnerUid);
+  const notesCol = await partnerDataCol('notes');
   onSnapshot(query(notesCol, orderBy('timestamp', 'desc'), limit(5)), (snap) => {
     feed.innerHTML = '';
     if (snap.empty) {
@@ -651,11 +651,11 @@ async function loadTrainingProgress() {
   }
 }
 
-function loadLiveActivityFeedForSub() {
+async function loadLiveActivityFeedForSub() {
   const feed = document.getElementById('activityFeed');
   if (!feed || !partnerUid) return;
 
-  const partnerNotesCol = partnerDataCol('notes', partnerUid);
+  const partnerNotesCol = await partnerDataCol('notes');
 
   // Only show notes from the Dom (not the sub's own notes)
   onSnapshot(query(partnerNotesCol, orderBy('timestamp', 'desc'), limit(8)), (snap) => {
@@ -711,13 +711,13 @@ async function initRealScenes(isDom) {
   });
 }
 
-function loadLiveSubStatus() {
+async function loadLiveSubStatus() {
   if (!partnerUid) {
     const el = document.getElementById('liveStatusText');
     if (el) el.innerHTML = 'No partner paired yet';
     return;
   }
-  const notesRef = partnerDataCol('notes', partnerUid);
+  const notesRef = await partnerDataCol('notes');
   const q = query(notesRef, orderBy('timestamp', 'desc'), limit(1));
   onSnapshot(q, (snap) => {
     if (!snap.empty) {
