@@ -521,6 +521,24 @@
               '</div>' +
               '<button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>';
 
+          } else if (rel && rel.status === 'pending') {
+            const partnerProfile = await getUserProfile(rel.domId);
+            const partnerName    = partnerProfile?.displayName || 'a Dominant';
+            
+            card.innerHTML =
+              '<div style="display:flex;align-items:center;gap:14px">' +
+                '<div style="font-size:28px">\uD83D\uDCE8</div>' +
+                '<div style="flex:1">' +
+                  '<div style="display:inline-block;background:rgba(255,193,7,.15);color:#ffd54f;border:1px solid #ffd54f;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:1px">PENDING INVITE</div>' +
+                  '<div style="margin-top:6px;font-family:\'Playfair Display\',serif;font-size:15px;color:var(--gold-light)">' +
+                    'From: <strong>' + partnerName + '</strong>' +
+                  '</div>' +
+                  '<div style="font-size:11px;color:var(--cream-mute);margin-top:4px">They sent you a pairing invite</div>' +
+                '</div>' +
+              '</div>' +
+              '<button onclick="acceptInviteFromSettings()" class="settings-action-btn" style="margin:14px 0 0 0;width:100%;padding:12px;font-size:12px;">Accept Invite &amp; Link Accounts</button>';
+            
+            acceptArea.style.display = 'none';
           } else {
             card.innerHTML =
               '<div style="text-align:center;padding:12px 4px">' +
@@ -528,7 +546,7 @@
                 '<div style="font-size:11px;margin-top:4px">Ask your Dominant to send you a pairing invite from their Settings</div>' +
               '</div>';
             acceptArea.style.display = 'block';
-            document.getElementById('acceptMsg').innerHTML = 'If your Dom has sent an invite, tap above to accept.';
+            document.getElementById('acceptMsg').innerHTML = 'If your Dom has sent an invite, tap above to check manually.';
           }
         }
       } catch(e) {
