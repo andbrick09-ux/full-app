@@ -29,23 +29,8 @@
   .sub-info{flex:1;min-width:0}
   .sub-title{font-family:'Playfair Display',serif;font-size:15px;color:#eee;margin-bottom:4px}
   .sub-meta{font-size:10px;color:#888}
-  .sub-progress-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:8px}
   .sub-progress-fill{height:100%;background:var(--luxury-gradient);border-radius:3px}
   .sub-pct{font-size:13px;color:var(--gold);font-weight:700;flex-shrink:0}
-  
-  /* Modal Styles */
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-    z-index: 1000; display: none; align-items: center; justify-content: center;
-    opacity: 0; transition: 0.3s;
-  }
-  .modal-overlay.open { display: flex; opacity: 1; }
-  .modal-content {
-    background: var(--surface); border: 1px solid var(--gold-b);
-    border-radius: 20px; width: 90%; max-width: 500px; max-height: 85vh;
-    display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
 </style>
 </head>
 <body data-nav="Learning">
@@ -67,19 +52,6 @@
   <div id="subList"></div>
 </div>
 
-<!-- Mastery Modal -->
-<div class="modal-overlay" id="masteryModal">
-  <div class="modal-content">
-    <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center;">
-      <h2 style="font-family:'Playfair Display',serif; color:var(--gold); margin:0; font-size:20px;">Mastery Tracker</h2>
-      <span class="material-symbols-rounded" style="cursor:pointer; color:#888;" onclick="closeMasteryTracker()">close</span>
-    </div>
-    <div id="masteryContent" style="padding: 20px; overflow-y: auto; flex: 1;">
-      <div style="text-align:center; color:#888; padding:40px;">Calculating Mastery...</div>
-    </div>
-  </div>
-</div>
-
 <div id="toast" class="toast"></div>
 
 <script type="module">
@@ -90,7 +62,6 @@
 
   const params = new URLSearchParams(window.location.search);
   const topicId = params.get('topic');
-  let currentUser = null;
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -101,7 +72,7 @@
 
   async function init() {
     if (!topicId) { showToast('No topic specified.'); return; }
-    currentUser = await requireAuth();
+    const user = await requireAuth();
 
     const topicSnap = await getDoc(doc(db, 'trainingTopics', topicId));
     if (!topicSnap.exists()) { showToast('Topic not found.'); return; }
@@ -120,7 +91,7 @@
 
     const progressSnap = await getDocs(query(
       collection(db, 'userTrainingProgress'),
-      where('submissiveId', '==', currentUser.uid),
+      where('submissiveId', '==', user.uid),
       where('topicId', '==', topicId)
     ));
     const progressByItemId = {};
@@ -142,14 +113,6 @@
             <div class="sub-meta">Body Positions & Protocol Postures</div>
           </div>
           <div style="color:var(--gold);"><span class="material-symbols-rounded">chevron_right</span></div>
-        </div>
-        <div class="glass-card sub-card" style="border-left: 3px solid #4fc38a; background: rgba(79,195,138,0.05);" onclick="openMasteryTracker()">
-          <div class="sub-icon" style="color:#4fc38a; border-color:#4fc38a;"><span class="material-symbols-rounded">military_tech</span></div>
-          <div class="sub-info">
-            <div class="sub-title" style="color: #4fc38a;">Position Mastery Tracker</div>
-            <div class="sub-meta">Check your requirements for Gold Badges</div>
-          </div>
-          <div style="color:#4fc38a;"><span class="material-symbols-rounded">chevron_right</span></div>
         </div>
       `;
     }
@@ -181,88 +144,6 @@
       listEl.appendChild(card);
     }
   }
-
-  window.openMasteryTracker = async function() {
-    document.getElementById('masteryModal').classList.add('open');
-    document.getElementById('masteryContent').innerHTML = '<div style="text-align:center; color:#888; padding:40px;">Calculating Mastery...</div>';
-    
-    try {
-      const actsSnap = await getDocs(query(
-        collection(db, 'trainingActivity'),
-        where('uid', '==', currentUser.uid),
-        where('topicId', '==', 'positions')
-      ));
-      
-      let readGuide = false;
-      const holdsByPos = {}; 
-      
-      actsSnap.forEach(d => {
-        const act = d.data();
-        if (act.type === 'read_guide') readGuide = true;
-        if (act.type === 'hold_practice' && act.title) {
-          const posMatch = act.title.match(/Hold Practice:\s*(.*)/i);
-          if (posMatch) {
-            const pName = posMatch[1].trim();
-            if (!holdsByPos[pName]) holdsByPos[pName] = { days: new Set(), photo: false, video: false };
-            if (act.timestamp) {
-               const dStr = act.timestamp.toDate().toDateString();
-               holdsByPos[pName].days.add(dStr);
-            }
-            if (act.photoSent) holdsByPos[pName].photo = true;
-            if (act.videoSent) holdsByPos[pName].video = true;
-          }
-        }
-      });
-
-      const topicMasteryPct = parseInt(document.getElementById('topicMastery').textContent) || 0;
-      const quizPassed = topicMasteryPct >= 80;
-
-      const positions = [
-        "Attention", "Inspection", "Waitress", "Wall", "Oscar", "Wait",
-        "Egyptian", "Collar Me", "Nadu", "Ready to Please",
-        "Humble", "Table", "Stool", "Doll"
-      ];
-
-      let html = '';
-      let totalMastered = 0;
-      
-      positions.forEach(p => {
-        const data = holdsByPos[p] || { days: new Set(), photo: false, video: false };
-        const holdCount = data.days.size;
-        const isMastered = readGuide && quizPassed && holdCount >= 3 && data.photo && data.video;
-        if (isMastered) totalMastered++;
-        
-        html += `
-          <div class="glass-card" style="margin-bottom:12px; padding:16px; border-left:3px solid ${isMastered ? '#4fc38a' : 'rgba(255,255,255,0.1)'}; background: ${isMastered ? 'rgba(79,195,138,0.03)' : 'rgba(255,255,255,0.02)'}; border-radius:12px;">
-            <div style="font-family:'Playfair Display',serif; font-size:18px; color:${isMastered ? '#4fc38a' : '#eee'}; margin-bottom:10px; display:flex; justify-content:space-between;">
-              ${p} ${isMastered ? '<span class="material-symbols-rounded">military_tech</span>' : ''}
-            </div>
-            <div style="font-size:12px; color:#aaa; line-height:1.7;">
-              <div><span style="color:${readGuide?'#4fc38a':'#666'};margin-right:6px;">${readGuide?'☑':'☐'}</span> Read Official Guide</div>
-              <div><span style="color:${quizPassed?'#4fc38a':'#666'};margin-right:6px;">${quizPassed?'☑':'☐'}</span> Topic Knowledge > 80%</div>
-              <div><span style="color:${holdCount>=3?'#4fc38a':'#666'};margin-right:6px;">${holdCount>=3?'☑':'☐'}</span> 3 Days of Hold Practice (${Math.min(holdCount,3)}/3)</div>
-              <div><span style="color:${data.photo?'#4fc38a':'#666'};margin-right:6px;">${data.photo?'☑':'☐'}</span> Photo Proof Sent</div>
-              <div><span style="color:${data.video?'#4fc38a':'#666'};margin-right:6px;">${data.video?'☑':'☐'}</span> Video Proof Sent</div>
-            </div>
-          </div>
-        `;
-      });
-
-      document.getElementById('masteryContent').innerHTML = `
-        <div style="text-align:center; margin-bottom:20px; font-family:'Playfair Display',serif; color:var(--gold);">
-          ${totalMastered} / 14 Mastered
-        </div>
-        ${html}
-      `;
-    } catch (err) {
-      console.error(err);
-      document.getElementById('masteryContent').innerHTML = '<div style="color:var(--red); padding:20px;">Error calculating mastery.</div>';
-    }
-  };
-
-  window.closeMasteryTracker = function() {
-    document.getElementById('masteryModal').classList.remove('open');
-  };
 
   init().catch(err => { console.error(err); showToast('Failed to load topic.'); });
 </script>
