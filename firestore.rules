@@ -36,5 +36,13 @@ service cloud.firestore {
     match /data/{relationshipId}/{allSubcollections=**} {
       allow read, write: if isAuth();
     }
+    
+    // 4. Training Module Collections
+    match /trainingItems/{docId} { allow read, write: if isAuth(); }
+    match /userTrainingProgress/{docId} { allow read, write: if isAuth(); }
+    match /trainingActivityLog/{docId} { allow read, write: if isAuth(); }
+    match /trainingAssignments/{docId} { allow read, write: if isAuth(); }
+    match /trainingTopics/{docId} { allow read, write: if isAuth(); }
+    match /trainingCategories/{docId} { allow read, write: if isAuth(); }
   }
 }
