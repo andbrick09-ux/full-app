@@ -195,7 +195,17 @@ export async function sendPairingInvite(subEmail) {
   const subData = subDoc.data();
 
   if (subData.role !== 'sub') throw new Error('That account is not registered as a Sub.');
-  if (subData.relationshipId) throw new Error('That Sub is already paired with someone.');
+  
+  if (subData.relationshipId) {
+    // Check if it's a ghost relationship (deleted by admin)
+    const relSnap = await getDoc(doc(db, 'relationships', subData.relationshipId));
+    if (!relSnap.exists() || relSnap.data().status === 'inactive') {
+      // Self-heal the stale record
+      await updateDoc(doc(db, 'users', subDoc.id), { relationshipId: null });
+    } else {
+      throw new Error('That Sub is already paired with someone.');
+    }
+  }
 
   // Create relationship
   const relRef = await addDoc(collection(db, 'relationships'), {
