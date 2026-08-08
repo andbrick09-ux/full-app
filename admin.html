@@ -101,7 +101,7 @@
     import { requireAuth, getMyProfile, getUserProfile } from './auth.js';
     import { db } from './firebase-config.js';
     import { 
-      collection, query, getDocs, orderBy 
+      collection, query, getDocs, orderBy, deleteDoc, doc 
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     let allRelationships = [];
@@ -214,6 +214,7 @@
               <th>SUB</th>
               <th>STATUS</th>
               <th>CREATED</th>
+              <th>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
@@ -235,6 +236,9 @@
             </td>
             <td><span class="badge ${statusClass}">${rel.status.toUpperCase()}</span></td>
             <td style="color:var(--muted);font-size:13px">${created}</td>
+            <td>
+              <button onclick="adminUnpair('${rel.id}')" class="btn btn-secondary" style="color:var(--red);border-color:var(--red);padding:6px 12px;font-size:10px;">Unpair</button>
+            </td>
           </tr>
         `;
       });
@@ -304,6 +308,19 @@
       if (container) container.style.opacity = '0.6';
       await loadAllData();
       if (container) container.style.opacity = '1';
+    };
+
+    window.adminUnpair = async function(relId) {
+      if (!confirm('Are you sure you want to completely unpair this relationship? This action cannot be undone.')) return;
+      
+      try {
+        await deleteDoc(doc(db, 'relationships', relId));
+        alert('Relationship unpaired successfully.');
+        await refreshData();
+      } catch (err) {
+        console.error('Error unpairing:', err);
+        alert('Failed to unpair: ' + err.message);
+      }
     };
 
     // Boot everything
