@@ -126,7 +126,8 @@
         <div class="sub-pct">${pct}%</div>
       `;
       card.onclick = () => {
-        window.location.href = `tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(sub.id)}`;
+        sessionStorage.removeItem('tm_queue');
+        window.location.href = `tm-session.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(sub.id)}`;
       };
       listEl.appendChild(card);
     }

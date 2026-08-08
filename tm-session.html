@@ -83,7 +83,7 @@
 
 <script type="module">
   import { requireAuth, getMyDominant } from './auth.js';
-  import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { doc, getDoc, setDoc, addDoc, getDocs, collection, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
   import { db } from './firebase-config.js';
   import {
     evaluateAttempt, markFlashcardViewed, updateSpacedRepetition,
@@ -108,7 +108,7 @@
 
   function backToList() {
     if (PREVIEW_MODE) { window.close(); return; }
-    window.location.href = `tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}`;
+    window.location.href = `tm-topic.html?topic=${encodeURIComponent(topicId)}`;
   }
 
   async function loadNextItem() {
@@ -120,7 +120,7 @@
           <div style="font-size:40px; margin-bottom:10px;">✨</div>
           <h2 style="color:var(--gold); font-family:'Playfair Display',serif;">Session Complete</h2>
           <p style="color:var(--cream-mute); font-size:13px; margin: 15px 0 25px;">You have completed all items in your review queue.</p>
-          <button class="gold-btn" onclick="window.location.href='tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}'">Back to Category</button>
+          <button class="gold-btn" onclick="window.location.href='tm-topic.html?topic=${encodeURIComponent(topicId)}'">Back to Category</button>
         </div>
       `;
       return;
@@ -487,7 +487,7 @@
     document.getElementById('itemTitle').textContent = item.title;
     document.getElementById('closeLink').href = PREVIEW_MODE
       ? `tm-admin-item.html?item=${encodeURIComponent(itemId)}`
-      : `tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}`;
+      : `tm-topic.html?topic=${encodeURIComponent(topicId)}`;
 
     if (PREVIEW_MODE) {
       const banner = document.createElement('div');
@@ -536,8 +536,25 @@
         sessionQueue = [initialItemId];
       }
 
+      // If still empty, fetch ALL items for the topic and subcategory and build queue
+      if (sessionQueue.length === 0 && topicId && subcategoryId) {
+        try {
+          const itemsSnap = await getDocs(query(
+            collection(db, 'trainingItems'),
+            where('topicId', '==', topicId),
+            where('subcategoryId', '==', subcategoryId),
+            where('isActive', '==', true)
+          ));
+          const sorted = itemsSnap.docs.map(d => ({ id: d.id, order: d.data().order || 0 })).sort((a, b) => a.order - b.order);
+          sessionQueue = sorted.map(i => i.id);
+          sessionStorage.setItem('tm_queue', JSON.stringify(sessionQueue));
+        } catch (e) {
+          console.error('Failed to build dynamic queue', e);
+        }
+      }
+
       if (sessionQueue.length === 0) {
-        showToast('No items to review.');
+        showToast('No items to review in this category.');
         setTimeout(backToList, 1500);
         return;
       }
