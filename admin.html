@@ -101,7 +101,7 @@
     import { requireAuth, getMyProfile, getUserProfile } from './auth.js';
     import { db } from './firebase-config.js';
     import { 
-      collection, query, getDocs, orderBy, deleteDoc, doc 
+      collection, query, getDocs, orderBy, deleteDoc, doc, updateDoc, getDoc, arrayRemove 
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     let allRelationships = [];
@@ -313,9 +313,28 @@
     window.adminUnpair = async function(relId) {
       if (!confirm('Are you sure you want to completely unpair this relationship? This action cannot be undone.')) return;
       
+      const rel = allRelationships.find(r => r.id === relId);
+      if (!rel) return alert('Relationship not found in memory.');
+
       try {
+        // 1. Clear Sub's relationshipId
+        await updateDoc(doc(db, 'users', rel.subId), { relationshipId: null });
+        
+        // 2. Remove from Dom's relationshipIds array
+        await updateDoc(doc(db, 'users', rel.domId), { 
+          relationshipIds: arrayRemove(relId)
+        });
+
+        // 3. If it was the Dom's active focus, clear that too
+        const domDoc = await getDoc(doc(db, 'users', rel.domId));
+        if (domDoc.exists() && domDoc.data().activeRelationshipId === relId) {
+          await updateDoc(doc(db, 'users', rel.domId), { activeRelationshipId: null });
+        }
+
+        // 4. Finally, delete the relationship
         await deleteDoc(doc(db, 'relationships', relId));
-        alert('Relationship unpaired successfully.');
+        
+        alert('Relationship unpaired and user accounts cleaned up successfully.');
         await refreshData();
       } catch (err) {
         console.error('Error unpairing:', err);
