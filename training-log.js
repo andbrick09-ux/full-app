@@ -26,7 +26,7 @@ export async function logTrainingCompletion(trainingId, level, customMessage = n
     const name = trainingNames[trainingId] || trainingId;
     const message = customMessage || `Completed ${name} (Level ${level})`;
 
-    await addDoc(dataCol('notes'), {
+    await addDoc(dataCol('activity'), {
       content: message,
       type: 'training',
       trainingId: trainingId,

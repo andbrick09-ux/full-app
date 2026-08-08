@@ -798,9 +798,17 @@ window.issueCorrection = async function() {
   }
 };
 
-window.markServiceComplete = function() {
-  alert("Service marked complete and reported to Sir! 👑");
-  // TODO: Write completion to tasks/notes + partner feed
+window.markServiceComplete = async function() {
+  try {
+    await addDoc(dataCol('activity'), {
+      content: "Service checklist completed",
+      type: 'task',
+      timestamp: serverTimestamp()
+    });
+    alert("Service marked complete and reported to Sir! 👑");
+  } catch (e) {
+    console.error("Failed to mark service complete:", e);
+  }
 };
 
 window.acknowledgeNote = async function(noteId, type) {
