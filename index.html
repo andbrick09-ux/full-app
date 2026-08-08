@@ -657,29 +657,36 @@ async function loadLiveActivityFeedForSub() {
 
   const partnerNotesCol = await partnerDataCol('notes');
 
-  // Only show notes from the Dom (not the sub's own notes)
-  onSnapshot(query(partnerNotesCol, orderBy('timestamp', 'desc'), limit(8)), (snap) => {
+  // Only show notes from the Dom that haven't been acknowledged
+  const unacknowledgedQuery = query(partnerNotesCol, where('checked', '==', false));
+  onSnapshot(unacknowledgedQuery, (snap) => {
     feed.innerHTML = '';
 
     if (snap.empty) {
-      feed.innerHTML = `<div class="empty"><p>No notes from Sir yet.</p></div>`;
+      feed.innerHTML = `<div class="empty"><p>No pending notes from Sir.</p></div>`;
       return;
     }
 
-    snap.forEach(docSnap => {
+    // Sort client-side by timestamp descending to avoid composite index requirement
+    const docs = [];
+    snap.forEach(d => docs.push(d));
+    docs.sort((a, b) => {
+      const ta = a.data().timestamp?.toMillis() || 0;
+      const tb = b.data().timestamp?.toMillis() || 0;
+      return tb - ta;
+    });
+
+    const top8 = docs.slice(0, 8);
+
+    top8.forEach(docSnap => {
       const n = docSnap.data();
       const el = document.createElement('div');
       el.className = 'arow';
       
-      let ackHtml = '';
-      if (n.checked !== true) {
-        let btnText = "Acknowledge";
-        if (n.type === 'praise') btnText = "Thank you, Sir";
-        if (n.type === 'correction') btnText = "Understood, Sir";
-        ackHtml = `<div style="margin-top:8px;"><button onclick="acknowledgeNote('${docSnap.id}')" style="background:rgba(201,168,76,0.1); border:1px solid var(--gold); color:var(--gold); padding:4px 12px; border-radius:6px; font-size:10px; font-family:'Montserrat',sans-serif; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">${btnText}</button></div>`;
-      } else {
-        ackHtml = `<div style="margin-top:6px; font-size:9px; color:var(--gold-dim); text-transform:uppercase; letter-spacing:1.5px; font-weight:700;">✓ Acknowledged</div>`;
-      }
+      let btnText = "Acknowledge";
+      if (n.type === 'praise') btnText = "Thank you, Sir";
+      if (n.type === 'correction') btnText = "Understood, Sir";
+      let ackHtml = `<div style="margin-top:8px;"><button onclick="acknowledgeNote('${docSnap.id}')" style="background:rgba(201,168,76,0.1); border:1px solid var(--gold); color:var(--gold); padding:4px 12px; border-radius:6px; font-size:10px; font-family:'Montserrat',sans-serif; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">${btnText}</button></div>`;
       
       let icon = '👑';
       if (n.type === 'praise') icon = '💖';
