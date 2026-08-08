@@ -128,15 +128,19 @@
              return `<option value="${r.id}" ${selected}>${r.subName}</option>`;
           }).join('');
           
-          const banner = document.createElement('div');
-          banner.style = "background: rgba(201,168,76,0.05); border: 1px solid var(--gold-b); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;";
+          let banner = document.getElementById('subSwitcherBanner');
+          if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'subSwitcherBanner';
+            banner.style = "background: rgba(201,168,76,0.05); border: 1px solid var(--gold-b); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;";
+            grid.parentNode.insertBefore(banner, grid);
+          }
           banner.innerHTML = `
             <div style="font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; font-weight: 600;">Viewing:</div>
             <select id="subSwitcher" style="background: var(--surface); color: var(--text); border: 1px solid var(--gold-b); border-radius: 6px; padding: 6px 12px; font-family: inherit; font-size: 13px; outline: none; cursor: pointer;">
               ${options}
             </select>
           `;
-          grid.parentNode.insertBefore(banner, grid);
           
           setTimeout(() => {
             const switcher = document.getElementById('subSwitcher');
@@ -220,23 +224,21 @@
             card.classList.add('locked');
             card.onclick = (e) => {
               e.preventDefault();
-              const toast = document.getElementById('toast');
-              if (toast) {
-                toast.textContent = 'Locked by Sir';
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 2500);
-              }
+              showToast('Locked by Sir');
             };
+            html += `
+              <div class="training-meta" style="margin-top:12px;">Waiting for Sir to assign</div>
+            `;
           } else {
             card.onclick = () => window.location.href = `${t.id}-training.html`;
+            html += `
+              ${assignedData.noteFromSir ? `<div style="font-size:11px;color:var(--gold);margin-top:6px;font-style:italic;">“${assignedData.noteFromSir}”</div>` : ''}
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progress}%"></div>
+              </div>
+              <div class="training-meta">Progress: ${progress}%</div>
+            `;
           }
-
-          html += `
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${progress}%"></div>
-            </div>
-            <div class="training-meta">Progress: ${progress}%</div>
-          `;
 
           card.innerHTML = html;
         }
