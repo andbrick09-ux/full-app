@@ -137,10 +137,19 @@
           }
           banner.innerHTML = `
             <div style="font-size: 11px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; font-weight: 600;">Viewing:</div>
-            <select id="subSwitcher" style="background: var(--surface); color: var(--text); border: 1px solid var(--gold-b); border-radius: 6px; padding: 6px 12px; font-family: inherit; font-size: 13px; outline: none; cursor: pointer;">
-              ${options}
-            </select>
+            <div style="position:relative; display:inline-block;">
+              <select id="subSwitcher" style="appearance:none; -webkit-appearance:none; background:var(--surface); border:1px solid var(--gold-b); color:var(--gold-l); font-family:'Raleway',sans-serif; font-size:13px; font-weight:600; padding:6px 30px 6px 12px; border-radius:8px; cursor:pointer; outline:none; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+                ${options}
+              </select>
+              <span class="material-symbols-rounded" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gold); font-size:16px;">expand_more</span>
+            </div>
           `;
+          if (!document.getElementById('selectOptionStyles')) {
+            const style = document.createElement('style');
+            style.id = 'selectOptionStyles';
+            style.innerHTML = 'select option { background-color: var(--surface); color: var(--text); font-weight: 500; }';
+            document.head.appendChild(style);
+          }
           
           setTimeout(() => {
             const switcher = document.getElementById('subSwitcher');

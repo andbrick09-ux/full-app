@@ -201,10 +201,20 @@ async function renderDomDashboard() {
     };
 
     const selectHtml = `
-      <select onchange="window.switchActiveSubUI(this.value)" style="appearance:none;background:transparent;border:none;color:var(--gold-l);font-weight:600;font-family:inherit;font-size:inherit;cursor:pointer;outline:none;border-bottom:1px dashed var(--gold-b);">
-        ${options}
-      </select>
+      <div style="position:relative; display:inline-block;">
+        <select onchange="window.switchActiveSubUI(this.value)" style="appearance:none; -webkit-appearance:none; background:rgba(201,168,76,0.05); border:1px solid var(--gold-b); color:var(--gold-l); font-family:'Raleway',sans-serif; font-size:14px; font-weight:600; padding:6px 32px 6px 14px; border-radius:12px; cursor:pointer; outline:none; box-shadow:0 4px 12px rgba(0,0,0,0.3); backdrop-filter:blur(10px);">
+          ${options}
+        </select>
+        <span class="material-symbols-rounded" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gold); font-size:16px;">expand_more</span>
+      </div>
     `;
+    // We add a global style for the options just in case
+    if (!document.getElementById('selectOptionStyles')) {
+      const style = document.createElement('style');
+      style.id = 'selectOptionStyles';
+      style.innerHTML = 'select option { background-color: var(--surface); color: var(--text); font-weight: 500; }';
+      document.head.appendChild(style);
+    }
     subNameHtml = selectHtml;
     subNameHtmlLive = selectHtml;
   }
