@@ -461,6 +461,8 @@
               if (!subName) {
                 subName = subProfile?.email ? subProfile.email.split('@')[0] : 'Unknown Sub';
               }
+              const partnerTitle = subProfile?.title ? ` <span style="font-size:12px;opacity:0.8;font-style:italic">(${subProfile.title})</span>` : '';
+              const pairedSince = r.createdAt?.toDate ? ' &bull; Paired ' + r.createdAt.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
               const isActive = r.id === activeRelId;
               const isPending = r.status === 'pending';
               
@@ -476,9 +478,9 @@
               html += `
                 <div style="background:rgba(255,255,255,0.03);border:1px solid ${isActive ? 'var(--gold)' : 'var(--border)'};border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
                   <div>
-                    <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--cream)">${subName}</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--cream)">${subName}${partnerTitle}</div>
                     <div style="font-size:10px;color:var(--cream-mute);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">
-                      ${isPending ? 'Invite Sent' : (isActive ? 'Current Focus' : 'Standby')}
+                      ${isPending ? 'Invite Sent' : (isActive ? 'Current Focus' : 'Standby')}${pairedSince}
                     </div>
                   </div>
                   <div style="display:flex;gap:8px;">
@@ -501,6 +503,8 @@
             const partnerUid     = await getPartnerUid();
             const partnerProfile = partnerUid ? await getUserProfile(partnerUid) : null;
             const partnerName    = partnerProfile?.displayName || 'your Dom';
+            const partnerTitle   = partnerProfile?.title ? ` <span style="font-size:12px;opacity:0.8;font-style:italic">(${partnerProfile.title})</span>` : '';
+            const pairedSince    = rel.createdAt?.toDate ? rel.createdAt.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown Date';
             const partnerEmail   = partnerProfile?.email || '—';
 
             card.innerHTML =
@@ -509,9 +513,10 @@
                 '<div style="flex:1">' +
                   '<div class="rel-badge active">PAIRED &amp; ACTIVE</div>' +
                   '<div style="margin-top:6px;font-family:\'Playfair Display\',serif;font-size:15px;color:var(--gold-light)">' +
-                    'Dom: <strong>' + partnerName + '</strong> ' +
+                    'Dom: <strong>' + partnerName + '</strong>' + partnerTitle +
                   '</div>' +
                   '<div style="font-size:11px;color:var(--cream-mute);margin-top:4px">Email: ' + partnerEmail + '</div>' +
+                  '<div style="font-size:11px;color:var(--cream-mute);margin-top:2px">Paired since: ' + pairedSince + '</div>' +
                 '</div>' +
               '</div>' +
               '<button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>';
