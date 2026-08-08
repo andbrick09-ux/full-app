@@ -105,6 +105,19 @@
     const listEl = document.getElementById('subList');
     listEl.innerHTML = '';
 
+    if (topicId === 'positions') {
+      listEl.innerHTML += `
+        <div class="glass-card sub-card" style="border-left: 3px solid var(--gold);" onclick="window.location.href='learning-article-positions.html'">
+          <div class="sub-icon" style="color:var(--gold);"><span class="material-symbols-rounded">menu_book</span></div>
+          <div class="sub-info">
+            <div class="sub-title" style="color: var(--gold);">Official Learning Guide</div>
+            <div class="sub-meta">Body Positions & Protocol Postures</div>
+          </div>
+          <div style="color:var(--gold);"><span class="material-symbols-rounded">chevron_right</span></div>
+        </div>
+      `;
+    }
+
     if (subs.length === 0) {
       listEl.innerHTML = `<div style="text-align:center;padding:40px;color:#777;">No subcategories yet.</div>`;
       return;
