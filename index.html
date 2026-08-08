@@ -666,15 +666,31 @@ async function loadLiveActivityFeedForSub() {
       return;
     }
 
-    snap.forEach(doc => {
-      const n = doc.data();
+    snap.forEach(docSnap => {
+      const n = docSnap.data();
       const el = document.createElement('div');
       el.className = 'arow';
+      
+      let ackHtml = '';
+      if (n.checked !== true) {
+        let btnText = "Acknowledge";
+        if (n.type === 'praise') btnText = "Thank you, Sir";
+        if (n.type === 'correction') btnText = "Understood, Sir";
+        ackHtml = `<div style="margin-top:8px;"><button onclick="acknowledgeNote('${docSnap.id}')" style="background:rgba(201,168,76,0.1); border:1px solid var(--gold); color:var(--gold); padding:4px 12px; border-radius:6px; font-size:10px; font-family:'Montserrat',sans-serif; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;">${btnText}</button></div>`;
+      } else {
+        ackHtml = `<div style="margin-top:6px; font-size:9px; color:var(--gold-dim); text-transform:uppercase; letter-spacing:1.5px; font-weight:700;">✓ Acknowledged</div>`;
+      }
+      
+      let icon = '👑';
+      if (n.type === 'praise') icon = '💖';
+      if (n.type === 'correction') icon = '⚠️';
+
       el.innerHTML = `
-        <div class="aico">👑</div>
+        <div class="aico">${icon}</div>
         <div style="flex:1">
           <span class="aname">${n.content || n.text || 'Note from Sir'}</span>
           <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
+          ${ackHtml}
         </div>
       `;
       feed.appendChild(el);
@@ -740,6 +756,7 @@ window.issuePraise = async function() {
     await addDoc(dataCol('notes'), {
       content: content,
       type: 'praise',
+      checked: false,
       timestamp: serverTimestamp()
     });
     alert("Praise issued to your sub! It will appear in their Recent Devotions.");
@@ -758,6 +775,7 @@ window.issueCorrection = async function() {
     await addDoc(dataCol('notes'), {
       content: content,
       type: 'correction',
+      checked: false,
       timestamp: serverTimestamp()
     });
     alert("Correction logged and sent to your sub.");
@@ -767,8 +785,18 @@ window.issueCorrection = async function() {
 };
 
 window.markServiceComplete = function() {
-  alert("Service marked complete and reported to Sir! ✨");
+  alert("Service marked complete and reported to Sir! 👑");
   // TODO: Write completion to tasks/notes + partner feed
+};
+
+window.acknowledgeNote = async function(noteId) {
+  try {
+    const partnerNotesCol = await partnerDataCol('notes');
+    const noteRef = doc(partnerNotesCol, noteId);
+    await setDoc(noteRef, { checked: true }, { merge: true });
+  } catch (e) {
+    console.error("Failed to acknowledge:", e);
+  }
 };
 
 // Boot
