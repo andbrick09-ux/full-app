@@ -142,7 +142,7 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 </div>
 
 <script type="module">
-import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol } from './auth.js';
+import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol, getDomRoster, switchActiveSub } from './auth.js';
 import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 let currentRole = null;
@@ -179,9 +179,35 @@ async function init() {
   initLiveWeekTracker();
 }
 
-function renderDomDashboard() {
+async function renderDomDashboard() {
   const container = document.getElementById('dashboard');
-  const subName = partnerDisplayName || currentProfile?.displayName || "your sub";
+  let subNameHtml = `<span style="color:var(--gold-l);font-weight:600">${partnerDisplayName || currentProfile?.displayName || "your sub"}</span>`;
+  let subNameHtmlLive = partnerDisplayName || currentProfile?.displayName || "your sub";
+
+  const roster = await getDomRoster();
+  if (roster.length > 1) {
+    for (let r of roster) {
+      const p = await getUserProfile(r.subId);
+      r.subName = p?.displayName || 'Unknown Sub';
+    }
+    let options = roster.map(r => {
+      const selected = r.subId === partnerUid ? 'selected' : '';
+      return `<option value="${r.id}" ${selected}>${r.subName}</option>`;
+    }).join('');
+    
+    window.switchActiveSubUI = async function(val) {
+      await switchActiveSub(val);
+      window.location.reload();
+    };
+
+    const selectHtml = `
+      <select onchange="window.switchActiveSubUI(this.value)" style="appearance:none;background:transparent;border:none;color:var(--gold-l);font-weight:600;font-family:inherit;font-size:inherit;cursor:pointer;outline:none;border-bottom:1px dashed var(--gold-b);">
+        ${options}
+      </select>
+    `;
+    subNameHtml = selectHtml;
+    subNameHtmlLive = selectHtml;
+  }
 
   container.innerHTML = `
     <header class="hdr">
@@ -189,7 +215,7 @@ function renderDomDashboard() {
       <div class="hdr-role">
         <span class="app-sub">Command &amp; Control</span>
       </div>
-      <div style="margin-top:6px;font-size:12px;color:var(--muted)">Overseeing <span style="color:var(--gold-l);font-weight:600">${subName}</span></div>
+      <div style="margin-top:6px;font-size:12px;color:var(--muted)">Overseeing ${subNameHtml}</div>
     </header>
 
     <div class="stat-grid" id="statsGrid">
@@ -216,7 +242,7 @@ function renderDomDashboard() {
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
         <div style="width:42px;height:42px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:20px">👑</div>
         <div style="flex:1">
-          <div style="font-weight:600;color:var(--gold-l);font-size:15px">${subName}</div>
+          <div style="font-weight:600;color:var(--gold-l);font-size:15px">${subNameHtmlLive}</div>
           <div style="font-size:10px;color:var(--muted)" id="liveStatusText">Loading live status...</div>
         </div>
       </div>
