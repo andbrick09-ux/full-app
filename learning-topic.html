@@ -34,13 +34,13 @@
   .sub-pct{font-size:13px;color:var(--gold);font-weight:700;flex-shrink:0}
 </style>
 </head>
-<body data-nav="testing">
+<body data-nav="Learning">
 
 <div class="topbar">
-  <a class="back-btn" href="tm-hub.html"><span class="material-symbols-rounded">arrow_back</span></a>
+  <a class="back-btn" href="learning-hub.html"><span class="material-symbols-rounded">arrow_back</span></a>
   <div class="topbar-center">
     <div class="topbar-title" id="topicTitle">Topic</div>
-    <div class="topbar-sub">Testing</div>
+    <div class="topbar-sub">Learning</div>
   </div>
 </div>
 
@@ -126,8 +126,8 @@
         <div class="sub-pct">${pct}%</div>
       `;
       card.onclick = () => {
-        sessionStorage.removeItem('tm_queue');
-        window.location.href = `tm-session.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(sub.id)}`;
+        sessionStorage.removeItem('lm_queue');
+        window.location.href = `learning-viewer.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(sub.id)}`;
       };
       listEl.appendChild(card);
     }

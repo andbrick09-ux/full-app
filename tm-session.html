@@ -545,7 +545,10 @@
             where('subcategoryId', '==', subcategoryId),
             where('isActive', '==', true)
           ));
-          const sorted = itemsSnap.docs.map(d => ({ id: d.id, order: d.data().order || 0 })).sort((a, b) => a.order - b.order);
+          const sorted = itemsSnap.docs
+            .map(d => ({ id: d.id, order: d.data().order || 0, type: d.data().type }))
+            .filter(i => i.type !== 'flashcard')
+            .sort((a, b) => a.order - b.order);
           sessionQueue = sorted.map(i => i.id);
           sessionStorage.setItem('tm_queue', JSON.stringify(sessionQueue));
         } catch (e) {
