@@ -43,6 +43,6 @@ service cloud.firestore {
     match /trainingActivityLog/{docId} { allow read, write: if isAuth(); }
     match /trainingAssignments/{docId} { allow read, write: if isAuth(); }
     match /trainingTopics/{docId} { allow read, write: if isAuth(); }
-    match /trainingCategories/{docId} { allow read, write: if isAuth(); }
+    match /trainingSubcategories/{docId} { allow read, write: if isAuth(); }
   }
 }
