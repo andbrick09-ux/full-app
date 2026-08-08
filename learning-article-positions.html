@@ -10,632 +10,176 @@
 <link rel="stylesheet" href="styles.css"/>
 <link rel="stylesheet" href="nav.css"/>
 <style>
-  body {
-    padding-bottom: 120px; /* Space for nav */
+  html, body {
+    overflow: hidden; /* Prevent body vertical scrolling */
+    height: 100vh;
   }
-  .article-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    color: var(--cream);
-    line-height: 1.7;
-    font-size: 15px;
-  }
+  .topbar { display:flex; align-items:center; gap:12px; }
+  .close-btn { width:36px; height:36px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(212,175,55,.08); border:1px solid var(--border); text-decoration:none; cursor:pointer; }
+  .close-btn .material-symbols-rounded { font-size:20px; color:var(--gold); }
   
-  .article-header {
+  .helper-text {
     text-align: center;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 5px 0 15px 0;
   }
-  
-  .article-header h1 {
-    font-family: 'Playfair Display', serif;
-    color: var(--gold);
-    font-size: 32px;
-    margin-bottom: 10px;
-    line-height: 1.2;
-  }
-  
-  .article-header .subtitle {
-    color: var(--cream-mute);
+  .helper-text .material-symbols-rounded {
     font-size: 14px;
+    vertical-align: middle;
+    margin: 0 4px;
+  }
+
+  /* Carousel */
+  .carousel-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100vh - 150px);
+  }
+  .carousel-container::-webkit-scrollbar { display: none; }
+  .carousel-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .carousel-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    padding: 0 15px 80px 15px; /* bottom padding for scroll space */
+    box-sizing: border-box;
+    overflow-y: auto; /* allow vertical scroll inside slide */
+  }
+  
+  /* Typography */
+  .slide-category {
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  h2 {
-    font-family: 'Playfair Display', serif;
+    letter-spacing: 2px;
     color: var(--gold);
-    font-size: 26px;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    border-bottom: 1px dashed rgba(212,175,55,0.3);
-    padding-bottom: 10px;
-  }
-  
-  h3 {
-    font-family: 'Playfair Display', serif;
-    color: #eee;
-    font-size: 20px;
-    margin-top: 40px;
-    margin-bottom: 15px;
-  }
-  
-  h4 {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--gold);
-    margin-top: 20px;
-    margin-bottom: 8px;
-  }
-  
-  p {
-    margin-bottom: 16px;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding-left: 0;
-    margin-bottom: 20px;
-  }
-  
-  ul li {
-    position: relative;
-    padding-left: 20px;
-    margin-bottom: 10px;
-  }
-  
-  ul li::before {
-    content: '•';
-    color: var(--gold);
-    position: absolute;
-    left: 0;
-    font-size: 18px;
-    line-height: 1.5;
-  }
-  
-  .sequence-box {
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--gold);
-    padding: 15px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .sequence-box strong {
-    color: var(--gold);
-    display: block;
+    text-align: center;
     margin-bottom: 5px;
   }
-  
-  .mark-read-btn {
-    display: block;
-    width: 100%;
-    max-width: 300px;
-    margin: 60px auto 20px;
-    padding: 16px;
-    background: var(--gold);
-    color: #000;
+  .slide-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: #eee;
     text-align: center;
-    border: none;
-    border-radius: 25px;
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+
+  /* Accordions */
+  .accordion {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .accordion-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 15px;
+    font-weight: 500;
+    color: var(--cream);
     cursor: pointer;
+    user-select: none;
+  }
+  .accordion-header .material-symbols-rounded {
+    color: var(--gold);
+    transition: transform 0.3s;
+  }
+  .accordion.active {
+    background: rgba(212,175,55,0.05);
+    border-color: rgba(212,175,55,0.3);
+  }
+  .accordion.active .accordion-header .material-symbols-rounded {
+    transform: rotate(180deg);
+  }
+  .accordion-body {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    color: var(--cream-mute);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .accordion.active .accordion-body {
+    padding: 0 16px 16px 16px;
+    max-height: 1000px;
+  }
+  .accordion-body ul {
+    padding-left: 20px;
+    margin: 10px 0 0 0;
+  }
+  .accordion-body li {
+    margin-bottom: 6px;
+  }
+  .accordion-body li::marker {
+    color: var(--gold);
+  }
+
+  /* Misc */
+  .progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    padding: 0 20px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
     transition: 0.3s;
   }
-  
-  .mark-read-btn:disabled {
-    background: #444;
-    color: #888;
-    cursor: not-allowed;
+  .dot.active {
+    background: var(--gold);
+    transform: scale(1.3);
   }
   
-  .mark-read-btn .material-symbols-rounded {
-    vertical-align: middle;
-    margin-right: 8px;
-    font-size: 20px;
-  }
+  .intro-text p { margin-bottom: 15px; color: var(--cream-mute); line-height: 1.6; font-size: 14px; }
+  .intro-text ul { padding-left: 20px; margin-bottom: 15px; color: var(--cream-mute); font-size: 14px; }
+  .intro-text li { margin-bottom: 8px; }
+  .intro-text li::marker { color: var(--gold); }
+  
+  .sequence-box { background: var(--glass); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; }
+  .sequence-box strong { color: var(--gold); display: block; margin-bottom: 5px; font-size: 14px;}
+  .sequence-box p { font-size: 14px; margin-bottom: 5px; color: #eee; }
+  .sequence-box span { font-size: 12px; color: var(--cream-mute); }
+
+  .mark-read-btn { display: block; width: 100%; max-width: 300px; margin: 40px auto 20px; padding: 16px; background: var(--gold); color: #000; text-align: center; border: none; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.3s; }
+  .mark-read-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+  .mark-read-btn .material-symbols-rounded { vertical-align: middle; margin-right: 8px; font-size: 20px; }
 </style>
 </head>
 <body data-nav="learning">
 
 <div class="topbar">
-  <a class="back-btn" href="learning-topic.html?topic=positions"><span class="material-symbols-rounded">arrow_back</span></a>
+  <a class="close-btn" href="learning-topic.html?topic=positions"><span class="material-symbols-rounded">close</span></a>
   <div class="topbar-center">
-    <div class="topbar-title">Library</div>
-    <div class="topbar-sub">Learning Guide</div>
+    <div class="topbar-title">Learning Guide</div>
   </div>
 </div>
 
-<div class="article-container">
-  
-  <div class="article-header">
-    <h1>Body Positions & Protocol Postures</h1>
-    <div class="subtitle">Complete study material for the 14 core positions</div>
-  </div>
-
-  <h2>How to Use This Guide</h2>
-  <p>This Learning Guide is the study material for the Body Positions & Protocol Postures training topic. Read it before or alongside flashcards, quizzes, and hold practice.</p>
-  
-  <p>For each position you will find:</p>
-  <ul>
-    <li><strong>Form</strong> — exact body mechanics</li>
-    <li><strong>Purpose</strong> — why the position exists</li>
-    <li><strong>What the Submissive Learns & Feels</strong> — the internal experience and training value</li>
-    <li><strong>What the Dominant Gains</strong> — practical and psychological benefits for the Dom</li>
-    <li><strong>Common Mistakes</strong> — what to avoid</li>
-    <li><strong>Key Transitions</strong> — how to enter and leave the position cleanly</li>
-  </ul>
-  
-  <p><strong>Suggested learning path:</strong></p>
-  <ul>
-    <li>1. Read the full entry for a position</li>
-    <li>2. Practice the form (use Hold Practice in the app)</li>
-    <li>3. Review flashcards for recognition and purpose</li>
-    <li>4. Test yourself with quizzes and error identification</li>
-    <li>5. Practice transitions and sequences</li>
-    <li>6. Apply the position in real protocol and reflect</li>
-  </ul>
-
-  <h2>Overview of the 14 Positions</h2>
-  
-  <h4>Standing</h4>
-  <ul>
-    <li><strong>Attention</strong> — Instant readiness</li>
-    <li><strong>Inspection</strong> — Full examination and ownership display</li>
-    <li><strong>Waitress</strong> — Service readiness</li>
-    <li><strong>Wall</strong> — Corrective isolation</li>
-    <li><strong>Oscar</strong> — Elegant formal display</li>
-    <li><strong>Wait</strong> — Patient non-demanding availability</li>
-  </ul>
-  
-  <h4>Kneeling</h4>
-  <ul>
-    <li><strong>Egyptian</strong> — Modest closed formal kneeling</li>
-    <li><strong>Collar Me</strong> — Ritual offering of the throat</li>
-    <li><strong>Nadu</strong> — Classic open home-base submission</li>
-    <li><strong>Ready to Please</strong> — Oral/sexual service readiness</li>
-  </ul>
-  
-  <h4>Floor & Objectification</h4>
-  <ul>
-    <li><strong>Humble</strong> — Deep deference and ego surrender</li>
-    <li><strong>Table</strong> — Objectification as furniture</li>
-    <li><strong>Stool</strong> — Lower compressed objectification</li>
-    <li><strong>Doll</strong> — Complete passivity and poseability</li>
-  </ul>
-
-  <!-- STANDING -->
-  <h2>Standing Positions</h2>
-  
-  <h3>1. Attention</h3>
-  <h4>Form</h4>
-  <p>Standing fully upright. Feet together or very close. Soft knees (not locked). Tall spine, shoulders back, chest open. Arms relaxed at the sides with hands lightly touching the outer thighs. Head level, eyes soft or forward. Complete stillness.</p>
-  <h4>Purpose</h4>
-  <p>Instant readiness. The clean standing signal of "I am fully present and available." Used as the default high-protocol standing start and as a rapid orientation posture.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>A sharp "on-duty" mental switch. Disciplined pride mixed with quiet anticipation. The body becomes a clear instrument of readiness. Stillness trains focus and removes fidgeting as a habit.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>An unambiguous visual signal that the submissive is oriented, present, and ready for the next instruction. Fast to assume and easy to read from across a room. Excellent for protocol starts and resets.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Locking the knees (creates tension and instability)</li>
-    <li>Collapsing the chest or rounding the shoulders</li>
-    <li>Clenching the hands or holding them stiffly away from the body</li>
-    <li>Feet too wide (loses the clean military line)</li>
-    <li>Looking around or shifting weight</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>Into Inspection: step feet apart and raise hands behind the head in one controlled motion</li>
-    <li>Into Wait: clasp hands behind the back while keeping the tall spine</li>
-    <li>Into Waitress: raise arms to 30–45° with palms up</li>
-    <li>Into Wall: move to the wall, place hands high, and stretch upward</li>
-  </ul>
-
-  <h3>2. Inspection</h3>
-  <h4>Form</h4>
-  <p>Feet shoulder-width apart. Hands clasped behind the head or neck. Elbows pulled wide. Chest and underarms fully open. Spine straight and tall. Head neutral or slightly lifted. The entire front of the body is presented without protective posture.</p>
-  <h4>Purpose</h4>
-  <p>Full visual and tactile examination. Ownership display. Removes any shielding of the body so the Dominant can inspect, touch, groom, or simply look without obstruction.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Strong sense of exposure and vulnerability under prolonged observation. The open posture removes the ability to hide. Over time it builds composure under scrutiny and acceptance of being fully seen.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Unrestricted visual and physical access. Clear demonstration of ownership. Useful for grooming checks, body inspection, and reinforcing that nothing is withheld from view or touch.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Keeping elbows close to the body (defeats the open chest)</li>
-    <li>Collapsing the chest or hunching</li>
-    <li>Looking down in a closed or ashamed way instead of composed exposure</li>
-    <li>Shifting weight or closing the stance</li>
-    <li>Interlocking fingers too tightly so the arms creep forward</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Attention: step feet apart and raise hands behind the head</li>
-    <li>Into Oscar: drop the elbows and bring hands down to the chest</li>
-    <li>Into Nadu: lower to kneeling while keeping composure, then open knees and place palms up</li>
-    <li>Into Wall: turn toward the wall and raise arms high against it</li>
-  </ul>
-
-  <h3>3. Waitress</h3>
-  <h4>Form</h4>
-  <p>Standing, balanced and elegant. Arms held out to the sides at roughly 30–45 degrees, palms facing upward as if supporting a tray. Soft knees, tall spine, calm stillness. The posture should look functional and refined rather than strained.</p>
-  <h4>Purpose</h4>
-  <p>Service readiness. Signals that the submissive is present as a functional attendant — ready to carry, serve, or be used in a household or protocol service role.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>A shift from being purely ornamental to being a useful object of service. The held arms create a mild endurance element. Mentally it links the body to the role of serving rather than simply waiting.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Visual satisfaction of elegant service posture plus practical readiness. Easy to read as "available to serve." Useful in protocol scenes that involve serving drinks, presenting items, or maintaining a service atmosphere.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Dropping the arms to the sides (breaks the service signal)</li>
-    <li>Raising the arms too high or locking the elbows (looks strained)</li>
-    <li>Collapsing the posture or leaning</li>
-    <li>Making the hands tense or clawed instead of open and ready</li>
-    <li>Fidgeting or adjusting the arms repeatedly</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Attention: raise arms smoothly to the tray position</li>
-    <li>Into Attention: lower arms to the sides and bring feet together</li>
-    <li>Into Wait: lower arms and clasp hands behind the back</li>
-  </ul>
-  
-  <h3>4. Wall</h3>
-  <h4>Form</h4>
-  <p>Facing a wall (or with back to the Dominant), feet wide, arms raised high against the wall or surface, body stretched upward. Chest close to or against the wall depending on instruction. Stillness maintained under stretch and isolation.</p>
-  <h4>Purpose</h4>
-  <p>Corrective isolation, punishment, or stress holding. Removes face-to-face connection while keeping the submissive controlled and accessible. Creates a clear "put in the corner" psychological effect.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>The feeling of being set aside and isolated. Acceptance of constrained discomfort and the loss of easy interaction. Builds endurance and the ability to remain present without reassurance or eye contact.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Isolation while still controlled. Easy access to the back, rear, and sides. Strong demonstration of authority. Useful for cooling down, correction, or holding the submissive in place without conversation.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Standing too close or too far so the stretch is lost</li>
-    <li>Dropping the arms or collapsing the stretch</li>
-    <li>Turning the head to look for the Dominant</li>
-    <li>Shifting feet or coming off the wall</li>
-    <li>Talking or making noise without permission</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Wait or Attention: move to the wall, place hands high, stretch upward</li>
-    <li>From Inspection: turn toward the wall and raise arms high</li>
-    <li>Out of Wall into Humble: turn, lower to kneeling, then fold forward to forehead on the floor</li>
-    <li>Out of Wall into Nadu: turn and settle into open kneeling</li>
-  </ul>
-
-  <h3>5. Oscar</h3>
-  <h4>Form</h4>
-  <p>Standing, feet close. Hands placed at the chest (cupping, lightly crossed, or held in a contained formal position). More closed and ceremonial than Inspection. Tall spine, calm composure, statue-like stillness.</p>
-  <h4>Purpose</h4>
-  <p>Elegant formal display without maximum exposure. Used when protocol and presentation are wanted but full openness is not required or not appropriate for the setting.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Contained, ceremonial presentation. Feels more like a formal statue than an open examination posture. Trains precision and the ability to hold a refined, closed elegance.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Refined aesthetic protocol when full openness is not desired. Clean formal look that still clearly signals submission and composure. Useful in transitional or semi-public protocol moments.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Letting the hands drop or become casual</li>
-    <li>Slouching or losing the tall spine</li>
-    <li>Making the posture too rigid or tense</li>
-    <li>Opening the stance too wide (loses the formal closed line)</li>
-    <li>Fidgeting with the hands at the chest</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Inspection: drop elbows and bring hands down to the chest</li>
-    <li>Into Inspection: raise hands behind the head and open elbows wide</li>
-    <li>From Attention: bring hands up to the chest while keeping feet close</li>
-  </ul>
-
-  <h3>6. Wait</h3>
-  <h4>Form</h4>
-  <p>Standing, feet roughly shoulder-width. Hands clasped behind the back. Tall spine, calm stillness, soft or downcast eyes. The posture is quiet and non-demanding — present without seeking attention.</p>
-  <h4>Purpose</h4>
-  <p>Patient, non-demanding availability. Used when the Dominant wants the submissive oriented and ready but free to focus elsewhere for a period of time.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>True patience. Remaining present without seeking reassurance, eye contact, or interaction. Trains the ability to wait without filling silence or fidgeting. Builds quiet endurance and trust in the Dominant's timing.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Freedom to focus on other tasks, conversation, or scene elements while the submissive stays oriented and available. Clear signal of patience rather than active service-seeking.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Clasping hands in front instead of behind the back</li>
-    <li>Shifting weight, glancing around, or seeking eye contact</li>
-    <li>Collapsing the posture or leaning on one hip</li>
-    <li>Making noise or trying to attract attention</li>
-    <li>Tightening the hands or shoulders instead of settling</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Attention: clasp hands behind the back while keeping tall spine</li>
-    <li>Into Wall: move to the wall, place hands high, stretch upward</li>
-    <li>Into Attention: release hands to the sides and bring feet together</li>
-    <li>Into Nadu: lower to open kneeling with palms up</li>
-  </ul>
-
-  <!-- KNEELING -->
-  <h2>Kneeling Positions</h2>
-
-  <h3>7. Egyptian</h3>
-  <h4>Form</h4>
-  <p>Kneeling upright. Knees together or only slightly apart. Arms crossed over the chest. Spine tall, head neutral or slightly bowed. The posture is closed and modest compared with Nadu.</p>
-  <h4>Purpose</h4>
-  <p>Modest / closed formal kneeling. Maintains clear submission and protocol while remaining less sexually open. Suitable for transitional moments, more public settings, or when a contained formal kneel is preferred.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Contained yet clearly submissive. Teaches the difference between open availability and closed formal presentation. Builds the ability to hold protocol without the full openness of Nadu.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Elegant protocol with less sexual openness. Useful when the setting or mood calls for formality without full exposure. Clear kneeling signal that still preserves a degree of modesty.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Spreading the knees wide and turning palms up (this becomes Nadu)</li>
-    <li>Slouching or collapsing the chest behind the crossed arms</li>
-    <li>Letting the arms drop or become casual</li>
-    <li>Sitting back onto the heels in a loose or sloppy way</li>
-    <li>Looking around instead of holding composed stillness</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Nadu: bring knees closer together and cross arms over the chest</li>
-    <li>Into Nadu: open the knees and place palms upward on the thighs</li>
-    <li>From standing: lower to kneeling and cross the arms</li>
-    <li>Into Humble: fold forward until the forehead reaches the floor</li>
-  </ul>
-
-  <h3>8. Collar Me</h3>
-  <h4>Form</h4>
-  <p>Kneeling, knees spread. Hands at the neck or head, lifting the hair to fully expose the throat. Spine tall enough to present the neck clearly. The posture is an active offering of the most symbolic point of ownership.</p>
-  <h4>Purpose</h4>
-  <p>Ritual invitation for collaring or ownership affirmation. The submissive deliberately presents the throat as a clear, powerful signal of offering and acceptance of ownership.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Strong vulnerability through the active offering of the throat. A surge of symbolic surrender. Trains the willingness to present the body for ownership marks and rituals without hesitation.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Clear, powerful presentation of the throat. Easy access for collaring, kissing, gripping, or ritual. Strong reinforcement of ownership and the submissive's active participation in that ownership.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Leaving the hair hanging over the neck (defeats the exposure)</li>
-    <li>Collapsing the posture so the neck is not clearly offered</li>
-    <li>Keeping the knees closed (reduces the open offering quality)</li>
-    <li>Looking away in a closed or resistant manner</li>
-    <li>Dropping the hands before being released</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>Into Nadu: lower the hands to the thighs with palms up and settle the head down</li>
-    <li>Into Ready to Please: lean the torso forward and present the mouth</li>
-    <li>From Nadu: raise hands to lift the hair and expose the throat</li>
-    <li>From standing: lower to kneeling and immediately present the throat</li>
-  </ul>
-
-  <h3>9. Nadu</h3>
-  <h4>Form</h4>
-  <p>Kneeling. Knees wide. Buttocks resting on the heels. Spine tall. Palms facing upward on the thighs. Head bowed or eyes downcast. Complete stillness. This is the classic default open submission posture.</p>
-  <h4>Purpose</h4>
-  <p>Classic default open submission / home-base posture. The reliable foundation for long holds, protocol, and easy access to the head, mouth, and upper body. Signals ongoing availability without active service-seeking.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Deep mental settling and quiet subspace. Continuous reminder of availability. The open knees and upturned palms create a sustained sense of being offered. Builds the ability to remain open and still for extended periods.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Reliable long-hold foundation. Easy access to head, mouth, and upper body. Clear open availability without requiring constant interaction. The standard "home base" kneeling posture for protocol.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Knees close together (loses the open quality)</li>
-    <li>Palms facing down instead of up</li>
-    <li>Head held high with eyes looking forward</li>
-    <li>Sitting with weight shifted or one hip collapsed</li>
-    <li>Fidgeting hands or adjusting clothing without permission</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>Into Ready to Please: lean the torso forward and present the mouth</li>
-    <li>Into Egyptian: bring knees closer and cross arms over the chest</li>
-    <li>Into Humble: fold forward until the forehead reaches the floor</li>
-    <li>Into Table: move forward onto hands and knees with a flat back</li>
-    <li>From Attention or Wait: lower controlled into open kneeling with palms up</li>
-  </ul>
-
-  <h3>10. Ready to Please</h3>
-  <h4>Form</h4>
-  <p>Kneeling, knees spread. Torso leaning slightly forward. Hands on the floor or thighs for support. Mouth clearly presented at a useful height and angle. The posture is actively oriented toward oral or close-range sexual service.</p>
-  <h4>Purpose</h4>
-  <p>Immediate readiness for oral or close-range sexual service. Signals clear sexual availability and a giving-focused headspace rather than passive waiting.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Strong shift into giving-focused service headspace. The forward lean and presented mouth orient attention toward use rather than waiting. Builds the mental link between posture and active service.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Correct height and angle for immediate oral use. Clear visual signal of sexual availability and willingness to serve. Removes ambiguity about intent.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Keeping the torso completely upright (loses the service orientation)</li>
-    <li>Hiding or closing the mouth</li>
-    <li>Knees too close together</li>
-    <li>Looking up for approval instead of holding the service orientation</li>
-    <li>Collapsing the back or losing the presented line</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Nadu: lean the torso forward and present the mouth</li>
-    <li>Back into Nadu: sit more upright and place palms upward on the thighs</li>
-    <li>From Collar Me: lower the hands and lean forward into service orientation</li>
-    <li>From standing: lower to kneeling and immediately adopt the forward service lean</li>
-  </ul>
-
-  <!-- FLOOR & OBJECTIFICATION -->
-  <h2>Floor & Objectification Positions</h2>
-  
-  <h3>11. Humble</h3>
-  <h4>Form</h4>
-  <p>From kneeling, fold forward until the forehead rests on the floor. Arms stretched forward or folded beside the head. Face fully hidden. The body is low, still, and completely deferred.</p>
-  <h4>Purpose</h4>
-  <p>Deep deference, apology, prostration, and full surrender of ego. The most overtly lowering posture in the set. Used for apology, deep protocol, or when maximum visual and psychological impact of surrender is wanted.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Powerful lowering and release of pride. Meditative submission. The hidden face and floor-level position create a strong sense of ego surrender and acceptance of being fully beneath.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Maximum visual and psychological impact of the submissive going fully low. Clear act of apology or deep deference. Strong reinforcement of hierarchy without requiring words.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Only partially lowering the face (forehead must contact the floor)</li>
-    <li>Keeping the arms in a defensive or closed position</li>
-    <li>Turning the head to the side to maintain some visibility</li>
-    <li>Rising without permission or rushing the exit</li>
-    <li>Making noise or breaking stillness while lowered</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From any kneeling position: fold the torso forward until the forehead reaches the floor</li>
-    <li>Out of Humble: rise smoothly while maintaining composure and settle into the instructed next posture</li>
-    <li>Common path: Wall or correction → Humble as apology → Nadu or Attention as release</li>
-  </ul>
-
-  <h3>12. Table</h3>
-  <h4>Form</h4>
-  <p>Hands and knees. Back flat and level like a tabletop. Arms and thighs roughly vertical. Head neutral and aligned with the spine. The body forms a usable, stable surface.</p>
-  <h4>Purpose</h4>
-  <p>Objectification as functional furniture. The submissive becomes a surface that can be used — for resting items, as a footstool alternative, or simply as a demonstration of being a useful object rather than a person in that moment.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Shift from person to useful object. Endurance and stillness under use. Builds the ability to hold form while being treated as furniture and to accept objectification without breaking posture.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Practical use of the body as a surface. Deep objectification satisfaction. Clear visual of the submissive as furniture. Useful in objectification-focused scenes and protocol.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Arching or rounding the back (must stay flat and level)</li>
-    <li>Letting the head hang low or crane upward</li>
-    <li>Knees far forward of the hips (destroys the stable table shape)</li>
-    <li>Collapsing one shoulder or hip</li>
-    <li>Moving or adjusting when something is placed on the back</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Nadu: move forward onto hands and knees and flatten the back</li>
-    <li>Into Stool: lower the body so the forearms and elbows rest on the floor</li>
-    <li>From Stool: raise onto the hands while flattening the back</li>
-    <li>Into Doll: allow the body to become limp and arrangeable from the hands-and-knees base</li>
-  </ul>
-
-  <h3>13. Stool</h3>
-  <h4>Form</h4>
-  <p>Low kneel. Forearms and elbows flat on the floor. Body compact and low. The posture is more compressed and diminished than Table, increasing the height differential and sense of restriction.</p>
-  <h4>Purpose</h4>
-  <p>Lower, more compressed objectification or stress position. Reinforces status through physical height difference and a restricted shape. Used when a lower, more diminished object-form is wanted.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Being kept physically diminished and restricted. Stronger sense of smallness and compression than Table. Builds endurance in a tighter shape and acceptance of being held low.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Stronger height differential and restriction. Clear visual of the submissive kept low and compact. Useful when a more intense objectification or stress hold is desired without full prostration.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Supporting weight on straight arms instead of forearms (raises the body)</li>
-    <li>Letting the chest or hips rise (loses the compressed shape)</li>
-    <li>Turning the head or looking around</li>
-    <li>Spreading the knees too wide or collapsing inward</li>
-    <li>Shifting to relieve pressure without permission</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From Table: lower the body onto the forearms and elbows</li>
-    <li>Back into Table: raise onto the hands while flattening the back</li>
-    <li>From Nadu or Humble: move into the low forearm-supported shape</li>
-    <li>Into Doll: release tension and become arrangeable from the low position</li>
-  </ul>
-
-  <h3>14. Doll</h3>
-  <h4>Form</h4>
-  <p>Lying or arranged in a deliberately limp or posed position. The body is passive. No active holding of tension. The submissive becomes poseable — a mannequin or toy to be arranged and used without resistance.</p>
-  <h4>Purpose</h4>
-  <p>Complete passivity and objectification as a poseable toy or mannequin. The final step of objectification: the submissive surrenders movement and initiative so the Dominant has total freedom to arrange and use the body.</p>
-  <h4>What the Submissive Learns & Feels</h4>
-  <p>Surrender of all initiative and movement. Floating, doll-like headspace. Builds the ability to release control of the body entirely and remain passive while being positioned and used.</p>
-  <h4>What the Dominant Gains</h4>
-  <p>Total freedom to arrange and use the body without resistance. Complete objectification. No need to account for the submissive's active posture-holding — the body simply receives.</p>
-  <h4>Common Mistakes</h4>
-  <ul>
-    <li>Actively holding a rigid or posed shape (defeats passivity)</li>
-    <li>Self-adjusting position or clothing</li>
-    <li>Tensing when touched or moved</li>
-    <li>Looking at the Dominant for cues instead of remaining passive</li>
-    <li>Speaking or responding beyond what is permitted in the doll state</li>
-  </ul>
-  <h4>Key Transitions</h4>
-  <ul>
-    <li>From any kneeling or floor position: allow the body to become limp and arrangeable</li>
-    <li>From Table or Stool: release active holding and become passive</li>
-    <li>Out of Doll: only when instructed — return to a held posture such as Nadu or Attention with composure</li>
-  </ul>
-
-  <h2>Core Sequences to Practice</h2>
-  <p>These multi-step flows reinforce protocol and smooth transitions. Practice them slowly and with full composure.</p>
-  
-  <div class="sequence-box">
-    <strong>Classic High-Protocol Opening</strong>
-    Attention → Inspection → Nadu<br>
-    <span style="font-size:12px;color:var(--cream-mute)">Standing readiness, full examination, then open home-base kneeling.</span>
-  </div>
-  
-  <div class="sequence-box">
-    <strong>Standing Readiness into Deep Submission</strong>
-    Attention → Inspection → Nadu → Humble<br>
-    <span style="font-size:12px;color:var(--cream-mute)">Progresses from readiness through examination and open kneeling into full prostration.</span>
-  </div>
-  
-  <div class="sequence-box">
-    <strong>Increasing Objectification</strong>
-    Nadu → Table → Stool → Doll<br>
-    <span style="font-size:12px;color:var(--cream-mute)">From available submission into functional furniture, then lower compression, then complete passivity.</span>
-  </div>
-  
-  <div class="sequence-box">
-    <strong>Ownership then Service</strong>
-    Collar Me → Ready to Please<br>
-    <span style="font-size:12px;color:var(--cream-mute)">Throat offered for ownership, then mouth presented for service.</span>
-  </div>
-  
-  <div class="sequence-box">
-    <strong>Readiness to Service</strong>
-    Attention → Nadu → Ready to Please<br>
-    <span style="font-size:12px;color:var(--cream-mute)">Standing readiness, open kneeling, then active service orientation.</span>
-  </div>
-  
-  <div class="sequence-box">
-    <strong>Progressive Lowering of Status</strong>
-    Inspection → Nadu → Table → Stool → Humble<br>
-    <span style="font-size:12px;color:var(--cream-mute)">Full exposure through open kneeling into furniture, compression, and prostration.</span>
-  </div>
-
-  <h2>Principles That Apply to Every Position</h2>
-  <ul>
-    <li>Stillness is part of the position. Fidgeting breaks protocol.</li>
-    <li>Transitions should be as controlled as the holds themselves.</li>
-    <li>Eyes, breath, and facial composure matter as much as limb placement.</li>
-    <li>When in doubt, choose the cleaner, more deliberate version of the movement.</li>
-    <li>Do not self-adjust clothing, hair, or posture unless instructed.</li>
-    <li>Exit a position only when released or given the next command.</li>
-    <li>The goal is not only correct shape — it is correct attitude inside the shape.</li>
-  </ul>
-
-  <h2>How This Guide Connects to the App</h2>
-  <p>In the Testing Module:</p>
-  <ul>
-    <li><strong>Position Basics</strong> — recognition and core flashcards drawn from this guide</li>
-    <li><strong>Form & Correct Technique</strong> — quizzes and error identification based on the Common Mistakes sections</li>
-    <li><strong>Purpose & When to Use</strong> — questions drawn from the Purpose sections</li>
-    <li><strong>What the Submissive Learns / Dom's Value</strong> — drawn from the experience and benefit sections</li>
-    <li><strong>Transitions & Sequences</strong> — drawn from the Key Transitions and Core Sequences sections</li>
-    <li><strong>Scenarios & Application</strong> — real-use decision questions built from Purpose and Dom Value</li>
-  </ul>
-  
-  <p><em>Use this guide to study. Use the app to test, practice holds, and track mastery.</em></p>
-
-  <button class="mark-read-btn" id="markReadBtn">
-    <span class="material-symbols-rounded">check_circle</span> Mark as Read
-  </button>
-  
-  <p style="text-align:center;font-size:11px;color:#666;margin-top:40px;">— End of Learning Guide —</p>
+<div class="helper-text">
+  <span class="material-symbols-rounded">swipe_left</span>
+  Swipe to turn page
+  <span class="material-symbols-rounded">swipe_right</span>
 </div>
 
+<div class="carousel-container" id="carousel">
+  <!-- Slides injected here -->
+</div>
+
+<div class="progress-dots" id="dotsContainer"></div>
 <div id="toast" class="toast"></div>
 
 <script type="module">
@@ -645,6 +189,135 @@
 
   let user = null;
 
+  const positions = [
+    {
+      category: "Standing", title: "1. Attention",
+      form: "Standing fully upright. Feet together or very close. Soft knees (not locked). Tall spine, shoulders back, chest open. Arms relaxed at the sides with hands lightly touching the outer thighs. Head level, eyes soft or forward. Complete stillness.",
+      purpose: "Instant readiness. The clean standing signal of 'I am fully present and available.' Used as the default high-protocol standing start and as a rapid orientation posture.",
+      learns: "A sharp 'on-duty' mental switch. Disciplined pride mixed with quiet anticipation. The body becomes a clear instrument of readiness. Stillness trains focus and removes fidgeting as a habit.",
+      gains: "An unambiguous visual signal that the submissive is oriented, present, and ready for the next instruction. Fast to assume and easy to read from across a room. Excellent for protocol starts and resets.",
+      mistakes: ["Locking the knees (creates tension and instability)", "Collapsing the chest or rounding the shoulders", "Clenching the hands or holding them stiffly away from the body", "Feet too wide (loses the clean military line)", "Looking around or shifting weight"],
+      transitions: ["Into Inspection: step feet apart and raise hands behind the head in one controlled motion", "Into Wait: clasp hands behind the back while keeping the tall spine", "Into Waitress: raise arms to 30–45° with palms up", "Into Wall: move to the wall, place hands high, and stretch upward"]
+    },
+    {
+      category: "Standing", title: "2. Inspection",
+      form: "Feet shoulder-width apart. Hands clasped behind the head or neck. Elbows pulled wide. Chest and underarms fully open. Spine straight and tall. Head neutral or slightly lifted. The entire front of the body is presented without protective posture.",
+      purpose: "Full visual and tactile examination. Ownership display. Removes any shielding of the body so the Dominant can inspect, touch, groom, or simply look without obstruction.",
+      learns: "Strong sense of exposure and vulnerability under prolonged observation. The open posture removes the ability to hide. Over time it builds composure under scrutiny and acceptance of being fully seen.",
+      gains: "Unrestricted visual and physical access. Clear demonstration of ownership. Useful for grooming checks, body inspection, and reinforcing that nothing is withheld from view or touch.",
+      mistakes: ["Keeping elbows close to the body (defeats the open chest)", "Collapsing the chest or hunching", "Looking down in a closed or ashamed way instead of composed exposure", "Shifting weight or closing the stance", "Interlocking fingers too tightly so the arms creep forward"],
+      transitions: ["From Attention: step feet apart and raise hands behind the head", "Into Oscar: drop the elbows and bring hands down to the chest", "Into Nadu: lower to kneeling while keeping composure, then open knees and place palms up", "Into Wall: turn toward the wall and raise arms high against it"]
+    },
+    {
+      category: "Standing", title: "3. Waitress",
+      form: "Standing, balanced and elegant. Arms held out to the sides at roughly 30–45 degrees, palms facing upward as if supporting a tray. Soft knees, tall spine, calm stillness. The posture should look functional and refined rather than strained.",
+      purpose: "Service readiness. Signals that the submissive is present as a functional attendant — ready to carry, serve, or be used in a household or protocol service role.",
+      learns: "A shift from being purely ornamental to being a useful object of service. The held arms create a mild endurance element. Mentally it links the body to the role of serving rather than simply waiting.",
+      gains: "Visual satisfaction of elegant service posture plus practical readiness. Easy to read as 'available to serve.' Useful in protocol scenes that involve serving drinks, presenting items, or maintaining a service atmosphere.",
+      mistakes: ["Dropping the arms to the sides (breaks the service signal)", "Raising the arms too high or locking the elbows (looks strained)", "Collapsing the posture or leaning", "Making the hands tense or clawed instead of open and ready", "Fidgeting or adjusting the arms repeatedly"],
+      transitions: ["From Attention: raise arms smoothly to the tray position", "Into Attention: lower arms to the sides and bring feet together", "Into Wait: lower arms and clasp hands behind the back"]
+    },
+    {
+      category: "Standing", title: "4. Wall",
+      form: "Facing a wall (or with back to the Dominant), feet wide, arms raised high against the wall or surface, body stretched upward. Chest close to or against the wall depending on instruction. Stillness maintained under stretch and isolation.",
+      purpose: "Corrective isolation, punishment, or stress holding. Removes face-to-face connection while keeping the submissive controlled and accessible. Creates a clear 'put in the corner' psychological effect.",
+      learns: "The feeling of being set aside and isolated. Acceptance of constrained discomfort and the loss of easy interaction. Builds endurance and the ability to remain present without reassurance or eye contact.",
+      gains: "Isolation while still controlled. Easy access to the back, rear, and sides. Strong demonstration of authority. Useful for cooling down, correction, or holding the submissive in place without conversation.",
+      mistakes: ["Standing too close or too far so the stretch is lost", "Dropping the arms or collapsing the stretch", "Turning the head to look for the Dominant", "Shifting feet or coming off the wall", "Talking or making noise without permission"],
+      transitions: ["From Wait or Attention: move to the wall, place hands high, stretch upward", "From Inspection: turn toward the wall and raise arms high", "Out of Wall into Humble: turn, lower to kneeling, then fold forward to forehead on the floor", "Out of Wall into Nadu: turn and settle into open kneeling"]
+    },
+    {
+      category: "Standing", title: "5. Oscar",
+      form: "Standing, feet close. Hands placed at the chest (cupping, lightly crossed, or held in a contained formal position). More closed and ceremonial than Inspection. Tall spine, calm composure, statue-like stillness.",
+      purpose: "Elegant formal display without maximum exposure. Used when protocol and presentation are wanted but full openness is not required or not appropriate for the setting.",
+      learns: "Contained, ceremonial presentation. Feels more like a formal statue than an open examination posture. Trains precision and the ability to hold a refined, closed elegance.",
+      gains: "Refined aesthetic protocol when full openness is not desired. Clean formal look that still clearly signals submission and composure. Useful in transitional or semi-public protocol moments.",
+      mistakes: ["Letting the hands drop or become casual", "Slouching or losing the tall spine", "Making the posture too rigid or tense", "Opening the stance too wide (loses the formal closed line)", "Fidgeting with the hands at the chest"],
+      transitions: ["From Inspection: drop elbows and bring hands down to the chest", "Into Inspection: raise hands behind the head and open elbows wide", "From Attention: bring hands up to the chest while keeping feet close"]
+    },
+    {
+      category: "Standing", title: "6. Wait",
+      form: "Standing, feet roughly shoulder-width. Hands clasped behind the back. Tall spine, calm stillness, soft or downcast eyes. The posture is quiet and non-demanding — present without seeking attention.",
+      purpose: "Patient, non-demanding availability. Used when the Dominant wants the submissive oriented and ready but free to focus elsewhere for a period of time.",
+      learns: "True patience. Remaining present without seeking reassurance, eye contact, or interaction. Trains the ability to wait without filling silence or fidgeting. Builds quiet endurance and trust in the Dominant's timing.",
+      gains: "Freedom to focus on other tasks, conversation, or scene elements while the submissive stays oriented and available. Clear signal of patience rather than active service-seeking.",
+      mistakes: ["Clasping hands in front instead of behind the back", "Shifting weight, glancing around, or seeking eye contact", "Collapsing the posture or leaning on one hip", "Making noise or trying to attract attention", "Tightening the hands or shoulders instead of settling"],
+      transitions: ["From Attention: clasp hands behind the back while keeping tall spine", "Into Wall: move to the wall, place hands high, stretch upward", "Into Attention: release hands to the sides and bring feet together", "Into Nadu: lower to open kneeling with palms up"]
+    },
+    {
+      category: "Kneeling", title: "7. Egyptian",
+      form: "Kneeling upright. Knees together or only slightly apart. Arms crossed over the chest. Spine tall, head neutral or slightly bowed. The posture is closed and modest compared with Nadu.",
+      purpose: "Modest / closed formal kneeling. Maintains clear submission and protocol while remaining less sexually open. Suitable for transitional moments, more public settings, or when a contained formal kneel is preferred.",
+      learns: "Contained yet clearly submissive. Teaches the difference between open availability and closed formal presentation. Builds the ability to hold protocol without the full openness of Nadu.",
+      gains: "Elegant protocol with less sexual openness. Useful when the setting or mood calls for formality without full exposure. Clear kneeling signal that still preserves a degree of modesty.",
+      mistakes: ["Spreading the knees wide and turning palms up (this becomes Nadu)", "Slouching or collapsing the chest behind the crossed arms", "Letting the arms drop or become casual", "Sitting back onto the heels in a loose or sloppy way", "Looking around instead of holding composed stillness"],
+      transitions: ["From Nadu: bring knees closer together and cross arms over the chest", "Into Nadu: open the knees and place palms upward on the thighs", "From standing: lower to kneeling and cross the arms", "Into Humble: fold forward until the forehead reaches the floor"]
+    },
+    {
+      category: "Kneeling", title: "8. Collar Me",
+      form: "Kneeling, knees spread. Hands at the neck or head, lifting the hair to fully expose the throat. Spine tall enough to present the neck clearly. The posture is an active offering of the most symbolic point of ownership.",
+      purpose: "Ritual invitation for collaring or ownership affirmation. The submissive deliberately presents the throat as a clear, powerful signal of offering and acceptance of ownership.",
+      learns: "Strong vulnerability through the active offering of the throat. A surge of symbolic surrender. Trains the willingness to present the body for ownership marks and rituals without hesitation.",
+      gains: "Clear, powerful presentation of the throat. Easy access for collaring, kissing, gripping, or ritual. Strong reinforcement of ownership and the submissive's active participation in that ownership.",
+      mistakes: ["Leaving the hair hanging over the neck (defeats the exposure)", "Collapsing the posture so the neck is not clearly offered", "Keeping the knees closed (reduces the open offering quality)", "Looking away in a closed or resistant manner", "Dropping the hands before being released"],
+      transitions: ["Into Nadu: lower the hands to the thighs with palms up and settle the head down", "Into Ready to Please: lean the torso forward and present the mouth", "From Nadu: raise hands to lift the hair and expose the throat", "From standing: lower to kneeling and immediately present the throat"]
+    },
+    {
+      category: "Kneeling", title: "9. Nadu",
+      form: "Kneeling. Knees wide. Buttocks resting on the heels. Spine tall. Palms facing upward on the thighs. Head bowed or eyes downcast. Complete stillness. This is the classic default open submission posture.",
+      purpose: "Classic default open submission / home-base posture. The reliable foundation for long holds, protocol, and easy access to the head, mouth, and upper body. Signals ongoing availability without active service-seeking.",
+      learns: "Deep mental settling and quiet subspace. Continuous reminder of availability. The open knees and upturned palms create a sustained sense of being offered. Builds the ability to remain open and still for extended periods.",
+      gains: "Reliable long-hold foundation. Easy access to head, mouth, and upper body. Clear open availability without requiring constant interaction. The standard 'home base' kneeling posture for protocol.",
+      mistakes: ["Knees close together (loses the open quality)", "Palms facing down instead of up", "Head held high with eyes looking forward", "Sitting with weight shifted or one hip collapsed", "Fidgeting hands or adjusting clothing without permission"],
+      transitions: ["Into Ready to Please: lean the torso forward and present the mouth", "Into Egyptian: bring knees closer and cross arms over the chest", "Into Humble: fold forward until the forehead reaches the floor", "Into Table: move forward onto hands and knees with a flat back", "From Attention or Wait: lower controlled into open kneeling with palms up"]
+    },
+    {
+      category: "Kneeling", title: "10. Ready to Please",
+      form: "Kneeling, knees spread. Torso leaning slightly forward. Hands on the floor or thighs for support. Mouth clearly presented at a useful height and angle. The posture is actively oriented toward oral or close-range sexual service.",
+      purpose: "Immediate readiness for oral or close-range sexual service. Signals clear sexual availability and a giving-focused headspace rather than passive waiting.",
+      learns: "Strong shift into giving-focused service headspace. The forward lean and presented mouth orient attention toward use rather than waiting. Builds the mental link between posture and active service.",
+      gains: "Correct height and angle for immediate oral use. Clear visual signal of sexual availability and willingness to serve. Removes ambiguity about intent.",
+      mistakes: ["Keeping the torso completely upright (loses the service orientation)", "Hiding or closing the mouth", "Knees too close together", "Looking up for approval instead of holding the service orientation", "Collapsing the back or losing the presented line"],
+      transitions: ["From Nadu: lean the torso forward and present the mouth", "Back into Nadu: sit more upright and place palms upward on the thighs", "From Collar Me: lower the hands and lean forward into service orientation", "From standing: lower to kneeling and immediately adopt the forward service lean"]
+    },
+    {
+      category: "Floor & Objectification", title: "11. Humble",
+      form: "From kneeling, fold forward until the forehead rests on the floor. Arms stretched forward or folded beside the head. Face fully hidden. The body is low, still, and completely deferred.",
+      purpose: "Deep deference, apology, prostration, and full surrender of ego. The most overtly lowering posture in the set. Used for apology, deep protocol, or when maximum visual and psychological impact of surrender is wanted.",
+      learns: "Powerful lowering and release of pride. Meditative submission. The hidden face and floor-level position create a strong sense of ego surrender and acceptance of being fully beneath.",
+      gains: "Maximum visual and psychological impact of the submissive going fully low. Clear act of apology or deep deference. Strong reinforcement of hierarchy without requiring words.",
+      mistakes: ["Only partially lowering the face (forehead must contact the floor)", "Keeping the arms in a defensive or closed position", "Turning the head to the side to maintain some visibility", "Rising without permission or rushing the exit", "Making noise or breaking stillness while lowered"],
+      transitions: ["From any kneeling position: fold the torso forward until the forehead reaches the floor", "Out of Humble: rise smoothly while maintaining composure and settle into the instructed next posture", "Common path: Wall or correction → Humble as apology → Nadu or Attention as release"]
+    },
+    {
+      category: "Floor & Objectification", title: "12. Table",
+      form: "Hands and knees. Back flat and level like a tabletop. Arms and thighs roughly vertical. Head neutral and aligned with the spine. The body forms a usable, stable surface.",
+      purpose: "Objectification as functional furniture. The submissive becomes a surface that can be used — for resting items, as a footstool alternative, or simply as a demonstration of being a useful object rather than a person in that moment.",
+      learns: "Shift from person to useful object. Endurance and stillness under use. Builds the ability to hold form while being treated as furniture and to accept objectification without breaking posture.",
+      gains: "Practical use of the body as a surface. Deep objectification satisfaction. Clear visual of the submissive as furniture. Useful in objectification-focused scenes and protocol.",
+      mistakes: ["Arching or rounding the back (must stay flat and level)", "Letting the head hang low or crane upward", "Knees far forward of the hips (destroys the stable table shape)", "Collapsing one shoulder or hip", "Moving or adjusting when something is placed on the back"],
+      transitions: ["From Nadu: move forward onto hands and knees and flatten the back", "Into Stool: lower the body so the forearms and elbows rest on the floor", "From Stool: raise onto the hands while flattening the back", "Into Doll: allow the body to become limp and arrangeable from the hands-and-knees base"]
+    },
+    {
+      category: "Floor & Objectification", title: "13. Stool",
+      form: "Low kneel. Forearms and elbows flat on the floor. Body compact and low. The posture is more compressed and diminished than Table, increasing the height differential and sense of restriction.",
+      purpose: "Lower, more compressed objectification or stress position. Reinforces status through physical height difference and a restricted shape. Used when a lower, more diminished object-form is wanted.",
+      learns: "Being kept physically diminished and restricted. Stronger sense of smallness and compression than Table. Builds endurance in a tighter shape and acceptance of being held low.",
+      gains: "Stronger height differential and restriction. Clear visual of the submissive kept low and compact. Useful when a more intense objectification or stress hold is desired without full prostration.",
+      mistakes: ["Supporting weight on straight arms instead of forearms (raises the body)", "Letting the chest or hips rise (loses the compressed shape)", "Turning the head or looking around", "Spreading the knees too wide or collapsing inward", "Shifting to relieve pressure without permission"],
+      transitions: ["From Table: lower the body onto the forearms and elbows", "Back into Table: raise onto the hands while flattening the back", "From Nadu or Humble: move into the low forearm-supported shape", "Into Doll: release tension and become arrangeable from the low position"]
+    },
+    {
+      category: "Floor & Objectification", title: "14. Doll",
+      form: "Lying or arranged in a deliberately limp or posed position. The body is passive. No active holding of tension. The submissive becomes poseable — a mannequin or toy to be arranged and used without resistance.",
+      purpose: "Complete passivity and objectification as a poseable toy or mannequin. The final step of objectification: the submissive surrenders movement and initiative so the Dominant has total freedom to arrange and use the body.",
+      learns: "Surrender of all initiative and movement. Floating, doll-like headspace. Builds the ability to release control of the body entirely and remain passive while being positioned and used.",
+      gains: "Total freedom to arrange and use the body without resistance. Complete objectification. No need to account for the submissive's active posture-holding — the body simply receives.",
+      mistakes: ["Actively holding a rigid or posed shape (defeats passivity)", "Self-adjusting position or clothing", "Tensing when touched or moved", "Looking at the Dominant for cues instead of remaining passive", "Speaking or responding beyond what is permitted in the doll state"],
+      transitions: ["From any kneeling or floor position: allow the body to become limp and arrangeable", "From Table or Stool: release active holding and become passive", "Out of Doll: only when instructed — return to a held posture such as Nadu or Attention with composure"]
+    }
+  ];
+
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -652,7 +325,123 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
+  function buildAccordion(title, content) {
+    let contentHtml = content;
+    if (Array.isArray(content)) {
+      contentHtml = '<ul>' + content.map(i => `<li>${i}</li>`).join('') + '</ul>';
+    }
+    return `
+      <div class="accordion" onclick="this.classList.toggle('active')">
+        <div class="accordion-header">
+          ${title}
+          <span class="material-symbols-rounded">expand_more</span>
+        </div>
+        <div class="accordion-body">${contentHtml}</div>
+      </div>
+    `;
+  }
+
+  function renderSlides() {
+    const carousel = document.getElementById('carousel');
+    let html = '';
+
+    // SLIDE 1: Intro
+    html += `
+      <div class="carousel-slide">
+        <div class="slide-category">Learning Guide</div>
+        <div class="slide-title">Body Positions &<br>Protocol Postures</div>
+        <div class="intro-text">
+          <p>This is the study material for the 14 core protocol postures. Read it before or alongside your quizzes and hold practice.</p>
+          <p><strong>Suggested learning path:</strong></p>
+          <ul>
+            <li>Read the full entry for a position</li>
+            <li>Practice the form (use Hold Practice)</li>
+            <li>Review flashcards for recognition</li>
+            <li>Test yourself with quizzes</li>
+          </ul>
+          <p style="text-align:center; margin-top:30px; font-weight:600; color:var(--gold);">Swipe left to begin <span class="material-symbols-rounded" style="vertical-align:middle;font-size:18px;">arrow_forward</span></p>
+        </div>
+      </div>
+    `;
+
+    // SLIDES 2-15: Positions
+    positions.forEach(p => {
+      html += `
+        <div class="carousel-slide">
+          <div class="slide-category">${p.category}</div>
+          <div class="slide-title">${p.title}</div>
+          ${buildAccordion('Form', p.form)}
+          ${buildAccordion('Purpose', p.purpose)}
+          ${buildAccordion('What the Submissive Learns', p.learns)}
+          ${buildAccordion('What the Dominant Gains', p.gains)}
+          ${buildAccordion('Common Mistakes', p.mistakes)}
+          ${buildAccordion('Key Transitions', p.transitions)}
+        </div>
+      `;
+    });
+
+    // SLIDE 16: Conclusion
+    html += `
+      <div class="carousel-slide">
+        <div class="slide-category">Review</div>
+        <div class="slide-title">Core Sequences &<br>Principles</div>
+        
+        <div class="sequence-box">
+          <strong>Classic High-Protocol Opening</strong>
+          <p>Attention &rarr; Inspection &rarr; Nadu</p>
+          <span>Standing readiness, full examination, then open home-base kneeling.</span>
+        </div>
+        
+        <div class="sequence-box">
+          <strong>Standing Readiness into Deep Submission</strong>
+          <p>Attention &rarr; Inspection &rarr; Nadu &rarr; Humble</p>
+          <span>Progresses from readiness through examination and open kneeling into full prostration.</span>
+        </div>
+        
+        <div class="sequence-box">
+          <strong>Increasing Objectification</strong>
+          <p>Nadu &rarr; Table &rarr; Stool &rarr; Doll</p>
+          <span>From available submission into functional furniture, then lower compression, then complete passivity.</span>
+        </div>
+
+        <div class="intro-text" style="margin-top:20px;">
+          <p><strong>Principles That Apply to Every Position:</strong></p>
+          <ul>
+            <li>Stillness is part of the position. Fidgeting breaks protocol.</li>
+            <li>Transitions should be as controlled as the holds themselves.</li>
+            <li>Eyes, breath, and facial composure matter as much as limb placement.</li>
+            <li>When in doubt, choose the cleaner, more deliberate version of the movement.</li>
+          </ul>
+        </div>
+
+        <button class="mark-read-btn" id="markReadBtn">
+          <span class="material-symbols-rounded">check_circle</span> Mark as Read
+        </button>
+      </div>
+    `;
+
+    carousel.innerHTML = html;
+
+    // Dots setup
+    const dotsContainer = document.getElementById('dotsContainer');
+    for (let i = 0; i < 16; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dotsContainer.appendChild(dot);
+    }
+
+    // Scroll listener for dots
+    carousel.addEventListener('scroll', () => {
+      const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+      const dots = dotsContainer.querySelectorAll('.dot');
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    });
+  }
+
   async function init() {
+    renderSlides();
     user = await requireAuth();
 
     document.getElementById('markReadBtn').onclick = async () => {
