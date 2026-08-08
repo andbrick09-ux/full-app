@@ -226,7 +226,7 @@
 
   <script type="module">
     import { requireAuth, getMyProfile, logOut, dataRef,
-             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile } from './auth.js';
+             getRelationship, sendPairingInvite, acceptPairingInvite, unpair, getPartnerUid, getUserProfile, getDomRoster, switchActiveSub } from './auth.js';
     import { getDoc, setDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
     import { updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { db } from './firebase-config.js';
@@ -424,40 +424,83 @@
       card.innerHTML = '<div style="text-align:center;padding:12px;color:var(--cream-mute);font-size:13px">Loading relationship status\u2026</div>';
 
       try {
-        const rel  = await getRelationship();
         const role = myProfile?.role;
 
-        if (rel && rel.status === 'active') {
-          const partnerUid     = await getPartnerUid();
-          const partnerProfile = partnerUid ? await getUserProfile(partnerUid) : null;
-          const partnerName    = partnerProfile?.displayName || 'your partner';
-          const partnerRole    = partnerProfile?.role === 'dom' ? '\uD83D\uDC51 Dom' : '\uD83C\uDF38 Sub';
-          const partnerLabel   = role === 'dom' ? 'Sub' : 'Dom';
-          const partnerEmail   = partnerProfile?.email || '—';
-
-          card.innerHTML =
-            '<div style="display:flex;align-items:center;gap:14px">' +
-              '<div style="font-size:28px">\uD83D\uDD17</div>' +
-              '<div style="flex:1">' +
-                '<div class="rel-badge active">PAIRED &amp; ACTIVE</div>' +
-                '<div style="margin-top:6px;font-family:\'Playfair Display\',serif;font-size:15px;color:var(--gold-light)">' +
-                  partnerLabel + ': <strong>' + partnerName + '</strong> ' +
-                  '<span style="font-size:12px;opacity:0.8">(' + partnerRole + ')</span>' +
-                '</div>' +
-                '<div style="font-size:11px;color:var(--cream-mute);margin-top:4px">Email: ' + partnerEmail + '</div>' +
-                '<div style="font-size:11px;color:var(--cream-mute);margin-top:2px">Connected \u2022 Relationship ID: ' + rel.id.substring(0,8) + '\u2026</div>' +
-              '</div>' +
-            '</div>' +
-            '<button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>';
-
-        } else {
-          if (role === 'dom') {
+        if (role === 'dom') {
+          const roster = await getDomRoster();
+          const activeRelId = myProfile?.activeRelationshipId;
+          
+          if (!roster || roster.length === 0) {
             card.innerHTML =
               '<div style="text-align:center;padding:8px 4px">' +
                 '<div style="font-size:13px;color:var(--cream-mute)">No Sub currently paired</div>' +
                 '<div style="font-size:11px;margin-top:4px">Use the form below to send an invite</div>' +
               '</div>';
             inviteForm.style.display = 'block';
+          } else {
+            let html = '<div style="margin-bottom:12px;font-family:\'Playfair Display\',serif;font-size:14px;color:var(--gold-light)">Your Sub Roster</div>';
+            html += '<div style="display:flex;flex-direction:column;gap:12px;">';
+            for (const r of roster) {
+              const subProfile = await getUserProfile(r.subId);
+              let subName = subProfile?.name || subProfile?.username || subProfile?.displayName || subProfile?.email;
+              if (!subName) {
+                subName = subProfile?.email ? subProfile.email.split('@')[0] : 'Unknown Sub';
+              }
+              const isActive = r.id === activeRelId;
+              const isPending = r.status === 'pending';
+              
+              let btnHtml = '';
+              if (isPending) {
+                btnHtml = `<button class="settings-action-btn" style="background:transparent;border:1px solid rgba(255,193,7,.3);color:#ffd54f;padding:6px 12px;font-size:10px" disabled>Pending</button>`;
+              } else if (isActive) {
+                btnHtml = `<button class="settings-action-btn" style="background:transparent;border:1px solid rgba(76,175,80,.3);color:#81c784;padding:6px 12px;font-size:10px" disabled>Active</button>`;
+              } else {
+                btnHtml = `<button class="settings-action-btn" style="padding:6px 12px;font-size:10px" onclick="switchActiveSubFromSettings('${r.id}')">Select</button>`;
+              }
+
+              html += `
+                <div style="background:rgba(255,255,255,0.03);border:1px solid ${isActive ? 'var(--gold)' : 'var(--border)'};border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:space-between;">
+                  <div>
+                    <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--cream)">${subName}</div>
+                    <div style="font-size:10px;color:var(--cream-mute);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">
+                      ${isPending ? 'Invite Sent' : (isActive ? 'Current Focus' : 'Standby')}
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    ${btnHtml}
+                    <button class="settings-danger-btn" style="margin:0;padding:6px;width:auto;" onclick="unpairFromSettings('${r.id}')" title="Unpair">
+                      <span class="material-symbols-rounded" style="font-size:16px;">link_off</span>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }
+            html += '</div>';
+            card.innerHTML = html;
+            inviteForm.style.display = 'block';
+          }
+        } else {
+          // SUB LOGIC
+          const rel = await getRelationship();
+          if (rel && rel.status === 'active') {
+            const partnerUid     = await getPartnerUid();
+            const partnerProfile = partnerUid ? await getUserProfile(partnerUid) : null;
+            const partnerName    = partnerProfile?.displayName || 'your Dom';
+            const partnerEmail   = partnerProfile?.email || '—';
+
+            card.innerHTML =
+              '<div style="display:flex;align-items:center;gap:14px">' +
+                '<div style="font-size:28px">\uD83D\uDD17</div>' +
+                '<div style="flex:1">' +
+                  '<div class="rel-badge active">PAIRED &amp; ACTIVE</div>' +
+                  '<div style="margin-top:6px;font-family:\'Playfair Display\',serif;font-size:15px;color:var(--gold-light)">' +
+                    'Dom: <strong>' + partnerName + '</strong> ' +
+                  '</div>' +
+                  '<div style="font-size:11px;color:var(--cream-mute);margin-top:4px">Email: ' + partnerEmail + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<button onclick="unpairFromSettings()" class="settings-danger-btn" style="margin:14px 0 0 0">Unpair Accounts</button>';
+
           } else {
             card.innerHTML =
               '<div style="text-align:center;padding:12px 4px">' +
@@ -502,14 +545,31 @@
       } catch(ex) { msg.style.color='#e57373'; msg.textContent=ex.message||'No pending invite found.'; }
     };
 
-    window.unpairFromSettings = async function() {
+    window.switchActiveSubFromSettings = async function(relId) {
+      const card = document.getElementById('relStatusCard');
+      card.style.opacity = '0.6';
+      try {
+        await switchActiveSub(relId);
+        // Refresh local profile to get new activeRelationshipId
+        myProfile = await getMyProfile(); 
+        showToast('Active Sub Switched');
+        setTimeout(() => { loadRelationship(); card.style.opacity = '1'; }, 400);
+      } catch(ex) {
+        showToast('Error switching sub: ' + ex.message);
+        card.style.opacity = '1';
+      }
+    };
+
+    window.unpairFromSettings = async function(relId = null) {
       if (!confirm('Are you sure you want to unpair? This will break the connection on both sides.')) return;
       const card = document.getElementById('relStatusCard');
       card.style.opacity='0.6';
       try {
-        await unpair();
+        await unpair(relId);
+        // Update myProfile cache in case active was removed
+        myProfile = await getMyProfile();
         showToast('Accounts unpaired successfully');
-        setTimeout(() => { loadRelationship(); }, 600);
+        setTimeout(() => { loadRelationship(); card.style.opacity='1'; }, 600);
       } catch(ex) { showToast(ex.message||'Failed to unpair'); card.style.opacity='1'; }
     };
 
@@ -524,6 +584,7 @@
     window.selectFontSize   = selectFontSize;
     window.clearHistory     = clearHistory;
     window.loadRelationship = loadRelationship;
+    window.switchActiveSubFromSettings = switchActiveSubFromSettings;
 
     init();
   </script>
