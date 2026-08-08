@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -765,14 +765,19 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px;
 <script src="nav.js"></script>
 <div id="toast" class="toast"></div>
 
-<
-<script>
+<script type="module">
 // ─────────────────────────────────────────────────────────────────────────────
-// GLOBAL STATE & INITIALIZATION (FIXED)
+// FIREBASE IMPORTS
+// ─────────────────────────────────────────────────────────────────────────────
+import { requireAuth, dataRef } from './auth.js';
+import { getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
 // ─────────────────────────────────────────────────────────────────────────────
 let currentStep = 0;
 let activeModel = 'claude';
-let vaultSongs = [];
+let vaultSongs  = [];
 let chatHistory = [];
 let currentPlan = null;
 
@@ -782,60 +787,629 @@ const MODEL_CFG = {
   gemini: { label: 'Gemini', cls: 'mb-gemini', icon: 'diamond',      orbColor: '#4285f4' }
 };
 
-// Small helpers
-function ps(id) { return document.getElementById(id); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const AI_ENDPOINTS = {
+  claude: 'https://api.anthropic.com/v1/messages',
+  grok:   'https://api.x.ai/v1/chat/completions',
+  gemini: k => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${k}`
+};
 
-function toast(msg) {
-  const el = document.getElementById('toast');
-  if (el) {
-    el.textContent = msg;
-    el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2200);
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+function $$(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toast(msg, dur = 2400) {
+  const el = $$('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// API KEY MANAGEMENT  (stored in localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+const KEY_PFX = 'dsb_aikey_';
+
+function saveKey(model, val) {
+  val = val.trim();
+  val ? localStorage.setItem(KEY_PFX + model, val) : localStorage.removeItem(KEY_PFX + model);
+  updateKeyStatus(model);
+}
+function getKey(model) { return localStorage.getItem(KEY_PFX + model) || ''; }
+
+function updateKeyStatus(model) {
+  const el = $$(`ks-${model}`);
+  if (!el) return;
+  const ok = !!getKey(model);
+  el.textContent = ok ? '✓ Key saved' : 'Not set';
+  el.className = `key-status ${ok ? 'ok' : 'no'}`;
+}
+function loadKeys() {
+  ['claude','grok','gemini'].forEach(m => {
+    const inp = $$(`key-${m}`);
+    if (inp) inp.value = getKey(m);
+    updateKeyStatus(m);
+  });
+}
+
+function openKeySheet()  { $$('keyOverlay')?.classList.add('open'); }
+function closeKeySheet() { $$('keyOverlay')?.classList.remove('open'); }
+function toggleEye(inputId, btn) {
+  const inp = $$(inputId); if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  const icon = btn.querySelector('.material-symbols-rounded');
+  if (icon) icon.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODEL PICKER
+// ─────────────────────────────────────────────────────────────────────────────
+function pickModel(m) {
+  activeModel = m;
+  document.querySelectorAll('.model-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.m === m)
+  );
+  const cfg = MODEL_CFG[m];
+  const badge = $$('revModelBadge');
+  if (badge) { badge.className = `mbadge ${cfg.cls}`; badge.textContent = cfg.label; }
+  const warn = $$('noKeyWarn');
+  if (warn) warn.style.display = getKey(m) ? 'none' : 'flex';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHIP PICKER  (single-select within a group)
+// ─────────────────────────────────────────────────────────────────────────────
+function pickChip(el, groupId, hiddenId) {
+  $$(groupId)?.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const h = $$(hiddenId); if (h) h.value = el.dataset.v;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SONG VAULT — load from Firestore  (same path as song-vault.html)
+// ─────────────────────────────────────────────────────────────────────────────
+async function loadVaultSongs() {
+  try {
+    const ref  = dataRef('song-vault');           // /users/{uid}/song-vault/data
+    const snap = await getDoc(ref);
+    vaultSongs = snap.exists() ? (snap.data().songs || []) : [];
+  } catch(e) {
+    console.warn('[Scene Builder] Could not load vault songs:', e?.message);
+    vaultSongs = [];
+  }
+  const countEl = $$('vaultCount');
+  if (countEl) countEl.textContent = vaultSongs.length;
+  const noVault  = $$('noVaultMsg');
+  const buildRow = $$('buildPlaylistRow');
+  if (noVault)  noVault.classList.toggle('show', vaultSongs.length === 0);
+  if (buildRow) buildRow.style.display = vaultSongs.length ? '' : 'none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STEP NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function goStep(n) {
+  currentStep = n;
+  document.querySelectorAll('.step-view').forEach((el, i) =>
+    el.classList.toggle('active', i === n)
+  );
+  document.querySelectorAll('.bstep').forEach((el, i) => {
+    el.classList.remove('active','done');
+    if (i === n) el.classList.add('active');
+    else if (i < n) el.classList.add('done');
+  });
+  document.querySelectorAll('.bstep-line').forEach((el, i) =>
+    el.classList.toggle('done', i < n)
+  );
+  // When landing on Review step, rebuild the summary grid
+  if (n === 2) updateSummaryGrid();
+}
+
+function tryGoStep(n) {
+  if (n <= currentStep) { goStep(n); return; }
+  if (n <= 2) { goStep(n); return; }
+  if (n === 3 && currentPlan) { goStep(3); return; }
+  toast('Build the scene plan first');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUMMARY GRID  (Review step)
+// ─────────────────────────────────────────────────────────────────────────────
+function updateSummaryGrid() {
+  const grid = $$('sumGrid'); if (!grid) return;
+  const rows = [
+    { lbl: 'Duration',      val: $$('durVal')?.value    || '—' },
+    { lbl: 'Intention',     val: $$('intVal')?.value    || '—' },
+    { lbl: 'Intensity',     val: ($$('intenRange')?.value || '—') + '/10' },
+    { lbl: 'Verbal Style',  val: $$('verbVal')?.value   || '—' },
+    { lbl: 'Climax Goal',   val: $$('climaxVal')?.value || '—' },
+    { lbl: 'Aftercare',     val: $$('acVal')?.value     || '—' }
+  ];
+  grid.innerHTML = rows.map(r => `
+    <div class="sum-item">
+      <div class="sum-lbl">${r.lbl}</div>
+      <div class="sum-val">${esc(r.val)}</div>
+    </div>`).join('');
+  const warn = $$('noKeyWarn');
+  if (warn) warn.style.display = getKey(activeModel) ? 'none' : 'flex';
+  const badge = $$('revModelBadge');
+  const cfg = MODEL_CFG[activeModel];
+  if (badge) { badge.className = `mbadge ${cfg.cls}`; badge.textContent = cfg.label; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROMPT BUILDER
+// ─────────────────────────────────────────────────────────────────────────────
+function buildScenePrompt() {
+  const herMap    = $$('herMap')?.value?.trim()    || '';
+  const duration  = $$('durVal')?.value            || '90 minutes';
+  const intention = $$('intVal')?.value            || 'Psychological control and dominance';
+  const intensity = $$('intenRange')?.value        || '7';
+  const verbal    = $$('verbVal')?.value           || 'commanding and authoritative';
+  const climax    = $$('climaxVal')?.value         || 'subspace';
+  const aftercare = $$('acVal')?.value             || 'hold her close';
+  const sirNotes  = $$('sirNotes')?.value?.trim()  || '';
+  const finalNote = $$('finalNotes')?.value?.trim()|| '';
+
+  return `You are Sir's BDSM scene planning AI. Create a detailed, professional scene plan.
+
+${herMap ? `HER SCENE MAP (what she submitted):\n${herMap}\n` : ''}
+SCENE PARAMETERS:
+- Duration: ${duration}
+- Sir's Primary Intention: ${intention}
+- Overall Intensity (1–10): ${intensity}/10
+- Sir's Verbal Style: ${verbal}
+- Climax Goal: ${climax}
+- Aftercare Style: ${aftercare}
+${sirNotes  ? `- Sir's Private Notes: ${sirNotes}` : ''}
+${finalNote ? `- Final Thoughts: ${finalNote}` : ''}
+
+Build a complete, practical scene plan. Use rich, evocative language suited to an experienced Dom.
+Return ONLY a JSON object — no markdown fences, no extra text — with this exact structure:
+
+{
+  "title": "Short evocative scene name",
+  "tagline": "One elegant italic line",
+  "overview": { "body": "2–3 sentence scene overview" },
+  "timeline": {
+    "phases": [
+      {
+        "time": "0:00–15:00",
+        "name": "Phase name",
+        "objective": "One sentence objective",
+        "steps": ["Step 1", "Step 2", "Step 3"],
+        "transition": "Transition cue to next phase"
+      }
+    ]
+  },
+  "scripts": {
+    "lines": [
+      { "label": "Opening",       "text": "Exact words to say" },
+      { "label": "Mid-scene",     "text": "Exact words to say" },
+      { "label": "At peak",       "text": "Exact words to say" },
+      { "label": "Into aftercare","text": "Exact words to say" }
+    ]
+  },
+  "limits": { "body": "Hard limits and safety notes from her map" },
+  "aftercare": { "body": "Detailed aftercare instructions" }
+}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI CALLER  (Claude / Grok / Gemini)
+// ─────────────────────────────────────────────────────────────────────────────
+async function callAI(prompt) {
+  const key = getKey(activeModel);
+  if (!key) throw new Error(`No API key for ${MODEL_CFG[activeModel].label}. Tap the 🔑 key button to add it.`);
+
+  if (activeModel === 'claude') {
+    const res = await fetch(AI_ENDPOINTS.claude, {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `Claude ${res.status}`); }
+    const d = await res.json();
+    return d.content?.[0]?.text || '';
+  }
+
+  if (activeModel === 'grok') {
+    const res = await fetch(AI_ENDPOINTS.grok, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'grok-beta',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `Grok ${res.status}`); }
+    const d = await res.json();
+    return d.choices?.[0]?.message?.content || '';
+  }
+
+  if (activeModel === 'gemini') {
+    const res = await fetch(AI_ENDPOINTS.gemini(key), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 4096 }
+      })
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `Gemini ${res.status}`); }
+    const d = await res.json();
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  throw new Error('Unknown model');
+}
+
+function parseJSON(raw) {
+  const cleaned = raw.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/g,'').trim();
+  return JSON.parse(cleaned);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD SCENE  (main action)
+// ─────────────────────────────────────────────────────────────────────────────
+async function buildScene() {
+  if (!getKey(activeModel)) { openKeySheet(); toast('Add your API key first'); return; }
+
+  goStep(3);
+  chatHistory = [];
+
+  const thinkEl  = $$('thinkEl');
+  const planWrap = $$('planWrap');
+  const thinkOrb = $$('thinkOrb');
+  const thinkIcon = $$('thinkIcon');
+  const thinkSub  = $$('thinkSub');
+
+  thinkEl?.classList.add('show');
+  planWrap?.classList.remove('show');
+  if (thinkOrb)  thinkOrb.style.setProperty('--orb-c', MODEL_CFG[activeModel].orbColor);
+  if (thinkIcon) thinkIcon.textContent = MODEL_CFG[activeModel].icon;
+  if (thinkSub)  thinkSub.textContent = `via ${MODEL_CFG[activeModel].label}`;
+
+  const prompt = buildScenePrompt();
+
+  try {
+    const raw = await callAI(prompt);
+    let plan;
+    try { plan = parseJSON(raw); }
+    catch { plan = { title:"Sir's Blueprint", tagline:"The Architecture of Control", overview:{ body: raw } }; }
+
+    currentPlan = plan;
+    chatHistory.push({ role:'user', content: prompt });
+    chatHistory.push({ role:'assistant', content: raw });
+
+    renderPlan(plan);
+
+    thinkEl?.classList.remove('show');
+    planWrap?.classList.add('show');
+
+    if ($$('planTitle')) $$('planTitle').textContent = plan.title    || "Sir's Blueprint";
+    if ($$('planSub'))   $$('planSub').textContent   = plan.tagline  || "The Architecture of Control";
+
+    const pb = $$('planModelBadge');
+    if (pb) { const cfg = MODEL_CFG[activeModel]; pb.className = `mbadge ${cfg.cls}`; pb.textContent = cfg.label; }
+
+    await loadVaultSongs();
+
+  } catch(e) {
+    thinkEl?.classList.remove('show');
+    planWrap?.classList.add('show');
+    const sec = $$('planSections');
+    if (sec) sec.innerHTML = `
+      <div class="err-card">
+        <h4>Failed to build scene plan</h4>
+        <p>${esc(e.message)}</p>
+        <button class="sb-btn btn-outline" onclick="goStep(2)">
+          <span class="material-symbols-rounded">arrow_back</span> Go Back
+        </button>
+      </div>`;
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER PLAN  — collapsible sections
+// ─────────────────────────────────────────────────────────────────────────────
+function renderPlan(plan) {
+  const sec = $$('planSections'); if (!sec) return;
+  let html = '';
+
+  if (plan.overview?.body)
+    html += mkSection('theater_comedy','Overview','',
+      `<p style="font-size:13px;line-height:1.8;color:#ccc;font-weight:300;">${esc(plan.overview.body)}</p>`);
+
+  if (plan.timeline?.phases?.length) {
+    let tl = '<div class="timeline">';
+    plan.timeline.phases.forEach(p => {
+      tl += `<div class="tl-item">
+        <div class="tl-time">${esc(p.time||'')}</div>
+        <div class="tl-phase">${esc(p.name||'')}</div>
+        ${p.objective ? `<div class="tl-obj">${esc(p.objective)}</div>` : ''}
+        ${(p.steps||[]).map(s=>`<div class="tl-step">${esc(s)}</div>`).join('')}
+        ${p.transition ? `<div class="tl-trans">→ ${esc(p.transition)}</div>` : ''}
+      </div>`;
+    });
+    tl += '</div>';
+    html += mkSection('schedule','Scene Timeline',`${plan.timeline.phases.length} Phases`, tl);
+  }
+
+  if (plan.scripts?.lines?.length) {
+    let sc = '';
+    plan.scripts.lines.forEach(line => {
+      const sid = 'sc_' + Math.random().toString(36).substr(2,6);
+      sc += `<div class="script">
+        <div class="script-lbl">${esc(line.label||'')}</div>
+        <div class="script-txt" id="${sid}">${esc(line.text||'')}</div>
+        <button class="script-copy" onclick="copyScript('${sid}')" title="Copy">
+          <span class="material-symbols-rounded">content_copy</span>
+        </button>
+      </div>`;
+    });
+    html += mkSection('record_voice_over',"Sir's Scripts",`${plan.scripts.lines.length} Lines`, sc);
+  }
+
+  if (plan.limits?.body)
+    html += mkSection('warning','Limits & Safety','Review Before',
+      `<p style="font-size:13px;line-height:1.8;color:#ffcdd2;font-weight:300;">${esc(plan.limits.body)}</p>`,
+      'collapsed');
+
+  if (plan.aftercare?.body)
+    html += mkSection('spa','Aftercare Protocol','',
+      `<p style="font-size:13px;line-height:1.8;color:#ccc;font-weight:300;">${esc(plan.aftercare.body)}</p>`);
+
+  sec.innerHTML = html;
+}
+
+function mkSection(icon, title, badge, bodyHtml, state = '') {
+  const id = 'ps_' + Math.random().toString(36).substr(2,6);
+  return `<div class="plan-sec">
+    <div class="plan-sec-hdr" onclick="toggleSection('${id}')">
+      <span class="material-symbols-rounded">${icon}</span>
+      <h4>${title}</h4>
+      ${badge ? `<span class="plan-badge">${badge}</span>` : ''}
+    </div>
+    <div class="plan-sec-body ${state}" id="${id}">${bodyHtml}</div>
+  </div>`;
+}
+
+function toggleSection(id) { $$(id)?.classList.toggle('collapsed'); }
+
+function copyScript(id) {
+  const el = $$(id); if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => toast('Script copied ✓'));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOUNDTRACK  — AI matches vault songs to scene phases
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleSoundtrack() {
+  const hdr  = $$('soundtrackHdr');
+  const body = $$('soundtrackBody');
+  if (!hdr || !body) return;
+  const c = hdr.classList.toggle('collapsed');
+  body.classList.toggle('hidden', c);
+}
+
+async function buildSoundtrack() {
+  if (!vaultSongs.length) { toast('Add songs to the Song Vault first'); return; }
+  if (!currentPlan)       { toast('Build the scene plan first'); return; }
+  if (!getKey(activeModel)) { openKeySheet(); toast('Add your API key first'); return; }
+
+  const thinking = $$('stThinking');
+  const render   = $$('playlistRender');
+  const regenRow = $$('regenRow');
+  const buildRow = $$('buildPlaylistRow');
+
+  thinking?.classList.add('show');
+  if (render)   { render.style.display = 'none'; }
+  if (regenRow) regenRow.style.display = 'none';
+  if (buildRow) buildRow.style.display = 'none';
+
+  try {
+    const songList = vaultSongs.slice(0,50).map((s,i) =>
+      `${i+1}. "${s.title}" by ${s.artist} [tags: ${(s.tags||[]).join(', ')||'none'}]`
+    ).join('\n');
+
+    const phases = currentPlan.timeline?.phases?.map(p=>p.name).join(', ') || 'Opening, Build, Peak, Aftercare';
+
+    const prompt = `You are a scene soundtrack curator for a BDSM scene.
+
+SCENE: ${currentPlan.title || 'Scene'}
+PHASES: ${phases}
+
+VAULT SONGS (numbered):
+${songList}
+
+Match songs from the vault to the scene phases. For each phase pick 2–3 songs.
+Mark one song per phase as a "transition" signal (cues the next phase transition).
+Return ONLY a JSON array — no extra text:
+[
+  {
+    "phase": "Phase name",
+    "songs": [
+      { "index": 1, "reason": "Why this fits", "transition": false },
+      { "index": 3, "reason": "Why this fits", "transition": true }
+    ]
+  }
+]`;
+
+    const raw     = await callAI(prompt);
+    const phases_plan = parseJSON(raw);
+
+    let html = '';
+    phases_plan.forEach((ph, pi) => {
+      html += `<div class="pl-phase">
+        <div class="pl-phase-hdr">
+          <div class="pl-phase-num">${pi+1}</div>
+          <div class="pl-phase-name">${esc(ph.phase)}</div>
+          <div class="pl-phase-time">${(ph.songs||[]).length} tracks</div>
+        </div>`;
+      (ph.songs||[]).forEach(s => {
+        const song = vaultSongs[s.index-1]; if (!song) return;
+        const ytUrl = `https://www.youtube.com/watch?v=${song.videoId}`;
+        html += `<div class="pl-song ${s.transition?'transition-signal':''}">
+          ${song.thumb
+            ? `<img class="pl-thumb" src="${esc(song.thumb)}" alt="" loading="lazy"/>`
+            : `<div class="pl-thumb-ph">🎵</div>`}
+          <div class="pl-song-info">
+            <div class="pl-song-title">${esc(song.title)}</div>
+            <div class="pl-song-artist">${esc(song.artist)}</div>
+            <div class="pl-song-meta">
+              ${s.transition?`<div class="pl-signal-badge"><span class="material-symbols-rounded">notifications</span>Phase Signal</div>`:''}
+              ${(song.tags||[]).slice(0,2).map(t=>`<span class="pl-tag">${esc(t)}</span>`).join('')}
+            </div>
+            ${s.reason?`<div class="pl-reason">"${esc(s.reason)}"</div>`:''}
+          </div>
+          <a href="${ytUrl}" target="_blank" rel="noopener" class="pl-open-btn">
+            <span class="material-symbols-rounded">play_arrow</span>
+          </a>
+        </div>`;
+      });
+      html += '</div>';
+    });
+
+    if (render)   { render.innerHTML = html; render.style.display = ''; }
+    if (regenRow) regenRow.style.display = '';
+
+  } catch(e) {
+    toast('Soundtrack error: ' + e.message);
+    if (buildRow) buildRow.style.display = '';
+  } finally {
+    thinking?.classList.remove('show');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REFINEMENT CHAT
+// ─────────────────────────────────────────────────────────────────────────────
+async function sendChat() {
+  const inp     = $$('chatInput');
+  const hist    = $$('chatHist');
+  const sendBtn = $$('chatSendBtn');
+  if (!inp || !hist) return;
+
+  const msg = inp.value.trim(); if (!msg) return;
+  if (!currentPlan)   { toast('Build the scene plan first'); return; }
+  if (!getKey(activeModel)) { openKeySheet(); toast('Add your API key first'); return; }
+
+  inp.value = '';
+  if (sendBtn) sendBtn.disabled = true;
+
+  hist.innerHTML += `<div class="chat-msg user">${esc(msg)}</div>`;
+  const typingId = 'tp_' + Date.now();
+  hist.innerHTML += `<div class="chat-typing" id="${typingId}"><span></span><span></span><span></span></div>`;
+  hist.scrollTop = hist.scrollHeight;
+
+  chatHistory.push({ role:'user', content: msg });
+
+  try {
+    const refinePrompt = `Current scene plan JSON:
+${JSON.stringify(currentPlan, null, 2)}
+
+Update request: ${msg}
+
+Return the complete updated plan as JSON in the exact same format. Return ONLY the JSON object.`;
+
+    const raw  = await callAI(refinePrompt);
+    $$(typingId)?.remove();
+
+    try {
+      const updated = parseJSON(raw);
+      currentPlan = updated;
+      chatHistory.push({ role:'assistant', content: raw });
+      renderPlan(updated);
+      hist.innerHTML += `<div class="chat-msg ai">Plan updated — scroll up to review the changes.</div>`;
+    } catch {
+      hist.innerHTML += `<div class="chat-msg ai">${esc(raw)}</div>`;
+    }
+  } catch(e) {
+    $$(typingId)?.remove();
+    hist.innerHTML += `<div class="chat-msg ai">Error: ${esc(e.message)}</div>`;
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+    hist.scrollTop = hist.scrollHeight;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COPY & RESET
+// ─────────────────────────────────────────────────────────────────────────────
+function copyPlan() {
+  if (!currentPlan) { toast('No plan to copy'); return; }
+  let t = `${currentPlan.title||"Sir's Scene Plan"}\n${currentPlan.tagline||''}\n\n`;
+  if (currentPlan.overview?.body)       t += `OVERVIEW\n${currentPlan.overview.body}\n\n`;
+  if (currentPlan.timeline?.phases?.length) {
+    t += 'TIMELINE\n';
+    currentPlan.timeline.phases.forEach(p => {
+      t += `\n${p.time||''} — ${p.name||''}\n`;
+      if (p.objective) t += `  ${p.objective}\n`;
+      (p.steps||[]).forEach(s => t += `  • ${s}\n`);
+    });
+    t += '\n';
+  }
+  if (currentPlan.scripts?.lines?.length) {
+    t += '\nSCRIPTS\n';
+    currentPlan.scripts.lines.forEach(l => t += `\n[${l.label}]\n"${l.text}"\n`);
+    t += '\n';
+  }
+  if (currentPlan.aftercare?.body) t += `\nAFTERCARE\n${currentPlan.aftercare.body}\n`;
+  navigator.clipboard.writeText(t).then(() => toast('Plan copied to clipboard ✓'));
+}
+
+function resetAll() {
+  currentPlan = null; chatHistory = [];
+  goStep(0);
+  ['herMap','sirNotes','finalNotes','chatInput'].forEach(id => { const el = $$(id); if (el) el.value = ''; });
+  const sec = $$('planSections'); if (sec) sec.innerHTML = '';
+  const hist = $$('chatHist');
+  if (hist) hist.innerHTML = '<div class="chat-msg ai">The scene plan is ready. Tell me what to adjust — a phase, a script, the pacing, the tone. I\'ll rebuild the full plan with your changes.</div>';
+  const render = $$('playlistRender');
+  if (render) { render.innerHTML = ''; render.style.display = 'none'; }
+  const regen = $$('regenRow'); if (regen) regen.style.display = 'none';
+  const buildRow = $$('buildPlaylistRow'); if (buildRow) buildRow.style.display = '';
+  toast('Reset — ready for a new scene');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPOSE TO HTML onclick=
+// ─────────────────────────────────────────────────────────────────────────────
+Object.assign(window, {
+  pickModel, pickChip, goStep, tryGoStep,
+  openKeySheet, closeKeySheet, saveKey, toggleEye,
+  buildScene, copyPlan, resetAll,
+  toggleSection, copyScript,
+  buildSoundtrack, toggleSoundtrack,
+  sendChat
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  if (typeof initNav === 'function') initNav();
-  loadKeys();                    // your existing key loader
-  pickModel('claude');           // default model
-  loadVaultSongs();              // attempt to load from Firebase / Song Vault
-  goStep(0);                     // start at step 0
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SONG VAULT LOADING
-// ─────────────────────────────────────────────────────────────────────────────
-async function loadVaultSongs() {
-  try {
-    // Adjust collection/path to match your Firebase setup
-    const snapshot = await db.collection("songs").get();   // or your actual collection
-    vaultSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    console.log(`✅ Loaded ${vaultSongs.length} songs from vault`);
-  } catch(e) {
-    console.warn("⚠️ Could not load vault songs (using empty fallback)", e);
-    vaultSongs = [];
-  }
+try {
+  await requireAuth();        // redirect to login if not signed in
+  await loadVaultSongs();     // pre-load vault song count
+} catch(e) {
+  console.warn('[Scene Builder] Init partial failure:', e?.message || e);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// YOUR ORIGINAL SCRIPT CODE (unchanged below this point)
-// Paste everything from your original <script> here after the globals
-// ─────────────────────────────────────────────────────────────────────────────
-
-// (All your functions: pickModel, goStep, callAI, renderPlan, buildPlaylist, etc.)
-// They will now work because the missing globals are defined.
-
-// Example of the end of your script (copy the rest from your file):
-function resetAll() {
-  // your original reset code
-}
-
-// ... rest of your original functions ...
-
+loadKeys();
+pickModel('claude');
+goStep(0);
 </script>
 </body>
 </html>
