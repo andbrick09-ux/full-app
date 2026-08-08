@@ -54,6 +54,7 @@
     <button class="diff-tab" data-diff="intermediate">Intermediate</button>
     <button class="diff-tab" data-diff="advanced">Advanced</button>
   </div>
+  <button id="startSessionBtn" class="settings-action-btn" style="width:100%; margin-bottom: 20px; font-weight: 700; display: none;">Start Training Session</button>
   <div id="itemList"></div>
 </div>
 
@@ -88,13 +89,23 @@
 
   function render() {
     const listEl = document.getElementById('itemList');
+    const startBtn = document.getElementById('startSessionBtn');
     listEl.innerHTML = '';
     const filtered = currentFilter === 'all' ? allItems : allItems.filter(i => i.difficulty === currentFilter);
 
     if (filtered.length === 0) {
       listEl.innerHTML = `<div class="empty-state">No items at this difficulty yet.</div>`;
+      startBtn.style.display = 'none';
       return;
     }
+
+    startBtn.style.display = 'block';
+    startBtn.onclick = () => {
+      // Build the queue of item IDs based on the current filter
+      const queueIds = filtered.map(i => i.id);
+      sessionStorage.setItem('tm_queue', JSON.stringify(queueIds));
+      window.location.href = `tm-session.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subId)}`;
+    };
 
     for (const item of filtered.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))) {
       const progress = progressByItemId[item.id];

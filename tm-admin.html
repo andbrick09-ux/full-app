@@ -55,7 +55,7 @@
 <script type="module">
   import { requireAuth, getMyProfile } from './auth.js';
   import {
-    collection, doc, setDoc, getDoc, getDocs, query, where
+    collection, doc, setDoc, getDoc, getDocs, query, where, deleteDoc
   } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
   import { db } from './firebase-config.js';
 
@@ -73,6 +73,9 @@
   async function renderDashboard() {
     const main = document.getElementById('mainContent');
     main.innerHTML = `
+      <div style="text-align:right; margin-bottom: 16px;">
+        <button id="wipeDataBtn" class="settings-danger-btn" style="padding: 8px 16px; font-size: 11px; width: auto; margin:0">Wipe Training Database</button>
+      </div>
       <div class="glass-card form-card">
         <span class="field-label">Add New Topic</span>
         <input class="text-input" id="newTitle" placeholder="Title"/>
@@ -85,6 +88,32 @@
       </div>
       <div id="topicList"></div>
     `;
+
+    document.getElementById('wipeDataBtn').onclick = async () => {
+      if (!confirm('Are you absolutely sure you want to WIPE all Training Topics, Subcategories, and Items? This cannot be undone!')) return;
+      if (!confirm('Final warning: All training content will be deleted immediately.')) return;
+      
+      const btn = document.getElementById('wipeDataBtn');
+      btn.textContent = 'Wiping...';
+      btn.disabled = true;
+
+      try {
+        const collectionsToWipe = ['trainingTopics', 'trainingSubcategories', 'trainingItems'];
+        for (const coll of collectionsToWipe) {
+          const snap = await getDocs(collection(db, coll));
+          for (const d of snap.docs) {
+            await deleteDoc(doc(db, coll, d.id));
+          }
+        }
+        showToast('Database wiped successfully!');
+        renderDashboard();
+      } catch (err) {
+        console.error(err);
+        showToast('Error wiping data: ' + err.message);
+        btn.textContent = 'Wipe Training Database';
+        btn.disabled = false;
+      }
+    };
 
     document.getElementById('addTopicBtn').onclick = async () => {
       const title = document.getElementById('newTitle').value.trim();

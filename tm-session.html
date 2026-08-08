@@ -93,10 +93,11 @@
   const params = new URLSearchParams(window.location.search);
   let topicId = params.get('topic');
   let subcategoryId = params.get('sub');
-  const itemId = params.get('item');
+  const initialItemId = params.get('item'); // Might be used for preview mode
   const PREVIEW_MODE = params.get('preview') === '1';
 
-  let user, item, progress, dominantUid;
+  let user, item, progress, dominantUid, itemId;
+  let sessionQueue = [];
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -108,6 +109,43 @@
   function backToList() {
     if (PREVIEW_MODE) { window.close(); return; }
     window.location.href = `tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}`;
+  }
+
+  async function loadNextItem() {
+    if (PREVIEW_MODE) { backToList(); return; }
+    
+    if (sessionQueue.length === 0) {
+      document.getElementById('sessionCard').innerHTML = `
+        <div style="text-align:center; padding: 30px 10px;">
+          <div style="font-size:40px; margin-bottom:10px;">✨</div>
+          <h2 style="color:var(--gold); font-family:'Playfair Display',serif;">Session Complete</h2>
+          <p style="color:var(--cream-mute); font-size:13px; margin: 15px 0 25px;">You have completed all items in your review queue.</p>
+          <button class="gold-btn" onclick="window.location.href='tm-subcategory.html?topic=${encodeURIComponent(topicId)}&sub=${encodeURIComponent(subcategoryId)}'">Back to Category</button>
+        </div>
+      `;
+      return;
+    }
+
+    itemId = sessionQueue.shift();
+    sessionStorage.setItem('tm_queue', JSON.stringify(sessionQueue));
+    
+    try {
+      const itemSnap = await getDoc(doc(db, 'trainingItems', itemId));
+      if (!itemSnap.exists()) return loadNextItem(); // Skip invalid items
+      
+      item = itemSnap.data();
+      if (!topicId) topicId = item.topicId;
+      if (!subcategoryId) subcategoryId = item.subcategoryId;
+
+      const progressSnap = await getDoc(doc(db, 'userTrainingProgress', `${user.uid}_${itemId}`));
+      progress = progressSnap.exists() ? progressSnap.data() : null;
+
+      await render();
+    } catch (e) {
+      console.error(e);
+      showToast('Error loading next item.');
+      loadNextItem();
+    }
   }
 
   // ── Firestore write helpers ──────────────────────────────────────────────
@@ -181,7 +219,7 @@
     document.getElementById('stillLearningBtn').onclick = async () => {
       await saveProgress({ status: STATUS.IN_PROGRESS });
       await logActivity({ knownFlag: false });
-      backToList();
+      loadNextItem();
     };
 
     document.getElementById('knownBtn').onclick = async () => {
@@ -192,9 +230,9 @@
       await logActivity({ knownFlag: true });
       if (evalResult.mastered) {
         document.getElementById('masteredNote').innerHTML = `<div class="mastered-flash">✨ Mastered</div>`;
-        setTimeout(backToList, 900);
+        setTimeout(loadNextItem, 900);
       } else {
-        backToList();
+        loadNextItem();
       }
     };
   }
@@ -240,7 +278,7 @@
     nextBtn.className = 'gold-btn';
     nextBtn.style.marginTop = '14px';
     nextBtn.textContent = 'Continue';
-    nextBtn.onclick = backToList;
+    nextBtn.onclick = loadNextItem;
     card.appendChild(nextBtn);
   }
 
@@ -355,7 +393,7 @@
       await logActivity({ reflectionSubmitted: true });
       const card2 = document.getElementById('sessionCard');
       card2.innerHTML = `<div class="mastered-flash">✨ Reflection Saved</div>`;
-      setTimeout(backToList, 900);
+      setTimeout(loadNextItem, 900);
     };
   }
 
@@ -440,7 +478,7 @@
           </div>
           <button class="gold-btn" id="doneBtn">Continue</button>
         `;
-        document.getElementById('doneBtn').onclick = backToList;
+        document.getElementById('doneBtn').onclick = loadNextItem;
       };
     };
   }
@@ -471,27 +509,41 @@
   }
 
   async function init() {
-    if (!itemId) { showToast('Missing item.'); return; }
-    if (!PREVIEW_MODE && (!topicId || !subcategoryId)) { showToast('Missing item.'); return; }
     user = await requireAuth();
-
-    const itemSnap = await getDoc(doc(db, 'trainingItems', itemId));
-    if (!itemSnap.exists()) { showToast('Item not found.'); return; }
-    item = itemSnap.data();
-    if (!topicId) topicId = item.topicId;
-    if (!subcategoryId) subcategoryId = item.subcategoryId;
-
-    if (PREVIEW_MODE) {
-      progress = null;
-    } else {
-      const progressSnap = await getDoc(doc(db, 'userTrainingProgress', `${user.uid}_${itemId}`));
-      progress = progressSnap.exists() ? progressSnap.data() : null;
-    }
-
     const dom = await getMyDominant();
     dominantUid = dom?.uid ?? null;
 
-    await render();
+    if (PREVIEW_MODE) {
+      if (!initialItemId) { showToast('Missing item.'); return; }
+      itemId = initialItemId;
+      const itemSnap = await getDoc(doc(db, 'trainingItems', itemId));
+      if (!itemSnap.exists()) { showToast('Item not found.'); return; }
+      item = itemSnap.data();
+      progress = null;
+      await render();
+    } else {
+      const storedQueue = sessionStorage.getItem('tm_queue');
+      if (storedQueue) {
+        try {
+          sessionQueue = JSON.parse(storedQueue);
+        } catch (e) {
+          sessionQueue = [];
+        }
+      }
+      
+      // Fallback for single item from URL (backward compatibility)
+      if (sessionQueue.length === 0 && initialItemId) {
+        sessionQueue = [initialItemId];
+      }
+
+      if (sessionQueue.length === 0) {
+        showToast('No items to review.');
+        setTimeout(backToList, 1500);
+        return;
+      }
+
+      await loadNextItem();
+    }
   }
 
   init().catch(err => { console.error(err); showToast('Failed to load session.'); });
