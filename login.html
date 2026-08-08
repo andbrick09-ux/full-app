@@ -195,6 +195,9 @@ body{
     <div class="field">
       <label for="inputPassword">Password</label>
       <input type="password" id="inputPassword" placeholder="••••••••" autocomplete="current-password" required />
+      <div id="forgotWrap" style="text-align:right; margin-top:8px;">
+        <a href="#" onclick="handleForgot(event)" style="font-size:10px; color:var(--gold); text-decoration:none; font-weight:600; letter-spacing:1px; text-transform:uppercase;">Forgot Password?</a>
+      </div>
     </div>
 
     <!-- Signup-only: role -->
@@ -230,7 +233,7 @@ body{
 </div>
 
 <script type="module">
-import { signIn, signUp, getCurrentUser } from './auth.js';
+import { signIn, signUp, getCurrentUser, resetPassword } from './auth.js';
 
 // Redirect if already signed in
 getCurrentUser().then(user => {
@@ -247,6 +250,8 @@ window.setMode = function(m) {
   document.getElementById('btnSignup').classList.toggle('active', isSignup);
   document.getElementById('fieldName').style.display  = isSignup ? '' : 'none';
   document.getElementById('fieldRole').style.display  = isSignup ? '' : 'none';
+  const forgotWrap = document.getElementById('forgotWrap');
+  if (forgotWrap) forgotWrap.style.display = isSignup ? 'none' : 'block';
   document.getElementById('submitLabel').textContent   = isSignup ? 'Create Account' : 'Sign In';
   document.getElementById('bottomHint').textContent    = isSignup
     ? 'Already have an account? Switch to Sign In above.'
@@ -255,6 +260,44 @@ window.setMode = function(m) {
 
   const pwInput = document.getElementById('inputPassword');
   pwInput.setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+};
+
+window.handleForgot = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('inputEmail').value.trim();
+  const err   = document.getElementById('errorMsg');
+  
+  // Reset error styles to default error
+  err.style.background = '';
+  err.style.color = '';
+  err.style.borderColor = '';
+  err.classList.remove('show');
+  
+  if (!email) {
+    err.textContent = 'Please enter your email address above, then click Forgot Password.';
+    err.classList.add('show');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.querySelector('#submitLabel').textContent = 'Sending email...';
+
+  try {
+    await resetPassword(email);
+    // Success style
+    err.style.background = 'rgba(79,195,138,0.10)';
+    err.style.color = 'var(--green)';
+    err.style.borderColor = 'rgba(79,195,138,0.25)';
+    err.textContent = 'Password reset email sent! Check your inbox.';
+    err.classList.add('show');
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.querySelector('#submitLabel').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  }
 };
 
 window.handleSubmit = async function(e) {
