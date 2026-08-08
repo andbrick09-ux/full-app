@@ -86,3 +86,5 @@ export function calculateTopicMastery(allItemIds, progressByItemId) {
   
   return Math.round((masteredCount / allItemIds.length) * 100);
 }
+
+export const calculateSubcategoryMastery = calculateTopicMastery;
