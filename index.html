@@ -143,7 +143,7 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 
 <script type="module">
 import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol, getDomRoster, switchActiveSub } from './auth.js';
-import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs, deleteDoc, serverTimestamp, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 let currentRole = null;
 let currentProfile = null;
@@ -730,14 +730,39 @@ async function loadLiveSubStatus() {
 }
 
 // Action handlers
-window.issuePraise = function() {
-  alert("Praise issued to your sub. They will receive a notification. 💖");
-  // TODO: Write to partner's notifications collection
+window.issuePraise = async function() {
+  if (!partnerUid) return alert("No active sub.");
+  const msg = prompt("Add a note for this praise (optional):");
+  if (msg === null) return;
+  const content = msg.trim() ? `Praise: ${msg}` : "Praise Issued 💖";
+  
+  try {
+    await addDoc(dataCol('notes'), {
+      content: content,
+      type: 'praise',
+      timestamp: serverTimestamp()
+    });
+    alert("Praise issued to your sub! It will appear in their Recent Devotions.");
+  } catch (e) {
+    console.error("Failed to issue praise:", e);
+  }
 };
 
-window.issueCorrection = function() {
-  if (confirm("Issue a correction? This will be logged.")) {
+window.issueCorrection = async function() {
+  if (!partnerUid) return alert("No active sub.");
+  const msg = prompt("Reason for correction (optional):");
+  if (msg === null) return;
+  const content = msg.trim() ? `Correction: ${msg}` : "Correction Issued ⚠️";
+  
+  try {
+    await addDoc(dataCol('notes'), {
+      content: content,
+      type: 'correction',
+      timestamp: serverTimestamp()
+    });
     alert("Correction logged and sent to your sub.");
+  } catch (e) {
+    console.error("Failed to issue correction:", e);
   }
 };
 
