@@ -545,11 +545,17 @@
             where('subcategoryId', '==', subcategoryId),
             where('isActive', '==', true)
           ));
-          const sorted = itemsSnap.docs
-            .map(d => ({ id: d.id, order: d.data().order || 0, type: d.data().type }))
+          const testItems = itemsSnap.docs
+            .map(d => ({ id: d.id, type: d.data().type }))
             .filter(i => i.type !== 'flashcard')
-            .sort((a, b) => a.order - b.order);
-          sessionQueue = sorted.map(i => i.id);
+            .map(i => i.id);
+
+          // Fisher-Yates shuffle
+          for (let i = testItems.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [testItems[i], testItems[j]] = [testItems[j], testItems[i]];
+          }
+          sessionQueue = testItems;
           sessionStorage.setItem('tm_queue', JSON.stringify(sessionQueue));
         } catch (e) {
           console.error('Failed to build dynamic queue', e);
