@@ -142,8 +142,22 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 </div>
 
 <script type="module">
-import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol, getDomRoster, switchActiveSub } from './auth.js';
+import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol, getDomRoster, switchActiveSub, getRelationship } from './auth.js';
 import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs, deleteDoc, serverTimestamp, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey:"AIzaSyAV7Tmfw06rgKEY5LVOmR8bSmH0UrjB314",
+  authDomain:"dom-sub-hub-3e530.firebaseapp.com",
+  projectId:"dom-sub-hub-3e530",
+  storageBucket:"dom-sub-hub-3e530.firebasestorage.app",
+  messagingSenderId:"672279944225",
+  appId:"1:672279944225:web:18acb9fb8158a1f14b1760",
+  databaseURL:"https://dom-sub-hub-3e530-default-rtdb.firebaseio.com"
+};
+const rtdbApp = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const rtdb = getDatabase(rtdbApp);
 
 let currentRole = null;
 let currentProfile = null;
@@ -230,23 +244,24 @@ async function renderDomDashboard() {
       <div style="margin-top:6px;font-size:12px;color:var(--muted)">Overseeing ${subNameHtml}</div>
     </header>
 
+    <!-- PENDING APPROVALS ALERT BANNER -->
+    <div id="pendingAlertBanner" style="margin-bottom:16px;"></div>
+
     <div class="stat-grid" id="statsGrid">
       <div class="card"><span class="card-val" id="streakVal">—</span><span class="card-lbl">Sub's Day Streak</span></div>
       <div class="card accent"><span class="card-val" id="compVal">—</span><span class="card-lbl">Compliance</span></div>
       <div class="card accent"><span class="card-val" id="pendingVal">—</span><span class="card-lbl">Pending Reports</span></div>
       <div class="card"><span class="card-val" id="scenesVal">—</span><span class="card-lbl">Scenes Created</span></div>
-      <div class="card"><span class="card-val">5</span><span class="card-lbl">Training Programs</span></div>
     </div>
 
     <div class="sec-lbl">COMMAND CENTER</div>
-    <div class="quick-grid">
-      <a href="scene-builder.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
-      <a href="scene-builder.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
-      <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Review Progress</span></a>
-      <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Training Oversight</span></a>
-      <a href="assign-training.html" class="qbtn"><span class="qi">📋</span><span class="ql">Assign Training</span></a>
-      <a href="public-play-menu.html" class="qbtn"><span class="qi">🌹</span><span class="ql">Public Play</span></a>
-      <a href="toy-vault.html" class="qbtn"><span class="qi">🧰</span><span class="ql">Toy Vault</span></a>
+    <div class="quick-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <a href="scene-menu.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Build Scene</span></a>
+      <a href="tasks.html" class="qbtn"><span class="qi">⚡</span><span class="ql">Assign Task</span></a>
+      <a href="tm-dom-overview.html" class="qbtn"><span class="qi">🎓</span><span class="ql">Academy</span></a>
+      <a href="calendar.html" class="qbtn"><span class="qi">📅</span><span class="ql">Schedule</span></a>
+      <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">BDSM Limits</span></a>
+      <a href="public-game.html" class="qbtn"><span class="qi">🎲</span><span class="ql">Public Play</span></a>
     </div>
 
     <div class="sec-lbl">SUB’S LIVE STATUS</div>
@@ -453,6 +468,46 @@ async function loadLiveStatsForDom() {
 
   // Live Sub Status
   loadLiveSubStatus();
+
+  // Pending Queue Verification Banner & Counter
+  try {
+    const rel = await getRelationship();
+    if (rel) {
+      const queueRef = ref(rtdb, `relationships/${rel.id}/queue`);
+      onValue(queueRef, (snap) => {
+        let pendingCount = 0;
+        if (snap.exists()) {
+          const queueObj = snap.val();
+          Object.keys(queueObj).forEach(k => {
+            if (!queueObj[k].resolved) pendingCount++;
+          });
+        }
+        
+        const pEl = document.getElementById('pendingVal');
+        if (pEl) pEl.textContent = pendingCount;
+
+        const bannerContainer = document.getElementById('pendingAlertBanner');
+        if (bannerContainer) {
+          if (pendingCount > 0) {
+            bannerContainer.innerHTML = `
+              <div onclick="window.location.href='tasks.html'" style="background:linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.05)); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; box-shadow:0 4px 15px rgba(212,175,55,0.15);">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <span style="font-size:22px">🔔</span>
+                  <div>
+                    <div style="font-weight:700; color:var(--gold-l); font-size:13px; letter-spacing:0.5px">PENDING VERIFICATION REQUIRED</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:2px">${pendingCount} item(s) awaiting your review &amp; decision</div>
+                  </div>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:1px; background:rgba(212,175,55,0.15); padding:6px 14px; border-radius:20px; border:1px solid var(--gold-b); white-space:nowrap;">Review →</span>
+              </div>
+            `;
+          } else {
+            bannerContainer.innerHTML = '';
+          }
+        }
+      });
+    }
+  } catch(e) {}
 }
 
 async function loadLiveActivityFeedForDom() {
@@ -760,19 +815,35 @@ async function initRealScenes(isDom) {
 }
 
 async function loadLiveSubStatus() {
+  const el = document.getElementById('liveStatusText');
   if (!partnerUid) {
-    const el = document.getElementById('liveStatusText');
     if (el) el.innerHTML = 'No partner paired yet';
     return;
   }
+
+  try {
+    const rel = await getRelationship();
+    if (rel) {
+      const checkinRef = ref(rtdb, `relationships/${rel.id}/checkin`);
+      onValue(checkinRef, (snap) => {
+        if (snap.exists()) {
+          const c = snap.val();
+          let text = `💭 Mood: <strong style="color:var(--gold);">${c.mood || 'Devoted'}</strong>`;
+          if (c.energy) text += ` · Energy: <strong>${c.energy}/5</strong>`;
+          if (c.note) text += `<br><span style="font-style:italic;color:#ccc">“${c.note}”</span>`;
+          if (el) el.innerHTML = text;
+        }
+      });
+    }
+  } catch(e) {}
+
   const notesRef = await partnerDataCol('notes');
   const q = query(notesRef, orderBy('timestamp', 'desc'), limit(1));
   onSnapshot(q, (snap) => {
-    if (!snap.empty) {
+    if (!snap.empty && el && !el.innerHTML.includes('Mood:')) {
       const latest = snap.docs[0].data();
       const text = latest.content || latest.text || 'Recently active';
-      const el = document.getElementById('liveStatusText');
-      if (el) el.innerHTML = `${text} <span style="color:#4ade80">• just now</span>`;
+      el.innerHTML = `${text} <span style="color:#4ade80">• just now</span>`;
     }
   });
 }
