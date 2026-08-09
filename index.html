@@ -523,6 +523,8 @@ async function loadSubTrainingProgress() {
 
       const card = document.createElement('div');
       card.className = 'progress-card';
+      card.style.cursor = 'pointer';
+      card.onclick = () => window.location.href = `${t.id}-training.html`;
       card.innerHTML = `
         <div class="progress-header">
           <span class="progress-name">${t.icon} ${t.name}</span>
@@ -639,6 +641,8 @@ async function loadTrainingProgress() {
 
         const card = document.createElement('div');
         card.className = 'progress-card';
+        card.style.cursor = 'pointer';
+        card.onclick = () => window.location.href = `${id}-training.html`;
         card.innerHTML = `
           <div class="progress-header">
             <span class="progress-name">${trainingIcons[id]} ${trainingNames[id]}</span>
