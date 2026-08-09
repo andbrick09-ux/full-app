@@ -4,576 +4,161 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#051024"/>
-<title>SPTI & Onboarding · Dom Sub Hub</title>
+<title>SPTI Profile · Dom Sub Hub</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link rel="manifest" href="manifest.json"/>
-<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css"/>
 <link rel="stylesheet" href="nav.css"/>
 
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .shell {
+    position:relative; z-index:1;
+    max-width:480px; margin:0 auto;
+    display:flex; flex-direction:column; min-height:100dvh;
+  }
+  .page-content {
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    padding:24px 20px 100px; scrollbar-width:none;
+  }
+  .page-content::-webkit-scrollbar { display:none; }
 
-:root {
-  --bg:          #051024;
-  --surface:     rgba(5,16,36,0.85);
-  --surface2:    rgba(2,8,20,0.92);
-  --gold:        #D4AF37;
-  --gold-light:  #F5E6A3;
-  --gold-dim:    rgba(212,175,55,.28);
-  --border:      rgba(212,175,55,.15);
-  --luxury-gradient: linear-gradient(135deg,#D4AF37,#F5E6A3);
-  --cream:       #f0e6d3;
-  --cream-dim:   rgba(240,230,211,.6);
-  --cream-mute:  rgba(240,230,211,.3);
-  --red:         #F44336;
-  --amber:       #FF9800;
-  --green:       #4CAF50;
-  --purple:      #BA68C8;
-  --safe-b:      env(safe-area-inset-bottom,0px);
-  --safe-t:      env(safe-area-inset-top,0px);
-}
+  /* Redesign custom styles based on native classes */
+  .title-section { margin-bottom: 24px; }
+  .title-section h1 { 
+    font-family: 'Playfair Display', serif; 
+    color: var(--gold); 
+    font-size: 24px; 
+    margin-bottom: 12px; 
+  }
+  .title-section p { 
+    font-size: 13px; 
+    color: var(--cream-dim); 
+    line-height: 1.6; 
+    margin-bottom: 14px; 
+  }
+  
+  .take-test-btn {
+    width: 100%; padding: 16px; border-radius: 12px; border: none; cursor: pointer;
+    background: var(--luxury-gradient); color: var(--deep-blue);
+    font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700;
+    text-align: center; display: block; text-decoration: none;
+    margin-bottom: 32px; transition: transform 0.2s;
+  }
+  .take-test-btn:active { transform: scale(0.98); }
 
-html, body { height: 100%; }
-body {
-  background: var(--bg); color: var(--cream);
-  font-family: 'Montserrat', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none; overflow-x: hidden;
-}
-body::before {
-  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(212,175,55,.07) 0%, transparent 60%);
-}
+  .paste-section label {
+    display: block; font-size: 13px; color: var(--cream); margin-bottom: 8px; font-family: 'Montserrat', sans-serif;
+  }
+  .results-textarea {
+    width: 100%; height: 200px; background: rgba(2,8,20,0.6);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; color: var(--cream); font-family: 'Montserrat', sans-serif;
+    font-size: 13px; resize: none; margin-bottom: 16px; outline: none;
+    line-height: 1.5;
+  }
+  .results-textarea:focus { border-color: var(--gold); }
+  .results-textarea::placeholder { color: var(--cream-mute); }
 
-.shell {
-  position:relative; z-index:1;
-  max-width:480px; margin:0 auto;
-  display:flex; flex-direction:column; min-height:100dvh;
-}
+  .actions-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+  
+  .save-btn {
+    padding: 12px 24px; border-radius: 30px; border: none; cursor: pointer;
+    background: var(--luxury-gradient); color: var(--deep-blue);
+    font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 600;
+    transition: transform 0.2s;
+  }
+  .save-btn:active { transform: scale(0.95); }
 
-/* ── Topbar ── */
-.topbar {
-  display:flex; align-items:center; gap:12px;
-  padding: calc(12px + var(--safe-t)) 16px 12px;
-  background:rgba(5,16,36,.92); backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  position:sticky; top:0; z-index:40;
-}
-.tb-back {
-  width:38px; height:38px; border-radius:10px;
-  display:flex; align-items:center; justify-content:center;
-  background:var(--surface); border:1px solid var(--border);
-  text-decoration:none; cursor:pointer; flex-shrink:0; transition:all .2s;
-}
-.tb-back:active { transform:scale(.93); }
-.tb-back .material-symbols-rounded { font-size:20px; color:var(--gold); }
-.tb-center { flex:1; min-width:0; }
-.tb-title {
-  font-family:'Playfair Display',serif; font-size:12px; letter-spacing:2px;
-  color:var(--cream); text-transform:uppercase; font-weight:600;
-}
-.tb-sub {
-  font-family:'Playfair Display',serif; font-size:11px; font-style:italic;
-  color:var(--gold); margin-top:1px; opacity:.7;
-}
-.tb-badge {
-  background:rgba(212,175,55,.1); border:1px solid var(--border);
-  border-radius:20px; padding:4px 12px;
-  font-size:9px; font-weight:700; letter-spacing:1px; color:var(--gold); flex-shrink:0;
-}
+  .skip-btn {
+    background: transparent; border: none; color: var(--cream-dim); cursor: pointer;
+    font-family: 'Montserrat', sans-serif; font-size: 13px; text-decoration: underline;
+  }
 
-/* ── Wizard Stepper Bar ── */
-.stepper-bar {
-  display:flex; background:rgba(2,8,20,.95);
-  border-bottom:1px solid var(--border);
-  padding:12px 16px; overflow-x:auto; scrollbar-width:none;
-}
-.stepper-bar::-webkit-scrollbar { display:none; }
-.step-pill {
-  flex:1; min-width:70px; text-align:center; padding:6px 4px;
-  font-family:'Playfair Display',serif; font-size:8.5px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--cream-mute); border-bottom:2px solid transparent;
-  transition:all .2s; white-space:nowrap;
-}
-.step-pill.active { color:var(--gold); border-bottom-color:var(--gold); font-weight:700; }
-.step-pill.completed { color:var(--green); }
+  .back-bottom-btn {
+    display: block; width: 100%; padding: 14px; border-radius: 30px;
+    background: transparent; border: 1px solid rgba(255,255,255,0.2);
+    color: var(--cream-dim); text-align: center; text-decoration: none;
+    font-family: 'Montserrat', sans-serif; font-size: 13px;
+    transition: background 0.2s;
+  }
+  .back-bottom-btn:active { background: rgba(255,255,255,0.05); }
 
-/* ── Page content ── */
-.page-content {
-  flex:1; overflow-y:auto; overflow-x:hidden;
-  padding:20px 16px 100px; scrollbar-width:none;
-}
-.page-content::-webkit-scrollbar { display:none; }
-
-.step-panel { display:none; }
-.step-panel.active { display:block; }
-
-/* ── Section Header ── */
-.sec-hd {
-  font-family:'Playfair Display',serif; font-weight:600;
-  font-size:10px; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--gold-light); padding-bottom:6px; margin-bottom:14px;
-  border-bottom:1px solid var(--border);
-  display:flex; align-items:center; gap:6px;
-}
-.sec-hd .material-symbols-rounded { font-size:15px; color:var(--gold); }
-
-/* ── Cards & Inputs ── */
-.card-box {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; padding:16px; margin-bottom:16px;
-}
-.card-title { font-family:'Playfair Display',serif; font-size:14px; color:var(--gold); margin-bottom:6px; }
-.card-desc { font-size:11px; color:var(--cream-mute); margin-bottom:14px; line-height:1.5; }
-
-.role-selector { display:flex; gap:10px; margin-bottom:14px; }
-.role-opt {
-  flex:1; padding:14px 10px; border-radius:12px;
-  background:rgba(255,255,255,.03); border:1px solid var(--border);
-  text-align:center; cursor:pointer; transition:all .2s;
-}
-.role-opt.active { background:rgba(212,175,55,.15); border-color:var(--gold); }
-.role-opt-icon { font-size:22px; margin-bottom:4px; }
-.role-opt-title { font-family:'Playfair Display',serif; font-size:12px; font-weight:600; color:var(--cream); }
-
-.text-input {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:12px; padding:12px 14px; margin-bottom:12px;
-  font-size:12px; color:var(--cream); font-family:'Montserrat',sans-serif; outline:none;
-}
-.text-input:focus { border-color:var(--gold); }
-
-/* ── Assessment Cards ── */
-.cat-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; margin-bottom:14px; overflow:hidden;
-}
-.cat-hd {
-  padding:12px 14px; background:rgba(212,175,55,.05);
-  border-bottom:1px solid var(--border);
-  font-family:'Playfair Display',serif; font-size:13px; font-weight:600; color:var(--cream);
-}
-.item-row { padding:14px; border-bottom:1px solid rgba(255,255,255,.04); }
-.item-row:last-child { border-bottom:none; }
-.item-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.item-name { font-size:12px; font-weight:600; color:var(--cream); }
-.item-val { font-size:11px; font-weight:700; color:var(--gold); }
-
-.slider-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.item-slider {
-  flex:1; -webkit-appearance:none; appearance:none; height:6px;
-  border-radius:3px; background:rgba(255,255,255,.1); outline:none;
-}
-.item-slider::-webkit-slider-thumb {
-  -webkit-appearance:none; appearance:none; width:18px; height:18px;
-  border-radius:50%; background:var(--gold); cursor:pointer;
-  box-shadow:0 0 8px rgba(212,175,55,.5);
-}
-
-.toggles-row { display:flex; gap:6px; }
-.tg-btn {
-  flex:1; padding:6px 8px; border-radius:8px;
-  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
-  font-size:9.5px; font-weight:600; color:var(--cream-mute);
-  cursor:pointer; text-align:center; transition:all .15s;
-  display:flex; align-items:center; justify-content:center; gap:4px;
-}
-.tg-btn.active.hard { background:rgba(244,67,54,.15); border-color:rgba(244,67,54,.4); color:var(--red); }
-.tg-btn.active.soft { background:rgba(255,152,0,.15); border-color:rgba(255,152,0,.4); color:var(--amber); }
-.tg-btn.active.fav  { background:rgba(212,175,55,.15); border-color:var(--border); color:var(--gold); }
-
-/* ── Primary Action Buttons ── */
-.btn-row { display:flex; gap:10px; margin-top:16px; }
-.primary-btn {
-  flex:1; padding:14px; border-radius:14px; border:none; cursor:pointer;
-  font-family:'Playfair Display',serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
-  background:var(--luxury-gradient); color:#051024;
-  display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s;
-}
-.primary-btn:active { transform:scale(.97); }
-.secondary-btn {
-  padding:14px 18px; border-radius:14px; border:1px solid var(--border);
-  background:transparent; color:var(--cream-dim); cursor:pointer;
-  font-family:'Playfair Display',serif; font-size:10px; letter-spacing:1px; text-transform:uppercase;
-}
-
-/* ── Profile & Summary ── */
-.radar-box {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; padding:20px 14px; text-align:center; margin-bottom:16px;
-}
-.cat-bar-item { margin-bottom:12px; text-align:left; }
-.cat-bar-hd { display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; }
-.cat-bar-track { height:8px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
-.cat-bar-fill { height:100%; background:var(--luxury-gradient); border-radius:4px; transition:width .4s ease; }
-
-.badge-tag {
-  font-size:9.5px; font-weight:600; padding:4px 10px; border-radius:12px;
-  display:inline-flex; align-items:center; gap:4px; margin:2px;
-}
-.badge-tag.hard { background:rgba(244,67,54,.12); border:1px solid rgba(244,67,54,.3); color:var(--red); }
-.badge-tag.soft { background:rgba(255,152,0,.12); border:1px solid rgba(255,152,0,.3); color:var(--amber); }
-.badge-tag.fav  { background:rgba(212,175,55,.12); border:1px solid var(--border); color:var(--gold); }
-
-/* ── Toast ── */
-.dsh-toast {
-  position:fixed; bottom:calc(80px + var(--safe-b)); left:50%;
-  transform:translateX(-50%) translateY(12px);
-  background:#0d1120; border:1px solid var(--border);
-  border-radius:24px; padding:10px 20px;
-  font-size:11px; font-weight:600; color:var(--gold);
-  letter-spacing:.5px; white-space:nowrap; z-index:999;
-  opacity:0; pointer-events:none; transition:all .3s ease;
-}
-.dsh-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  /* ── Toast ── */
+  .dsh-toast {
+    position:fixed; bottom:calc(80px + var(--safe-b)); left:50%;
+    transform:translateX(-50%) translateY(12px);
+    background:#0d1120; border:1px solid var(--border);
+    border-radius:24px; padding:10px 20px;
+    font-size:11px; font-weight:600; color:var(--gold);
+    letter-spacing:.5px; white-space:nowrap; z-index:999;
+    opacity:0; pointer-events:none; transition:all .3s ease;
+  }
+  .dsh-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
-
 <body data-nav="more">
 <div class="shell">
-
-  <!-- ══ TOPBAR ══ -->
-  <header class="topbar">
-    <a href="more.html" class="tb-back" aria-label="Back">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </a>
-    <div class="tb-center">
-      <div class="tb-title">Onboarding & SPTI</div>
-      <div class="tb-sub">Dynamic & Preference Setup</div>
-    </div>
-    <div class="tb-badge" id="roleBadge">Setup Wizard</div>
-  </header>
-
-  <!-- ══ STEPPER BAR ══ -->
-  <div class="stepper-bar">
-    <div class="step-pill active" id="pill1" onclick="goToStep(1)">1. Dynamic</div>
-    <div class="step-pill" id="pill2" onclick="goToStep(2)">2. AI Key</div>
-    <div class="step-pill" id="pill3" onclick="goToStep(3)">3. SPTI Test</div>
-    <div class="step-pill" id="pill4" onclick="goToStep(4)">4. Kinks</div>
-    <div class="step-pill" id="pill5" onclick="goToStep(5)">5. Active</div>
-  </div>
-
-  <!-- ══ CONTENT ══ -->
+  <!-- Content -->
   <div class="page-content">
-
-    <!-- ─── STEP 1: DYNAMIC & ROLE ─── -->
-    <div class="step-panel active" id="step1">
-      <div class="card-box">
-        <div class="card-title">1. Dynamic & Role Setup</div>
-        <div class="card-desc">Create or join your consensual adult relationship dynamic.</div>
-
-        <div class="role-selector">
-          <div class="role-opt active" id="optDom" onclick="selectRole('dom')">
-            <div class="role-opt-icon">👑</div>
-            <div class="role-opt-title">Dominant</div>
-          </div>
-          <div class="role-opt" id="optSub" onclick="selectRole('sub')">
-            <div class="role-opt-icon">🧎</div>
-            <div class="role-opt-title">Submissive</div>
-          </div>
-        </div>
-
-        <input type="text" class="text-input" id="dynamicNameInput" placeholder="Dynamic Title (e.g. Sir & Sub)"/>
-        <input type="text" class="text-input" id="inviteCodeInput" placeholder="Invite Code (If joining existing dynamic)"/>
-
-        <div class="btn-row">
-          <button class="primary-btn" onclick="nextStep(2)">Next: AI Key →</button>
-        </div>
-      </div>
+    <div class="title-section">
+      <h1>SPTI profile</h1>
+      <p>Results are private — only you and the AI see them. They help tailor scene ideas, kink examples, and tone. Your partner only sees whether you've completed SPTI.</p>
+      <p>You skipped SPTI earlier. Paste results when ready.</p>
     </div>
 
-    <!-- ─── STEP 2: AI KEY CONFIG ─── -->
-    <div class="step-panel" id="step2">
-      <div class="card-box">
-        <div class="card-title">2. Shared AI Key</div>
-        <div class="card-desc">Configure your Google Gemini API key for automated scene prompts, protocol suggestions, and music vault recommendations.</div>
+    <a href="https://spti-test.com" target="_blank" class="take-test-btn">Take the test at spti-test.com</a>
 
-        <input type="text" class="text-input" id="sharedApiKeyInput" placeholder="AIzaSy... API Key"/>
-
-        <div class="btn-row">
-          <button class="secondary-btn" onclick="goToStep(1)">← Back</button>
-          <button class="primary-btn" onclick="nextStep(3)">Next: SPTI Test →</button>
-        </div>
-      </div>
+    <div class="paste-section">
+      <label>Paste results</label>
+      <textarea id="sptiResults" class="results-textarea" placeholder="Paste your SPTI results from spti-test.com..."></textarea>
     </div>
 
-    <!-- ─── STEP 3: SPTI ASSESSMENT ─── -->
-    <div class="step-panel" id="step3">
-      <div class="sec-hd">
-        <span class="material-symbols-rounded">tune</span>
-        3. SPTI Trait Inventory
-      </div>
-
-      <div id="assessmentContainer"></div>
-
-      <div class="btn-row">
-        <button class="secondary-btn" onclick="goToStep(2)">← Back</button>
-        <button class="primary-btn" onclick="nextStep(4)">Next: Kinks →</button>
-      </div>
+    <div class="actions-row">
+      <button class="save-btn" onclick="saveResults()">Save results</button>
+      <button class="skip-btn" onclick="clearOrSkip()">Clear / skip for now</button>
     </div>
 
-    <!-- ─── STEP 4: KINKS & LIMITS ─── -->
-    <div class="step-panel" id="step4">
-      <div class="card-box">
-        <div class="card-title">4. Kinks & Boundaries Overview</div>
-        <div class="card-desc">Review your core desires, soft limits, and hard boundaries.</div>
-
-        <div id="summaryFavs"></div>
-        <div id="summaryLimits" style="margin-top:10px;"></div>
-
-        <div class="btn-row" style="margin-top:16px;">
-          <button class="secondary-btn" onclick="goToStep(3)">← Back</button>
-          <button class="primary-btn" onclick="finishOnboarding()">Complete Setup ✓</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── STEP 5: DONE & PROFILE ─── -->
-    <div class="step-panel" id="step5">
-      <div class="sec-hd">
-        <span class="material-symbols-rounded">analytics</span>
-        5. Dynamic Active & Profile Summary
-      </div>
-
-      <div class="radar-box" id="categoryBars"></div>
-
-      <a href="bdsm-test.html" class="primary-btn" style="text-decoration:none;margin-bottom:10px;">
-        <span class="material-symbols-rounded">flame</span>
-        Take BDSMTest.org Alignment
-      </a>
-
-      <a href="index.html" class="primary-btn" style="text-decoration:none;">
-        <span class="material-symbols-rounded">home</span>
-        Return to Dashboard
-      </a>
-    </div>
-
-  </div><!-- /page-content -->
-</div><!-- /shell -->
+    <a href="more.html" class="back-bottom-btn">Back to knowledge</a>
+  </div>
+</div>
 
 <div class="dsh-toast" id="toast"></div>
 
 <script src="nav.js"></script>
 <script>
-var currentStep = 1;
-var selectedRole = 'dom';
-var userScores = {};
-var STORAGE_KEY = 'sirender_spti_scores';
-
-var SPTI_DATA = [
-  {
-    id: 'bondage',
-    name: 'Bondage & Restraint',
-    items: [
-      'Rope Shibari & Body Harnesses',
-      'Leather Cuffs & Metal Chains',
-      'Positional Restraint & Suspension',
-      'Blindfolds & Sensory Deprivation',
-      'Gagging & Mouth Restraints'
-    ]
-  },
-  {
-    id: 'impact',
-    name: 'Impact & Sensation',
-    items: [
-      'Hand Spanking & Warm-Up',
-      'Flogging & Leather Paddling',
-      'Caning & Heavy Impact',
-      'Temperature Play (Ice & Wax)',
-      'Sensation Play (Wartenberg Wheel/Feathers)'
-    ]
-  },
-  {
-    id: 'psychological',
-    name: 'Psychological & Power',
-    items: [
-      'Tease & Orgasm Denial',
-      'Humiliation & Degradation',
-      'Praise & Reward Dynamics',
-      'Overbedience & Command Tasks',
-      'Mind Games & Psychological Control'
-    ]
-  },
-  {
-    id: 'service',
-    name: 'Service & Protocol',
-    items: [
-      'Kneeling & Posture Etiquette',
-      'Serving Drinks / Food / Personal Care',
-      'Domestic Duties & Chores',
-      'Formal Naming & Verbal Respect',
-      'Daily Submissive Protocols'
-    ]
-  },
-  {
-    id: 'fetish',
-    name: 'Roleplay & Fetish',
-    items: [
-      'Footwear & High Heels Worship',
-      'Leather / Latex / Vinyl Outfits',
-      'Medical & Inspection Play',
-      'Ageplay / Caretaking Dynamics',
-      'Petplay & Collar Duties'
-    ]
-  },
-  {
-    id: 'aftercare',
-    name: 'Aftercare & Reassurance',
-    items: [
-      'Physical Warmth & Blankets',
-      'Snuggling & Cuddling',
-      'Verbal Reassurance & Praise',
-      'Hydration & Snack Care',
-      'Decompression & Quiet Reflection'
-    ]
-  }
-];
-
-function selectRole(role) {
-  selectedRole = role;
-  document.getElementById('optDom').classList.toggle('active', role === 'dom');
-  document.getElementById('optSub').classList.toggle('active', role === 'sub');
-}
-
-function goToStep(step) {
-  currentStep = step;
-  for(var i=1; i<=5; i++) {
-    var p = document.getElementById('step' + i);
-    var pill = document.getElementById('pill' + i);
-    if(p) p.classList.toggle('active', i === step);
-    if(pill) {
-      pill.classList.toggle('active', i === step);
-      pill.classList.toggle('completed', i < step);
+  // Load existing results on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("spti_profile_results");
+    if (saved) {
+      document.getElementById("sptiResults").value = saved;
     }
-  }
-
-  if(step === 3) initAssessment();
-  if(step === 4) renderSummary();
-  if(step === 5) renderProfile();
-}
-
-function nextStep(step) {
-  goToStep(step);
-}
-
-function initAssessment() {
-  var container = document.getElementById('assessmentContainer');
-  if(!container) return;
-  container.innerHTML = '';
-
-  var saved = localStorage.getItem(STORAGE_KEY);
-  if(saved) {
-    try { userScores = JSON.parse(saved); } catch(e){}
-  }
-
-  SPTI_DATA.forEach(function(cat) {
-    var card = document.createElement('div'); card.className = 'cat-card';
-
-    var itemsHtml = cat.items.map(function(item, idx) {
-      var key = cat.id + '_' + idx;
-      var cur = userScores[key] || { val: 50, hard: false, soft: false, fav: false };
-      
-      return '<div class="item-row">' +
-        '<div class="item-hd">' +
-          '<span class="item-name">' + item + '</span>' +
-          '<span class="item-val" id="val_' + key + '">' + (cur.hard ? 'HARD LIMIT' : cur.val + '%') + '</span>' +
-        '</div>' +
-        '<div class="slider-row">' +
-          '<input type="range" class="item-slider" id="sld_' + key + '" min="0" max="100" value="' + cur.val + '" ' + (cur.hard ? 'disabled' : '') + ' oninput="updateItemVal(\'' + key + '\', this.value)"/>' +
-        '</div>' +
-        '<div class="toggles-row">' +
-          '<button class="tg-btn hard ' + (cur.hard ? 'active' : '') + '" onclick="toggleLimit(\'' + key + '\', \'hard\')">❌ Hard Limit</button>' +
-          '<button class="tg-btn soft ' + (cur.soft ? 'active' : '') + '" onclick="toggleLimit(\'' + key + '\', \'soft\')">⚠️ Soft Limit</button>' +
-          '<button class="tg-btn fav ' + (cur.fav ? 'active' : '') + '" onclick="toggleLimit(\'' + key + '\', \'fav\')">⭐ Favorite</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-
-    card.innerHTML = '<div class="cat-hd">' + cat.name + '</div>' + itemsHtml;
-    container.appendChild(card);
   });
-}
 
-function updateItemVal(key, val) {
-  if(!userScores[key]) userScores[key] = { val: 50, hard: false, soft: false, fav: false };
-  userScores[key].val = parseInt(val);
-  var txt = document.getElementById('val_' + key);
-  if(txt && !userScores[key].hard) txt.textContent = val + '%';
-}
-
-function toggleLimit(key, type) {
-  if(!userScores[key]) userScores[key] = { val: 50, hard: false, soft: false, fav: false };
-  if(type === 'hard') {
-    userScores[key].hard = !userScores[key].hard;
-    if(userScores[key].hard) { userScores[key].soft = false; userScores[key].fav = false; }
-  } else if(type === 'soft') {
-    userScores[key].soft = !userScores[key].soft;
-    if(userScores[key].soft) userScores[key].hard = false;
-  } else if(type === 'fav') {
-    userScores[key].fav = !userScores[key].fav;
-    if(userScores[key].fav) userScores[key].hard = false;
+  function showToast(msg, callback) {
+    var t = document.getElementById('toast'); 
+    if(!t) return;
+    t.textContent = msg; 
+    t.classList.add('show');
+    setTimeout(function() { 
+        t.classList.remove('show'); 
+        if(callback) setTimeout(callback, 300);
+    }, 2000);
   }
-  initAssessment();
-}
 
-function renderSummary() {
-  var favsBox = document.getElementById('summaryFavs');
-  var limitsBox = document.getElementById('summaryLimits');
-  var favs = [], limits = [];
-
-  SPTI_DATA.forEach(function(cat) {
-    cat.items.forEach(function(item, idx) {
-      var key = cat.id + '_' + idx;
-      var score = userScores[key] || { val: 50, hard: false, soft: false, fav: false };
-      if(score.fav) favs.push(item);
-      if(score.hard) limits.push({ item: item, type: 'hard' });
-      else if(score.soft) limits.push({ item: item, type: 'soft' });
+  function saveResults() {
+    const val = document.getElementById("sptiResults").value;
+    localStorage.setItem("spti_profile_results", val);
+    showToast("Results saved securely!", function() {
+        window.location.href = "more.html";
     });
-  });
+  }
 
-  if(favsBox) favsBox.innerHTML = '<strong>Favorites:</strong><br>' + (favs.length ? favs.map(function(f){ return '<span class="badge-tag fav">⭐ ' + f + '</span>'; }).join('') : 'None');
-  if(limitsBox) limitsBox.innerHTML = '<strong>Limits:</strong><br>' + (limits.length ? limits.map(function(l){ return '<span class="badge-tag ' + l.type + '">' + (l.type==='hard'?'❌ ':'⚠️ ') + l.item + '</span>'; }).join('') : 'None');
-}
-
-function finishOnboarding() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(userScores));
-  showToast('Onboarding complete ✓');
-  goToStep(5);
-}
-
-function renderProfile() {
-  var barsBox = document.getElementById('categoryBars');
-  if(!barsBox) return;
-
-  var catScores = {};
-  SPTI_DATA.forEach(function(cat) {
-    var total = 0, count = 0;
-    cat.items.forEach(function(item, idx) {
-      var key = cat.id + '_' + idx;
-      var score = userScores[key] || { val: 50, hard: false, soft: false, fav: false };
-      if(!score.hard) { total += score.val; count++; }
-    });
-    catScores[cat.name] = count > 0 ? Math.round(total / count) : 0;
-  });
-
-  barsBox.innerHTML = Object.keys(catScores).map(function(cName) {
-    var score = catScores[cName];
-    return '<div class="cat-bar-item">' +
-      '<div class="cat-bar-hd"><span>' + cName + '</span><span>' + score + '%</span></div>' +
-      '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + score + '%"></div></div>' +
-    '</div>';
-  }).join('');
-}
-
-function showToast(msg) {
-  var t = document.getElementById('toast'); if(!t) return;
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2000);
-}
+  function clearOrSkip() {
+    document.getElementById("sptiResults").value = "";
+    localStorage.removeItem("spti_profile_results");
+    window.location.href = "more.html";
+  }
 </script>
 </body>
 </html>
