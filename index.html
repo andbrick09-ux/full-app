@@ -127,6 +127,16 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 
 /* role header tweak */
 .hdr-role{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+
+/* Sub Check-In & Task Preview Styles */
+.mood-btn{background:rgba(201,168,76,0.06);border:1px solid var(--gold-b);color:var(--muted2);padding:6px 12px;border-radius:14px;font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Raleway',sans-serif}
+.mood-btn.active,.mood-btn:hover{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-l);box-shadow:0 0 10px rgba(201,168,76,0.2)}
+.task-row{background:var(--surface);border:1px solid var(--gold-b);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;transition:border-color .2s}
+.task-row:hover{border-color:rgba(201,168,76,0.4)}
+.task-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--gold-b);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:transparent;font-size:11px}
+.task-check.done{background:var(--gold);border-color:var(--gold);color:#080c14}
+.task-title{font-size:12px;color:var(--gold-l);font-weight:500;flex:1}
+.task-title.done{text-decoration:line-through;color:var(--muted)}
 </style>
 </head>
 
@@ -143,9 +153,9 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 
 <script type="module">
 import { requireAuth, getMyRole, getMyProfile, getPartnerUid, getUserProfile, dataRef, dataCol, partnerDataRef, partnerDataCol, getDomRoster, switchActiveSub, getRelationship } from './auth.js';
-import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs, deleteDoc, serverTimestamp, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getDoc, setDoc, onSnapshot, query, orderBy, limit, collection, doc, where, getDocs, deleteDoc, serverTimestamp, addDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, onValue, set as setRtdb } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 const firebaseConfig = {
   apiKey:"AIzaSyAV7Tmfw06rgKEY5LVOmR8bSmH0UrjB314",
@@ -251,6 +261,7 @@ async function renderDomDashboard() {
       <div class="card"><span class="card-val" id="streakVal">—</span><span class="card-lbl">Sub's Day Streak</span></div>
       <div class="card accent"><span class="card-val" id="compVal">—</span><span class="card-lbl">Compliance</span></div>
       <div class="card accent"><span class="card-val" id="pendingVal">—</span><span class="card-lbl">Pending Reports</span></div>
+      <div class="card accent"><span class="card-val" id="tasksVal">—</span><span class="card-lbl">Tasks Due Today</span></div>
       <div class="card"><span class="card-val" id="scenesVal">—</span><span class="card-lbl">Scenes Created</span></div>
     </div>
 
@@ -274,10 +285,13 @@ async function renderDomDashboard() {
         </div>
       </div>
       <div style="display:flex;gap:10px">
-        <button onclick="issuePraise()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--gold-b);background:transparent;color:var(--gold);font-size:10px;letter-spacing:1px">ISSUE PRAISE</button>
-        <button onclick="issueCorrection()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--crimson);background:var(--crimson);color:white;font-size:10px;letter-spacing:1px">ISSUE CORRECTION</button>
+        <button onclick="issuePraise()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--gold-b);background:transparent;color:var(--gold);font-size:10px;letter-spacing:1px;cursor:pointer">ISSUE PRAISE</button>
+        <button onclick="issueCorrection()" style="flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--crimson);background:var(--crimson);color:white;font-size:10px;letter-spacing:1px;cursor:pointer">ISSUE CORRECTION</button>
       </div>
     </div>
+
+    <div class="sec-lbl">SUB'S DIRECTIVES DUE TODAY</div>
+    <div id="domTasksPreview"></div>
 
     <div class="sec-lbl">PROTOCOL COMMAND CENTER</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -302,6 +316,7 @@ async function renderDomDashboard() {
   // Load real data
   loadLiveStatsForDom();
   loadLiveActivityFeedForDom();
+  loadTasksPreviewForDom();
   initRealScenes(true);
   loadSubTrainingProgress();
 }
@@ -326,15 +341,39 @@ function renderSubDashboard() {
       <div class="card accent"><span class="card-val" id="tasksVal">—</span><span class="card-lbl">Tasks Due Today</span></div>
     </div>
 
+    <div class="sec-lbl">DAILY CHECK-IN <span style="font-size:8px;color:var(--muted)">(syncs to Sir)</span></div>
+    <div class="card" style="padding:16px 14px;" id="subCheckinCard">
+      <div style="font-size:11px;font-weight:600;color:var(--gold-l);margin-bottom:8px;">MY CURRENT MOOD</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="moodPillContainer">
+        <button class="mood-btn active" data-mood="Devoted" onclick="window.selectMood(this)">Devoted</button>
+        <button class="mood-btn" data-mood="Obedient" onclick="window.selectMood(this)">Obedient</button>
+        <button class="mood-btn" data-mood="Submissive" onclick="window.selectMood(this)">Submissive</button>
+        <button class="mood-btn" data-mood="Needy" onclick="window.selectMood(this)">Needy</button>
+        <button class="mood-btn" data-mood="Exhausted" onclick="window.selectMood(this)">Exhausted</button>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--gold-l);margin-bottom:8px;">ENERGY LEVEL (1-5)</div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
+        <input type="range" id="energyRange" min="1" max="5" value="3" oninput="document.getElementById('energyNum').textContent=this.value" style="flex:1;accent-color:var(--gold);cursor:pointer;">
+        <span id="energyNum" style="font-size:14px;font-weight:700;color:var(--gold);min-width:16px;">3</span>
+      </div>
+      <div style="margin-bottom:12px;">
+        <input type="text" id="checkinNote" placeholder="Add a short note for Sir..." style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--gold-b);border-radius:10px;padding:8px 12px;color:var(--text);font-size:12px;outline:none;">
+      </div>
+      <button onclick="window.submitSubCheckin()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--gold);background:var(--gold-dim);color:var(--gold-l);font-weight:600;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;">SUBMIT CHECK-IN TO SIR ✨</button>
+    </div>
+
     <div class="sec-lbl">MY SERVICE</div>
     <div class="quick-grid" style="grid-template-columns: repeat(3, 1fr);">
       <a href="training-menu.html" class="qbtn"><span class="qi">🏆</span><span class="ql">Training</span></a>
       <a href="sub-bdsm-checklist.html" class="qbtn"><span class="qi">📋</span><span class="ql">Limits</span></a>
-      <a href="spti-test.html" class="qbtn"><span class="qi">📊</span><span class="ql">SPTI Test</span></a>
-      <a href="bdsm-test.html" class="qbtn"><span class="qi">🔥</span><span class="ql">BDSM Test</span></a>
+      <a href="tasks.html" class="qbtn"><span class="qi">⚡</span><span class="ql">Tasks</span></a>
+      <a href="javascript:void(0)" onclick="window.markServiceComplete()" class="qbtn"><span class="qi">👑</span><span class="ql">Report Duty</span></a>
       <a href="scene-menu.html" class="qbtn"><span class="qi">🎭</span><span class="ql">Map Scene</span></a>
       <a href="notes.html" class="qbtn"><span class="qi">📝</span><span class="ql">Notes</span></a>
     </div>
+
+    <div class="sec-lbl">TODAY'S DIRECTIVES</div>
+    <div id="subTasksPreview"></div>
 
     <div class="sec-lbl">TRAINING PROGRESS HUB <span style="font-size:8px;color:var(--muted)">(live)</span></div>
     <div id="trainingProgress"></div>
@@ -348,11 +387,28 @@ function renderSubDashboard() {
 
   loadLiveStatsForSub();
   loadTrainingProgress();
+  loadTasksPreviewForSub();
   loadLiveActivityFeedForSub();
   initRealScenes(false);
 }
 
-// ==================== REAL FIRESTORE FUNCTIONS ====================
+// ==================== REAL FIRESTORE & RTDB FUNCTIONS ====================
+
+function getLocalDateString(d = new Date()) {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getSceneIcon(s) {
+  if (s.icon) return s.icon;
+  const icons = ['🎭', '🌹', '⚡', '🔒', '🕯️', '👑', '⛓️', '🍷'];
+  const str = (s.name || s.title || 'Scene');
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return icons[Math.abs(hash) % icons.length];
+}
 
 async function initLiveWeekTracker() {
   const LABELS = ['M','T','W','T','F','S','S'];
@@ -371,7 +427,7 @@ async function initLiveWeekTracker() {
     row.innerHTML = '';
     for (let i = 0; i < 7; i++) {
       const day = new Date(mon); day.setDate(mon.getDate() + i);
-      const iso = day.toISOString().slice(0, 10);
+      const iso = getLocalDateString(day);
       const isToday = day.getTime() === today.getTime();
       const isDone = saved.includes(iso);
 
@@ -405,8 +461,8 @@ async function initLiveWeekTracker() {
 }
 
 async function loadLiveStatsForDom() {
-  // Streak + Compliance (from week stats)
-  const weekRef = dataRef('stats/week');
+  // Streak + Compliance (from active sub's week stats)
+  const weekRef = partnerUid ? await partnerDataRef('stats/week') : dataRef('stats/week');
   onSnapshot(weekRef, (snap) => {
     if (!snap.exists()) return;
     const saved = snap.data().done || [];
@@ -414,7 +470,7 @@ async function loadLiveStatsForDom() {
     let streak = 0;
     let cur = new Date(today);
     while (true) {
-      const iso = cur.toISOString().slice(0,10);
+      const iso = getLocalDateString(cur);
       if (saved.includes(iso)) { streak++; cur.setDate(cur.getDate()-1); }
       else break;
     }
@@ -425,7 +481,7 @@ async function loadLiveStatsForDom() {
     let done = 0;
     for (let i=0; i<elapsed; i++) {
       const d = new Date(mon); d.setDate(mon.getDate()+i);
-      if (saved.includes(d.toISOString().slice(0,10))) done++;
+      if (saved.includes(getLocalDateString(d))) done++;
     }
     const comp = elapsed > 0 ? Math.round((done / elapsed) * 100) : 0;
     document.getElementById('compVal').textContent = comp + '%';
@@ -446,16 +502,12 @@ async function loadLiveStatsForDom() {
       if (el) el.textContent = snap.size || '—';
     });
 
-    // Tasks Due Today for the Sub (Dom view) - using LOCAL date
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Tasks Due Today for the Sub (Dom view) - using LOCAL date string
+    const todayStr = getLocalDateString();
 
     const tasksQuery = query(
       await partnerDataCol('tasks'),
-      where('dueDate', '>=', today.toISOString().slice(0,10)),
-      where('dueDate', '<', tomorrow.toISOString().slice(0,10)),
+      where('dueDate', '==', todayStr),
       where('completed', '==', false)
     );
     onSnapshot(tasksQuery, (snap) => {
@@ -636,7 +688,7 @@ async function loadLiveStatsForSub() {
     const today = new Date(); today.setHours(0,0,0,0);
     let streak = 0; let cur = new Date(today);
     while (true) {
-      const iso = cur.toISOString().slice(0,10);
+      const iso = getLocalDateString(cur);
       if (saved.includes(iso)) { streak++; cur.setDate(cur.getDate()-1); } else break;
     }
     document.getElementById('streakVal').textContent = streak || '—';
@@ -644,21 +696,16 @@ async function loadLiveStatsForSub() {
     const mon = new Date(today); mon.setDate(today.getDate() - ((today.getDay()+6)%7));
     const elapsed = Math.floor((today-mon)/86400000)+1;
     let done = 0;
-    for(let i=0;i<elapsed;i++){ const d=new Date(mon);d.setDate(mon.getDate()+i); if(saved.includes(d.toISOString().slice(0,10))) done++; }
+    for(let i=0;i<elapsed;i++){ const d=new Date(mon);d.setDate(mon.getDate()+i); if(saved.includes(getLocalDateString(d))) done++; }
     const comp = elapsed>0 ? Math.round((done/elapsed)*100) : 0;
     document.getElementById('compVal').textContent = comp + '%';
   });
 
-  // Tasks due today (from tasks collection) - using range query (more reliable)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
+  // Tasks due today using LOCAL date string
+  const todayStr = getLocalDateString();
   const tasksQuery = query(
     dataCol('tasks'),
-    where('dueDate', '>=', today.toISOString().slice(0,10)),
-    where('dueDate', '<', tomorrow.toISOString().slice(0,10)),
+    where('dueDate', '==', todayStr),
     where('completed', '==', false)
   );
   onSnapshot(tasksQuery, (snap) => {
@@ -805,7 +852,7 @@ async function initRealScenes(isDom) {
       el.className = 'srow';
       el.href = 'scene-menu.html';
       el.innerHTML = `
-        <div class="sico">${['🎭','🌹','⚡','🔒','🕯️'][Math.floor(Math.random()*5)]}</div>
+        <div class="sico">${getSceneIcon(s)}</div>
         <div style="flex:1;min-width:0">
           <span class="sname">${s.name || s.title || 'Scene'}</span>
           <span class="smeta">${s.date ? new Date(s.date).toLocaleDateString() : 'Saved scene'}</span>
@@ -850,17 +897,136 @@ async function loadLiveSubStatus() {
   });
 }
 
-// Action handlers
+// Action handlers & Check-in Logic
+window.selectMood = function(btn) {
+  const container = document.getElementById('moodPillContainer');
+  if (!container) return;
+  container.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+};
+
+window.submitSubCheckin = async function() {
+  const activeMoodBtn = document.querySelector('#moodPillContainer .mood-btn.active');
+  const mood = activeMoodBtn ? activeMoodBtn.dataset.mood : 'Devoted';
+  const energy = parseInt(document.getElementById('energyRange')?.value || '3');
+  const note = document.getElementById('checkinNote')?.value?.trim() || '';
+
+  try {
+    const rel = await getRelationship();
+    if (!rel) return alert("No active relationship linked.");
+    
+    const checkinRef = ref(rtdb, `relationships/${rel.id}/checkin`);
+    await setRtdb(checkinRef, {
+      mood: mood,
+      energy: energy,
+      note: note,
+      updatedAt: Date.now()
+    });
+
+    // Also log to activity feed
+    await addDoc(dataCol('activity'), {
+      content: `Checked in: Mood — ${mood}, Energy — ${energy}/5`,
+      type: 'task',
+      timestamp: serverTimestamp()
+    });
+
+    alert("Check-in submitted live to Sir! 👑");
+    if (document.getElementById('checkinNote')) document.getElementById('checkinNote').value = '';
+  } catch (e) {
+    console.error("Check-in error:", e);
+    alert("Failed to submit check-in: " + e.message);
+  }
+};
+
+async function loadTasksPreviewForDom() {
+  const container = document.getElementById('domTasksPreview');
+  if (!container || !partnerUid) {
+    if (container) container.innerHTML = `<div class="empty"><p>No active sub linked.</p></div>`;
+    return;
+  }
+
+  const todayStr = getLocalDateString();
+  const tasksCol = await partnerDataCol('tasks');
+  const q = query(tasksCol, where('dueDate', '==', todayStr), limit(4));
+
+  onSnapshot(q, (snap) => {
+    container.innerHTML = '';
+    if (snap.empty) {
+      container.innerHTML = `<div class="empty"><p>No directives assigned to sub for today.</p></div>`;
+      return;
+    }
+    snap.forEach(docSnap => {
+      const t = docSnap.data();
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <div class="task-check ${t.completed ? 'done' : ''}">${t.completed ? '✓' : ''}</div>
+        <span class="task-title ${t.completed ? 'done' : ''}">${t.title || t.text || 'Directive'}</span>
+        <span style="font-size:9px;color:var(--muted);">${t.completed ? 'COMPLETED' : 'PENDING'}</span>
+      `;
+      container.appendChild(row);
+    });
+  });
+}
+
+async function loadTasksPreviewForSub() {
+  const container = document.getElementById('subTasksPreview');
+  if (!container) return;
+
+  const todayStr = getLocalDateString();
+  const q = query(dataCol('tasks'), where('dueDate', '==', todayStr), limit(4));
+
+  onSnapshot(q, (snap) => {
+    container.innerHTML = '';
+    if (snap.empty) {
+      container.innerHTML = `<div class="empty"><p>No directives assigned for today.</p></div>`;
+      return;
+    }
+    snap.forEach(docSnap => {
+      const t = docSnap.data();
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <div class="task-check ${t.completed ? 'done' : ''}" onclick="window.toggleTaskComplete('${docSnap.id}', ${!t.completed})">${t.completed ? '✓' : ''}</div>
+        <span class="task-title ${t.completed ? 'done' : ''}">${t.title || t.text || 'Directive'}</span>
+        <span style="font-size:9px;color:var(--muted);">${t.completed ? 'DONE' : 'TAP TO COMPLETE'}</span>
+      `;
+      container.appendChild(row);
+    });
+  });
+}
+
+window.toggleTaskComplete = async function(taskId, completeState) {
+  try {
+    const taskRef = doc(dataCol('tasks'), taskId);
+    await updateDoc(taskRef, { completed: completeState });
+
+    if (completeState) {
+      await addDoc(dataCol('activity'), {
+        content: "Completed a daily directive",
+        type: 'task',
+        timestamp: serverTimestamp()
+      });
+    }
+  } catch (e) {
+    console.error("Task update error:", e);
+  }
+};
+
 window.issuePraise = async function() {
   if (!partnerUid) return alert("No active sub.");
-  const msg = prompt("Add a note for this praise (optional):");
+  const category = prompt("Praise category (e.g. Obedience, Task Completion, Protocol, Devotion):", "Obedience");
+  if (category === null) return;
+  const msg = prompt("Add an optional message for this praise:");
   if (msg === null) return;
-  const content = msg.trim() ? `Praise: ${msg}` : "Praise Issued 💖";
+  
+  const content = msg.trim() ? `[${category}] Praise: ${msg}` : `[${category}] Praise Issued 💖`;
   
   try {
     await addDoc(dataCol('notes'), {
       content: content,
       type: 'praise',
+      category: category,
       checked: false,
       timestamp: serverTimestamp()
     });
@@ -872,14 +1038,18 @@ window.issuePraise = async function() {
 
 window.issueCorrection = async function() {
   if (!partnerUid) return alert("No active sub.");
+  const category = prompt("Correction category (e.g. Protocol Breach, Tardiness, Task Missed):", "Protocol Breach");
+  if (category === null) return;
   const msg = prompt("Reason for correction (optional):");
   if (msg === null) return;
-  const content = msg.trim() ? `Correction: ${msg}` : "Correction Issued ⚠️";
+
+  const content = msg.trim() ? `[${category}] Correction: ${msg}` : `[${category}] Correction Issued ⚠️`;
   
   try {
     await addDoc(dataCol('notes'), {
       content: content,
       type: 'correction',
+      category: category,
       checked: false,
       timestamp: serverTimestamp()
     });
@@ -892,7 +1062,7 @@ window.issueCorrection = async function() {
 window.markServiceComplete = async function() {
   try {
     await addDoc(dataCol('activity'), {
-      content: "Service checklist completed",
+      content: "Service checklist completed & reported to Sir",
       type: 'task',
       timestamp: serverTimestamp()
     });
