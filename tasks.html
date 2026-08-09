@@ -49,6 +49,15 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 #appShell{display:none;flex-direction:column;min-height:100dvh;padding-bottom:calc(72px + var(--safe-b));}
 #appShell.visible{display:flex;}
 
+/* ── Phase 1 Additions ── */
+.sub-switcher-wrap{display:flex;align-items:center;background:rgba(212,175,55,.08);border:1px solid var(--gold-b);border-radius:16px;padding:2px 8px;}
+.sub-select-dropdown{background:none;border:none;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;outline:none;cursor:pointer;}
+.sub-select-dropdown option{background:#051024;color:var(--text);}
+.sub-filter-row{display:flex;gap:6px;padding:12px 16px 4px;overflow-x:auto;scrollbar-width:none;}
+.sub-filter-row::-webkit-scrollbar{display:none;}
+.sub-filter-pill{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--dim);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.sub-filter-pill.active{border-color:var(--gold);background:rgba(212,175,55,.12);color:var(--gold);}
+
 /* ── Header ── */
 .app-header{position:sticky;top:0;z-index:100;background:rgba(2,8,20,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-b);padding:calc(12px + var(--safe-t)) 20px 12px;display:flex;align-items:center;gap:12px;}
 .header-back{width:36px;height:36px;border-radius:10px;border:1px solid var(--gold-b);background:none;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:20px;flex-shrink:0;text-decoration:none;}
@@ -402,25 +411,53 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
       <span class="material-symbols-rounded">arrow_back</span>
     </a>
     <div class="header-title">
-      <div class="header-title-main">Tasks</div>
+      <div class="header-title-main">Tasks &amp; Discipline</div>
       <div class="header-title-sub" id="headerSub">Dom Sub Hub</div>
+    </div>
+    <div class="sub-switcher-wrap hidden" id="subSwitcherWrap">
+      <select class="sub-select-dropdown" id="subSelectDropdown" onchange="onSubSwitch(this.value)">
+        <option value="all">👥 All Subs</option>
+      </select>
     </div>
     <div class="header-badge" id="headerBadge">—</div>
   </div>
 
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tasks</button>
-    <button class="tab-btn" onclick="switchTab('queue')" id="tab-queue">Queue</button>
-    <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">Dashboard</button>
-    <button class="tab-btn" onclick="switchTab('rewards')" id="tab-rewards">Rewards</button>
-    <button class="tab-btn" onclick="switchTab('punishments')" id="tab-punishments">Punishments</button>
-    <button class="tab-btn" onclick="switchTab('history')" id="tab-history">History</button>
+    <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">📋 Tasks</button>
+    <button class="tab-btn" onclick="switchTab('store')" id="tab-store">🏪 Store &amp; Penalties</button>
+    <button class="tab-btn" onclick="switchTab('stats')" id="tab-stats">📊 Stats &amp; Mood</button>
   </div>
 
   <div id="tabContent">
 
-    <!-- TASKS TAB -->
+    <!-- 📋 TASKS TAB -->
     <div id="view-tasks">
+      <div class="sub-filter-row" id="subFilterRow">
+        <button class="sub-filter-pill active" data-filter="all" onclick="setSubFilter('all', this)">All</button>
+        <button class="sub-filter-pill" data-filter="sub_tasks" onclick="setSubFilter('sub_tasks', this)" id="pillSubTasks">Sub's Tasks</button>
+        <button class="sub-filter-pill" data-filter="dom_tasks" onclick="setSubFilter('dom_tasks', this)" id="pillDomTasks">Dom's Obligations</button>
+        <button class="sub-filter-pill" data-filter="habits" onclick="setSubFilter('habits', this)">Daily Habits</button>
+        <button class="sub-filter-pill" data-filter="pending_proof" onclick="setSubFilter('pending_proof', this)" id="pillPendingProof">Approvals <span class="tab-count" id="pendingProofBadge">0</span></button>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-lbl" id="taskSectionLbl">Active Tasks</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <a href="protocol-daily.html" style="font-size:10px;color:var(--gold);text-decoration:none;font-weight:600;display:flex;align-items:center;gap:2px;">
+              <span class="material-symbols-rounded" style="font-size:13px;">menu_book</span> Rulebook
+            </a>
+            <div class="section-action" id="filterToggle" onclick="cycleFilter()">
+              <span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> All
+            </div>
+          </div>
+        </div>
+        <div class="task-list" id="taskList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- 🏪 STORE & DISCIPLINE TAB -->
+    <div id="view-store" class="hidden">
       <div class="points-bar">
         <div class="pts-icon">⭐</div>
         <div class="pts-info">
@@ -434,50 +471,21 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
       </div>
       <div id="punishBanner"></div>
       <div id="demeritsBanner"></div>
-      <div id="achievementsStrip" class="achievements-wrap hidden">
-        <div class="achievements-head">
-          <div class="achievements-lbl">Achievements</div>
-        </div>
-        <div class="achievements-scroll" id="achievementsList"></div>
-      </div>
-      <div class="section">
-        <div class="section-head">
-          <div class="section-lbl">Active Tasks</div>
-          <div class="section-action" id="filterToggle" onclick="cycleFilter()">
-            <span class="material-symbols-rounded" style="font-size:14px;">filter_list</span> All
-          </div>
-        </div>
-        <div class="task-list" id="taskList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
-      </div>
-    </div>
 
-    <!-- QUEUE TAB -->
-    <div id="view-queue" class="hidden">
-      <div class="section">
-        <div class="section-head"><div class="section-lbl">Awaiting Sir's Attention</div></div>
-        <div class="task-list" id="queueList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
-      </div>
-    </div>
-
-    <!-- REWARDS TAB -->
-    <div id="view-rewards" class="hidden">
       <div class="section">
         <div class="section-head"><div class="section-lbl">Reward Store</div></div>
         <div class="task-list" id="rewardList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
-    </div>
 
-    <!-- PUNISHMENTS TAB -->
-    <div id="view-punishments" class="hidden">
-      <div class="section">
-        <div class="section-head"><div class="section-lbl">Punishment List</div></div>
+      <div class="section" style="margin-top:14px;">
+        <div class="section-head"><div class="section-lbl">Punishments &amp; Redemptions</div></div>
         <div class="task-list" id="punishList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
     </div>
 
-    <!-- DASHBOARD TAB -->
-    <div id="view-dashboard" class="hidden">
-      <div id="sirDashboard" class="hidden">
+    <!-- 📊 STATS & MOOD TAB -->
+    <div id="view-stats" class="hidden">
+      <div id="sirDashboard">
         <div class="dash-section-lbl">Overview</div>
         <div class="dash-grid" id="dashGrid">
           <div class="loading"><div class="spinner"></div></div>
@@ -496,28 +504,32 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
         <div style="padding:0 16px 14px;" id="dashAlerts"></div>
       </div>
       <div id="subDashboard" class="hidden">
-        <div class="dash-section-lbl">Your Status</div>
+        <div class="dash-section-lbl">Headspace &amp; Mood</div>
         <div class="dash-grid" id="subDashGrid">
           <div class="loading"><div class="spinner"></div></div>
         </div>
-        <div class="dash-section-lbl" style="margin-top:6px;">Request a Task from Sir</div>
+        <div class="dash-section-lbl" style="margin-top:6px;">Task Request for Partner</div>
         <div style="padding:0 16px 14px;">
           <div class="fg"><label class="fl">What would you like to do?</label>
             <input class="fi" id="taskReqTitle" placeholder="e.g. Practice a new position" maxlength="80"/>
           </div>
           <div class="fg"><label class="fl">Why / Context</label>
-            <textarea class="fi" id="taskReqNote" placeholder="Tell Sir why you're requesting this…" rows="2"></textarea>
+            <textarea class="fi" id="taskReqNote" placeholder="Tell your partner why you're requesting this…" rows="2"></textarea>
           </div>
-          <button class="submit-btn" onclick="sendTaskRequest()">Send Request to Sir</button>
+          <button class="submit-btn" onclick="sendTaskRequest()">Send Request</button>
         </div>
         <div class="dash-section-lbl">Pending Requests</div>
         <div style="padding:0 16px 14px;" id="taskRequestList"></div>
       </div>
-    </div>
 
-    <!-- HISTORY TAB -->
-    <div id="view-history" class="hidden">
-      <div class="section">
+      <div id="achievementsStrip" class="achievements-wrap" style="margin-top:14px;">
+        <div class="achievements-head">
+          <div class="achievements-lbl">Achievements</div>
+        </div>
+        <div class="achievements-scroll" id="achievementsList"></div>
+      </div>
+
+      <div class="section" style="margin-top:14px;">
         <div class="section-head"><div class="section-lbl">Activity Log</div></div>
         <div class="task-list" id="historyList"><div class="loading"><div class="spinner"></div> Loading…</div></div>
       </div>
@@ -540,10 +552,16 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 <div class="sheet" id="taskSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
-    <div class="sheet-title">New Task</div>
-    <div class="sheet-sub">Assign a task for Becca</div>
+    <div class="sheet-title" id="taskSheetTitle">New Task</div>
+    <div class="sheet-sub" id="taskSheetSub">Assign a new task</div>
   </div>
   <div class="sheet-body">
+    <div class="fg" id="targetRoleGroup"><label class="fl">Assign Task To</label>
+      <div class="chip-group" id="targetChips">
+        <div class="chip selected" data-val="sub" onclick="pickChip('targetChips',this)" id="targetChipSub">Submissive</div>
+        <div class="chip" data-val="dom" onclick="pickChip('targetChips',this)" id="targetChipDom">Dominant (Dom Task)</div>
+      </div>
+    </div>
     <div class="fg"><label class="fl">Task Title</label><input class="fi" id="taskTitle" placeholder="e.g. Morning affirmations" maxlength="80"/></div>
     <div class="fg"><label class="fl">Description (optional)</label><textarea class="fi" id="taskDesc" placeholder="Instructions or details…" rows="3"></textarea></div>
     <div class="fg"><label class="fl">Difficulty</label>
@@ -733,7 +751,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 
 <!-- ═══════════════ FIREBASE JS ═══════════════ -->
 <script type="module">
-import { requireAuth, getMyProfile, logOut, getRelationship } from './auth.js';
+import { requireAuth, getMyProfile, logOut, getRelationship, getDomRoster, getUserProfile, switchActiveSub } from './auth.js';
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, get, push, onValue, update, remove }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
@@ -761,7 +779,7 @@ let role = null;
   let relId = null;
   function rRef(p = '') {
     const base = relId ? ('relationships/' + relId) : 'global_tasks';
-    return p ? rRef( base + '/' + p) : rRef( base);
+    return p ? ref(db, base + '/' + p) : ref(db, base);
   }
 let curTab='tasks', filterState='all';
 let tasks={}, rewards={}, punishments={}, queue={};
@@ -837,25 +855,68 @@ W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
   document.getElementById('headerBadge').textContent  = isDom ? '👑 Sir' : '🌸 ' + displayName;
   document.getElementById('appShell').className       = 'visible ' + (isDom ? 'role-dom' : 'role-sub');
   document.getElementById('headerSub').textContent    = isDom ? 'Dominant View' : 'Submissive View';
-  document.getElementById('fabBtn').style.display     = isDom ? 'flex' : 'none';
+  document.getElementById('fabBtn').style.display     = 'flex'; // Visible for both on default 'tasks' tab
 
   // Personalise the check-in greeting with the sub's display name
   if (!isDom) {
     document.getElementById('checkinGreeting').textContent = 'Good to see you, ' + displayName;
+  } else {
+    // Populate Roster Dropdown for Dom
+    const roster = await getDomRoster();
+    if (roster.length > 0) {
+      const drop = document.getElementById('subSelectDropdown');
+      drop.innerHTML = '';
+      for (const r of roster) {
+        const subProfile = await getUserProfile(r.subId);
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = `🌸 ${subProfile?.displayName || subProfile?.name || 'Unknown'}`;
+        drop.appendChild(opt);
+      }
+      document.getElementById('subSwitcherWrap').classList.remove('hidden');
+      
+      if (!relId || !roster.find(x => x.id === relId)) {
+        relId = roster[0].id;
+        await switchActiveSub(relId);
+      }
+      drop.value = relId;
+    }
   }
 
-  listenPoints(); listenTasks(); listenRewards(); listenPunishments(); listenQueue(); listenHistory();
-  listenCheckin(); listenTaskRequests();
+  attachListeners();
+  
   setTimeout(checkDailyReset, 1500);
   setTimeout(renderAchievements, 2000);
   setTimeout(maybeShowCheckin, 1000);
 })();
 
+window.onSubSwitch = async function(val) {
+  relId = val;
+  await switchActiveSub(relId);
+  attachListeners();
+  switchTab(curTab);
+};
+
+let unsubscribes = [];
+function attachListeners() {
+  unsubscribes.forEach(u => u());
+  unsubscribes = [];
+  
+  unsubscribes.push(listenPoints());
+  unsubscribes.push(listenTasks());
+  unsubscribes.push(listenRewards());
+  unsubscribes.push(listenPunishments());
+  unsubscribes.push(listenQueue());
+  unsubscribes.push(listenHistory());
+  unsubscribes.push(listenCheckin());
+  unsubscribes.push(listenTaskRequests());
+}
+
 // ─────────────────────────────────────────────
 // POINTS
 // ─────────────────────────────────────────────
 function listenPoints() {
-  onValue(rRef('points'), s => {
+  return onValue(rRef('points'), s => {
     pts = s.val() || {balance:0,earned:0,lost:0};
     document.getElementById('ptBal').textContent    = pts.balance ?? 0;
     document.getElementById('ptEarned').textContent = pts.earned  ?? 0;
@@ -878,23 +939,44 @@ async function addPts(amount, reason) {
 // TASKS
 // ─────────────────────────────────────────────
 function listenTasks() {
-  onValue(rRef('tasks'), s => { tasks = s.val() || {}; renderTasks(); fillPunishDrop(); });
+  return onValue(rRef('tasks'), s => { tasks = s.val() || {}; renderTasks(); fillPunishDrop(); });
 }
+
+let currentSubFilter = 'all';
+window.setSubFilter = function(val, el) {
+  currentSubFilter = val;
+  document.querySelectorAll('.sub-filter-pill').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderTasks();
+};
 
 function renderTasks() {
   const list = document.getElementById('taskList');
   const entries = Object.entries(tasks).filter(([,t]) => !t.archived);
+  
+  // Pending proofs count badge
+  const pendingCount = entries.filter(([,t]) => t.proofPending).length;
+  document.getElementById('pendingProofBadge').textContent = pendingCount;
+  
   if (!entries.length) {
     list.innerHTML = emptyState('📋',
       role==='dom' ? 'No tasks yet' : 'No tasks assigned',
-      role==='dom' ? 'Tap + to assign a task.' : "Sir hasn't assigned any tasks yet.");
+      role==='dom' ? 'Tap + to assign a task.' : "Your partner hasn't assigned any tasks yet.");
     return;
   }
   const now = Date.now();
   let html = '';
   entries.forEach(([id, t]) => {
+    // Top-right dropdown filter (pending/done/all)
     if (filterState==='pending' && t.completedToday) return;
     if (filterState==='done'    && !t.completedToday) return;
+    
+    // Pill filter logic
+    if (currentSubFilter === 'sub_tasks' && t.targetRole === 'dom') return;
+    if (currentSubFilter === 'dom_tasks' && t.targetRole !== 'dom') return;
+    if (currentSubFilter === 'habits' && (t.schedule === 'once' || !t.schedule)) return;
+    if (currentSubFilter === 'pending_proof' && !t.proofPending) return;
+
     const done        = !!t.completedToday;
     const proofPend   = !!t.proofPending;
     const earnedPts   = calcPts(t.basePoints||10, t.difficulty);
@@ -917,36 +999,57 @@ function renderTasks() {
          </div>` : '';
 
     let actions = '';
-    if (role==='sub' && !done) {
-      if (t.requireProof && !proofPend) {
+    if (t.targetRole === 'dom') {
+      // Reciprocal Task assigned to Dom
+      if (role === 'dom' && !done) {
         actions = `<div class="task-actions">
-          <button class="t-btn proof" onclick="openProofSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">photo_camera</span> Submit Proof
-          </button>
-          <button class="t-btn fail" onclick="openFailSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
-          </button>
-        </div>`;
-      } else if (!t.requireProof) {
-        actions = `<div class="task-actions">
-          <button class="t-btn complete" onclick="completeTask('${id}')">
+          <button class="t-btn complete" onclick="completeDomTask('${id}')">
             <span class="material-symbols-rounded" style="font-size:13px;">check_circle</span> Complete
           </button>
-          <button class="t-btn fail" onclick="openFailSheet('${id}')">
-            <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
+        </div>`;
+      } else if (role === 'sub') {
+        actions = `<div class="task-actions">
+          <button class="t-btn remove" onclick="deleteTask('${id}')">
+            <span class="material-symbols-rounded" style="font-size:13px;">delete</span> Remove
+          </button>
+        </div>`;
+      }
+    } else {
+      // Standard Sub Task
+      if (role === 'sub' && !done) {
+        if (t.requireProof && !proofPend) {
+          actions = `<div class="task-actions">
+            <button class="t-btn proof" onclick="openProofSheet('${id}')">
+              <span class="material-symbols-rounded" style="font-size:13px;">photo_camera</span> Submit Proof
+            </button>
+            <button class="t-btn fail" onclick="openFailSheet('${id}')">
+              <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
+            </button>
+          </div>`;
+        } else if (!t.requireProof) {
+          actions = `<div class="task-actions">
+            <button class="t-btn complete" onclick="completeTask('${id}')">
+              <span class="material-symbols-rounded" style="font-size:13px;">check_circle</span> Complete
+            </button>
+            <button class="t-btn fail" onclick="openFailSheet('${id}')">
+              <span class="material-symbols-rounded" style="font-size:13px;">report</span> Failure
+            </button>
+          </div>`;
+        }
+      }
+      if (role === 'dom') {
+        actions = `<div class="task-actions">
+          <button class="t-btn remove" onclick="deleteTask('${id}')">
+            <span class="material-symbols-rounded" style="font-size:13px;">delete</span> Remove
           </button>
         </div>`;
       }
     }
-    if (role==='dom') {
-      actions = `<div class="task-actions">
-        <button class="t-btn remove" onclick="deleteTask('${id}')">
-          <span class="material-symbols-rounded" style="font-size:13px;">delete</span> Remove
-        </button>
-      </div>`;
-    }
 
-    html += `<div class="task-card${done?' done':''}${t.requireProof?' proof-required':''}${t.isRedemption?' is-redemption':''} fade-up">
+    // Dom task border style
+    const domTaskClass = t.targetRole === 'dom' ? ' is-redemption' : ''; // Reuse purple border for now
+
+    html += `<div class="task-card${done?' done':''}${t.requireProof?' proof-required':''}${t.isRedemption?' is-redemption':''}${domTaskClass} fade-up">
       <div class="task-card-header">
         <div class="task-check">${done ? '✓' : ''}</div>
         <div class="task-info">
@@ -955,10 +1058,11 @@ function renderTasks() {
             <span class="badge ${diffClass}">${diffLabel}</span>
             <span class="badge badge-sched">${schedLbl(t.schedule)}</span>
             ${proofBadge}${redemptionBadge}
+            ${t.targetRole === 'dom' ? '<span class="badge badge-redemption">Dom Task</span>' : ''}
           </div>
           ${dueLine}
         </div>
-        <div class="task-pts">+${earnedPts}${multBadge}</div>
+        ${t.targetRole !== 'dom' ? `<div class="task-pts">+${earnedPts}${multBadge}</div>` : ''}
       </div>
       ${t.description ? `<div class="task-desc">${esc(t.description)}</div>` : ''}
       ${streakHtml}
@@ -979,6 +1083,16 @@ async function completeTask(id) {
   if (t.schedule==='once') await update(rRef('tasks/'+id), {archived:true});
   if (t.isRedemption && t.redemptionFor) await update(rRef('queue/'+t.redemptionFor), {resolved:true, redeemed:true});
   showToast('✅ +' + earned + ' pts! Streak: ' + newStreak + (newStreak>=7 ? ' 🔥' : ''));
+}
+
+window.completeDomTask = async function(id) {
+  const t = tasks[id]; if (!t || t.completedToday) return;
+  const newStreak = (t.streak||0) + 1;
+  const best = Math.max(newStreak, t.bestStreak||0);
+  await update(rRef('tasks/'+id), { completedToday:true, completedAt:Date.now(), streak:newStreak, bestStreak:best });
+  await push(rRef('history'), { type:'dom_task_completed', taskTitle:t.title, streak:newStreak, ts:Date.now() });
+  if (t.schedule==='once') await update(rRef('tasks/'+id), {archived:true});
+  showToast('✅ Dom Task Completed! Streak: ' + newStreak + (newStreak>=7 ? ' 🔥' : ''));
 }
 
 function openFailSheet(id) {
@@ -1015,9 +1129,13 @@ async function saveTask() {
   const title = document.getElementById('taskTitle').value.trim();
   if (!title) { showToast('Enter a task title'); return; }
   const punishLink = document.getElementById('taskPunishLink').value;
+  const targetRole = document.querySelector('#targetChips .chip.selected')?.dataset.val || 'sub';
+  
   await push(rRef('tasks'), {
     title,
     description: document.getElementById('taskDesc').value.trim(),
+    targetRole: targetRole,
+    category: targetRole === 'dom' ? 'obligation' : 'habit',
     difficulty:  document.querySelector('#diffChips .chip.selected')?.dataset.val || 'simple',
     basePoints:  parseInt(document.getElementById('taskPoints').value) || 10,
     schedule:    document.getElementById('taskSchedule').value,
@@ -1127,7 +1245,7 @@ async function denyProof() {
 // QUEUE
 // ─────────────────────────────────────────────
 function listenQueue() {
-  onValue(rRef('queue'), s => {
+  return onValue(rRef('queue'), s => {
     queue = s.val() || {};
     updateQueueBadge();
     if (curTab === 'queue') renderQueue();
@@ -1283,7 +1401,7 @@ async function saveRedemptionTask() {
 // REWARDS
 // ─────────────────────────────────────────────
 function listenRewards() {
-  onValue(rRef('rewards'), s => { rewards = s.val() || {}; if (curTab==='rewards') renderRewards(); });
+  return onValue(rRef('rewards'), s => { rewards = s.val() || {}; if (curTab==='rewards') renderRewards(); });
 }
 
 function renderRewards() {
@@ -1365,7 +1483,7 @@ async function deleteReward(id) {
 // PUNISHMENTS
 // ─────────────────────────────────────────────
 function listenPunishments() {
-  onValue(rRef('punishments'), s => {
+  return onValue(rRef('punishments'), s => {
     punishments = s.val() || {};
     if (curTab==='punishments') renderPunishments();
     fillPunishDrop();
@@ -1445,7 +1563,7 @@ function fillPunishDrop() {
 // ─────────────────────────────────────────────
 let histData = {};
 function listenHistory() {
-  onValue(rRef('history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); renderAchievements(); });
+  return onValue(rRef('history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); renderAchievements(); });
 }
 
 function renderHistory() {
@@ -1490,18 +1608,23 @@ function renderHistory() {
 // ─────────────────────────────────────────────
 function switchTab(t) {
   curTab = t;
-  ['tasks','queue','dashboard','rewards','punishments','history'].forEach(x => {
+  ['tasks','store','stats'].forEach(x => {
     document.getElementById('view-'+x).classList.toggle('hidden', x !== t);
     document.getElementById('tab-'+x).classList.toggle('active', x === t);
   });
-  if (t==='rewards')     renderRewards();
-  if (t==='punishments') renderPunishments();
-  if (t==='history')     renderHistory();
-  if (t==='queue')       renderQueue();
-  if (t==='dashboard')   renderDashboard(window._checkinData);
-  const fabVisible = role==='dom' && ['tasks','rewards','punishments'].includes(t);
+  if (t === 'store') {
+    renderRewards();
+    renderPunishments();
+  }
+  if (t === 'stats') {
+    renderHistory();
+    if (typeof renderQueue === 'function') renderQueue();
+    if (typeof renderDashboard === 'function') renderDashboard(window._checkinData);
+  }
+  const fabVisible = (role === 'dom' && ['tasks','store'].includes(t)) || (role === 'sub' && t === 'tasks');
   document.getElementById('fabBtn').style.display = fabVisible ? 'flex' : 'none';
 }
+
 
 function openCreateSheet() {
   if (curTab==='tasks') {
@@ -1515,10 +1638,13 @@ function openCreateSheet() {
     document.getElementById('taskPunishLink').value = '';
     document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.remove('selected'));
     document.querySelector('#diffChips .chip[data-val="simple"]').classList.add('selected');
+    if (document.querySelectorAll('#targetChips .chip').length > 0) {
+      document.querySelectorAll('#targetChips .chip').forEach(c => c.classList.remove('selected'));
+      document.querySelector('#targetChips .chip[data-val="sub"]').classList.add('selected');
+    }
     openSheet('taskSheet');
   }
-  else if (curTab==='rewards') openSheet('rewardSheet');
-  else if (curTab==='punishments') openSheet('punishSheet');
+  else if (curTab==='store') openSheet('rewardSheet');
 }
 
 function openSheet(id) {
@@ -1779,14 +1905,14 @@ function closeCheckin() {
 }
 
 function listenCheckin() {
-  onValue(rRef('checkin'), s => {
+  return onValue(rRef('checkin'), s => {
     window._checkinData = s.val() || null;
     if (curTab === 'dashboard') renderDashboard(window._checkinData);
   });
 }
 
 function listenTaskRequests() {
-  onValue(rRef('taskRequests'), s => {
+  return onValue(rRef('taskRequests'), s => {
     taskRequests = s.val() || {};
     if (curTab === 'dashboard') renderDashboard(window._checkinData);
     if (curTab === 'queue') renderQueue();
