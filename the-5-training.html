@@ -235,7 +235,7 @@
   </div>
 
   <script type="module">
-    import { requireAuth, dataRef } from './auth.js';
+    import { requireAuth, dataRef, getMyProfile, partnerDataRef } from './auth.js';
     import { setDoc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     // ── Phase data ────────────────────────────────────────────
@@ -502,7 +502,12 @@
     (async function init() {
       try {
         await requireAuth();
-        dbRef = dataRef('training/the-5-training');
+        const profile = await getMyProfile();
+          if (profile.role === 'sir') {
+            dbRef = await partnerDataRef('training/the-5-training');
+          } else {
+            dbRef = dataRef('training/the-5-training');
+          }
         const snap = await getDoc(dbRef);
         if (snap.exists()) {
           state = mergeLoadedState(snap.data());
