@@ -733,7 +733,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.5;}
 
 <!-- ═══════════════ FIREBASE JS ═══════════════ -->
 <script type="module">
-import { requireAuth, getMyProfile, logOut } from './auth.js';
+import { requireAuth, getMyProfile, logOut, getRelationship } from './auth.js';
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, get, push, onValue, update, remove }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
@@ -758,6 +758,11 @@ try { storage = getStorage(app); } catch(e) { console.warn('Firebase Storage not
 
 // ── State ──
 let role = null;
+  let relId = null;
+  function rRef(p = '') {
+    const base = relId ? ('relationships/' + relId) : 'global_tasks';
+    return p ? rRef( base + '/' + p) : rRef( base);
+  }
 let curTab='tasks', filterState='all';
 let tasks={}, rewards={}, punishments={}, queue={};
 let pts={balance:0,earned:0,lost:0};
@@ -813,6 +818,8 @@ W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
   const user = await requireAuth();
   const profile = await getMyProfile();
   role = profile?.role ?? null;
+  const rel = await getRelationship();
+  relId = rel ? rel.id : user.uid;
 
   if (!role) {
     // Profile missing or role not set — send back to login/onboarding
@@ -848,7 +855,7 @@ W.approveTaskRequest=approveTaskRequest; W.denyTaskRequest=denyTaskRequest;
 // POINTS
 // ─────────────────────────────────────────────
 function listenPoints() {
-  onValue(ref(db,'points'), s => {
+  onValue(rRef('points'), s => {
     pts = s.val() || {balance:0,earned:0,lost:0};
     document.getElementById('ptBal').textContent    = pts.balance ?? 0;
     document.getElementById('ptEarned').textContent = pts.earned  ?? 0;
@@ -857,21 +864,21 @@ function listenPoints() {
 }
 
 async function addPts(amount, reason) {
-  const s = await get(ref(db,'points'));
+  const s = await get(rRef('points'));
   const d = s.val() || {balance:0,earned:0,lost:0};
-  await set(ref(db,'points'), {
+  await set(rRef('points'), {
     balance: (d.balance||0) + amount,
     earned:  amount > 0 ? (d.earned||0) + amount  : (d.earned||0),
     lost:    amount < 0 ? (d.lost||0) + Math.abs(amount) : (d.lost||0)
   });
-  await push(ref(db,'history'), { type: amount>0?'points_earned':'points_lost', amount, reason, ts: Date.now() });
+  await push(rRef('history'), { type: amount>0?'points_earned':'points_lost', amount, reason, ts: Date.now() });
 }
 
 // ─────────────────────────────────────────────
 // TASKS
 // ─────────────────────────────────────────────
 function listenTasks() {
-  onValue(ref(db,'tasks'), s => { tasks = s.val() || {}; renderTasks(); fillPunishDrop(); });
+  onValue(rRef('tasks'), s => { tasks = s.val() || {}; renderTasks(); fillPunishDrop(); });
 }
 
 function renderTasks() {
@@ -966,11 +973,11 @@ async function completeTask(id) {
   const earned = calcPts(t.basePoints||10, t.difficulty);
   const newStreak = (t.streak||0) + 1;
   const best = Math.max(newStreak, t.bestStreak||0);
-  await update(ref(db,'tasks/'+id), { completedToday:true, completedAt:Date.now(), streak:newStreak, bestStreak:best });
+  await update(rRef('tasks/'+id), { completedToday:true, completedAt:Date.now(), streak:newStreak, bestStreak:best });
   await addPts(earned, 'Completed: ' + t.title);
-  await push(ref(db,'history'), { type:'task_completed', taskTitle:t.title, points:earned, streak:newStreak, ts:Date.now() });
-  if (t.schedule==='once') await update(ref(db,'tasks/'+id), {archived:true});
-  if (t.isRedemption && t.redemptionFor) await update(ref(db,'queue/'+t.redemptionFor), {resolved:true, redeemed:true});
+  await push(rRef('history'), { type:'task_completed', taskTitle:t.title, points:earned, streak:newStreak, ts:Date.now() });
+  if (t.schedule==='once') await update(rRef('tasks/'+id), {archived:true});
+  if (t.isRedemption && t.redemptionFor) await update(rRef('queue/'+t.redemptionFor), {resolved:true, redeemed:true});
   showToast('✅ +' + earned + ' pts! Streak: ' + newStreak + (newStreak>=7 ? ' 🔥' : ''));
 }
 
@@ -987,13 +994,13 @@ async function confirmFail() {
   const t = tasks[failId]; if (!t) return;
   const reason = document.getElementById('failReason').value.trim();
   const ded = t.punishPoints || 10;
-  await update(ref(db,'tasks/'+failId), { failedToday:true, failedAt:Date.now(), streak:0 });
+  await update(rRef('tasks/'+failId), { failedToday:true, failedAt:Date.now(), streak:0 });
   await addPts(-ded, 'Failed: ' + t.title);
-  await push(ref(db,'queue'), {
+  await push(rRef('queue'), {
     type:'failure_report', taskId:failId, taskTitle:t.title,
     punishLink: t.punishLink||null, punishPoints:ded, reason, ts:Date.now(), resolved:false
   });
-  await push(ref(db,'history'), { type:'task_failed', taskTitle:t.title, points:-ded, reason, ts:Date.now() });
+  await push(rRef('history'), { type:'task_failed', taskTitle:t.title, points:-ded, reason, ts:Date.now() });
   closeAllSheets(); failId = null;
   showToast('⚠️ Failure reported. -' + ded + ' pts');
 }
@@ -1001,14 +1008,14 @@ async function confirmFail() {
 async function deleteTask(id) {
   const ok = await customConfirm({title:'Remove this task?', message:'This will delete the task permanently.', icon:'🗑️', okText:'Remove'});
   if (!ok) return;
-  await remove(ref(db,'tasks/'+id));
+  await remove(rRef('tasks/'+id));
 }
 
 async function saveTask() {
   const title = document.getElementById('taskTitle').value.trim();
   if (!title) { showToast('Enter a task title'); return; }
   const punishLink = document.getElementById('taskPunishLink').value;
-  await push(ref(db,'tasks'), {
+  await push(rRef('tasks'), {
     title,
     description: document.getElementById('taskDesc').value.trim(),
     difficulty:  document.querySelector('#diffChips .chip.selected')?.dataset.val || 'simple',
@@ -1020,7 +1027,7 @@ async function saveTask() {
     requireProof, createdAt:Date.now(),
     completedToday:false, failedToday:false, streak:0, bestStreak:0
   });
-  await push(ref(db,'history'), { type:'task_created', taskTitle:title, ts:Date.now() });
+  await push(rRef('history'), { type:'task_created', taskTitle:title, ts:Date.now() });
   closeAllSheets();
   document.getElementById('taskTitle').value = '';
   document.getElementById('taskDesc').value = '';
@@ -1069,8 +1076,8 @@ async function submitProof() {
       proofUrl = await getDownloadURL(sr);
     }
   } catch(e) { /* storage unavailable — keep base64 URL */ }
-  await update(ref(db,'tasks/'+proofTaskId), { proofPending:true });
-  await push(ref(db,'queue'), {
+  await update(rRef('tasks/'+proofTaskId), { proofPending:true });
+  await push(rRef('queue'), {
     type:'proof_submission', taskId:proofTaskId, taskTitle:t.title,
     proofUrl, note: document.getElementById('proofNote').value.trim(),
     ts:Date.now(), resolved:false
@@ -1097,11 +1104,11 @@ async function approveProof() {
   const t = tasks[item.taskId]; if (!t) return;
   const earned = calcPts(t.basePoints||10, t.difficulty);
   const newStreak = (t.streak||0) + 1, best = Math.max(newStreak, t.bestStreak||0);
-  await update(ref(db,'tasks/'+item.taskId), { completedToday:true, completedAt:Date.now(), proofPending:false, streak:newStreak, bestStreak:best });
-  await update(ref(db,'queue/'+reviewQId), { resolved:true });
+  await update(rRef('tasks/'+item.taskId), { completedToday:true, completedAt:Date.now(), proofPending:false, streak:newStreak, bestStreak:best });
+  await update(rRef('queue/'+reviewQId), { resolved:true });
   await addPts(earned, 'Proof approved: ' + t.title);
-  await push(ref(db,'history'), { type:'proof_approved', taskTitle:t.title, points:earned, ts:Date.now() });
-  if (t.schedule==='once') await update(ref(db,'tasks/'+item.taskId), {archived:true});
+  await push(rRef('history'), { type:'proof_approved', taskTitle:t.title, points:earned, ts:Date.now() });
+  if (t.schedule==='once') await update(rRef('tasks/'+item.taskId), {archived:true});
   closeAllSheets(); reviewQId = null;
   showToast('✅ Proof approved! +' + earned + ' pts');
 }
@@ -1109,9 +1116,9 @@ async function approveProof() {
 async function denyProof() {
   if (!reviewQId) return;
   const item = queue[reviewQId]; if (!item) return;
-  await update(ref(db,'tasks/'+item.taskId), { proofPending:false });
-  await update(ref(db,'queue/'+reviewQId), { resolved:true });
-  await push(ref(db,'history'), { type:'proof_denied', taskTitle:item.taskTitle, ts:Date.now() });
+  await update(rRef('tasks/'+item.taskId), { proofPending:false });
+  await update(rRef('queue/'+reviewQId), { resolved:true });
+  await push(rRef('history'), { type:'proof_denied', taskTitle:item.taskTitle, ts:Date.now() });
   closeAllSheets(); reviewQId = null;
   showToast('Proof rejected — must resubmit');
 }
@@ -1120,7 +1127,7 @@ async function denyProof() {
 // QUEUE
 // ─────────────────────────────────────────────
 function listenQueue() {
-  onValue(ref(db,'queue'), s => {
+  onValue(rRef('queue'), s => {
     queue = s.val() || {};
     updateQueueBadge();
     if (curTab === 'queue') renderQueue();
@@ -1203,17 +1210,17 @@ async function approveQueueItem(id) {
   const item = queue[id]; if (!item) return;
   if (item.type === 'reward_request') {
     await addPts(-(item.cost||0), 'Reward: ' + item.rewardTitle);
-    if (item.rewardId) await update(ref(db,'rewards/'+item.rewardId), {pendingRequest:false});
-    await push(ref(db,'history'), { type:'reward_approved', rewardTitle:item.rewardTitle, cost:item.cost, ts:Date.now() });
+    if (item.rewardId) await update(rRef('rewards/'+item.rewardId), {pendingRequest:false});
+    await push(rRef('history'), { type:'reward_approved', rewardTitle:item.rewardTitle, cost:item.cost, ts:Date.now() });
     showToast('🎁 Reward approved!');
   }
-  await update(ref(db,'queue/'+id), {resolved:true});
+  await update(rRef('queue/'+id), {resolved:true});
 }
 
 async function denyQueueItem(id) {
   const item = queue[id]; if (!item) return;
-  if (item.rewardId) await update(ref(db,'rewards/'+item.rewardId), {pendingRequest:false});
-  await update(ref(db,'queue/'+id), {resolved:true});
+  if (item.rewardId) await update(rRef('rewards/'+item.rewardId), {pendingRequest:false});
+  await update(rRef('queue/'+id), {resolved:true});
   showToast('Dismissed');
 }
 
@@ -1238,7 +1245,7 @@ function renderPunishBanner() {
 }
 
 async function dismissPunishment(qId) {
-  await update(ref(db,'queue/'+qId), {resolved:true});
+  await update(rRef('queue/'+qId), {resolved:true});
   showToast('Punishment dismissed');
 }
 
@@ -1258,7 +1265,7 @@ function openRedemptionSheet(qId) {
 async function saveRedemptionTask() {
   const title = document.getElementById('redemptionTitle').value.trim();
   if (!title) { showToast('Enter a task title'); return; }
-  await push(ref(db,'tasks'), {
+  await push(rRef('tasks'), {
     title,
     description: document.getElementById('redemptionDesc').value.trim(),
     difficulty:'simple', basePoints:parseInt(document.getElementById('redemptionPoints').value)||10,
@@ -1266,8 +1273,8 @@ async function saveRedemptionTask() {
     requireProof:true, isRedemption:true, redemptionFor:redemptionQId,
     createdAt:Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
   });
-  if (redemptionQId) await update(ref(db,'queue/'+redemptionQId), {resolved:true, hadRedemption:true});
-  await push(ref(db,'history'), { type:'redemption_assigned', title, ts:Date.now() });
+  if (redemptionQId) await update(rRef('queue/'+redemptionQId), {resolved:true, hadRedemption:true});
+  await push(rRef('history'), { type:'redemption_assigned', title, ts:Date.now() });
   closeAllSheets(); redemptionQId = null;
   showToast('🌿 Redemption task assigned');
 }
@@ -1276,7 +1283,7 @@ async function saveRedemptionTask() {
 // REWARDS
 // ─────────────────────────────────────────────
 function listenRewards() {
-  onValue(ref(db,'rewards'), s => { rewards = s.val() || {}; if (curTab==='rewards') renderRewards(); });
+  onValue(rRef('rewards'), s => { rewards = s.val() || {}; if (curTab==='rewards') renderRewards(); });
 }
 
 function renderRewards() {
@@ -1317,7 +1324,7 @@ function renderRewards() {
 async function saveReward() {
   const title = document.getElementById('rewardTitle').value.trim();
   if (!title) { showToast('Enter a title'); return; }
-  await push(ref(db,'rewards'), {
+  await push(rRef('rewards'), {
     title, description:document.getElementById('rewardDesc').value.trim(),
     cost:parseInt(document.getElementById('rewardCost').value)||50,
     emoji:document.getElementById('rewardEmoji').value||'🎁', createdAt:Date.now()
@@ -1330,35 +1337,35 @@ async function saveReward() {
 async function requestReward(id) {
   const r = rewards[id]; if (!r) return;
   if ((pts.balance||0) < r.cost) { showToast('Not enough points'); return; }
-  await update(ref(db,'rewards/'+id), {pendingRequest:true, requestedAt:Date.now()});
-  await push(ref(db,'queue'), { type:'reward_request', rewardId:id, rewardTitle:r.title, cost:r.cost, ts:Date.now(), resolved:false });
+  await update(rRef('rewards/'+id), {pendingRequest:true, requestedAt:Date.now()});
+  await push(rRef('queue'), { type:'reward_request', rewardId:id, rewardTitle:r.title, cost:r.cost, ts:Date.now(), resolved:false });
   showToast("🎁 Request sent to Sir!");
 }
 
 async function approveReward(id) {
   const r = rewards[id]; if (!r) return;
   await addPts(-r.cost, 'Reward: ' + r.title);
-  await update(ref(db,'rewards/'+id), {pendingRequest:false, requestedAt:null});
-  await push(ref(db,'history'), { type:'reward_approved', rewardTitle:r.title, cost:r.cost, ts:Date.now() });
+  await update(rRef('rewards/'+id), {pendingRequest:false, requestedAt:null});
+  await push(rRef('history'), { type:'reward_approved', rewardTitle:r.title, cost:r.cost, ts:Date.now() });
   showToast('✅ Reward approved!');
 }
 
 async function denyReward(id) {
-  await update(ref(db,'rewards/'+id), {pendingRequest:false, requestedAt:null});
+  await update(rRef('rewards/'+id), {pendingRequest:false, requestedAt:null});
   showToast('Request denied');
 }
 
 async function deleteReward(id) {
   const ok = await customConfirm({title:'Remove this reward?', message:'It will be removed from the store.', icon:'🗑️', okText:'Remove'});
   if (!ok) return;
-  await remove(ref(db,'rewards/'+id));
+  await remove(rRef('rewards/'+id));
 }
 
 // ─────────────────────────────────────────────
 // PUNISHMENTS
 // ─────────────────────────────────────────────
 function listenPunishments() {
-  onValue(ref(db,'punishments'), s => {
+  onValue(rRef('punishments'), s => {
     punishments = s.val() || {};
     if (curTab==='punishments') renderPunishments();
     fillPunishDrop();
@@ -1393,7 +1400,7 @@ function renderPunishments() {
 async function savePunishment() {
   const title = document.getElementById('punishTitle').value.trim();
   if (!title) { showToast('Enter a title'); return; }
-  await push(ref(db,'punishments'), {
+  await push(rRef('punishments'), {
     title, description:document.getElementById('punishDesc').value.trim(),
     points:parseInt(document.getElementById('punishPoints').value)||15,
     emoji:document.getElementById('punishEmoji').value||'⚡', createdAt:Date.now()
@@ -1405,20 +1412,20 @@ async function savePunishment() {
 
 async function assignPunishment(id) {
   const p = punishments[id]; if (!p) return;
-  await push(ref(db,'queue'), {
+  await push(rRef('queue'), {
     type:'failure_report', taskTitle:"Sir's direct assignment",
     punishLink:id, punishPoints:p.points||0, reason:'Assigned manually by Sir',
     ts:Date.now(), resolved:false
   });
   await addPts(-(p.points||0), 'Punishment assigned: ' + p.title);
-  await push(ref(db,'history'), { type:'punishment_assigned', punishTitle:p.title, points:-(p.points||0), ts:Date.now() });
+  await push(rRef('history'), { type:'punishment_assigned', punishTitle:p.title, points:-(p.points||0), ts:Date.now() });
   showToast('⚡ Punishment assigned');
 }
 
 async function deletePunishment(id) {
   const ok = await customConfirm({title:'Remove this punishment?', message:'It will be removed from the list.', icon:'🗑️', okText:'Remove'});
   if (!ok) return;
-  await remove(ref(db,'punishments/'+id));
+  await remove(rRef('punishments/'+id));
 }
 
 function fillPunishDrop() {
@@ -1438,7 +1445,7 @@ function fillPunishDrop() {
 // ─────────────────────────────────────────────
 let histData = {};
 function listenHistory() {
-  onValue(ref(db,'history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); renderAchievements(); });
+  onValue(rRef('history'), s => { histData = s.val() || {}; if (curTab==='history') renderHistory(); renderAchievements(); });
 }
 
 function renderHistory() {
@@ -1672,7 +1679,7 @@ W.selectConsequence = function(el, globalIdx) {
 async function applyConsequence() {
   if (!currentConsequencePicked) return;
   const c = currentConsequencePicked;
-  await push(ref(db,'tasks'), {
+  await push(rRef('tasks'), {
     title: c.emoji + ' ' + c.title,
     description: c.desc,
     difficulty: 'demanding', basePoints: c.pts,
@@ -1681,11 +1688,11 @@ async function applyConsequence() {
     redemptionFor: currentConsequenceTaskId || null,
     createdAt: Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
   });
-  await push(ref(db,'history'), {
+  await push(rRef('history'), {
     type: 'consequence_assigned', title: c.title, tier: c.tier, pts: c.pts, ts: Date.now()
   });
   if (currentConsequenceTaskId && queue[currentConsequenceTaskId]) {
-    await update(ref(db,'queue/'+currentConsequenceTaskId), {resolved:true, hadConsequence:true});
+    await update(rRef('queue/'+currentConsequenceTaskId), {resolved:true, hadConsequence:true});
   }
   closeAllSheets();
   currentConsequenceTaskId = null; currentConsequencePicked = null;
@@ -1750,8 +1757,8 @@ async function submitCheckin() {
   if (!selectedMood) { showToast('Pick a mood first'); return; }
   const energy = parseInt(document.getElementById('energySlider').value);
   const note = document.getElementById('checkinNote').value.trim();
-  await set(ref(db,'checkin'), { mood:selectedMood, energy, note, ts:Date.now(), role:'sub' });
-  await push(ref(db,'history'), { type:'checkin', mood:selectedMood, energy, ts:Date.now() });
+  await set(rRef('checkin'), { mood:selectedMood, energy, note, ts:Date.now(), role:'sub' });
+  await push(rRef('history'), { type:'checkin', mood:selectedMood, energy, ts:Date.now() });
   localStorage.setItem(CHECKIN_KEY, new Date().toDateString());
   closeCheckin();
   showToast('💭 Check-in sent to Sir');
@@ -1772,14 +1779,14 @@ function closeCheckin() {
 }
 
 function listenCheckin() {
-  onValue(ref(db,'checkin'), s => {
+  onValue(rRef('checkin'), s => {
     window._checkinData = s.val() || null;
     if (curTab === 'dashboard') renderDashboard(window._checkinData);
   });
 }
 
 function listenTaskRequests() {
-  onValue(ref(db,'taskRequests'), s => {
+  onValue(rRef('taskRequests'), s => {
     taskRequests = s.val() || {};
     if (curTab === 'dashboard') renderDashboard(window._checkinData);
     if (curTab === 'queue') renderQueue();
@@ -1980,7 +1987,7 @@ function renderPointsChart() {
 async function sendTaskRequest() {
   const title = document.getElementById('taskReqTitle').value.trim();
   if (!title) { showToast('Describe what you want to do'); return; }
-  await push(ref(db,'taskRequests'), {
+  await push(rRef('taskRequests'), {
     title, note: document.getElementById('taskReqNote').value.trim(),
     ts: Date.now(), resolved: false, denied: false
   });
@@ -2002,20 +2009,20 @@ function openTaskRequestReview(reqId) {
 async function approveTaskRequest() {
   if (!reviewTaskReqId) return;
   const r = taskRequests[reviewTaskReqId]; if (!r) return;
-  await push(ref(db,'tasks'), {
+  await push(rRef('tasks'), {
     title: r.title, description: r.note||'',
     difficulty:'simple', basePoints:10, schedule:'once',
     due:null, punishLink:null, punishPoints:0, requireProof:false,
     createdAt:Date.now(), completedToday:false, failedToday:false, streak:0, bestStreak:0
   });
-  await update(ref(db,'taskRequests/'+reviewTaskReqId), {resolved:true, approvedAt:Date.now()});
+  await update(rRef('taskRequests/'+reviewTaskReqId), {resolved:true, approvedAt:Date.now()});
   closeAllSheets(); reviewTaskReqId = null;
   showToast('✅ Request approved and assigned!');
 }
 
 async function denyTaskRequest() {
   if (!reviewTaskReqId) return;
-  await update(ref(db,'taskRequests/'+reviewTaskReqId), {resolved:true, denied:true});
+  await update(rRef('taskRequests/'+reviewTaskReqId), {resolved:true, denied:true});
   closeAllSheets(); reviewTaskReqId = null;
   showToast('Request declined');
 }
@@ -2033,7 +2040,7 @@ function checkDailyReset() {
       u['tasks/'+id+'/completedToday'] = false;
       u['tasks/'+id+'/failedToday']    = false;
       u['tasks/'+id+'/proofPending']   = false;
-      update(ref(db), u);
+      update(rRef(), u);
     }
   });
 }

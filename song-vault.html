@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -566,8 +566,9 @@ body::before {
 
 <script src="nav.js"></script>
 <script type="module">
-import { requireAuth, dataRef, getSettings } from './auth.js';
+import { requireAuth, dataRef, getSettings, getRelationship } from './auth.js';
 import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { db } from './firebase-config.js';
 
 let vaultRef;
 
@@ -862,7 +863,12 @@ if('serviceWorker' in navigator) window.addEventListener('load',function(){ navi
 
 (async function initFirebase() {
   const user = await requireAuth();
-  vaultRef = dataRef('song-vault');
+  const rel = await getRelationship();
+  if (rel) {
+    vaultRef = doc(db, 'relationships', rel.id, 'vaults', 'songs');
+  } else {
+    vaultRef = dataRef('song-vault');
+  }
   await loadVault();
   const s = await getSettings(user.uid);
   if(s.role) adderRole = s.role.toLowerCase().includes('sub')?'sub':'dom';
