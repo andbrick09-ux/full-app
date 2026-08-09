@@ -565,54 +565,100 @@ body::before {
 <div class="dsh-toast" id="toast"></div>
 
 <script src="nav.js"></script>
-<script type="module">
-import { requireAuth, dataRef, getSettings, getRelationship } from './auth.js';
-import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { db } from './firebase-config.js';
-
-let vaultRef;
-
+<script>
 // ══════════════════════════════════════
-//  STATE
+//  STATE & GLOBALS
 // ══════════════════════════════════════
 var VAULT_KEY   = 'sirender_song_vault';
 var API_KEY_KEY = 'sirender_yt_api_key';
 var PRESETS     = ['warm-up','peak energy','rhythmic','intense impact','sensual','emotional','rope scene','teasing','aftercare','aftercare calm'];
 
 var vault = [], searchResults = [], nextPageToken = '', lastQuery = '', currentFilter = 'all', deleteTargetId = null, plItems = [];
-
 var adderRole = 'dom';
-/* Role set by Firebase */
+window._vaultRef = null;
 
 // ══════════════════════════════════════
 //  PERSISTENCE
 // ══════════════════════════════════════
-async function loadVault() { if(vaultRef) { const snap=await getDoc(vaultRef); vault=snap.exists()?snap.data().songs||[]:[]; updateBadge(); } }catch(e){ vault=[]; } }
-function saveVault() { if(vaultRef) setDoc(vaultRef,{songs:vault}); updateBadge(); }
-function getKey(){ return sessionStorage.getItem(API_KEY_KEY)||''; }
-function updateBadge(){ var n=vault.length; document.getElementById('vaultBadge').textContent=n+(n===1?' Song':' Songs'); }
+function loadVault() {
+  try {
+    var raw = localStorage.getItem(VAULT_KEY);
+    vault = raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    console.error('Error loading vault from localStorage:', e);
+    vault = [];
+  }
+  updateBadge();
+}
+
+function saveVault() {
+  try {
+    localStorage.setItem(VAULT_KEY, JSON.stringify(vault));
+    if (window._vaultRef && window._firebaseSetDoc) {
+      window._firebaseSetDoc(window._vaultRef, { songs: vault }).catch(function(e){
+        console.warn('Firebase save warning:', e);
+      });
+    }
+  } catch(e) {
+    console.error('Error saving vault:', e);
+  }
+  updateBadge();
+}
+
+function getKey(){
+  return localStorage.getItem(API_KEY_KEY) || sessionStorage.getItem(API_KEY_KEY) || '';
+}
+
+function updateBadge(){
+  var n = vault.length;
+  var badge = document.getElementById('vaultBadge');
+  if(badge) badge.textContent = n + (n === 1 ? ' Song' : ' Songs');
+}
 
 // ══════════════════════════════════════
-//  API KEY
+//  API KEY & MODALS
 // ══════════════════════════════════════
-function checkBanner(){ document.getElementById('apiBanner').classList.toggle('hidden',!!getKey()); }
-function openApiModal(){ document.getElementById('apiKeyInput').value=getKey(); document.getElementById('apiBack').classList.add('open'); }
-function closeApiModal(){ document.getElementById('apiBack').classList.remove('open'); }
+function checkBanner(){
+  var b = document.getElementById('apiBanner');
+  if(b) b.classList.toggle('hidden', !!getKey());
+}
+
+function openApiModal(){
+  var inp = document.getElementById('apiKeyInput');
+  var modal = document.getElementById('apiBack');
+  if(inp) inp.value = getKey();
+  if(modal) modal.classList.add('open');
+}
+
+function closeApiModal(){
+  var modal = document.getElementById('apiBack');
+  if(modal) modal.classList.remove('open');
+}
+
 function saveApiKey(){
-  var v=document.getElementById('apiKeyInput').value.trim();
+  var inp = document.getElementById('apiKeyInput');
+  var v = inp ? inp.value.trim() : '';
   if(!v){ showToast('Please enter a key'); return; }
-  sessionStorage.setItem(API_KEY_KEY,v); closeApiModal(); checkBanner(); showToast('API key saved ✓');
+  localStorage.setItem(API_KEY_KEY, v);
+  sessionStorage.setItem(API_KEY_KEY, v);
+  closeApiModal();
+  checkBanner();
+  showToast('API key saved ✓');
 }
 
 // ══════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════
 function switchTab(tab){
-  var s=tab==='search';
-  document.getElementById('panelSearch').classList.toggle('active',s);
-  document.getElementById('panelVault').classList.toggle('active',!s);
-  document.getElementById('tabSearch').classList.toggle('active',s);
-  document.getElementById('tabVault').classList.toggle('active',!s);
+  var s = tab === 'search';
+  var pSearch = document.getElementById('panelSearch');
+  var pVault  = document.getElementById('panelVault');
+  var tSearch = document.getElementById('tabSearch');
+  var tVault  = document.getElementById('tabVault');
+  if(pSearch) pSearch.classList.toggle('active', s);
+  if(pVault)  pVault.classList.toggle('active', !s);
+  if(tSearch) tSearch.classList.toggle('active', s);
+  if(tVault)  tVault.classList.toggle('active', !s);
   if(!s) renderVault();
 }
 
@@ -620,259 +666,353 @@ function switchTab(tab){
 //  SEARCH
 // ══════════════════════════════════════
 async function doSearch(pageToken){
-  var q=document.getElementById('searchInput').value.trim();
+  var searchInp = document.getElementById('searchInput');
+  var q = searchInp ? searchInp.value.trim() : '';
   if(!q){ showToast('Enter a search term'); return; }
-  var key=getKey(); if(!key){ openApiModal(); return; }
-  if(!pageToken){ lastQuery=q; nextPageToken=''; searchResults=[]; showState('loading'); }
-  try{
-    var p=new URLSearchParams({part:'snippet',q:q,type:'video',videoCategoryId:'10',maxResults:10,key:key});
-    if(pageToken) p.set('pageToken',pageToken);
-    var res=await fetch('https://www.googleapis.com/youtube/v3/search?'+p);
-    var data=await res.json();
-    if(data.error){ showState('error'); document.getElementById('errTitle').textContent='API Error '+data.error.code; document.getElementById('errDesc').textContent=data.error.message; return; }
-    nextPageToken=data.nextPageToken||'';
-    var ids=(data.items||[]).map(function(i){ return i.id.videoId; }).join(',');
-    var durMap={};
-    if(ids){
-      var vr=await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id='+ids+'&key='+key);
-      var vd=await vr.json();
-      (vd.items||[]).forEach(function(v){ durMap[v.id]=parseDur(v.contentDetails.duration); });
+  var key = getKey();
+  if(!key){ openApiModal(); return; }
+  if(!pageToken){ lastQuery = q; nextPageToken = ''; searchResults = []; showState('loading'); }
+  try {
+    var p = new URLSearchParams({ part: 'snippet', q: q, type: 'video', videoCategoryId: '10', maxResults: 10, key: key });
+    if(pageToken) p.set('pageToken', pageToken);
+    var res = await fetch('https://www.googleapis.com/youtube/v3/search?' + p);
+    var data = await res.json();
+    if(data.error){
+      showState('error');
+      var errT = document.getElementById('errTitle');
+      var errD = document.getElementById('errDesc');
+      if(errT) errT.textContent = 'API Error ' + (data.error.code || '');
+      if(errD) errD.textContent = data.error.message || 'Check your API key.';
+      return;
     }
-    var mapped=(data.items||[]).map(function(i){ return {videoId:i.id.videoId,title:i.snippet.title,artist:i.snippet.channelTitle,thumb:((i.snippet.thumbnails.medium||i.snippet.thumbnails.default)||{}).url||'',duration:durMap[i.id.videoId]||''}; });
-    searchResults=pageToken?searchResults.concat(mapped):mapped;
-    showState('results'); renderResults();
-  }catch(e){ showState('error'); document.getElementById('errTitle').textContent='Network Error'; document.getElementById('errDesc').textContent='Check your connection and try again.'; }
+    nextPageToken = data.nextPageToken || '';
+    var ids = (data.items || []).map(function(i){ return i.id.videoId; }).join(',');
+    var durMap = {};
+    if(ids){
+      var vr = await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=' + ids + '&key=' + key);
+      var vd = await vr.json();
+      (vd.items || []).forEach(function(v){ durMap[v.id] = parseDur(v.contentDetails.duration); });
+    }
+    var mapped = (data.items || []).map(function(i){
+      return {
+        videoId: i.id.videoId,
+        title: i.snippet.title,
+        artist: i.snippet.channelTitle,
+        thumb: ((i.snippet.thumbnails.medium || i.snippet.thumbnails.default) || {}).url || '',
+        duration: durMap[i.id.videoId] || ''
+      };
+    });
+    searchResults = pageToken ? searchResults.concat(mapped) : mapped;
+    showState('results');
+    renderResults();
+  } catch(e) {
+    showState('error');
+    var errT = document.getElementById('errTitle');
+    var errD = document.getElementById('errDesc');
+    if(errT) errT.textContent = 'Network Error';
+    if(errD) errD.textContent = 'Check your connection and try again.';
+  }
 }
+
 function loadMore(){ if(nextPageToken) doSearch(nextPageToken); }
+
 function showState(s){
-  document.getElementById('stateIdle').classList.toggle('hidden',s!=='idle');
-  document.getElementById('stateLoading').classList.toggle('hidden',s!=='loading');
-  document.getElementById('stateError').classList.toggle('hidden',s!=='error');
-  document.getElementById('resultsArea').classList.toggle('hidden',s!=='results');
+  var sIdle = document.getElementById('stateIdle');
+  var sLoad = document.getElementById('stateLoading');
+  var sErr  = document.getElementById('stateError');
+  var resArea = document.getElementById('resultsArea');
+  if(sIdle) sIdle.classList.toggle('hidden', s !== 'idle');
+  if(sLoad) sLoad.classList.toggle('hidden', s !== 'loading');
+  if(sErr)  sErr.classList.toggle('hidden', s !== 'error');
+  if(resArea) resArea.classList.toggle('hidden', s !== 'results');
 }
+
 function renderResults(){
-  var list=document.getElementById('resultsList'); list.innerHTML='';
-  document.getElementById('resultsHd').textContent=searchResults.length+' results for "'+lastQuery+'"';
+  var list = document.getElementById('resultsList');
+  if(!list) return;
+  list.innerHTML = '';
+  var resHd = document.getElementById('resultsHd');
+  if(resHd) resHd.textContent = searchResults.length + ' results for "' + lastQuery + '"';
   searchResults.forEach(function(item){
-    var inV=vault.some(function(v){ return v.videoId===item.videoId; });
-    var card=document.createElement('div'); card.className='result-card';
-    card.innerHTML=(item.thumb?'<img class="result-thumb" src="'+esc(item.thumb)+'" alt="" loading="lazy"/>':'<div class="result-thumb-ph">🎵</div>')+'<div class="result-info"><div class="result-title">'+esc(item.title)+'</div><div class="result-artist">'+esc(item.artist)+'</div>'+(item.duration?'<div class="result-dur">'+item.duration+'</div>':'')+'</div><button class="add-btn'+(inV?' added':'')+'">'+( inV?'✓ Added':'+ Add')+'</button>';
-    card.querySelector('.add-btn').addEventListener('click',function(){ addToVault(item,this); });
+    var inV = vault.some(function(v){ return v.videoId === item.videoId; });
+    var card = document.createElement('div'); card.className = 'result-card';
+    card.innerHTML = (item.thumb ? '<img class="result-thumb" src="' + esc(item.thumb) + '" alt="" loading="lazy"/>' : '<div class="result-thumb-ph">🎵</div>') + '<div class="result-info"><div class="result-title">' + esc(item.title) + '</div><div class="result-artist">' + esc(item.artist) + '</div>' + (item.duration ? '<div class="result-dur">' + item.duration + '</div>' : '') + '</div><button class="add-btn' + (inV ? ' added' : '') + '">' + (inV ? '✓ Added' : '+ Add') + '</button>';
+    card.querySelector('.add-btn').addEventListener('click', function(){ addToVault(item, this); });
     list.appendChild(card);
   });
-  document.getElementById('loadMoreBtn').style.display=nextPageToken?'':'none';
+  var lmBtn = document.getElementById('loadMoreBtn');
+  if(lmBtn) lmBtn.style.display = nextPageToken ? '' : 'none';
 }
 
 // ══════════════════════════════════════
 //  ADD FROM SEARCH
 // ══════════════════════════════════════
-function addToVault(item,btn){
-  if(vault.some(function(v){ return v.videoId===item.videoId; })){ showToast('Already in Vault'); return; }
-  vault.unshift({id:Date.now(),videoId:item.videoId,title:decode(item.title),artist:decode(item.artist),thumb:item.thumb,duration:item.duration,tags:[],note:'',addedBy:adderRole,addedAt:Date.now()});
-  saveVault(); btn.textContent='✓ Added'; btn.classList.add('added'); showToast('Added to Vault ✓');
+function addToVault(item, btn){
+  if(vault.some(function(v){ return v.videoId === item.videoId; })){ showToast('Already in Vault'); return; }
+  vault.unshift({ id: Date.now(), videoId: item.videoId, title: decode(item.title), artist: decode(item.artist), thumb: item.thumb, duration: item.duration, tags: [], note: '', addedBy: adderRole, addedAt: Date.now() });
+  saveVault();
+  if(btn){ btn.textContent = '✓ Added'; btn.classList.add('added'); }
+  showToast('Added to Vault ✓');
 }
 
 // ══════════════════════════════════════
 //  PASTE SINGLE LINK
 // ══════════════════════════════════════
 async function addFromPaste(){
-  var raw=document.getElementById('pasteInput').value.trim();
+  var pInp = document.getElementById('pasteInput');
+  var raw = pInp ? pInp.value.trim() : '';
   if(!raw){ showToast('Paste a YouTube link first'); return; }
-  var vid=extractVideoId(raw); if(!vid){ showToast('Could not find a video ID'); return; }
-  if(vault.some(function(v){ return v.videoId===vid; })){ showToast('Already in Vault'); return; }
-  var key=getKey(); if(!key){ openApiModal(); return; }
+  var vid = extractVideoId(raw);
+  if(!vid){ showToast('Could not find a video ID'); return; }
+  if(vault.some(function(v){ return v.videoId === vid; })){ showToast('Already in Vault'); return; }
+  var key = getKey();
+  if(!key){ openApiModal(); return; }
   showToast('Fetching details…');
-  try{
-    var res=await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id='+vid+'&key='+key);
-    var data=await res.json();
-    var item=(data.items||[])[0]; if(!item){ showToast('Video not found'); return; }
-    vault.unshift({id:Date.now(),videoId:vid,title:item.snippet.title,artist:item.snippet.channelTitle,thumb:((item.snippet.thumbnails.medium||item.snippet.thumbnails.default)||{}).url||'',duration:parseDur(item.contentDetails.duration||''),tags:[],note:'',addedBy:adderRole,addedAt:Date.now()});
-    saveVault(); document.getElementById('pasteInput').value=''; showToast('Added to Vault ✓');
-  }catch(e){ showToast('Error fetching video'); }
+  try {
+    var res = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=' + vid + '&key=' + key);
+    var data = await res.json();
+    var item = (data.items || [])[0];
+    if(!item){ showToast('Video not found'); return; }
+    vault.unshift({ id: Date.now(), videoId: vid, title: item.snippet.title, artist: item.snippet.channelTitle, thumb: ((item.snippet.thumbnails.medium || item.snippet.thumbnails.default) || {}).url || '', duration: parseDur(item.contentDetails.duration || ''), tags: [], note: '', addedBy: adderRole, addedAt: Date.now() });
+    saveVault();
+    if(pInp) pInp.value = '';
+    showToast('Added to Vault ✓');
+  } catch(e) { showToast('Error fetching video'); }
 }
 
 // ══════════════════════════════════════
 //  PLAYLIST IMPORT
 // ══════════════════════════════════════
 async function importPlaylist(){
-  var raw=document.getElementById('playlistInput').value.trim();
+  var plInp = document.getElementById('playlistInput');
+  var raw = plInp ? plInp.value.trim() : '';
   if(!raw){ showToast('Paste a playlist URL first'); return; }
-  var plId=extractPlaylistId(raw); if(!plId){ showToast('Could not find a playlist ID'); return; }
-  var key=getKey(); if(!key){ openApiModal(); return; }
-  showToast('Loading playlist…'); plItems=[];
-  try{
-    var pageToken='';
-    do{
-      var p=new URLSearchParams({part:'snippet',playlistId:plId,maxResults:50,key:key});
-      if(pageToken) p.set('pageToken',pageToken);
-      var res=await fetch('https://www.googleapis.com/youtube/v3/playlistItems?'+p);
-      var data=await res.json();
-      if(data.error){ showToast('Playlist error: '+data.error.message); return; }
-      var ids=(data.items||[]).filter(function(i){ return i.snippet.resourceId.kind==='youtube#video'; }).map(function(i){ return i.snippet.resourceId.videoId; }).join(',');
-      var durMap={};
+  var plId = extractPlaylistId(raw);
+  if(!plId){ showToast('Could not find a playlist ID'); return; }
+  var key = getKey();
+  if(!key){ openApiModal(); return; }
+  showToast('Loading playlist…'); plItems = [];
+  try {
+    var pageToken = '';
+    do {
+      var p = new URLSearchParams({ part: 'snippet', playlistId: plId, maxResults: 50, key: key });
+      if(pageToken) p.set('pageToken', pageToken);
+      var res = await fetch('https://www.googleapis.com/youtube/v3/playlistItems?' + p);
+      var data = await res.json();
+      if(data.error){ showToast('Playlist error: ' + data.error.message); return; }
+      var ids = (data.items || []).filter(function(i){ return i.snippet.resourceId.kind === 'youtube#video'; }).map(function(i){ return i.snippet.resourceId.videoId; }).join(',');
+      var durMap = {};
       if(ids){
-        var vr=await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id='+ids+'&key='+key);
-        var vd=await vr.json();
-        (vd.items||[]).forEach(function(v){ durMap[v.id]=parseDur(v.contentDetails.duration); });
+        var vr = await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=' + ids + '&key=' + key);
+        var vd = await vr.json();
+        (vd.items || []).forEach(function(v){ durMap[v.id] = parseDur(v.contentDetails.duration); });
       }
-      (data.items||[]).forEach(function(i){
-        if(i.snippet.resourceId.kind!=='youtube#video') return;
-        var vid=i.snippet.resourceId.videoId;
-        plItems.push({videoId:vid,title:i.snippet.title,artist:i.snippet.videoOwnerChannelTitle||'',thumb:((i.snippet.thumbnails.medium||i.snippet.thumbnails.default)||{}).url||'',duration:durMap[vid]||'',selected:true});
+      (data.items || []).forEach(function(i){
+        if(i.snippet.resourceId.kind !== 'youtube#video') return;
+        var vid = i.snippet.resourceId.videoId;
+        plItems.push({ videoId: vid, title: i.snippet.title, artist: i.snippet.videoOwnerChannelTitle || '', thumb: ((i.snippet.thumbnails.medium || i.snippet.thumbnails.default) || {}).url || '', duration: durMap[vid] || '', selected: true });
       });
-      pageToken=data.nextPageToken||'';
-    }while(pageToken);
+      pageToken = data.nextPageToken || '';
+    } while(pageToken);
     if(!plItems.length){ showToast('No videos found in playlist'); return; }
-    // filter already-in-vault
-    var inV=vault.map(function(v){ return v.videoId; });
-    var skip=plItems.filter(function(i){ return inV.indexOf(i.videoId)>-1; }).length;
-    plItems=plItems.filter(function(i){ return inV.indexOf(i.videoId)<0; });
-    document.getElementById('plSub').textContent=plItems.length+' new tracks'+(skip?' · '+skip+' already in Vault':'');
+    var inV = vault.map(function(v){ return v.videoId; });
+    var skip = plItems.filter(function(i){ return inV.indexOf(i.videoId) > -1; }).length;
+    plItems = plItems.filter(function(i){ return inV.indexOf(i.videoId) < 0; });
+    var plSub = document.getElementById('plSub');
+    if(plSub) plSub.textContent = plItems.length + ' new tracks' + (skip ? ' · ' + skip + ' already in Vault' : '');
     updatePlLabel(); renderPlList();
-    document.getElementById('playlistInput').value='';
-    document.getElementById('plBack').classList.add('open');
-  }catch(e){ showToast('Error loading playlist'); }
+    if(plInp) plInp.value = '';
+    var plBack = document.getElementById('plBack');
+    if(plBack) plBack.classList.add('open');
+  } catch(e) { showToast('Error loading playlist'); }
 }
-function closePlSheet(){ document.getElementById('plBack').classList.remove('open'); }
+
+function closePlSheet(){ var plBack = document.getElementById('plBack'); if(plBack) plBack.classList.remove('open'); }
+
 function renderPlList(){
-  var list=document.getElementById('plList'); list.innerHTML='';
-  plItems.forEach(function(item,idx){
-    var el=document.createElement('div'); el.className='pl-item'+(item.selected?' selected':'');
-    el.innerHTML=(item.thumb?'<img class="pl-thumb" src="'+esc(item.thumb)+'" alt="" loading="lazy"/>'  :'<div class="pl-thumb-ph">🎵</div>')+'<div class="pl-info"><div class="pl-item-title">'+esc(item.title)+'</div><div class="pl-item-artist">'+esc(item.artist)+(item.duration?' · '+item.duration:'')+'</div></div><div class="pl-check"><span class="material-symbols-rounded">check</span></div>';
-    el.addEventListener('click',function(){ plItems[idx].selected=!plItems[idx].selected; el.classList.toggle('selected',plItems[idx].selected); updatePlLabel(); });
+  var list = document.getElementById('plList');
+  if(!list) return;
+  list.innerHTML = '';
+  plItems.forEach(function(item, idx){
+    var el = document.createElement('div'); el.className = 'pl-item' + (item.selected ? ' selected' : '');
+    el.innerHTML = (item.thumb ? '<img class="pl-thumb" src="' + esc(item.thumb) + '" alt="" loading="lazy"/>' : '<div class="pl-thumb-ph">🎵</div>') + '<div class="pl-info"><div class="pl-item-title">' + esc(item.title) + '</div><div class="pl-item-artist">' + esc(item.artist) + (item.duration ? ' · ' + item.duration : '') + '</div></div><div class="pl-check"><span class="material-symbols-rounded">check</span></div>';
+    el.addEventListener('click', function(){ plItems[idx].selected = !plItems[idx].selected; el.classList.toggle('selected', plItems[idx].selected); updatePlLabel(); });
     list.appendChild(el);
   });
 }
-function updatePlLabel(){ var n=plItems.filter(function(i){ return i.selected; }).length; document.getElementById('plAddLabel').textContent='Add '+n+' Song'+(n!==1?'s':'')+' to Vault'; }
-function toggleSelectAll(){
-  var allOn=plItems.every(function(i){ return i.selected; });
-  plItems.forEach(function(i){ i.selected=!allOn; });
-  renderPlList(); updatePlLabel();
-  document.getElementById('selectAllBtn').textContent=allOn?'Select All':'Deselect All';
+
+function updatePlLabel(){
+  var n = plItems.filter(function(i){ return i.selected; }).length;
+  var lbl = document.getElementById('plAddLabel');
+  if(lbl) lbl.textContent = 'Add ' + n + ' Song' + (n !== 1 ? 's' : '') + ' to Vault';
 }
+
+function toggleSelectAll(){
+  var allOn = plItems.every(function(i){ return i.selected; });
+  plItems.forEach(function(i){ i.selected = !allOn; });
+  renderPlList(); updatePlLabel();
+  var saBtn = document.getElementById('selectAllBtn');
+  if(saBtn) saBtn.textContent = allOn ? 'Select All' : 'Deselect All';
+}
+
 function confirmImport(){
-  var toAdd=plItems.filter(function(i){ return i.selected; });
+  var toAdd = plItems.filter(function(i){ return i.selected; });
   if(!toAdd.length){ showToast('No songs selected'); return; }
-  var now=Date.now();
+  var now = Date.now();
   toAdd.slice().reverse().forEach(function(item){
-    vault.unshift({id:now++,videoId:item.videoId,title:decode(item.title),artist:decode(item.artist),thumb:item.thumb,duration:item.duration,tags:[],note:'',addedBy:adderRole,addedAt:now});
+    vault.unshift({ id: now++, videoId: item.videoId, title: decode(item.title), artist: decode(item.artist), thumb: item.thumb, duration: item.duration, tags: [], note: '', addedBy: adderRole, addedAt: now });
   });
-  saveVault(); closePlSheet(); showToast(toAdd.length+' songs added ✓'); switchTab('vault');
+  saveVault(); closePlSheet(); showToast(toAdd.length + ' songs added ✓'); switchTab('vault');
 }
 
 // ══════════════════════════════════════
 //  RENDER VAULT
 // ══════════════════════════════════════
 function renderVault(){
-  var list=document.getElementById('vaultList'), empty=document.getElementById('vaultEmpty');
-  list.innerHTML='';
-  var filtered=currentFilter==='all'?vault:vault.filter(function(s){ return s.tags.map(function(t){ return t.toLowerCase(); }).indexOf(currentFilter)>-1; });
+  var list = document.getElementById('vaultList'), empty = document.getElementById('vaultEmpty');
+  if(!list) return;
+  list.innerHTML = '';
+  var filtered = currentFilter === 'all' ? vault : vault.filter(function(s){ return s.tags.map(function(t){ return t.toLowerCase(); }).indexOf(currentFilter) > -1; });
   if(!filtered.length){
-    empty.classList.remove('hidden');
-    if(currentFilter!=='all'){ document.getElementById('emptyTitle').textContent='No songs with this tag'; document.getElementById('emptyDesc').textContent='Tag songs from the Vault list.'; }
-    else { document.getElementById('emptyTitle').textContent='The vault is empty'; document.getElementById('emptyDesc').textContent='Search for songs and add them here.\nBoth partners can build this together.'; }
+    if(empty) empty.classList.remove('hidden');
+    var empT = document.getElementById('emptyTitle');
+    var empD = document.getElementById('emptyDesc');
+    if(currentFilter !== 'all'){
+      if(empT) empT.textContent = 'No songs with this tag';
+      if(empD) empD.textContent = 'Tag songs from the Vault list.';
+    } else {
+      if(empT) empT.textContent = 'The vault is empty';
+      if(empD) empD.textContent = 'Search for songs and add them here.\nBoth partners can build this together.';
+    }
     return;
   }
-  empty.classList.add('hidden');
+  if(empty) empty.classList.add('hidden');
   filtered.forEach(function(song){
-    var card=document.createElement('div'); card.className='vault-card'; card.id='vc-'+song.id;
-    var tagsHtml=song.tags.map(function(t){ return '<span class="ctag">'+esc(t)+'</span>'; }).join('');
-    var presetHtml=PRESETS.map(function(p){ var on=song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(p)>-1; return '<button class="ptag'+(on?' on':'')+'" onclick="togglePreset('+song.id+',\''+escAttr(p)+'\',this)">'+p+'</button>'; }).join('');
-    card.innerHTML=
-      '<div class="vault-card-main">'+(song.thumb?'<img class="vault-thumb" src="'+esc(song.thumb)+'" alt="" loading="lazy"/>'  :'<div class="vault-thumb-ph">🎵</div>')+'<div class="vault-info"><div class="vault-song-title">'+esc(song.title)+'</div><div class="vault-artist">'+esc(song.artist)+'</div><div class="vault-meta"><span class="by-badge '+song.addedBy+'">'+(song.addedBy==='dom'?'Sir':'Sub')+'</span>'+(song.duration?'<span class="vault-dur">'+song.duration+'</span>':'')+'</div></div></div>'+
-      (song.tags.length?'<div class="card-tags">'+tagsHtml+'</div>':'')+
-      '<div class="vault-actions"><button class="va-btn tags" onclick="toggleTagPanel('+song.id+')">✦ Tags &amp; Note</button><a href="https://www.youtube.com/watch?v='+song.videoId+'" target="_blank" rel="noopener" class="va-btn open">▶ Open</a><button class="va-btn del" onclick="openDelConfirm('+song.id+')">✕</button></div>'+
-      '<div class="tag-panel" id="tp-'+song.id+'"><div class="tag-panel-inner"><div class="tp-label">Quick Tags</div><div class="preset-tags">'+presetHtml+'</div><div class="active-tags" id="at-'+song.id+'">'+activeTagsHtml(song)+'</div><div class="custom-row"><input class="custom-input" id="cti-'+song.id+'" placeholder="Custom tag…" onkeydown="if(event.key===\'Enter\')addCustomTag('+song.id+')"/><button class="custom-add" onclick="addCustomTag('+song.id+')">Add</button></div><textarea class="note-area" id="note-'+song.id+'" rows="2" placeholder="Note — great for teasing, use during rope scene…" onchange="saveNote('+song.id+',this.value)">'+esc(song.note||'')+'</textarea></div></div>';
+    var card = document.createElement('div'); card.className = 'vault-card'; card.id = 'vc-' + song.id;
+    var tagsHtml = song.tags.map(function(t){ return '<span class="ctag">' + esc(t) + '</span>'; }).join('');
+    var presetHtml = PRESETS.map(function(p){ var on = song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(p) > -1; return '<button class="ptag' + (on ? ' on' : '') + '" onclick="togglePreset(' + song.id + ',\'' + escAttr(p) + '\',this)">' + p + '</button>'; }).join('');
+    card.innerHTML =
+      '<div class="vault-card-main">' + (song.thumb ? '<img class="vault-thumb" src="' + esc(song.thumb) + '" alt="" loading="lazy"/>' : '<div class="vault-thumb-ph">🎵</div>') + '<div class="vault-info"><div class="vault-song-title">' + esc(song.title) + '</div><div class="vault-artist">' + esc(song.artist) + '</div><div class="vault-meta"><span class="by-badge ' + song.addedBy + '">' + (song.addedBy === 'dom' ? 'Sir' : 'Sub') + '</span>' + (song.duration ? '<span class="vault-dur">' + song.duration + '</span>' : '') + '</div></div></div>' +
+      (song.tags.length ? '<div class="card-tags">' + tagsHtml + '</div>' : '') +
+      '<div class="vault-actions"><button class="va-btn tags" onclick="toggleTagPanel(' + song.id + ')">✦ Tags &amp; Note</button><a href="https://www.youtube.com/watch?v=' + song.videoId + '" target="_blank" rel="noopener" class="va-btn open">▶ Open</a><button class="va-btn del" onclick="openDelConfirm(' + song.id + ')">✕</button></div>' +
+      '<div class="tag-panel" id="tp-' + song.id + '"><div class="tag-panel-inner"><div class="tp-label">Quick Tags</div><div class="preset-tags">' + presetHtml + '</div><div class="active-tags" id="at-' + song.id + '">' + activeTagsHtml(song) + '</div><div class="custom-row"><input class="custom-input" id="cti-' + song.id + '" placeholder="Custom tag…" onkeydown="if(event.key===\'Enter\')addCustomTag(' + song.id + ')"/><button class="custom-add" onclick="addCustomTag(' + song.id + ')">Add</button></div><textarea class="note-area" id="note-' + song.id + '" rows="2" placeholder="Note — great for teasing, use during rope scene…" onchange="saveNote(' + song.id + ',this.value)">' + esc(song.note || '') + '</textarea></div></div>';
     list.appendChild(card);
   });
 }
-function activeTagsHtml(song){ return song.tags.map(function(t){ return '<span class="atag">'+esc(t)+'<span class="atag-x" onclick="removeTag('+song.id+',\''+escAttr(t)+'\')">×</span></span>'; }).join(''); }
+
+function activeTagsHtml(song){ return song.tags.map(function(t){ return '<span class="atag">' + esc(t) + '<span class="atag-x" onclick="removeTag(' + song.id + ',\'' + escAttr(t) + '\')">×</span></span>'; }).join(''); }
 
 // ══════════════════════════════════════
 //  TAGS
 // ══════════════════════════════════════
-function toggleTagPanel(id){ document.getElementById('tp-'+id).classList.toggle('open'); }
-function togglePreset(id,tag,btn){
-  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
-  var idx=song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(tag);
-  if(idx>-1){ song.tags.splice(idx,1); btn.classList.remove('on'); }
-  else{ song.tags.push(tag); btn.classList.add('on'); }
+function toggleTagPanel(id){ var tp = document.getElementById('tp-' + id); if(tp) tp.classList.toggle('open'); }
+function togglePreset(id, tag, btn){
+  var song = vault.find(function(s){ return s.id === id; }); if(!song) return;
+  var idx = song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(tag);
+  if(idx > -1){ song.tags.splice(idx, 1); btn.classList.remove('on'); }
+  else { song.tags.push(tag); btn.classList.add('on'); }
   saveVault(); refreshCardTags(id);
 }
 function addCustomTag(id){
-  var inp=document.getElementById('cti-'+id), tag=inp.value.trim(); if(!tag) return;
-  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
-  if(song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(tag.toLowerCase())<0){ song.tags.push(tag); saveVault(); refreshCardTags(id); }
-  inp.value='';
+  var inp = document.getElementById('cti-' + id), tag = inp ? inp.value.trim() : ''; if(!tag) return;
+  var song = vault.find(function(s){ return s.id === id; }); if(!song) return;
+  if(song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(tag.toLowerCase()) < 0){ song.tags.push(tag); saveVault(); refreshCardTags(id); }
+  if(inp) inp.value = '';
 }
-function removeTag(id,tag){
-  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
-  song.tags=song.tags.filter(function(t){ return t.toLowerCase()!==tag.toLowerCase(); });
+function removeTag(id, tag){
+  var song = vault.find(function(s){ return s.id === id; }); if(!song) return;
+  song.tags = song.tags.filter(function(t){ return t.toLowerCase() !== tag.toLowerCase(); });
   saveVault(); refreshCardTags(id);
 }
 function refreshCardTags(id){
-  var song=vault.find(function(s){ return s.id===id; }); if(!song) return;
-  var at=document.getElementById('at-'+id); if(at) at.innerHTML=activeTagsHtml(song);
-  var card=document.getElementById('vc-'+id);
+  var song = vault.find(function(s){ return s.id === id; }); if(!song) return;
+  var at = document.getElementById('at-' + id); if(at) at.innerHTML = activeTagsHtml(song);
+  var card = document.getElementById('vc-' + id);
   if(card){
-    var old=card.querySelector('.card-tags'); if(old) old.remove();
-    if(song.tags.length){ var row=document.createElement('div'); row.className='card-tags'; row.innerHTML=song.tags.map(function(t){ return '<span class="ctag">'+esc(t)+'</span>'; }).join(''); card.querySelector('.vault-actions').insertAdjacentElement('beforebegin',row); }
+    var old = card.querySelector('.card-tags'); if(old) old.remove();
+    if(song.tags.length){ var row = document.createElement('div'); row.className = 'card-tags'; row.innerHTML = song.tags.map(function(t){ return '<span class="ctag">' + esc(t) + '</span>'; }).join(''); card.querySelector('.vault-actions').insertAdjacentElement('beforebegin', row); }
   }
-  PRESETS.forEach(function(p){ var btn=document.querySelector('#tp-'+id+' .ptag[onclick*="\''+p+'\'"]'); if(btn) btn.classList.toggle('on',song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(p)>-1); });
+  PRESETS.forEach(function(p){ var btn = document.querySelector('#tp-' + id + ' .ptag[onclick*="\'' + p + '\'"]'); if(btn) btn.classList.toggle('on', song.tags.map(function(t){ return t.toLowerCase(); }).indexOf(p) > -1); });
 }
-function saveNote(id,val){ var song=vault.find(function(s){ return s.id===id; }); if(song){ song.note=val; saveVault(); } }
+function saveNote(id, val){ var song = vault.find(function(s){ return s.id === id; }); if(song){ song.note = val; saveVault(); } }
 
 // ══════════════════════════════════════
 //  FILTER
 // ══════════════════════════════════════
-function setFilter(tag,btn){
-  currentFilter=tag;
+function setFilter(tag, btn){
+  currentFilter = tag;
   document.querySelectorAll('.fchip').forEach(function(c){ c.classList.remove('active'); });
-  btn.classList.add('active'); renderVault();
+  if(btn) btn.classList.add('active');
+  renderVault();
 }
 
 // ══════════════════════════════════════
 //  DELETE
 // ══════════════════════════════════════
-function openDelConfirm(id){ deleteTargetId=id; document.getElementById('delBack').classList.add('open'); }
-function closeDelConfirm(){ deleteTargetId=null; document.getElementById('delBack').classList.remove('open'); }
-function confirmDelete(){ vault=vault.filter(function(s){ return s.id!==deleteTargetId; }); saveVault(); closeDelConfirm(); renderVault(); renderResults(); showToast('Removed from Vault'); }
+function openDelConfirm(id){ deleteTargetId = id; var db = document.getElementById('delBack'); if(db) db.classList.add('open'); }
+function closeDelConfirm(){ deleteTargetId = null; var db = document.getElementById('delBack'); if(db) db.classList.remove('open'); }
+function confirmDelete(){ vault = vault.filter(function(s){ return s.id !== deleteTargetId; }); saveVault(); closeDelConfirm(); renderVault(); renderResults(); showToast('Removed from Vault'); }
 
 // ══════════════════════════════════════
 //  TOAST
 // ══════════════════════════════════════
 var _tt;
-function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){ t.classList.remove('show'); },2200); }
+function showToast(msg){ var t = document.getElementById('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(_tt); _tt = setTimeout(function(){ t.classList.remove('show'); }, 2200); }
 
 // ══════════════════════════════════════
 //  UTILS
 // ══════════════════════════════════════
-function extractVideoId(url){ var pats=[/(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/,/music\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})/]; for(var i=0;i<pats.length;i++){ var m=url.match(pats[i]); if(m) return m[1]; } if(/^[A-Za-z0-9_-]{11}$/.test(url)) return url; return null; }
-function extractPlaylistId(url){ var m=url.match(/[?&]list=([A-Za-z0-9_-]+)/); return m?m[1]:null; }
-function parseDur(iso){ if(!iso) return ''; var m=iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m) return ''; var h=parseInt(m[1]||0),mn=parseInt(m[2]||0),s=parseInt(m[3]||0); return h>0?h+':'+pad(mn)+':'+pad(s):mn+':'+pad(s); }
-function pad(n){ return String(n).padStart(2,'0'); }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escAttr(s){ return String(s||'').replace(/'/g,"\\'"); }
-function decode(s){ var t=document.createElement('textarea'); t.innerHTML=s; return t.value; }
+function extractVideoId(url){ var pats = [/(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/, /music\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})/]; for(var i = 0; i < pats.length; i++){ var m = url.match(pats[i]); if(m) return m[1]; } if(/^[A-Za-z0-9_-]{11}$/.test(url)) return url; return null; }
+function extractPlaylistId(url){ var m = url.match(/[?&]list=([A-Za-z0-9_-]+)/); return m ? m[1] : null; }
+function parseDur(iso){ if(!iso) return ''; var m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m) return ''; var h = parseInt(m[1] || 0), mn = parseInt(m[2] || 0), s = parseInt(m[3] || 0); return h > 0 ? h + ':' + pad(mn) + ':' + pad(s) : mn + ':' + pad(s); }
+function pad(n){ return String(n).padStart(2, '0'); }
+function esc(s){ return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function escAttr(s){ return String(s || '').replace(/'/g, "\\'"); }
+function decode(s){ var t = document.createElement('textarea'); t.innerHTML = s; return t.value; }
 
 // ══════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════
-loadVault(); updateBadge(); checkBanner();
-if('serviceWorker' in navigator) window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+loadVault();
+updateBadge();
+checkBanner();
 
-(async function initFirebase() {
-  const user = await requireAuth();
-  const rel = await getRelationship();
-  if (rel) {
-    vaultRef = doc(db, 'relationships', rel.id, 'vaults', 'songs');
-  } else {
-    vaultRef = dataRef('song-vault');
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+
+<script type="module">
+import { requireAuth, dataRef, getSettings, getRelationship } from './auth.js';
+import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { db } from './firebase-config.js';
+
+window._firebaseSetDoc = setDoc;
+
+(async function initFirebaseSync() {
+  try {
+    const user = await requireAuth();
+    const rel = await getRelationship();
+    let vaultRef;
+    if (rel) {
+      vaultRef = doc(db, 'relationships', rel.id, 'vaults', 'songs');
+    } else {
+      vaultRef = dataRef('song-vault');
+    }
+    window._vaultRef = vaultRef;
+    const snap = await getDoc(vaultRef);
+    if (snap.exists()) {
+      vault = snap.data().songs || [];
+      localStorage.setItem(VAULT_KEY, JSON.stringify(vault));
+    }
+    const s = await getSettings(user.uid);
+    if(s && s.role) adderRole = s.role.toLowerCase().includes('sub') ? 'sub' : 'dom';
+    renderVault();
+    updateBadge();
+  } catch (e) {
+    console.warn('Firebase sync deferred:', e);
+    renderVault();
   }
-  await loadVault();
-  const s = await getSettings(user.uid);
-  if(s.role) adderRole = s.role.toLowerCase().includes('sub')?'sub':'dom';
-  renderVault();
 })();
 </script>
 </body>
