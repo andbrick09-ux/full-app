@@ -308,8 +308,17 @@ body::before {
         </div>
         <div id="pairsContainer">Loading partner match...</div>
       </div>
+      
+      <!-- Partner Overlay Radar Chart -->
+      <div class="sec-hd">
+        <span class="material-symbols-rounded">radar</span>
+        Alignment Overlay
+      </div>
+      <div class="spectrum-box" style="padding-bottom: 24px;">
+         <canvas id="matchRadarChart"></canvas>
+      </div>
 
-      <a href="scene-builder.html" class="primary-btn" style="text-decoration:none;">
+      <a href="scene-builder.html" id="sceneBuilderLink" class="primary-btn" style="text-decoration:none;">
         <span class="material-symbols-rounded">auto_awesome</span>
         Build Scene From Matched Roles
       </a>
@@ -498,6 +507,7 @@ function renderRadarChart() {
   });
 }
 
+var matchRadarChartInst = null;
 function renderCompare() {
   var container = document.getElementById('pairsContainer');
   if(!container) return;
@@ -514,13 +524,93 @@ function renderCompare() {
 
   container.innerHTML = pairs.map(function(p) {
     var dVal = roleScores[p.domId] || 50;
-    var sVal = roleScores[p.subId] || 50;
+    var sVal = roleScores[p.subId] || 50; // In a real app, this would use partnerScores
     var avg = Math.round((dVal + sVal) / 2);
     return '<div class="match-pair-row">' +
       '<div class="pair-names">' + p.dom + ' ↔ ' + p.sub + '</div>' +
       '<div class="pair-score">' + avg + '% Match</div>' +
     '</div>';
   }).join('');
+  
+  // Setup Partner Overlay Radar
+  var ctx = document.getElementById('matchRadarChart');
+  if(ctx) {
+    var myCats = {};
+    var partnerCats = {}; // Mock partner data
+    
+    BDSM_ROLES.forEach(r => {
+      if(!myCats[r.cat]) { myCats[r.cat] = { sum: 0, count: 0 }; partnerCats[r.cat] = { sum: 0, count: 0 }; }
+      
+      var myVal = roleScores[r.id] || 0;
+      // Mock partner values based on yours to show some differences
+      var pVal = Math.max(0, Math.min(100, (100 - myVal) + Math.floor(Math.random() * 40 - 20))); 
+      
+      myCats[r.cat].sum += myVal;
+      myCats[r.cat].count++;
+      
+      partnerCats[r.cat].sum += pVal;
+      partnerCats[r.cat].count++;
+    });
+    
+    var labels = Object.keys(myCats);
+    var myData = labels.map(l => Math.round(myCats[l].sum / myCats[l].count));
+    var partnerData = labels.map(l => Math.round(partnerCats[l].sum / partnerCats[l].count));
+
+    if(matchRadarChartInst) matchRadarChartInst.destroy();
+    
+    matchRadarChartInst = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Your Alignment',
+          data: myData,
+          backgroundColor: 'rgba(212,175,55,0.25)',
+          borderColor: '#D4AF37',
+          borderWidth: 2,
+          pointBackgroundColor: '#F5E6A3',
+          pointBorderColor: '#051024',
+          pointBorderWidth: 2
+        },
+        {
+          label: 'Partner Alignment',
+          data: partnerData,
+          backgroundColor: 'rgba(186,104,200,0.25)',
+          borderColor: '#BA68C8',
+          borderWidth: 2,
+          pointBackgroundColor: '#E1BEE7',
+          pointBorderColor: '#051024',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        scales: {
+          r: {
+            angleLines: { color: 'rgba(212,175,55,0.15)' },
+            grid: { color: 'rgba(212,175,55,0.15)' },
+            pointLabels: { color: '#f0e6d3', font: { family: 'Montserrat', size: 10, weight: 600 } },
+            ticks: { display: false, min: 0, max: 100 }
+          }
+        },
+        plugins: {
+          legend: { 
+            position: 'bottom',
+            labels: { color: '#f0e6d3', font: { family: 'Montserrat', size: 11 } }
+          }
+        }
+      }
+    });
+  }
+  
+  // Update Scene Builder Link with top roles
+  var sorted = BDSM_ROLES.slice().sort(function(a,b) {
+    return (roleScores[b.id]||0) - (roleScores[a.id]||0);
+  });
+  var topRoles = sorted.slice(0, 3).map(r => r.name).join(', ');
+  var link = document.getElementById('sceneBuilderLink');
+  if(link) {
+    link.href = 'scene-builder.html?roles=' + encodeURIComponent(topRoles);
+  }
 }
 
 function switchTab(tab) {

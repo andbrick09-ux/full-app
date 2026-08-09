@@ -1411,5 +1411,26 @@ loadKeys();
 pickModel('claude');
 goStep(0);
 </script>
+<script>
+// Auto-fill from BDSM Test match
+document.addEventListener("DOMContentLoaded", function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var roles = urlParams.get('roles');
+  if(roles) {
+    var ta = document.getElementById('herMap');
+    if(ta) {
+      ta.value = "Top Matched Roles: " + roles + "\n\n" + ta.value;
+      
+      // Select appropriate intent based on roles (mock logic)
+      if(roles.toLowerCase().includes('rigger') || roles.toLowerCase().includes('rope')) {
+        document.getElementById('intVal').value = 'Physical sensation and impact play';
+        var chips = document.getElementById('intChips').querySelectorAll('.chip');
+        chips.forEach(c => c.classList.remove('on'));
+        chips[1].classList.add('on');
+      }
+    }
+  }
+});
+</script>
 </body>
 </html>
