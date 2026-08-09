@@ -137,6 +137,16 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 .task-check.done{background:var(--gold);border-color:var(--gold);color:#080c14}
 .task-title{font-size:12px;color:var(--gold-l);font-weight:500;flex:1}
 .task-title.done{text-decoration:line-through;color:var(--muted)}
+/* Modal Styles */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:999;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;}
+.modal-overlay.open{display:flex;opacity:1;}
+.modal-box{background:var(--surface);border:1px solid var(--gold-b);border-radius:24px;width:90%;max-width:400px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.5);transform:translateY(20px);transition:transform 0.3s cubic-bezier(0.2,0.8,0.2,1);}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold-l);margin-bottom:6px;font-weight:600;}
+.modal-meta{font-size:11px;color:var(--muted);margin-bottom:16px;}
+.modal-content{font-size:13px;line-height:1.6;color:var(--text);background:rgba(0,0,0,0.2);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);margin-bottom:20px;font-style:italic;}
+.modal-close{width:100%;padding:12px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold-l);font-weight:600;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.modal-close:active{transform:scale(0.97);background:var(--gold-dim);}
 </style>
 </head>
 
@@ -149,6 +159,16 @@ body[data-role="sub"] .accent { --accent: var(--gold); }
 
   <!-- Content will be dynamically injected by JS based on role -->
 
+</div>
+
+<!-- Activity Modal -->
+<div class="modal-overlay" id="activityModal" onclick="this.classList.remove('open')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" id="amTitle">Check-In Details</div>
+    <div class="modal-meta" id="amMeta">Just now</div>
+    <div class="modal-content" id="amContent">No note provided.</div>
+    <button class="modal-close" onclick="document.getElementById('activityModal').classList.remove('open')">CLOSE</button>
+  </div>
 </div>
 
 <script type="module">
@@ -585,6 +605,7 @@ async function loadLiveActivityFeedForDom() {
       if (n.type === 'praise_ack') icon = '💖';
       if (n.type === 'task') icon = '✅';
       if (n.type === 'training') icon = '🔥';
+      if (n.type === 'checkin') icon = '💭';
 
       el.innerHTML = `
         <div class="aico">${icon}</div>
@@ -593,6 +614,24 @@ async function loadLiveActivityFeedForDom() {
           <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
         </div>
       `;
+      
+      if (n.type === 'checkin' && n.note) {
+        el.onclick = () => {
+          document.getElementById('amTitle').textContent = 'Sub Check-In';
+          document.getElementById('amMeta').textContent = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'Just now';
+          document.getElementById('amContent').innerHTML = `<strong>Stats:</strong><br>${n.content}<br><br><strong>Note:</strong><br>"${n.note}"`;
+          document.getElementById('activityModal').classList.add('open');
+        };
+      } else if (n.note || n.fullText) {
+        // Fallback for other types with notes
+        el.onclick = () => {
+          document.getElementById('amTitle').textContent = 'Activity Details';
+          document.getElementById('amMeta').textContent = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'Just now';
+          document.getElementById('amContent').innerHTML = n.note || n.fullText;
+          document.getElementById('activityModal').classList.add('open');
+        };
+      }
+      
       feed.appendChild(el);
     });
   });
@@ -925,8 +964,9 @@ window.submitSubCheckin = async function() {
 
     // Also log to activity feed
     await addDoc(dataCol('activity'), {
-      content: `Checked in: Mood — ${mood}, Energy — ${energy}/5`,
-      type: 'task',
+      content: `Mood — ${mood}, Horniness — ${energy}/5`,
+      note: note,
+      type: 'checkin',
       timestamp: serverTimestamp()
     });
 
