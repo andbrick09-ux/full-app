@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -233,6 +233,13 @@
     .chip.selected {
       background:rgba(212,175,55,.2); border-color:var(--gold);
       color:var(--gold-light); font-weight:700;
+    }
+    
+    .chip.sub-requested, .pill.sub-requested, .int-chip.sub-requested {
+      border-color: var(--gold) !important;
+      color: var(--gold) !important;
+      background: rgba(212,175,55,.15) !important;
+      box-shadow: inset 0 0 8px rgba(212,175,55,.2) !important;
     }
 
     /* Intensity chips */
@@ -1861,6 +1868,9 @@
       <span class="material-symbols-rounded">gavel</span>
       Directive
     </div>
+    <button class="reset-btn" id="mergeBtn" style="display:none; margin-right:8px; border-color:var(--gold); color:var(--gold);" onclick="openMergeModal()" title="Merge Sub's Map">
+      <span class="material-symbols-rounded">merge_type</span>
+    </button>
     <button class="reset-btn" onclick="confirmReset()" aria-label="Reset session">
       <span class="material-symbols-rounded">restart_alt</span>
     </button>
@@ -3238,6 +3248,23 @@
 </div>
 
 <!-- Save Scene Name Modal -->
+<!-- Merge Scene Modal -->
+<div class="modal-back" id="mergeModal" style="z-index:330;">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" style="color:var(--gold);">Merge Sub's Map</div>
+    <p class="sheet-body">Select a mapped scene from your Sub to load it into the builder. Their requested chips will highlight in gold.</p>
+    
+    <div id="mergeSceneList" style="margin-top:16px; margin-bottom:16px; max-height:250px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+      <!-- Populated via JS -->
+    </div>
+
+    <div class="sheet-row">
+      <button class="sheet-btn sheet-btn-cancel" onclick="document.getElementById('mergeModal').classList.remove('open')" style="flex:1;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-back" id="saveSceneModal" style="z-index:330;">
   <div class="modal-sheet">
     <div class="sheet-handle"></div>
@@ -3360,6 +3387,65 @@ async function getSettings() {
 async function persistSettings(data) {
   await setDoc(dataRef('settings'), data, { merge: true });
 }
+
+// History: sub-collection /users/{uid}/scenes
+  async function openMergeModal() {
+    if (!partnerUid) { showToast('No active Sub'); return; }
+    document.getElementById('mergeModal').classList.add('open');
+    const container = document.getElementById('mergeSceneList');
+    container.innerHTML = '<div style="color:var(--cream-mute);font-size:12px;text-align:center;">Loading Sub scenes...</div>';
+    
+    try {
+      const pCol = await partnerDataCol('scenes');
+      const snap = await getDocs(query(pCol, orderBy('date', 'desc'), limit(10)));
+      if (snap.empty) {
+        container.innerHTML = '<div style="color:var(--cream-mute);font-size:12px;text-align:center;">Your Sub has not saved any scenes yet.</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const dDate = d.date ? new Date(d.date).toLocaleDateString() : 'Unknown Date';
+        const el = document.createElement('div');
+        el.style.cssText = "background:rgba(212,175,55,0.1); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer;";
+        el.onclick = () => { mergeSubScene(docSnap.id, d.rawChips, d.rawText); };
+        el.innerHTML = `
+          <div style="font-family:'Playfair Display'; color:var(--gold); font-size:14px; margin-bottom:4px;">${d.name || 'Unnamed Scene'}</div>
+          <div style="font-size:10px; color:var(--cream-mute);">${dDate}</div>
+        `;
+        container.appendChild(el);
+      });
+    } catch(e) {
+      container.innerHTML = '<div style="color:var(--red);font-size:12px;text-align:center;">Error loading scenes.</div>';
+    }
+  }
+
+  function mergeSubScene(id, rawChips, rawText) {
+    doReset();
+    document.querySelectorAll('.sub-requested').forEach(el => el.classList.remove('sub-requested'));
+    
+    if (rawText) {
+      if (rawText.craving) document.getElementById('craving').value = rawText.craving;
+      if (rawText.nervous) document.getElementById('nervous').value = rawText.nervous;
+      if (rawText.perfect) document.getElementById('perfect').value = rawText.perfect;
+      if (rawText.stretch) document.getElementById('stretch').value = rawText.stretch;
+    }
+    
+    if (rawChips && Array.isArray(rawChips)) {
+      rawChips.forEach(val => {
+        const el = document.querySelector(`[data-val="${val}"]`);
+        if (el) {
+          el.classList.add('selected');
+          el.classList.add('sub-requested');
+        }
+      });
+    }
+    
+    document.getElementById('mergeModal').classList.remove('open');
+    showToast("Sub's Map Loaded ✨");
+    if (navigator.vibrate) navigator.vibrate(6);
+  }
 
 // History: sub-collection /users/{uid}/scenes
 async function getHistory() {
@@ -3568,7 +3654,11 @@ document.querySelectorAll('[data-group]').forEach(container => {
 // ── Collect selections ────────────────────────────────────────────
 function getSelections(group) {
   return Array.from(document.querySelectorAll(`[data-group="${group}"] .selected`))
-    .map(e => e.dataset.val).filter(Boolean);
+    .map(e => {
+      let val = e.dataset.val;
+      if (e.classList.contains('sub-requested')) val += ' ✨';
+      return val;
+    }).filter(Boolean);
 }
 function getTextVal(id) { return (document.getElementById(id)?.value || '').trim(); }
 
@@ -3739,6 +3829,8 @@ function applyMode() {
   document.getElementById('topbar-title').textContent = m.topbarTitle;
   document.getElementById('topbar-sub').textContent = m.topbarSub;
   document.getElementById('modeBadge').classList.toggle('sir-mode', isSir);
+  const mergeBtn = document.getElementById('mergeBtn');
+  if (mergeBtn) mergeBtn.style.display = isSir ? 'flex' : 'none';
 
   const s0 = document.querySelector('[data-step="0"]');
   s0.querySelector('.step-eyebrow').textContent = m.step0Eyebrow;
@@ -4010,8 +4102,9 @@ function toggleNameCalling(chip) {
 function getVerbalSelections() {
   const sels = getSelections('verbal');
   const offLimits = (document.getElementById('nameCallingOffLimits')?.value || '').trim();
-  if (offLimits && sels.includes('Name Calling')) {
-    sels[sels.indexOf('Name Calling')] = `Name Calling (off-limits: ${offLimits})`;
+  const ncIndex = sels.findIndex(s => s.startsWith('Name Calling'));
+  if (offLimits && ncIndex !== -1) {
+    sels[ncIndex] = `${sels[ncIndex]} (off-limits: ${offLimits})`;
   }
   return sels;
 }
@@ -4026,7 +4119,7 @@ function toggleOtherRelease(chip) {
   if (navigator.vibrate) navigator.vibrate(5);
 }
 function getReleaseSelections() {
-  const standard = getSelections('release').filter(v => v !== 'Other');
+  const standard = getSelections('release').filter(v => !v.startsWith('Other'));
   const other = (document.getElementById('releaseOtherText')?.value || '').trim();
   if (other) standard.push(`Other: ${other}`);
   return standard;
@@ -4041,7 +4134,7 @@ function toggleOtherDress(chip) {
   if (navigator.vibrate) navigator.vibrate(5);
 }
 function getDressSelections() {
-  const standard = getSelections('dress').filter(v => v !== 'Other');
+  const standard = getSelections('dress').filter(v => !v.startsWith('Other'));
   const other = (document.getElementById('dressOtherText')?.value || '').trim();
   if (other) standard.push(`Other: ${other}`);
   return standard;
@@ -4113,11 +4206,25 @@ async function confirmSaveScene() {
   const nameInput = document.getElementById('saveSceneNameInput');
   const name = (nameInput?.value || '').trim();
   const defaultName = `Scene — ${new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
+  
+  const rawChips = Array.from(document.querySelectorAll('.chip.selected, .pill.selected, .int-chip.selected'))
+    .map(e => e.dataset.val)
+    .filter(Boolean);
+    
+  const rawText = {
+    craving: document.getElementById('craving')?.value || '',
+    nervous: document.getElementById('nervous')?.value || '',
+    perfect: document.getElementById('perfect')?.value || '',
+    stretch: document.getElementById('stretch')?.value || ''
+  };
+
   const snapshot = {
     name: name || defaultName,
     date: new Date().toISOString(),
     mapText: buildMapText(),
     sirsNotes: (document.getElementById('sirsNotesText')?.value || '').trim(),
+    rawChips: rawChips,
+    rawText: rawText,
     checkin: null,
   };
   try {
