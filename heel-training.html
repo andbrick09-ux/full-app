@@ -517,7 +517,8 @@
     // ── Persist ───────────────────────────────────────────────
     async function persist() {
       if (!dbRef) return;
-      try { await setDoc(dbRef, { entries, startDate, completedPhases }); }
+      const progress = Math.round(((completedPhases?.length || 0) / PHASES.length) * 100) || 0;
+      try { await setDoc(dbRef, { entries, startDate, completedPhases, progress }); }
       catch(e) { console.error('persist error:', e); }
     }
 

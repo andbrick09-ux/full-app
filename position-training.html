@@ -271,6 +271,7 @@
       if (!dbRef) return;
       try {
         await setDoc(dbRef, {
+          progress: Math.round(((Object.keys(st.mastered || {}).length) / P.length) * 100) || 0,
           mastered:      st.mastered      || {},
           dailyPractice: st.dailyPractice || {},
           dailyCounts:   st.dailyCounts   || {},

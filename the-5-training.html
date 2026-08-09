@@ -309,6 +309,7 @@
       if (!dbRef) return;
       try {
         await setDoc(dbRef, {
+          progress: Math.round(((state.completedPhases?.length || 0) / PHASES.length) * 100) || 0,
           tasks:           state.tasks           || {},
           completedPhases: state.completedPhases || [],
           sessions:        state.sessions        || 0,
