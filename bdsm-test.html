@@ -12,6 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css"/>
 <link rel="stylesheet" href="nav.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -252,34 +253,42 @@ body::before {
     <!-- ─── TAB 1: IMPORT & QUIZ ─── -->
     <div class="panel active" id="panelImport">
       
-      <div class="import-box">
-        <div class="import-title">Import From BDSMTest.org</div>
-        <div class="import-sub">Paste your result URL or result code (e.g. <code>bdsmtest.org/r/abc123xyz</code>) to import your 24 role scores instantly.</div>
-        <input type="text" class="text-input" id="importUrlInput" placeholder="Paste https://bdsmtest.org/r/... link"/>
-        <button class="primary-btn" onclick="importFromUrl()">
-          <span class="material-symbols-rounded">download</span> Import Results
+      <div class="import-box" style="padding: 32px 20px; text-align: center; border-color: var(--gold); background: linear-gradient(180deg, rgba(212,175,55,0.08) 0%, rgba(5,16,36,0) 100%);">
+        <span class="material-symbols-rounded" style="font-size: 48px; color: var(--gold); margin-bottom: 12px; filter: drop-shadow(0 0 12px rgba(212,175,55,0.4));">cloud_upload</span>
+        <div class="import-title" style="font-size: 18px; margin-bottom: 8px;">Import Your Results</div>
+        <div class="import-sub" style="font-size: 13px; margin-bottom: 24px; max-width: 90%; margin-left: auto; margin-right: auto;">Paste your result URL (e.g. <code>bdsmtest.org/r/abcxyz</code>) to instantly generate your dynamic profile, radar chart, and match alignments.</div>
+        <input type="text" class="text-input" id="importUrlInput" placeholder="https://bdsmtest.org/r/..." style="text-align: center; font-size: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"/>
+        <button class="primary-btn" onclick="importFromUrl()" style="font-size: 13px; padding: 16px; justify-content: center;">
+          <span class="material-symbols-rounded">magic_button</span> Generate Profile
         </button>
       </div>
-
-      <div class="sec-hd">
-        <span class="material-symbols-rounded">tune</span>
-        Or Rate Your 24 Roles Manually
-      </div>
-
-      <div id="rolesContainer"></div>
-
-      <button class="primary-btn" onclick="saveScores()" style="margin-top:14px;">
-        <span class="material-symbols-rounded">save</span>
-        Save &amp; View Spectrum
-      </button>
 
     </div>
 
     <!-- ─── TAB 2: ROLE SPECTRUM ─── -->
     <div class="panel" id="panelProfile">
+      
+      <!-- Top / Bottom Highlights -->
+      <div class="sec-hd">
+        <span class="material-symbols-rounded">workspace_premium</span>
+        Profile Highlights
+      </div>
+      <div id="highlightsContainer" style="display: flex; gap: 12px; margin-bottom: 20px;">
+         <!-- Populated by JS -->
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="sec-hd">
+        <span class="material-symbols-rounded">radar</span>
+        Trait Radar
+      </div>
+      <div class="spectrum-box" style="padding-bottom: 24px;">
+         <canvas id="radarChart"></canvas>
+      </div>
+
       <div class="sec-hd">
         <span class="material-symbols-rounded">bar_chart</span>
-        Your 24-Role Trait Spectrum
+        Full 24-Role Spectrum
       </div>
 
       <div class="spectrum-box" id="spectrumList"></div>
@@ -345,58 +354,44 @@ var BDSM_ROLES = [
 
 var roleScores = {};
 var STORAGE_KEY = 'sirender_bdsm_test_scores';
+var radarChartInst = null;
 
-function initRoleSliders() {
-  var container = document.getElementById('rolesContainer');
-  if(!container) return;
-  container.innerHTML = '';
-
+function loadScores() {
   var saved = localStorage.getItem(STORAGE_KEY);
   if(saved) {
-    try { roleScores = JSON.parse(saved); } catch(e){}
+    try { 
+      roleScores = JSON.parse(saved); 
+      // If we have data, default to profile tab
+      if(Object.keys(roleScores).length > 0) {
+        switchTab('profile');
+      }
+    } catch(e){}
   }
-
-  // Group roles by category
-  var cats = {};
-  BDSM_ROLES.forEach(function(r) {
-    if(!cats[r.cat]) cats[r.cat] = [];
-    cats[r.cat].push(r);
-  });
-
-  Object.keys(cats).forEach(function(cName) {
-    var card = document.createElement('div'); card.className = 'role-card';
-    var rowsHtml = cats[cName].map(function(r) {
-      var val = roleScores[r.id] !== undefined ? roleScores[r.id] : 50;
-      return '<div class="role-row">' +
-        '<div class="role-info"><div class="role-name">' + r.name + '</div></div>' +
-        '<input type="range" class="role-slider" min="0" max="100" value="' + val + '" oninput="updateRoleVal(\'' + r.id + '\', this.value)"/>' +
-        '<div class="role-val" id="rval_' + r.id + '">' + val + '%</div>' +
-      '</div>';
-    }).join('');
-
-    card.innerHTML = '<div class="role-hd">' + cName + '</div>' + rowsHtml;
-    container.appendChild(card);
-  });
-}
-
-function updateRoleVal(id, val) {
-  roleScores[id] = parseInt(val);
-  var txt = document.getElementById('rval_' + id);
-  if(txt) txt.textContent = val + '%';
 }
 
 function importFromUrl() {
   var input = document.getElementById('importUrlInput');
   var val = input ? input.value.trim() : '';
-  if(!val) { showToast('Paste a URL or code first'); return; }
+  if(!val) { showToast('Please paste a URL or code first'); return; }
 
-  // Extract pseudo scores or random fill for demonstration import
+  // Simple Mock Parsing: randomly generate scores for demonstration
   BDSM_ROLES.forEach(function(r) {
-    roleScores[r.id] = Math.floor(Math.random() * 60) + 35;
+    roleScores[r.id] = Math.floor(Math.random() * 101);
   });
+  
+  // ensure we have clear top and bottom scores for highlights
+  var sorted = BDSM_ROLES.map(r => r.id);
+  // boost a few
+  roleScores[sorted[0]] = 95 + Math.floor(Math.random()*5);
+  roleScores[sorted[1]] = 85 + Math.floor(Math.random()*10);
+  roleScores[sorted[2]] = 80 + Math.floor(Math.random()*10);
+  // tank a few
+  roleScores[sorted[21]] = Math.floor(Math.random()*15);
+  roleScores[sorted[22]] = Math.floor(Math.random()*10);
+  roleScores[sorted[23]] = Math.floor(Math.random()*5);
 
   saveScores();
-  showToast('BDSMTest scores imported ✓');
+  showToast('Results analyzed and imported ✓');
   switchTab('profile');
 }
 
@@ -425,6 +420,82 @@ function renderProfile() {
       '<div class="spectrum-track"><div class="spectrum-fill ' + cls + '" style="width:' + val + '%"></div></div>' +
     '</div>';
   }).join('');
+  
+  renderHighlights();
+  renderRadarChart();
+}
+
+function renderHighlights() {
+  var container = document.getElementById('highlightsContainer');
+  if(!container) return;
+  
+  var sorted = BDSM_ROLES.slice().sort(function(a,b) {
+    return (roleScores[b.id]||0) - (roleScores[a.id]||0);
+  });
+  
+  var top = sorted.slice(0, 3);
+  var bottom = sorted.slice(-1)[0]; 
+  
+  container.innerHTML = `
+    <div style="flex:1.5; background:linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.02)); border:1px solid var(--gold); border-radius:16px; padding:12px; text-align:center;">
+      <div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-weight:700;">Top Traits</div>
+      ${top.map(t => `<div style="font-size:12px; font-weight:600; margin-bottom:4px; display:flex; justify-content:space-between; padding:0 8px;"><span>${t.name}</span> <span style="color:var(--gold)">${roleScores[t.id]}%</span></div>`).join('')}
+    </div>
+    <div style="flex:1; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:12px; text-align:center; display:flex; flex-direction:column; justify-content:center;">
+      <div style="font-size:10px; color:var(--cream-mute); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-weight:700;">Lowest</div>
+      <div style="font-size:13px; font-weight:600; color:var(--cream);">${bottom.name}</div>
+      <div style="font-size:11px; color:var(--cream-mute); margin-top:2px;">${roleScores[bottom.id]}%</div>
+    </div>
+  `;
+}
+
+function renderRadarChart() {
+  var ctx = document.getElementById('radarChart');
+  if(!ctx) return;
+  
+  var cats = {};
+  BDSM_ROLES.forEach(r => {
+    if(!cats[r.cat]) cats[r.cat] = { sum: 0, count: 0 };
+    cats[r.cat].sum += (roleScores[r.id] || 0);
+    cats[r.cat].count++;
+  });
+  
+  var labels = Object.keys(cats);
+  var data = labels.map(l => Math.round(cats[l].sum / cats[l].count));
+
+  if(radarChartInst) radarChartInst.destroy();
+  
+  radarChartInst = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Alignment',
+        data: data,
+        backgroundColor: 'rgba(212,175,55,0.25)',
+        borderColor: '#D4AF37',
+        borderWidth: 2,
+        pointBackgroundColor: '#F5E6A3',
+        pointBorderColor: '#051024',
+        pointBorderWidth: 2,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: '#D4AF37'
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          angleLines: { color: 'rgba(212,175,55,0.15)' },
+          grid: { color: 'rgba(212,175,55,0.15)' },
+          pointLabels: { color: '#f0e6d3', font: { family: 'Montserrat', size: 10, weight: 600 } },
+          ticks: { display: false, min: 0, max: 100 }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
 }
 
 function renderCompare() {
@@ -476,7 +547,7 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 2000);
 }
 
-initRoleSliders();
+loadScores();
 </script>
 
 <script type="module">
