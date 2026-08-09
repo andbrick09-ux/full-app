@@ -59,7 +59,7 @@
     .ref-drawer-btn .material-symbols-rounded { font-size:16px; }
 
     /* ── Reference bottom sheet ── */
-    .ref-back { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .ref-back { position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
     .ref-back.open { opacity:1; pointer-events:all; }
     .ref-sheet { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:600px; max-height:88dvh; overflow-y:auto; scrollbar-width:none; padding:8px 20px calc(32px + var(--safe-b)); transform:translateY(100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2); }
     .ref-sheet::-webkit-scrollbar { display:none; }
@@ -185,7 +185,7 @@
     .reset-btn:active { border-color:#F44336; background:rgba(244,67,54,0.05); }
 
     /* ── Celebration overlay ── */
-    .celebration-overlay { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); backdrop-filter:blur(12px); opacity:0; pointer-events:none; transition:opacity .3s; }
+    .celebration-overlay { position:fixed; inset:0; z-index:4000; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); backdrop-filter:blur(12px); opacity:0; pointer-events:none; transition:opacity .3s; }
     .celebration-overlay.show { opacity:1; pointer-events:all; }
     .celebration-card { background:var(--glass); border:1.5px solid var(--border); backdrop-filter:blur(12px); border-radius:24px; padding:36px 28px; max-width:320px; width:90%; text-align:center; transform:scale(.85); transition:transform .4s cubic-bezier(.22,.68,0,1.3); }
     .celebration-overlay.show .celebration-card { transform:scale(1); }
@@ -196,7 +196,7 @@
     .celebration-btn { padding:12px 30px; background:var(--luxury-gradient); color:var(--midnight); border:none; border-radius:25px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; cursor:pointer; transition:.2s; }
 
     /* ── Reset confirm modal ── */
-    .modal-back { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .modal-back { position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
     .modal-back.open { opacity:1; pointer-events:all; }
     .modal-sheet { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:600px; padding:8px 24px calc(28px + var(--safe-b)); transform:translateY(100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2); }
     .modal-back.open .modal-sheet { transform:translateY(0); }
