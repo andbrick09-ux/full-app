@@ -543,7 +543,7 @@ async function loadSubTrainingProgress() {
               <span style="background:var(--crimson);color:white;font-size:9px;padding:1px 7px;border-radius:10px">ASSIGNED BY YOU</span>
               ${assignedData.noteFromSir ? `<div style="font-size:10px;color:#e07585;margin-top:4px">“${assignedData.noteFromSir}”</div>` : ''}
             </div>
-            <span onclick="unassignTraining('${t.id}', this)" style="color:#e07585; font-size:11px; cursor:pointer; padding:4px 8px;">Unassign</span>
+            <span onclick="event.stopPropagation(); unassignTraining('${t.id}', this)" style="color:#e07585; font-size:11px; cursor:pointer; padding:4px 8px;">Unassign</span>
           </div>
         ` : ''}
         <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
@@ -559,11 +559,11 @@ window.unassignTraining = async function(trainingId, element) {
   if (!confirm(`Unassign ${trainingId} training from your sub?`)) return;
 
   try {
-    const ref = partnerDataRef(`training/${trainingId}`);
+    const ref = await partnerDataRef(`training/${trainingId}`);
     await deleteDoc(ref);
     
     // Refresh the list
-    loadSubTrainingProgress();
+    loadLiveStatsForDom();
   } catch (error) {
     console.error('Unassign error:', error);
     alert('Failed to unassign training: ' + error.message);
