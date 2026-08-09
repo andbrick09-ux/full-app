@@ -68,7 +68,7 @@
     {
       page: 'testing',
       href: 'tm-hub.html',
-      label: 'Testing',
+      label: 'Academy',
       isButton: false,
       svg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'
     },
@@ -83,18 +83,16 @@
 
   var MORE_ITEMS = [
     { href: 'scene-menu.html', icon: '🎭', label: 'Scenes' },
-    { href: 'toy-vault.html', icon: '🔒', label: 'Toy Vault' },
-    { href: 'bdsm-checklist.html', icon: '✅', label: 'Assessments &amp; Ratings' },
-    /* { href: 'sirs-protocol.html', icon: '📜', label: 'Dom\u2019s Protocol' }, */
+    { href: 'sirs-protocol.html', icon: '📜', label: 'Dom’s Protocol' },
+    { href: 'protocol-daily.html', icon: '📋', label: 'Daily Protocol' },
+    { href: 'toy-vault.html', icon: '📦', label: 'Toy Vault' },
+    { href: 'bdsm-checklist.html', icon: '📑', label: 'Assessments & Ratings' },
     { href: 'song-vault.html', icon: '🎵', label: 'Song Vault' },
     { href: 'notes.html', icon: '📝', label: 'Notes' },
     { href: 'calendar.html', icon: '📅', label: 'Calendar' },
-    /*  { href: 'protocol-daily.html', icon: '📅', label: 'Daily Protocol' },*/
     { href: 'public-game.html', icon: '🎲', label: 'Public Fun' },
-    /*        { href: 'help.html', icon: '❓', label: 'Help &amp; Info' },*/
-    { href: 'admin.html', icon: '🛠️', label: 'Admin Panel' },
-    { href: 'settings.html', icon: '⚙️', label: 'Settings' }
-
+    { href: 'admin.html', icon: '⚙️', label: 'Admin Panel' },
+    { href: 'settings.html', icon: '🛠️', label: 'Settings' }
   ];
 
   /* ── 2. Read active page from <body data-nav="X"> ──────── */
