@@ -339,11 +339,11 @@
       btn.textContent = opt;
       btn.onclick = () => {
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-        const isCorrect = opt.trim().toLowerCase() === (item.correctAnswer || '').trim().toLowerCase();
+        const isCorrect = String(opt).trim().toLowerCase() === String(item.correctAnswer || '').trim().toLowerCase();
         btn.classList.add(isCorrect ? 'correct' : 'incorrect');
         if (!isCorrect) {
           document.querySelectorAll('.option-btn').forEach(b => {
-            if (b.textContent.trim().toLowerCase() === (item.correctAnswer || '').trim().toLowerCase()) b.classList.add('correct');
+            if (String(b.textContent).trim().toLowerCase() === String(item.correctAnswer || '').trim().toLowerCase()) b.classList.add('correct');
           });
         }
         submitQuizResult(isCorrect, item.correctAnswer, item.explanation);
@@ -361,7 +361,7 @@
         <button class="outline-btn" id="falseBtn">False</button>
       </div>
     `;
-    const correct = (item.correctAnswer || '').trim().toLowerCase();
+    const correct = String(item.correctAnswer || '').trim().toLowerCase();
     document.getElementById('trueBtn').onclick = () => {
       document.getElementById('trueBtn').disabled = true;
       document.getElementById('falseBtn').disabled = true;
@@ -383,7 +383,7 @@
     `;
     document.getElementById('fillSubmit').onclick = () => {
       const val = document.getElementById('fillInput').value.trim().toLowerCase();
-      const accepted = (item.correctAnswer || '').split('/').map(s => s.trim().toLowerCase());
+      const accepted = String(item.correctAnswer || '').split('/').map(s => s.trim().toLowerCase());
       const isCorrect = accepted.some(a => a && (val === a || val.includes(a) || a.includes(val)));
       document.getElementById('fillSubmit').disabled = true;
       document.getElementById('fillInput').disabled = true;
@@ -442,92 +442,6 @@
     };
   }
 
-  async function renderHoldPractice() {
-    const card = document.getElementById('sessionCard');
-    const checklist = item.formChecklist || [];
-    card.innerHTML = `
-      <div class="hold-timer">
-        <div class="hold-timer-val" id="timerVal">00:00</div>
-        <div class="hold-recommended">Recommended: ${item.recommendedHoldSeconds}s${item.recommendedHoldSecondsRange ? ` (${item.recommendedHoldSecondsRange[0]}\u2013${item.recommendedHoldSecondsRange[1]}s)` : ''}</div>
-      </div>
-      <div id="checklistWrap"></div>
-      <div style="display:flex;gap:10px;margin-top:20px;">
-        <button class="outline-btn" id="startBtn">Start</button>
-        <button class="gold-btn" id="finishBtn" disabled>Finish</button>
-      </div>
-      <div id="ratingArea"></div>
-    `;
-    const checklistWrap = document.getElementById('checklistWrap');
-    checklist.forEach((point, i) => {
-      const row = document.createElement('div');
-      row.className = 'checklist-item';
-      row.innerHTML = `<div class="check-box" data-i="${i}"><span class="material-symbols-rounded" style="font-size:14px;">check</span></div><div class="checklist-label">${point}</div>`;
-      checklistWrap.appendChild(row);
-    });
-    checklistWrap.addEventListener('click', (e) => {
-      const box = e.target.closest('.check-box');
-      if (box) box.classList.toggle('checked');
-    });
-
-    let seconds = 0, timerHandle = null, running = false;
-    function fmt(s) { const m = Math.floor(s / 60); const r = s % 60; return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`; }
-
-    document.getElementById('startBtn').onclick = () => {
-      if (!running) {
-        running = true;
-        document.getElementById('startBtn').textContent = 'Pause';
-        document.getElementById('finishBtn').disabled = false;
-        timerHandle = setInterval(() => { seconds++; document.getElementById('timerVal').textContent = fmt(seconds); }, 1000);
-      } else {
-        running = false;
-        document.getElementById('startBtn').textContent = 'Resume';
-        clearInterval(timerHandle);
-      }
-    };
-
-    document.getElementById('finishBtn').onclick = () => {
-      clearInterval(timerHandle);
-      document.getElementById('startBtn').disabled = true;
-      document.getElementById('finishBtn').disabled = true;
-      const checkedCount = document.querySelectorAll('.check-box.checked').length;
-      document.getElementById('ratingArea').innerHTML = `
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin:16px 0 8px;text-align:center;">Self-Rating</div>
-        <div class="rating-row">
-          ${[1,2,3,4,5].map(n => `<button class="rating-btn" data-r="${n}">${n}</button>`).join('')}
-        </div>
-        <button class="gold-btn" id="submitHold" disabled>Submit</button>
-      `;
-      let selectedRating = null;
-      document.querySelectorAll('.rating-btn').forEach(b => {
-        b.onclick = () => {
-          document.querySelectorAll('.rating-btn').forEach(x => x.classList.remove('selected'));
-          b.classList.add('selected');
-          selectedRating = parseInt(b.dataset.r, 10);
-          document.getElementById('submitHold').disabled = false;
-        };
-      });
-      document.getElementById('submitHold').onclick = async () => {
-        const bestHoldSeconds = Math.max(progress?.bestHoldSeconds ?? 0, seconds);
-        const evalResult = evaluateAttempt('hold_practice', {
-          bestHoldSeconds, recommendedHoldSeconds: item.recommendedHoldSeconds, selfRating: selectedRating,
-        });
-        const sr = await applySpacedRepetition(evalResult.mastered ? 95 : 65);
-        const attempts = (progress?.attempts ?? 0) + 1;
-        await saveProgress({ status: evalResult.status, bestHoldSeconds, attempts, ...sr });
-        await logActivity({ holdSeconds: seconds, checklistChecked: checkedCount, checklistTotal: checklist.length, selfRating: selectedRating });
-        const card2 = document.getElementById('sessionCard');
-        card2.innerHTML = `
-          <div class="feedback-panel ${evalResult.mastered ? 'correct' : 'neutral'}">
-            Held for ${fmt(seconds)}. Best: ${fmt(bestHoldSeconds)}.
-            ${evalResult.mastered ? '<div class="mastered-flash" style="margin-top:8px;">✨ Mastered</div>' : ''}
-          </div>
-          <button class="gold-btn" id="doneBtn">Continue</button>
-        `;
-        document.getElementById('doneBtn').onclick = loadNextItem;
-      };
-    };
-  }
-
   async function render() {
     document.getElementById('itemTitle').textContent = item.title;
     document.getElementById('closeLink').href = PREVIEW_MODE
@@ -546,11 +460,14 @@
     if (item.type === 'multiple_choice') return renderMultipleChoice();
     if (item.type === 'true_false') return renderTrueFalse();
     if (item.type === 'fill_blank') return renderFillBlank();
-    if (item.type === 'hold_practice') return renderHoldPractice();
     if (item.type === 'reflection') return renderReflection();
     if (SELF_ASSESS_TYPES.includes(item.type)) return renderSelfAssessed();
 
-    document.getElementById('sessionCard').innerHTML = `<div class="feedback-panel neutral">Unsupported item type: ${item.type}</div>`;
+    document.getElementById('sessionCard').innerHTML = `
+      <div class="feedback-panel neutral">This question type has been removed.</div>
+      <button class="gold-btn" style="margin-top:14px;" id="skipBtn">Skip Question</button>
+    `;
+    document.getElementById('skipBtn').onclick = loadNextItem;
   }
 
   async function init() {
@@ -592,7 +509,7 @@
           ));
           const testItems = itemsSnap.docs
             .map(d => ({ id: d.id, type: d.data().type }))
-            .filter(i => i.type !== 'flashcard')
+            .filter(i => i.type !== 'flashcard' && i.type !== 'hold_practice')
             .map(i => i.id);
 
           // Fisher-Yates shuffle
