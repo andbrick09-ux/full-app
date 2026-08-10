@@ -70,12 +70,18 @@
   .flip-face {
     position: absolute; inset: 0; backface-visibility: hidden;
     border-radius: 20px; background: var(--glass); border: 1.5px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    padding: 28px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    padding: 24px 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
   .flip-face.back { transform: rotateY(180deg); background: rgba(212,175,55,0.05); }
   
-  .flip-face-text { font-family: 'Playfair Display', serif; font-size: 18px; color: #eee; line-height: 1.6; white-space: pre-line; }
+  .flip-face-text { 
+    font-family: 'Playfair Display', serif; font-size: 18px; color: #eee; line-height: 1.6; white-space: pre-line;
+    margin: auto;
+    max-height: 100%; width: 100%; overflow-y: auto; padding: 0 14px; box-sizing: border-box;
+  }
+  .flip-face-text::-webkit-scrollbar { width: 4px; }
+  .flip-face-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
   .flip-face.front .flip-face-text { font-size: 28px; color: var(--gold); }
   
   .progress-dots {
