@@ -1621,7 +1621,7 @@ function switchTab(t) {
     if (typeof renderQueue === 'function') renderQueue();
     if (typeof renderDashboard === 'function') renderDashboard(window._checkinData);
   }
-  const fabVisible = (role === 'dom' && ['tasks','store'].includes(t)) || (role === 'sub' && t === 'tasks');
+  const fabVisible = (role === 'dom' && ['tasks','store','punish'].includes(t)) || (role === 'sub' && t === 'tasks');
   document.getElementById('fabBtn').style.display = fabVisible ? 'flex' : 'none';
 }
 
@@ -1644,7 +1644,20 @@ function openCreateSheet() {
     }
     openSheet('taskSheet');
   }
-  else if (curTab==='store') openSheet('rewardSheet');
+  else if (curTab==='store') {
+    document.getElementById('rewardTitle').value = '';
+    document.getElementById('rewardDesc').value = '';
+    document.getElementById('rewardCost').value = '50';
+    document.getElementById('rewardEmoji').value = '';
+    openSheet('rewardSheet');
+  }
+  else if (curTab==='punish') {
+    document.getElementById('punishTitle').value = '';
+    document.getElementById('punishDesc').value = '';
+    document.getElementById('punishPoints').value = '15';
+    document.getElementById('punishEmoji').value = '';
+    openSheet('punishSheet');
+  }
 }
 
 function openSheet(id) {
