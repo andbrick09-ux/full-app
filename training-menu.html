@@ -93,12 +93,12 @@
     window.activeSubName = 'Sub';
 
     const trainings = [
-      { id: 'the-5', name: 'The "5" Training', icon: '🖐️', desc: 'Classical conditioning protocol to cum on Sir\'s command.' },
-      { id: 'anal-plug', name: 'Anal Plug Training', icon: '💎', desc: 'Progressive size and duration training program.' },
-      { id: 'deepthroat', name: 'Deep Throat Training', icon: '👄', desc: 'Step-by-step depth and endurance conditioning.' },
-      { id: 'kegel', name: 'Kegel Training', icon: '🔐', desc: 'Pelvic floor strengthening routines.' },
-      { id: 'positions', name: 'Position Training', icon: '🧎‍♀️', desc: '12 submissive positions with mastery tracking.' },
-      { id: 'heel', name: 'Heel Training', icon: '👠', desc: 'Progressive heel height and endurance protocol.' }
+      { id: 'the-5', dbId: 'the-5-training', name: 'The "5" Training', icon: '🖐️', desc: 'Classical conditioning protocol to cum on Sir\'s command.' },
+      { id: 'anal-plug', dbId: 'anal-plug-training', name: 'Anal Plug Training', icon: '💎', desc: 'Progressive size and duration training program.' },
+      { id: 'deepthroat', dbId: 'deepthroat-training', name: 'Deep Throat Training', icon: '👄', desc: 'Step-by-step depth and endurance conditioning.' },
+      { id: 'kegel', dbId: 'kegel-training', name: 'Kegel Training', icon: '🔐', desc: 'Pelvic floor strengthening routines.' },
+      { id: 'position', dbId: 'position-training', name: 'Position Training', icon: '🧎‍♀️', desc: '12 submissive positions with mastery tracking.' },
+      { id: 'heel', dbId: 'heel', name: 'Heel Training', icon: '👠', desc: 'Progressive heel height and endurance protocol.' }
     ];
 
     async function renderTrainingMenu() {
@@ -180,7 +180,7 @@
           let ref;
           if (isDom) {
             // Dom checks the partner's (sub's) training document
-            const partnerRef = await partnerDataRef(`training/${t.id}`);
+            const partnerRef = await partnerDataRef(`training/${t.dbId}`);
             const snap = await getDoc(partnerRef);
             if (snap.exists()) {
               isAssigned = true;
@@ -189,7 +189,7 @@
             }
           } else {
             // Sub checks their own training document
-            const snap = await getDoc(dataRef(`training/${t.id}`));
+            const snap = await getDoc(dataRef(`training/${t.dbId}`));
             if (snap.exists()) {
               isAssigned = true;
               assignedData = snap.data();
@@ -218,9 +218,9 @@
           `;
 
           if (isAssigned) {
-            html += `<button class="assign-btn" onclick="unassignTraining('${t.id}', this)">Unassign</button>`;
+            html += `<button class="assign-btn" onclick="unassignTraining('${t.dbId}', this)">Unassign</button>`;
           } else {
-            html += `<button class="assign-btn" onclick="assignTraining('${t.id}', this)">Assign to ${window.activeSubName}</button>`;
+            html += `<button class="assign-btn" onclick="assignTraining('${t.dbId}', this)">Assign to ${window.activeSubName}</button>`;
           }
 
           card.innerHTML = html;
