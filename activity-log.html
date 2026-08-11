@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Full Activity Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="nav.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{ --gold:#c9a84c; --gold-l:#e2c47a; --gold-dim:rgba(201,168,76,0.11); --gold-b:rgba(201,168,76,0.2); --bg:#080c14; --surface:#0e1420; --text:#f0e6d2; --muted:#68707f; --safe-t:env(safe-area-inset-top,0px); }
+body{ min-height:100dvh; background:var(--bg); color:var(--text); font-family:'Raleway',sans-serif; padding-bottom:80px; }
+.hdr{text-align:center;padding-top:max(var(--safe-t),28px);padding-bottom:16px;border-bottom:1px solid var(--gold-b);margin-bottom:6px; position:relative;}
+.back-btn{position:absolute;left:16px;top:max(var(--safe-t),28px);color:var(--gold);text-decoration:none;font-size:24px;line-height:1;}
+.app-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--gold-l);letter-spacing:3px;text-transform:uppercase;}
+.page{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 16px 120px}
+.activity-feed{display:flex;flex-direction:column;gap:8px; margin-top:20px;}
+.arow{background:var(--surface);border:1px solid var(--gold-b);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.aico{width:36px;height:36px;border-radius:12px;background:var(--gold-dim);border:1px solid var(--gold-b);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.aname{font-family:'Playfair Display',serif;font-size:13px;color:var(--gold-l);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ameta{font-size:9px;color:var(--muted);margin-top:1px;display:block;}
+.empty{background:var(--surface);border:1px dashed rgba(201,168,76,.18);border-radius:18px;padding:24px 18px;text-align:center; font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:999;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--gold-b);border-radius:24px;width:90%;max-width:400px;padding:24px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold-l);margin-bottom:6px;font-weight:600;}
+.modal-meta{font-size:11px;color:var(--muted);margin-bottom:16px;}
+.modal-content{font-size:13px;line-height:1.6;color:var(--text);background:rgba(0,0,0,0.2);padding:16px;border-radius:12px;margin-bottom:20px;font-style:italic;}
+.modal-close{width:100%;padding:12px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold-l);font-size:11px;font-weight:600;cursor:pointer;}
+</style>
+</head>
+<body data-nav="home">
+
+<div class="page" id="dashboard">
+  <div class="hdr">
+    <a href="index.html" class="back-btn">‹</a>
+    <span class="app-name">Activity Log</span>
+  </div>
+  
+  <div class="activity-feed" id="activityFeed">
+    <div class="empty">Loading...</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="activityModal" onclick="this.classList.remove('open')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" id="amTitle">Details</div>
+    <div class="modal-meta" id="amMeta">Just now</div>
+    <div class="modal-content" id="amContent">No note provided.</div>
+    <button class="modal-close" onclick="document.getElementById('activityModal').classList.remove('open')">CLOSE</button>
+  </div>
+</div>
+
+<div id="navContainer"></div>
+
+<script type="module" src="nav.js"></script>
+<script type="module">
+import { requireAuth, getMyRole, getPartnerUid, partnerDataCol } from './auth.js';
+import { onSnapshot, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+let partnerUid = null;
+let role = null;
+
+async function init() {
+  const authRes = await requireAuth();
+  if (!authRes) return;
+  role = await getMyRole();
+  partnerUid = await getPartnerUid();
+  
+  if (role === 'dom') loadActivity();
+  // if role is sub, for now we will also load their own activity if we want, but the request was for Dom index.
+  // To keep it simple, we load the same data for now (from partnerDataCol).
+  else loadActivity();
+}
+
+async function loadActivity() {
+  const feed = document.getElementById('activityFeed');
+  if (!partnerUid) {
+    feed.innerHTML = `<div class="empty"><p>No partner paired.</p></div>`;
+    return;
+  }
+  const activityCol = await partnerDataCol('activity');
+  onSnapshot(query(activityCol, orderBy('timestamp', 'desc'), limit(100)), snap => {
+    feed.innerHTML = '';
+    if (snap.empty) {
+      feed.innerHTML = `<div class="empty"><p>No activity found.</p></div>`;
+      return;
+    }
+    snap.forEach(docSnap => {
+      const n = docSnap.data();
+      const el = document.createElement('div');
+      el.className = 'arow';
+      let icon = '📝';
+      if (n.type === 'correction_ack') icon = '⚠️';
+      if (n.type === 'praise_ack') icon = '💖';
+      if (n.type === 'task') icon = '✅';
+      if (n.type === 'training') icon = '🔥';
+      if (n.type === 'checkin') icon = '💭';
+
+      el.innerHTML = `
+        <div class="aico">${icon}</div>
+        <div style="flex:1; overflow:hidden;">
+          <span class="aname">${n.content || n.text || 'Action performed'}</span>
+          <span class="ameta">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'just now'}</span>
+        </div>
+      `;
+      
+      el.onclick = () => {
+        document.getElementById('amTitle').textContent = n.type === 'checkin' ? 'Sub Check-In' : 'Activity Details';
+        document.getElementById('amMeta').textContent = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'Just now';
+        let contentHtml = '';
+        if (n.type === 'checkin') {
+          contentHtml = `<strong>Stats:</strong><br>${n.content}`;
+          if (n.note) contentHtml += `<br><br><strong>Note:</strong><br>"${n.note}"`;
+        } else {
+          contentHtml = n.fullText || n.note || n.content || n.text || 'No additional details.';
+        }
+        document.getElementById('amContent').innerHTML = contentHtml;
+        document.getElementById('activityModal').classList.add('open');
+      };
+      feed.appendChild(el);
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>

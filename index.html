@@ -589,7 +589,7 @@ async function loadLiveActivityFeedForDom() {
   if (!partnerUid || !feed) return;
 
   const activityCol = await partnerDataCol('activity');
-  onSnapshot(query(activityCol, orderBy('timestamp', 'desc'), limit(8)), (snap) => {
+  onSnapshot(query(activityCol, orderBy('timestamp', 'desc'), limit(5)), (snap) => {
     feed.innerHTML = '';
     if (snap.empty) {
       feed.innerHTML = `<div class="empty"><p>No recent activity from your sub yet.</p></div>`;
@@ -615,25 +615,33 @@ async function loadLiveActivityFeedForDom() {
         </div>
       `;
       
-      if (n.type === 'checkin' && n.note) {
-        el.onclick = () => {
-          document.getElementById('amTitle').textContent = 'Sub Check-In';
-          document.getElementById('amMeta').textContent = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'Just now';
-          document.getElementById('amContent').innerHTML = `<strong>Stats:</strong><br>${n.content}<br><br><strong>Note:</strong><br>"${n.note}"`;
-          document.getElementById('activityModal').classList.add('open');
-        };
-      } else if (n.note || n.fullText) {
-        // Fallback for other types with notes
-        el.onclick = () => {
-          document.getElementById('amTitle').textContent = 'Activity Details';
-          document.getElementById('amMeta').textContent = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'Just now';
-          document.getElementById('amContent').innerHTML = n.note || n.fullText;
-          document.getElementById('activityModal').classList.add('open');
-        };
-      }
+      el.onclick = () => {
+        document.getElementById('amTitle').textContent = n.type === 'checkin' ? 'Sub Check-In' : 'Activity Details';
+        document.getElementById('amMeta').textContent = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : 'Just now';
+        
+        let contentHtml = '';
+        if (n.type === 'checkin') {
+          contentHtml = `<strong>Stats:</strong><br>${n.content}`;
+          if (n.note) contentHtml += `<br><br><strong>Note:</strong><br>"${n.note}"`;
+        } else {
+          contentHtml = n.fullText || n.note || n.content || n.text || 'No additional details.';
+        }
+        document.getElementById('amContent').innerHTML = contentHtml;
+        document.getElementById('activityModal').classList.add('open');
+      };
       
       feed.appendChild(el);
     });
+
+    const viewAllBtn = document.createElement('a');
+    viewAllBtn.href = 'activity-log.html';
+    viewAllBtn.className = 'qbtn';
+    viewAllBtn.style.marginTop = '12px';
+    viewAllBtn.style.textAlign = 'center';
+    viewAllBtn.style.justifyContent = 'center';
+    viewAllBtn.style.padding = '10px';
+    viewAllBtn.innerHTML = '<span class="ql" style="font-size:11px;">View Full Log</span>';
+    feed.appendChild(viewAllBtn);
   });
 }
 
