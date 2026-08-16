@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#080c14"/>
+  <title>Dom Sub Hub — Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <style>
+    .academy-mastery {
+      background: var(--glass);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    }
+    .academy-mastery-pct {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 600;
+      background: var(--luxury-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .pathway-card {
+      display: block;
+      position: relative;
+      padding: 22px 20px;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      text-decoration: none;
+      color: #ccc;
+      margin-bottom: 16px;
+      transition: all .3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .pathway-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--luxury-gradient);
+      border-radius: 18px 18px 0 0;
+      opacity: .7;
+    }
+    .pathway-card:active { transform: scale(.98); }
+    .pathway-icon {
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .pathway-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .pathway-desc {
+      font-size: 11px;
+      color: #999;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .pathway-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pathway-bar {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .pathway-fill {
+      height: 100%;
+      background: var(--luxury-gradient);
+      border-radius: 3px;
+    }
+    .pathway-pct {
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 700;
+      min-width: 32px;
+      text-align: right;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .7;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body data-nav="academy">
+
+  <div class="topbar">
+    <div class="topbar-center">
+      <div class="topbar-title" style="font-family:'Great Vibes',cursive; font-size:28px;">Academy</div>
+      <div class="topbar-sub">Training · Learning · Mastery</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Overall Mastery -->
+    <div class="academy-mastery">
+      <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); opacity:.7; margin-bottom:6px;">Overall Mastery</div>
+      <div style="display:flex; align-items:flex-end; justify-content:space-between;">
+        <div class="academy-mastery-pct" id="overallPct">47%</div>
+        <div style="font-size:11px; color:#999; text-align:right;">
+          <div id="pathwaysActive">4 of 9 pathways active</div>
+        </div>
+      </div>
+      <div class="pathway-bar" style="margin-top:14px;">
+        <div class="pathway-fill" id="overallFill" style="width:47%"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Your Pathways</div>
+
+    <!-- Skill Trainings -->
+    <a href="training-menu.html" class="pathway-card">
+      <span class="pathway-icon material-symbols-rounded">fitness_center</span>
+      <div class="pathway-title">Skill Trainings</div>
+      <div class="pathway-desc">Physical protocols & conditioning</div>
+      <div class="pathway-progress-row">
+        <div class="pathway-bar"><div class="pathway-fill" style="width:38%"></div></div>
+        <div class="pathway-pct">38%</div>
+      </div>
+    </a>
+
+    <!-- Learning Curriculum -->
+    <a href="learning-hub.html" class="pathway-card">
+      <span class="pathway-icon material-symbols-rounded">menu_book</span>
+      <div class="pathway-title">Learning Curriculum</div>
+      <div class="pathway-desc">Positions, protocol & knowledge</div>
+      <div class="pathway-progress-row">
+        <div class="pathway-bar"><div class="pathway-fill" style="width:22%"></div></div>
+        <div class="pathway-pct">22%</div>
+      </div>
+    </a>
+
+    <!-- Testing & Mastery -->
+    <a href="tm-hub.html" class="pathway-card">
+      <span class="pathway-icon material-symbols-rounded">verified</span>
+      <div class="pathway-title">Testing & Mastery</div>
+      <div class="pathway-desc">Verify skills & formal testing</div>
+      <div class="pathway-progress-row">
+        <div class="pathway-bar"><div class="pathway-fill" style="width:12%"></div></div>
+        <div class="pathway-pct">12%</div>
+      </div>
+    </a>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { requireAuth, getMyRole, getMyProfile } from './auth.js';
+    // You can later pull real overall progress from Firestore here
+    // and update #overallPct / #overallFill / #pathwaysActive
+
+    async function init() {
+      await requireAuth();
+      const role = await getMyRole();
+      // Optional: adjust copy or show Dom-specific context based on role
+    }
+    init();
+  </script>
+
+  <script src="nav.js"></script>
+</body>
+</html>
