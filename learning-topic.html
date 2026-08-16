@@ -29,6 +29,7 @@
   .sub-info{flex:1;min-width:0}
   .sub-title{font-family:'Playfair Display',serif;font-size:15px;color:#eee;margin-bottom:4px}
   .sub-meta{font-size:10px;color:#888}
+  .sub-progress-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:8px}
   .sub-progress-fill{height:100%;background:var(--luxury-gradient);border-radius:3px}
   .sub-pct{font-size:13px;color:var(--gold);font-weight:700;flex-shrink:0}
 </style>
@@ -62,6 +63,19 @@
 
   const params = new URLSearchParams(window.location.search);
   const topicId = params.get('topic');
+
+  const GUIDE_LINKS = {
+    positions: {
+      href: 'learning-article-positions.html',
+      title: 'Official Learning Guide',
+      meta: 'Body Positions & Protocol Postures'
+    },
+    'the-5-protocol': {
+      href: 'learning-article-5-protocol.html',
+      title: 'Official Learning Guide',
+      meta: 'The 5 Protocol — Orgasm on Command'
+    }
+  };
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -97,20 +111,20 @@
     const progressByItemId = {};
     progressSnap.forEach(d => { progressByItemId[d.data().itemId] = d.data(); });
 
-    // Topic-level mastery
     const allItemIds = allItems.map(i => i.id);
     document.getElementById('topicMastery').textContent = calculateTopicMastery(allItemIds, progressByItemId) + '%';
 
     const listEl = document.getElementById('subList');
     listEl.innerHTML = '';
 
-    if (topicId === 'positions') {
+    const guide = GUIDE_LINKS[topicId];
+    if (guide) {
       listEl.innerHTML += `
-        <div class="glass-card sub-card" style="border-left: 3px solid var(--gold);" onclick="window.location.href='learning-article-positions.html'">
+        <div class="glass-card sub-card" style="border-left: 3px solid var(--gold);" onclick="window.location.href='${guide.href}'">
           <div class="sub-icon" style="color:var(--gold);"><span class="material-symbols-rounded">menu_book</span></div>
           <div class="sub-info">
-            <div class="sub-title" style="color: var(--gold);">Official Learning Guide</div>
-            <div class="sub-meta">Body Positions & Protocol Postures</div>
+            <div class="sub-title" style="color: var(--gold);">${guide.title}</div>
+            <div class="sub-meta">${guide.meta}</div>
           </div>
           <div style="color:var(--gold);"><span class="material-symbols-rounded">chevron_right</span></div>
         </div>
@@ -118,7 +132,9 @@
     }
 
     if (subs.length === 0) {
-      listEl.innerHTML = `<div style="text-align:center;padding:40px;color:#777;">No subcategories yet.</div>`;
+      if (!guide) {
+        listEl.innerHTML = `<div style="text-align:center;padding:40px;color:#777;">No subcategories yet.</div>`;
+      }
       return;
     }
 
