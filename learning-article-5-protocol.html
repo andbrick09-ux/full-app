@@ -17,7 +17,7 @@
   .topbar { display:flex; align-items:center; gap:12px; }
   .close-btn { width:36px; height:36px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(212,175,55,.08); border:1px solid var(--border); text-decoration:none; cursor:pointer; }
   .close-btn .material-symbols-rounded { font-size:20px; color:var(--gold); }
-  
+
   .helper-text {
     text-align: center;
     font-size: 11px;
@@ -50,7 +50,7 @@
     box-sizing: border-box;
     overflow-y: auto;
   }
-  
+
   .slide-category {
     font-size: 12px;
     text-transform: uppercase;
@@ -61,10 +61,10 @@
   }
   .slide-title {
     font-family: 'Playfair Display', serif;
-    font-size: 32px;
+    font-size: 28px;
     color: #eee;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 22px;
     line-height: 1.2;
   }
 
@@ -108,7 +108,7 @@
   }
   .accordion.active .accordion-body {
     padding: 0 16px 16px 16px;
-    max-height: 1000px;
+    max-height: 1200px;
   }
   .accordion-body ul {
     padding-left: 20px;
@@ -140,12 +140,12 @@
     background: var(--gold);
     transform: scale(1.3);
   }
-  
+
   .intro-text p { margin-bottom: 15px; color: var(--cream-mute); line-height: 1.6; font-size: 14px; }
   .intro-text ul { padding-left: 20px; margin-bottom: 15px; color: var(--cream-mute); font-size: 14px; }
   .intro-text li { margin-bottom: 8px; }
   .intro-text li::marker { color: var(--gold); }
-  
+
   .sequence-box { background: var(--glass); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; }
   .sequence-box strong { color: var(--gold); display: block; margin-bottom: 5px; font-size: 14px;}
   .sequence-box p { font-size: 14px; margin-bottom: 5px; color: #eee; }
@@ -171,10 +171,7 @@
   <span class="material-symbols-rounded">swipe_right</span>
 </div>
 
-<div class="carousel-container" id="carousel">
-  <!-- Slides injected here -->
-</div>
-
+<div class="carousel-container" id="carousel"></div>
 <div class="progress-dots" id="dotsContainer"></div>
 <div id="toast" class="toast"></div>
 
@@ -185,274 +182,266 @@
 
   let user = null;
 
+  // Flexible sections: each has category, title, and blocks[{label, content}]
+  // content can be string or string[]
   const sections = [
     {
       category: "Foundation",
-      title: "1. Overview",
-      form: "The 5 Protocol trains a reliable conditioned response: when Sir says “5,” the body releases. Orgasm is no longer spontaneous or self-directed. It becomes a grant controlled by command through classical conditioning, strict rules, precise timing, and consistent reinforcement.",
-      purpose: "To create clear ownership of release and a trained body that answers the word.",
-      learns: "That climax is not a personal decision. It is received. The body learns to wait for and respond to a specific command.",
-      gains: "A precise, usable tool of control and a deepened power exchange expressed through the body’s automatic response.",
-      mistakes: [
-        "Treating the protocol as optional or casual",
-        "Expecting instant results without consistent pairing",
-        "Allowing spontaneous orgasms outside the rules"
-      ],
-      transitions: [
-        "Into Classical Conditioning: understand the mechanism that makes the response possible",
-        "Into The Arousal Scale: establish the shared measurement system"
+      title: "What The 5 Protocol Is",
+      blocks: [
+        { label: "What it is", content: "The 5 Protocol trains a reliable conditioned response. When Sir says “5,” the body releases. Orgasm is no longer spontaneous or self-directed. It is a grant controlled by command." },
+        { label: "Why it matters", content: "Release becomes owned. Decision-making around climax is removed. The power exchange is expressed in the body’s automatic answer to a single word." },
+        { label: "What you train", content: [
+          "To wait for the command",
+          "To treat release as received, not taken",
+          "To keep the association strong through obedience and repetition"
+        ]},
+        { label: "Common errors", content: [
+          "Treating the protocol as optional or casual",
+          "Expecting instant results without clean pairing",
+          "Taking spontaneous orgasms outside the rules"
+        ]}
       ]
     },
     {
       category: "Foundation",
-      title: "2. Classical Conditioning",
-      form: "A specific cue — the word “5” spoken in a firm, consistent tone — is repeatedly paired with the exact moment of orgasm. Over many precise repetitions the cue itself becomes capable of triggering release. The command and the beginning of climax must land together.",
-      purpose: "To convert a neutral word into a reliable trigger through associative learning.",
-      learns: "That timing and consistency are more powerful than intensity or desire alone. The body can be trained.",
-      gains: "A conditioned reflex that does not rely solely on physical stimulation.",
-      mistakes: [
-        "Inconsistent timing between command and climax",
-        "Varying the tone or wording of the cue",
-        "Insufficient number of clean pairings"
-      ],
-      transitions: [
-        "Into The Command: define the exact stimulus",
-        "Into Phase 3: apply the pairing at the edge"
+      title: "How Conditioning Works",
+      blocks: [
+        { label: "What it is", content: "Classical conditioning. The cue — the word “5” in a firm, consistent tone — is paired with the exact moment of orgasm until the cue itself can trigger release." },
+        { label: "Why it matters", content: "Timing and consistency build the reflex. Desire alone does not. Clean, repeated pairing does." },
+        { label: "What you train", content: [
+          "To hold until the command",
+          "To let the word land as the key",
+          "To strengthen the link every time you climax"
+        ]},
+        { label: "Common errors", content: [
+          "Command too early or too late",
+          "Changing the tone or the word",
+          "Too few clean pairings before advancing"
+        ]}
       ]
     },
     {
       category: "Foundation",
-      title: "3. The 1–5 Arousal Scale",
-      form: "All training operates on a mandatory scale: 1 Neutral, 2 Warm, 3 Building, 4 The Edge (permission required), 5 Orgasm (reached only on command). Levels must be reported accurately and in real time.",
-      purpose: "To create a shared, precise language for arousal so timing and control can be exact.",
-      learns: "Accurate self-observation. The ability to name and hold states of arousal without immediately seeking release.",
-      gains: "Clear communication and the ability to intervene or command at the correct moment.",
-      mistakes: [
-        "Approximating or rounding levels",
-        "Failing to report changes in real time",
-        "Claiming a level that is not true"
-      ],
-      transitions: [
-        "Into Core Rules: the scale becomes enforceable",
-        "Into Phase 2: use the scale for edge and permission work"
+      title: "Reading Your Body",
+      blocks: [
+        { label: "What it is", content: "The 1–5 scale is the shared language of this protocol. You must learn to read yourself accurately in real time.\n\n1 Neutral · 2 Warm · 3 Building · 4 The Edge (permission required) · 5 Orgasm (only on command)" },
+        { label: "In the body", content: "Learn the difference between “hot” and “at the edge.” Notice breath, tension, pelvic pull, and the point of no return. Level 4 is control under pressure. Level 5 is granted." },
+        { label: "What you practice", content: [
+          "Name your level every 15–30 seconds during training",
+          "Report changes immediately",
+          "Separate intensity from the actual edge"
+        ]},
+        { label: "Common errors", content: [
+          "Rounding or guessing",
+          "Staying silent when the level jumps",
+          "Calling 3 a 4, or 4 a near-5, to rush the outcome"
+        ]}
       ]
     },
     {
       category: "Rules",
-      title: "4. Core Rules",
-      form: "1. Say “5” out loud every time you orgasm (partnered or solo). 2. Request with the exact phrase: “Sir, may I please cum on 5?” 3. Level 5 is reached only on Sir’s command. 4. Honesty about arousal is mandatory. 5. The tone of the command remains consistent.",
-      purpose: "To lock the structure required for reliable conditioning.",
-      learns: "That rules are not suggestions. Compliance itself becomes part of the training.",
-      gains: "Predictable behavior and a clean framework in which conditioning can occur.",
-      mistakes: [
-        "Skipping the spoken “5” during solo orgasm",
-        "Altering the request phrase",
-        "Reaching orgasm without the command"
-      ],
-      transitions: [
-        "Into The Command: the word is elevated by the rules",
-        "Into Failure Protocol: rules define how misses are handled"
+      title: "Core Rules",
+      blocks: [
+        { label: "The rule", content: [
+          "Say “5” out loud on every orgasm — partnered or solo",
+          "Request with the exact phrase: “Sir, may I please cum on 5?”",
+          "Level 5 is reached only on Sir’s command",
+          "Honesty about arousal is mandatory",
+          "The tone of the command stays consistent"
+        ]},
+        { label: "Why required", content: "These rules create the structure conditioning needs. Without them the association stays weak or false." },
+        { label: "What obedience looks like", content: "You ask. You wait. You report true numbers. You speak the word on every climax. You do not improvise the phrase." },
+        { label: "What breaks it", content: [
+          "Skipping “5” alone",
+          "Changing the ask",
+          "Climaxing without the command",
+          "Lying about level",
+          "Treating tone as optional"
+        ]}
       ]
     },
     {
       category: "Rules",
-      title: "5. The Command",
-      form: "“5” is both the top of the scale and the release command. It is delivered in a firm, deliberate, consistent tone. The tone itself is part of the stimulus. Once conditioned, the word carries authority and the body is trained to answer it.",
-      purpose: "To establish a single, unambiguous trigger that owns the release.",
-      learns: "To associate one specific auditory cue with climax so strongly that the cue can initiate the response.",
-      gains: "A clean, repeatable command that produces a visible and physical result.",
-      mistakes: [
-        "Changing the word or tone frequently",
-        "Delivering the command casually or inconsistently",
-        "Using the word outside of intentional training or protocol"
-      ],
-      transitions: [
-        "Into Phase 3: the command is paired at the peak",
-        "Into Phase 4: the command is tested in wider contexts"
+      title: "The Command “5”",
+      blocks: [
+        { label: "What it is", content: "“5” is both the top of the scale and the release command. Delivered in a firm, deliberate, consistent tone. The tone is part of the stimulus." },
+        { label: "Why it matters", content: "One clear cue owns the release. When conditioned, the word carries authority. The body is trained to answer it." },
+        { label: "What you train", content: [
+          "To associate that specific sound with climax",
+          "To hold until it is given",
+          "To release when it is given"
+        ]},
+        { label: "Common errors", content: [
+          "Treating the word casually",
+          "Using it outside intentional training or protocol",
+          "Expecting the same result from a different tone or wording"
+        ]}
+      ]
+    },
+    {
+      category: "Rules",
+      title: "The Ask & The Beg",
+      blocks: [
+        { label: "The skill", content: "The ask is part of the training. Exact phrase: “Sir, may I please cum on 5?” Begging is not theater. It is emotional investment in a release you do not control." },
+        { label: "Why it matters", content: "A clean ask marks readiness and surrender. Denial raises the value of the later grant. Both strengthen the protocol." },
+        { label: "What good looks like", content: [
+          "Asked at true Level 4, not after you have already tipped",
+          "Clear, complete phrase",
+          "Stillness and composure if denied",
+          "Re-ask only if invited"
+        ]},
+        { label: "What weak looks like", content: [
+          "Vague (“please?” / “can I?”)",
+          "Asked too late, already past the edge",
+          "Sulking or collapsing after denial",
+          "Performing emotion instead of offering control"
+        ]}
       ]
     },
     {
       category: "Phases",
-      title: "6. Phase 1 — Foundation",
-      form: "Focus on awareness, basic denial, and initial pairing. Learn to identify and report arousal levels. Practice reaching 3–4 then stopping. Establish the hard rule that every orgasm is paired with saying “5.” Set a backup release phrase.",
-      purpose: "To plant the seed of the association and build the required self-awareness.",
-      learns: "Basic denial control and the habit of linking every climax to the word “5.”",
-      gains: "A clean starting association and accurate reporting ability.",
-      mistakes: [
-        "Skipping the spoken “5” on early orgasms",
-        "Rushing past awareness work",
-        "Neglecting to establish the backup phrase"
-      ],
-      transitions: [
-        "Into Phase 2: move from basic denial to edge mastery",
-        "Into Core Rules: the pairing rule becomes permanent"
+      title: "Phase 1 — Foundation",
+      blocks: [
+        { label: "Focus", content: "Awareness. Basic denial. Initial pairing. Every orgasm is linked to saying “5.”" },
+        { label: "What you practice", content: [
+          "Identify and report levels accurately",
+          "Reach 3–4, stop, drop, repeat",
+          "Say “5” on every climax",
+          "Establish the backup release phrase with Sir"
+        ]},
+        { label: "Solo rules", content: [
+          "Solo orgasms still require saying “5” out loud",
+          "Do not edge or release alone in ways that break Sir’s standing orders",
+          "Log solo pairings if required",
+          "“Cheating the protocol” alone still counts as breaking it"
+        ]},
+        { label: "Move on when", content: [
+          "Reporting is accurate and timely",
+          "Every orgasm (including solo) has been paired with “5” for the agreed stretch",
+          "Backup phrase is set"
+        ]}
       ]
     },
     {
       category: "Phases",
-      title: "7. Phase 2 — Edge & Permission",
-      form: "Train the ability to hold at Level 4 without tipping. Use countdown work to learn exact orgasm timing. Practice the permission sequence (normal permission word → replace with “5” → give “5” before the ask). Integrate begging and controlled denial before the command is granted.",
-      purpose: "To build plateau control and attach emotional weight to the granted release.",
-      learns: "How to stay at the edge, how to time the approach to climax, and how to invest emotionally in the request.",
-      gains: "A submissive who can be held at the edge and who experiences the command as meaningful relief.",
-      mistakes: [
-        "Tipping over repeatedly without stopping",
-        "Skipping the structured permission progression",
-        "Treating begging as optional or theatrical only"
-      ],
-      transitions: [
-        "Into Phase 3: the edge is now ready for precise command pairing",
-        "Into Key Principles: plateau control becomes a standing requirement"
+      title: "Phase 2 — Edge & Permission",
+      blocks: [
+        { label: "Focus", content: "Plateau control. Structured permission. Emotional weight on the grant." },
+        { label: "What you practice", content: [
+          "Hold at Level 4 without tipping",
+          "Countdown work to learn exact timing of your cycle",
+          "Permission sequence: normal permission word → replace with “5” → “5” given before the ask",
+          "Ask, accept denial, then receive the command"
+        ]},
+        { label: "What success looks like", content: "You can stay at the edge under instruction. Your ask is clean. Denial does not break composure. The eventual “5” lands as relief you waited for." },
+        { label: "Move on when", content: [
+          "You can hold the edge for the required cycles",
+          "The ask phrase is automatic and exact",
+          "Sir confirms timing and control are ready for direct pairing"
+        ]}
       ]
     },
     {
       category: "Phases",
-      title: "8. Phase 3 — Command Pairing",
-      form: "Bring arousal to the absolute edge. Sir delivers “5” at the exact moment of release while stimulation is present. Repeat until reliable. Begin testing at slightly lower arousal. Progress toward wave-riding: hold high arousal with breath, Kegels, and focus, then release on command with minimal or no touch.",
-      purpose: "To create the core conditioned reflex through repeated exact pairing.",
-      learns: "That the word can unlock release. The body begins to answer the cue.",
-      gains: "A functional trigger that works with decreasing physical stimulation.",
-      mistakes: [
-        "Poor timing of the command",
-        "Insufficient clean repetitions",
-        "Advancing to low-stimulation attempts before high-edge pairing is solid"
-      ],
-      transitions: [
-        "Into Phase 4: take the working trigger into real contexts",
-        "Into Key Principles: timing and repetition are now proven"
+      title: "Phase 3 — Command Pairing",
+      blocks: [
+        { label: "Focus", content: "Exact pairing at the edge. Begin transferring control to the verbal cue." },
+        { label: "What you practice", content: [
+          "Reach the absolute edge",
+          "Receive “5” at the moment of release while stimulation is present",
+          "Repeat until reliable",
+          "Test at slightly lower arousal",
+          "Begin wave-riding: hold high arousal with breath, Kegels, and focus; release on command with minimal or no touch"
+        ]},
+        { label: "What success looks like", content: "The word unlocks release with high consistency at the edge. Misses are rare and reported cleanly. Reduced stimulation still works under command." },
+        { label: "Move on when", content: [
+          "Pairing is reliable at the edge",
+          "Sir is satisfied with timing and response quality",
+          "You are ready to use the trigger outside formal drills"
+        ]}
       ]
     },
     {
       category: "Phases",
-      title: "9. Phase 4 — Integration & Maintenance",
-      form: "Apply the command during partnered sex with progressively less warm-up. Introduce subtle or non-sexual uses once reliability is high. Conduct regular maintenance sessions. Track success rate, lowest effective arousal level, and time from command to release.",
-      purpose: "To generalize the response and keep the association strong over time.",
-      learns: "That the trigger can operate beyond formal training sessions and that it requires ongoing care.",
-      gains: "A durable, practical command usable in wider protocol and daily contexts.",
-      mistakes: [
-        "Stopping practice once the trigger first works",
-        "Pushing public or subtle use too early",
-        "Failing to track objective metrics"
-      ],
-      transitions: [
-        "Into Long-Term View: maintenance becomes standing practice",
-        "Into Benefits: the practical value of the trained response is realized"
+      title: "Phase 4 — Integration & Maintenance",
+      blocks: [
+        { label: "Focus", content: "Real use. Less warm-up. Ongoing reinforcement." },
+        { label: "What you practice", content: [
+          "Commanded release during partnered sex with progressively less warm-up",
+          "Subtle or non-sexual uses only when reliability is high and Sir directs it",
+          "Regular maintenance sessions",
+          "Track success rate, lowest effective arousal level, time from command to release"
+        ]},
+        { label: "What success looks like", content: "The trigger works in wider contexts. The association stays sharp because it is used and maintained. Metrics are known, not guessed." },
+        { label: "Move on when", content: "There is no final “done.” Phase 4 is the standing practice of ownership. Mastery is maintained, not graduated from." }
       ]
     },
     {
       category: "Principles",
-      title: "10. Key Principles",
-      form: "Exact timing of command and climax. Consistent tone. Repeated clean pairings. Plateau control. Absolute honesty in reporting. Progressive reduction of physical stimulation. These elements together produce a reliable reflex.",
-      purpose: "To define the non-negotiable mechanics that make the protocol work.",
-      learns: "Which factors actually drive conditioning and which are distractions.",
-      gains: "A clear standard against which every session can be measured.",
-      mistakes: [
-        "Prioritizing intensity over timing",
-        "Allowing tone or wording to drift",
-        "Neglecting honesty or plateau work"
-      ],
-      transitions: [
-        "Into Failure Protocol: principles dictate how errors are corrected",
-        "Into all Phases: every stage applies these principles"
+      title: "Failure Protocol",
+      blocks: [
+        { label: "The principle", content: "Honest failure is data. It refines timing and control. It is not treated as disobedience when reported truthfully." },
+        { label: "In the body", content: "If you tip early or the command misses: stop. Let arousal drop. Name what happened and at what level. Wait until both are ready to continue." },
+        { label: "If you miss", content: [
+          "Stop all stimulation immediately",
+          "Calm and drop",
+          "Report honestly",
+          "Retry only when ready"
+        ]},
+        { label: "What Sir expects", content: "Truth over performance. No hiding. No faking to protect the session. No self-punishment spirals that replace honest reporting." }
       ]
     },
     {
       category: "Principles",
-      title: "11. Failure Protocol",
-      form: "If orgasm occurs before the command or the command fails: stop all stimulation immediately, allow arousal to drop, report honestly what happened and at what level, then retry only when both are ready. Honest failure is data.",
-      purpose: "To protect the conditioning process and the dynamic from destructive reactions to misses.",
-      learns: "That honest reporting is valued over perfect performance. Failure is used for refinement, not shame.",
-      gains: "Continued trust and cleaner data for improving timing and control.",
-      mistakes: [
-        "Continuing stimulation after an early release",
-        "Hiding or minimizing a miss",
-        "Responding to honest failure with harsh punishment that damages trust"
-      ],
-      transitions: [
-        "Into Core Rules: honesty remains mandatory even in failure",
-        "Into Key Principles: timing errors are corrected, not punished emotionally"
+      title: "Safeguards & When to Pause",
+      blocks: [
+        { label: "The principle", content: "Conditioning is intensive. The body and mind have limits. Pausing protects the protocol." },
+        { label: "When to pause", content: [
+          "Illness, exhaustion, high stress",
+          "Cycle-related pain or volatility if it destroys accurate reporting",
+          "Numbness, frustration spirals, or dread around training",
+          "Any point where “can’t” is being forced into “must fake”"
+        ]},
+        { label: "What is not allowed", content: [
+          "Faking orgasm to satisfy the command",
+          "Pushing through when reporting has become unreliable",
+          "Using shame to replace structure"
+        ]},
+        { label: "What Sir expects", content: "You flag limits early. You distinguish “can’t” from “won’t.” You protect the honesty the entire protocol depends on." }
+      ]
+    },
+    {
+      category: "Principles",
+      title: "Safety & Backup",
+      blocks: [
+        { label: "The rule", content: "A backup release phrase is set at the start of training. The primary command remains “5.” The backup is a controlled exception." },
+        { label: "Why required", content: "Safety, flexibility, and the option to temporarily retire the primary trigger without leaving you stranded." },
+        { label: "How it is used", content: "Only as directed. Not as a second everyday option. Not as a private loophole." },
+        { label: "What breaks it", content: [
+          "Never setting a backup",
+          "Using it casually",
+          "Treating “5” as disposable because a backup exists"
+        ]}
       ]
     },
     {
       category: "Outcomes",
-      title: "12. Benefits for the Submissive",
-      form: "Clear structure and removal of decision-making around release. Deeper submission through surrender of a core bodily response. More intense orgasms from built tension and commanded relief. Heightened body awareness. Stronger link between Sir’s authority and pleasure.",
-      purpose: "To define what successful conditioning gives the submissive.",
-      learns: "To experience release as something received rather than taken.",
-      gains: "Psychological surrender, intensified sensation, and a reliable container for arousal.",
-      mistakes: [
-        "Expecting only physical intensity without the mental surrender",
-        "Resisting the loss of spontaneous control"
-      ],
-      transitions: [
-        "Into Benefits for the Dominant: both sides gain from the same trained response",
-        "Into Long-Term View: benefits are sustained by maintenance"
-      ]
-    },
-    {
-      category: "Outcomes",
-      title: "13. Benefits for the Dominant",
-      form: "Direct control over the submissive’s most intense physical response. A clear, usable command that produces a reliable result. Reinforced ownership and authority. Expanded options for scenes, denial, and protocol. Observable proof of the power exchange.",
-      purpose: "To define the practical and psychological return for Sir.",
-      learns: "How to wield a precise verbal tool that the body answers.",
-      gains: "A visible, physical demonstration of control and a flexible protocol element.",
-      mistakes: [
-        "Using the command carelessly once it works",
-        "Neglecting the maintenance required to keep it reliable"
-      ],
-      transitions: [
-        "Into Phase 4: the gains are realized in real use",
-        "Into Long-Term View: authority is maintained through continued reinforcement"
-      ]
-    },
-    {
-      category: "Refinement",
-      title: "14. Common Mistakes",
-      form: "Inconsistent tone or changing the command word. Poor timing. Faking orgasm or lying about arousal. Skipping the request phrase. Failing to stop after early release. Neglecting maintenance. Rushing into advanced stages before plateau control is solid.",
-      purpose: "To identify the errors that most reliably weaken or destroy the association.",
-      learns: "Which behaviors actively work against the conditioning.",
-      gains: "The ability to protect the protocol by avoiding known failure points.",
-      mistakes: [
-        "Ignoring the list and repeating the same errors",
-        "Treating mistakes as inevitable rather than correctable"
-      ],
-      transitions: [
-        "Into Failure Protocol: how to respond when mistakes occur",
-        "Into Key Principles: the positive standards that prevent these errors"
-      ]
-    },
-    {
-      category: "Refinement",
-      title: "15. Safety & Backup",
-      form: "A backup release phrase is established at the beginning of training. It exists for safety, flexibility, and the possibility that the primary trigger may need to be temporarily retired. The primary command remains “5.” The backup is a controlled exception.",
-      purpose: "To protect the submissive and the dynamic while preserving the primacy of the trained command.",
-      learns: "That safety structures exist alongside strict protocol.",
-      gains: "A responsible framework that allows intensive conditioning without leaving the submissive stranded.",
-      mistakes: [
-        "Failing to establish a backup phrase",
-        "Using the backup casually or as a second everyday option",
-        "Treating the primary command as disposable"
-      ],
-      transitions: [
-        "Into Phase 1: the backup is set during foundation work",
-        "Into Long-Term View: both primary and backup remain available as needed"
-      ]
-    },
-    {
-      category: "Refinement",
-      title: "16. Long-Term View",
-      form: "The conditioned response is a trained skill. It requires ongoing practice. Regular maintenance sessions keep the association strong. Tracking success rate and the lowest effective arousal level provides objective feedback. With consistent reinforcement the body remains trained to answer the word. Without it the association can fade.",
-      purpose: "To establish that the protocol does not end when the trigger first works.",
-      learns: "That ownership of the response is maintained through continued use and care.",
-      gains: "A durable tool rather than a temporary effect.",
-      mistakes: [
-        "Assuming the response is permanent after initial success",
-        "Stopping all structured practice",
-        "Failing to monitor metrics over time"
-      ],
-      transitions: [
-        "Into Phase 4: maintenance is already built into advanced practice",
-        "Into Overview: the long-term state is the fulfillment of the original goal"
+      title: "What Mastery Looks Like",
+      blocks: [
+        { label: "Standard", content: "Reliable release under Sir’s command. Accurate self-reporting. Clean asks. Honest misses. Maintained association." },
+        { label: "Evidence", content: [
+          "High success rate on command at the edge",
+          "Working response with reduced warm-up when trained for it",
+          "Solo integrity (every climax still paired with “5”)",
+          "Metrics tracked, not assumed"
+        ]},
+        { label: "Ongoing duty", content: "Maintenance sessions. Continued honesty. No sliding back into self-granted release." },
+        { label: "Common errors", content: [
+          "Calling it mastered after one good session",
+          "Stopping practice once it “works”",
+          "Letting solo habits erode the association"
+        ]}
       ]
     }
   ];
@@ -468,6 +457,8 @@
     let contentHtml = content;
     if (Array.isArray(content)) {
       contentHtml = '<ul>' + content.map(i => `<li>${i}</li>`).join('') + '</ul>';
+    } else {
+      contentHtml = String(content).replace(/\n/g, '<br>');
     }
     return `
       <div class="accordion" onclick="this.classList.toggle('active')">
@@ -484,73 +475,68 @@
     const carousel = document.getElementById('carousel');
     let html = '';
 
-    // SLIDE 1: Intro
+    // Intro
     html += `
       <div class="carousel-slide">
         <div class="slide-category">Learning Guide</div>
         <div class="slide-title">The 5 Protocol</div>
         <div class="intro-text">
-          <p>This is the study material for orgasm-on-command training under The 5 Protocol. Read it before or alongside your practical training sessions and quizzes.</p>
-          <p><strong>Suggested learning path:</strong></p>
+          <p>This is the study material for orgasm on command under Sir’s control.</p>
+          <p>Read it before and alongside practical training. The goal is not information. The goal is a trained response: when Sir says “5,” your body releases.</p>
+          <p><strong>Learning path</strong></p>
           <ul>
-            <li>Read the full guide section by section</li>
-            <li>Practice the corresponding phase in the interactive training page</li>
-            <li>Review flashcards for recognition of rules and principles</li>
-            <li>Test yourself with true/false and multiple-choice questions</li>
+            <li>Read this guide</li>
+            <li>Practice the matching phase in training</li>
+            <li>Use flashcards and quizzes to lock the rules</li>
+            <li>Report honestly. Always.</li>
           </ul>
           <p style="text-align:center; margin-top:30px; font-weight:600; color:var(--gold);">Swipe left to begin <span class="material-symbols-rounded" style="vertical-align:middle;font-size:18px;">arrow_forward</span></p>
         </div>
       </div>
     `;
 
-    // Content slides
     sections.forEach(s => {
       html += `
         <div class="carousel-slide">
           <div class="slide-category">${s.category}</div>
           <div class="slide-title">${s.title}</div>
-          ${buildAccordion('Form', s.form)}
-          ${buildAccordion('Purpose', s.purpose)}
-          ${buildAccordion('What the Submissive Learns', s.learns)}
-          ${buildAccordion('What Is Gained', s.gains)}
-          ${buildAccordion('Common Mistakes', s.mistakes)}
-          ${buildAccordion('Key Transitions', s.transitions)}
+          ${s.blocks.map(b => buildAccordion(b.label, b.content)).join('')}
         </div>
       `;
     });
 
-    // Final Review slide
+    // Review
     html += `
       <div class="carousel-slide">
         <div class="slide-category">Review</div>
-        <div class="slide-title">Core Sequences &<br>Principles</div>
-        
+        <div class="slide-title">Path &amp; Principles</div>
+
         <div class="sequence-box">
-          <strong>Conditioning Sequence</strong>
-          <p>Awareness → Edge Control → Exact Pairing → Reduced Stimulation → Maintenance</p>
+          <strong>Conditioning path</strong>
+          <p>Awareness → Edge control → Exact pairing → Reduced stimulation → Maintenance</p>
           <span>Build the association first, then transfer control more fully to the verbal cue.</span>
         </div>
-        
+
         <div class="sequence-box">
-          <strong>Permission Progression</strong>
-          <p>Ask → Normal permission → Replace with “5” → “5” given before the ask</p>
+          <strong>Permission path</strong>
+          <p>Ask → Normal permission → Replace with “5” → “5” before the ask</p>
           <span>Gradually transfers the release trigger from ordinary permission to the trained command.</span>
         </div>
-        
+
         <div class="sequence-box">
-          <strong>Failure Handling</strong>
+          <strong>Failure path</strong>
           <p>Stop → Calm → Honest report → Retry when ready</p>
           <span>Honest misses are data. They refine timing; they are not treated as disobedience.</span>
         </div>
 
         <div class="intro-text" style="margin-top:20px;">
-          <p><strong>Principles That Apply Throughout:</strong></p>
+          <p><strong>Standing principles</strong></p>
           <ul>
-            <li>Exact timing of command and climax is non-negotiable.</li>
-            <li>Consistent tone is part of the conditioned stimulus.</li>
-            <li>Honesty about arousal level protects the entire process.</li>
-            <li>The association requires ongoing reinforcement to stay strong.</li>
-            <li>Release is a grant controlled by Sir, not a personal decision.</li>
+            <li>Exact timing of command and climax</li>
+            <li>Consistent tone is part of the cue</li>
+            <li>Honesty protects the process</li>
+            <li>Reinforcement keeps the response alive</li>
+            <li>Release is a grant controlled by Sir</li>
           </ul>
         </div>
 
@@ -562,7 +548,6 @@
 
     carousel.innerHTML = html;
 
-    // Dots (intro + 16 sections + review = 18)
     const totalSlides = 1 + sections.length + 1;
     const dotsContainer = document.getElementById('dotsContainer');
     for (let i = 0; i < totalSlides; i++) {
@@ -574,9 +559,7 @@
     carousel.addEventListener('scroll', () => {
       const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
       const dots = dotsContainer.querySelectorAll('.dot');
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === index);
-      });
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
     });
   }
 
@@ -588,7 +571,6 @@
       const btn = document.getElementById('markReadBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="material-symbols-rounded">sync</span> Saving...';
-
       try {
         await addDoc(collection(db, 'trainingActivity'), {
           uid: user.uid,
@@ -610,7 +592,6 @@
 
   init().catch(console.error);
 </script>
-
 <script src="nav.js"></script>
 </body>
 </html>
