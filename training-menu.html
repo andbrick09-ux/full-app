@@ -218,10 +218,10 @@
           `;
 
           if (isAssigned) {
-            html += `<button class="assign-btn" onclick="unassignTraining('${t.dbId}', this)">Unassign</button>`;
-          } else {
-            html += `<button class="assign-btn" onclick="assignTraining('${t.dbId}', this)">Assign to ${window.activeSubName}</button>`;
-          }
+  html += `<button class="assign-btn" onclick="event.stopPropagation(); unassignTraining('${t.dbId}', this)">Unassign</button>`;
+} else {
+  html += `<button class="assign-btn" onclick="event.stopPropagation(); assignTraining('${t.dbId}', this)">Assign to ${window.activeSubName}</button>`;
+}
 
           card.innerHTML = html;
           // Dom can always click to view the training (no locks for Dom)
