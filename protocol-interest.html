@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#080c14"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>Protocol Interest • Dom Sub Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <style>
+    .pi-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 16px}
+    .pi-stat{background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25);border-radius:12px;padding:10px 6px;text-align:center}
+    .pi-stat b{display:block;color:#d4af37;font-size:18px}
+    .pi-stat span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#b7b0a3)}
+    .pi-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+    .pi-toolbar button{appearance:none;border:1px solid #d4af37;background:transparent;color:#d4af37;font-family:inherit;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;border-radius:999px;cursor:pointer}
+    .pi-toolbar button.on,.pi-toolbar button.solid{background:#d4af37;color:#080c14;font-weight:700}
+    .pi-banner{font-size:13px;color:#d4af77;margin:0 0 14px;font-style:italic}
+    .pi-item{border-top:1px solid rgba(212,175,55,.2);padding:12px 0 10px}
+    .pi-item:first-of-type{border-top:0}
+    .pi-name{font-size:14px;line-height:1.4;margin-bottom:8px}
+    .pi-picks{display:flex;gap:6px}
+    .pi-pick{flex:1;text-align:center;border:1px solid rgba(212,175,55,.28);background:transparent;color:#b7b0a3;border-radius:10px;padding:8px 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+    .pi-pick[data-v="like"].on{background:#d4af37;color:#1a1406;border-color:#d4af37;font-weight:700}
+    .pi-pick[data-v="maybe"].on{background:#3a3426;color:#e6d7a2;border-color:#c4b07a}
+    .pi-pick[data-v="no"].on{background:#3a2424;color:#e3b6b6;border-color:#8a5555}
+    .pi-readonly .pi-pick{cursor:default;opacity:.9}
+    .pi-save{font-size:11px;color:#b7b0a3;text-align:center;margin:8px 0 24px}
+    #piSummary{white-space:pre-wrap;font-size:13px;line-height:1.55}
+    #subSwitcherBanner{background:rgba(201,168,76,0.05);border:1px solid rgba(212,175,55,.28);border-radius:12px;padding:12px 16px;margin:0 0 16px;display:none;align-items:center;justify-content:space-between;gap:12px}
+    #subSwitcherBanner .lbl{font-size:11px;letter-spacing:1px;color:#d4af37;text-transform:uppercase;font-weight:600}
+    #subSwitcher{appearance:none;-webkit-appearance:none;background:#0e1420;border:1px solid rgba(212,175,55,.35);color:#e2c47a;font-family:inherit;font-size:13px;font-weight:600;padding:8px 34px 8px 12px;border-radius:8px;cursor:pointer;outline:none;min-width:160px}
+    .switch-wrap{position:relative;display:inline-block}
+    .switch-wrap svg{width:16px;height:16px;position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:#d4af37}
+  </style>
+</head>
+<body data-nav="more">
+  <div class="topbar">
+    <div class="topbar-center">
+      <div class="topbar-title">Protocol Interest</div>
+      <div class="topbar-sub">Like · Maybe · No</div>
+    </div>
+  </div>
+  <div class="main">
+    <div id="subSwitcherBanner">
+      <div class="lbl">Viewing</div>
+      <div class="switch-wrap">
+        <select id="subSwitcher"></select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+    </div>
+    <p class="pi-banner" id="piBanner">Loading…</p>
+    <div class="pi-stats">
+      <div class="pi-stat"><b id="nTotal">0</b><span>Items</span></div>
+      <div class="pi-stat"><b id="nLike">0</b><span>Like</span></div>
+      <div class="pi-stat"><b id="nMaybe">0</b><span>Maybe</span></div>
+      <div class="pi-stat"><b id="nNo">0</b><span>No</span></div>
+    </div>
+    <div class="pi-toolbar">
+      <button type="button" class="on" data-filter="all">All</button>
+      <button type="button" data-filter="unset">Unmarked</button>
+      <button type="button" data-filter="like">Likes</button>
+      <button type="button" data-filter="maybe">Maybe</button>
+      <button type="button" data-filter="no">No</button>
+      <button type="button" class="solid" id="btnSummary">Review</button>
+    </div>
+    <div id="piSections"></div>
+    <div class="glass-card hidden" id="summaryCard" style="display:none;margin-top:8px">
+      <h2 style="font-family:'Playfair Display',serif;color:#d4af77;margin:0 0 8px">Selections</h2>
+      <div id="piSummary"></div>
+    </div>
+    <p class="pi-save" id="piSave">Marks save automatically.</p>
+    <div style="text-align:center;margin:8px 0 24px">
+      <a href="sirs-protocol.html" class="gold-btn">← Sir’s Protocol</a>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+<script type="module">
+import { requireAuth, getMyProfile, getPartnerUid, getUserProfile, getDomRoster, switchActiveSub, dataRef, partnerDataRef } from './auth.js';
+import { getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const DATA = [
+  { cat: "Standing rules", hint: "Always-on protocols", items: [
+    "Honorifics in every sentence of all communication",
+    "Public-collar jewelry (necklace or anklet) at all times",
+    "Grooming standards (shaved, specified nails, hair)",
+    "No unauthorized touching — permission required for self-pleasure",
+    "Keep a punishment / missed-task log",
+    "Social media cap (e.g. 30 minutes/day; night app bans)",
+    "Anchor scent used only during high arousal",
+    "Trigger-word kegels: 10 extra pulses",
+    "Secret-word kegels: 30 pulses immediately",
+    "Coded app status for current level of need"
+  ]},
+  { cat: "Daily — morning", hint: "Start-of-day sequence", items: [
+    "Good-morning protocol",
+    "Morning reverse strip photos (shower, naked, underwear, dressed)",
+    "Full-outfit ready-for-the-day selfie",
+    "Underwear / outfit photos for approval",
+    "Made-bed / tidy-space photo",
+    "Morning trainer plug from wake-up until first coffee"
+  ]},
+  { cat: "Daily — body and habit", hint: "Repeating physical standards", items: [
+    "64 oz water with photo proof of every glass or bottle",
+    "Assigned workout plus completion selfie",
+    "Kegel drills: 3 sets of 20",
+    "20-minute ankle-to-ear / flexibility routine",
+    "Arch / bridge hold, working toward 5 minutes",
+    "Daily gag-reflex hold, increasing time"
+  ]},
+  { cat: "Daily — close", hint: "End of day", items: [
+    "Good-night protocol"
+  ]},
+  { cat: "Weekly", hint: "Once-a-week rules and service", items: [
+    "Commando Mondays",
+    "Plug expansion +1/8 inch and log results",
+    "Gagged Saturday chores",
+    "High-heel housework for 2 hours",
+    "Weekly review of the punishment log"
+  ]},
+  { cat: "Multi-day cycles", hint: "Streaks and training blocks", items: [
+    "Orgasm denial streaks (7 / 14 / 30 days)",
+    "Archetype dress-up (helpless or pet) for 3 hours",
+    "Weighted plug held through 20 minutes of housework"
+  ]},
+  { cat: "On-command — orgasm control", hint: "Assigned sessions, not daily chores", items: [
+    "Mandatory maintenance — only when told, set duration and script",
+    "Decimal-scale edge (hold a named number 1–10)",
+    "60-minute edge",
+    "Look but don't touch to a chosen erotic video",
+    "Ruined orgasm",
+    "Count backward from 500 on high vibe",
+    "Non-genital peak (nipple / breast only)",
+    "Second orgasm within 30 minutes of the first",
+    "Wait 30 minutes after permission before climax",
+    "Struggle orgasm (thighs or wrists bound with a scarf)",
+    "Post-orgasm chore while still in afterglow",
+    "Breath-control tease; match breath on calls",
+    "Record an instructional masturbation video from a script"
+  ]},
+  { cat: "On-command — physical / endurance", hint: "Training drills when assigned", items: [
+    "Wall-sit with vibrator until legs fail",
+    "Leg-spread lock with pillow or block for 30 minutes",
+    "Inversion oral on a toy (head off the bed)",
+    "Self-bondage for 1 hour with reflection",
+    "Suction drill: 30-second holds",
+    "No-hands oral (hands bound behind the back)",
+    "Temperature shock (ice water / warm tea) before oral",
+    "Clothespin ladder on inner thighs",
+    "Low-temp wax on thighs with breath work",
+    "10-minute total-surrender still lie"
+  ]},
+  { cat: "On-command — mind", hint: "Choice and labeling work", items: [
+    "Forced choice between two wicked options plus written rationale",
+    "Mirror work using only the labels given to your body"
+  ]},
+  { cat: "Public — low visibility", hint: "Discreet missions", items: [
+    "Weighted walk (Ben Wa or small plug) on errands",
+    "Remote-toy café",
+    "Code-word with a cashier",
+    "Demure gaze; no eye contact with strangers",
+    "Seat of submission on public chairs",
+    "Bottomless errands in a long skirt or trench",
+    "Hardware-store raid with photo of kinky use",
+    "Kitchen-aisle critique of spoons / spatulas",
+    "Office-supply challenge (ruler mark or rubber-band flick)",
+    "Write Property of [Name] on receipts and send a photo"
+  ]},
+  { cat: "Public — medium", hint: "Higher heat, still deniable", items: [
+    "Suggestive shopping list with a blank face",
+    "Wardrobe hunt: Confidence, Vulnerable, and Fantasy pieces",
+    "Price-tag rule — model without looking; he decides",
+    "Silent changing-room striptease video",
+    "Fitting-room 10-minute edge (5 silent edges)",
+    "High-arousal face selfie in a secluded aisle",
+    "Library whisper: discipline book plus dirty poem voice note",
+    "Museum pose mirroring a surrendering statue",
+    "Elevator sprint: peak between floors, composed at the doors",
+    "Off-camera security-station tease of a hidden mark"
+  ]},
+  { cat: "Public — brave", hint: "Rare. Mark honestly. Negotiation required each time.", items: [
+    "Parked-car POV ruined-orgasm video in a busy lot",
+    "Public-restroom audio of vows",
+    "Triple-edge mall trip: 3 restrooms in 1 hour",
+    "Quiet park video begging for release",
+    "Ask a stranger for a number 1–20; that is later edge minutes",
+    "Heart rate above 120 from arousal while standing still in public"
+  ]},
+  { cat: "One-off written / recorded", hint: "Assignments, not repeating chores", items: [
+    "1,000-word vulnerability essay",
+    "Blindfolded audio taboo confession",
+    "Third-person anonymous erotica of your specific desires",
+    "20-question truth serum, 100% honesty"
+  ]}
+];
+
+function sid(cat, item){ return cat + "||" + item; }
+
+let marks = {};
+let mode = "all";
+let canEdit = true;
+let saveTimer = null;
+let subjectName = "you";
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function allItems(){
+  const out = [];
+  DATA.forEach(s => s.items.forEach(item => out.push({cat:s.cat, item})));
+  return out;
+}
+
+function stats(){
+  const total = allItems().length;
+  let like=0,maybe=0,no=0;
+  Object.values(marks).forEach(v => {
+    if(v==="like") like++; else if(v==="maybe") maybe++; else if(v==="no") no++;
+  });
+  nTotal.textContent = total;
+  nLike.textContent = like;
+  nMaybe.textContent = maybe;
+  nNo.textContent = no;
+}
+
+function visible(id){
+  if(mode==="all") return true;
+  if(mode==="unset") return !marks[id];
+  return marks[id]===mode;
+}
+
+function render(){
+  const root = document.getElementById("piSections");
+  root.innerHTML = "";
+  DATA.forEach(section => {
+    const items = section.items.filter(item => visible(sid(section.cat, item)));
+    if(!items.length) return;
+    const card = document.createElement("div");
+    card.className = "glass-card";
+    card.style.marginBottom = "16px";
+    card.innerHTML = `<h2 style="font-family:'Playfair Display',serif;color:#d4af77;margin:0 0 4px">${section.cat}</h2>
+      <p style="color:var(--muted,#b7b0a3);font-size:13px;margin:0 0 8px">${section.hint}</p>`;
+    items.forEach(item => {
+      const id = sid(section.cat, item);
+      const row = document.createElement("div");
+      row.className = "pi-item" + (canEdit ? "" : " pi-readonly");
+      row.innerHTML = `<div class="pi-name">${item}</div>
+        <div class="pi-picks">
+          <button type="button" class="pi-pick${marks[id]==="like"?" on":""}" data-v="like">Like</button>
+          <button type="button" class="pi-pick${marks[id]==="maybe"?" on":""}" data-v="maybe">Maybe</button>
+          <button type="button" class="pi-pick${marks[id]==="no"?" on":""}" data-v="no">No</button>
+        </div>`;
+      row.querySelectorAll(".pi-pick").forEach(btn => {
+        btn.onclick = () => {
+          if(!canEdit) return;
+          const v = btn.dataset.v;
+          if(marks[id]===v) delete marks[id]; else marks[id]=v;
+          render();
+          queueSave();
+        };
+      });
+      card.appendChild(row);
+    });
+    root.appendChild(card);
+  });
+  stats();
+}
+
+function buildSummary(){
+  const buckets = {like:[], maybe:[], no:[]};
+  allItems().forEach(({cat,item}) => {
+    const v = marks[sid(cat,item)];
+    if(v) buckets[v].push("• " + item);
+  });
+  const block = (title, arr) => arr.length ? title+"\n"+arr.join("\n")+"\n\n" : "";
+  return "Protocol interest — " + subjectName + "\n\n" +
+    block("LIKE", buckets.like) +
+    block("MAYBE", buckets.maybe) +
+    block("NO", buckets.no) +
+    "(Unmarked items were left blank.)";
+}
+
+function queueSave(){
+  document.getElementById("piSave").textContent = "Saving…";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 400);
+}
+
+async function saveNow(){
+  try{
+    await setDoc(dataRef("protocolInterest"), {
+      marks,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    document.getElementById("piSave").textContent = "Saved to her file. Sir can see this.";
+  }catch(e){
+    console.error(e);
+    document.getElementById("piSave").textContent = "Save failed. Check connection.";
+    toast("Could not save");
+  }
+}
+
+document.querySelectorAll("[data-filter]").forEach(btn => {
+  btn.onclick = () => {
+    mode = btn.dataset.filter;
+    document.querySelectorAll("[data-filter]").forEach(b => b.classList.toggle("on", b===btn));
+    document.getElementById("summaryCard").style.display = "none";
+    render();
+  };
+});
+document.getElementById("btnSummary").onclick = () => {
+  const card = document.getElementById("summaryCard");
+  document.getElementById("piSummary").textContent = buildSummary();
+  card.style.display = "block";
+  card.scrollIntoView({behavior:"smooth"});
+};
+
+async function loadActiveSubMarks(){
+  marks = {};
+  try{
+    const pref = await partnerDataRef("protocolInterest");
+    const snap = await getDoc(pref);
+    if(snap.exists()) marks = snap.data().marks || {};
+    const pUid = await getPartnerUid();
+    const p = pUid ? await getUserProfile(pUid) : null;
+    subjectName = p?.displayName || "your sub";
+    document.getElementById("piBanner").textContent =
+      "Viewing " + subjectName + "’s answers. She marks these on her account.";
+    document.getElementById("piSave").textContent = "Read-only for Sir.";
+  }catch(e){
+    subjectName = "your sub";
+    document.getElementById("piBanner").textContent = "No paired sub, or her list has not been saved yet.";
+    document.getElementById("piSave").textContent = "";
+  }
+  document.getElementById("summaryCard").style.display = "none";
+  render();
+}
+
+async function renderRosterSwitcher(){
+  const banner = document.getElementById("subSwitcherBanner");
+  const select = document.getElementById("subSwitcher");
+  const roster = await getDomRoster();
+  const activePartnerUid = await getPartnerUid();
+
+  if(!roster.length){
+    banner.style.display = "none";
+    return;
+  }
+
+  for(const r of roster){
+    const p = await getUserProfile(r.subId);
+    r.subName = p?.displayName || "Unknown sub";
+  }
+
+  select.innerHTML = roster.map(r => {
+    const selected = r.subId === activePartnerUid ? "selected" : "";
+    return `<option value="${r.id}" ${selected}>${r.subName}</option>`;
+  }).join("");
+
+  banner.style.display = roster.length ? "flex" : "none";
+
+  select.onchange = async (e) => {
+    select.disabled = true;
+    toast("Switching active sub…");
+    try{
+      await switchActiveSub(e.target.value);
+      await loadActiveSubMarks();
+      toast("Now viewing " + subjectName);
+    }catch(err){
+      console.error(err);
+      toast("Could not switch sub");
+    }
+    select.disabled = false;
+  };
+}
+
+async function init(){
+  await requireAuth();
+  const profile = await getMyProfile();
+  const isDom = profile?.role === "dom";
+
+  if(isDom){
+    canEdit = false;
+    await renderRosterSwitcher();
+    await loadActiveSubMarks();
+  }else{
+    canEdit = true;
+    document.getElementById("subSwitcherBanner").style.display = "none";
+    const snap = await getDoc(dataRef("protocolInterest"));
+    if(snap.exists()) marks = snap.data().marks || {};
+    subjectName = profile?.displayName || "you";
+    document.getElementById("piBanner").textContent =
+      "Mark what you like, might try, or do not want. Sir can see your answers.";
+    document.getElementById("piSave").textContent = "Marks save automatically.";
+    render();
+  }
+}
+init();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
