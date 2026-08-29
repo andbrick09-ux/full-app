@@ -431,32 +431,10 @@
       </div>
     </div>
 
-    <!-- REAL-TIME ON-SCREEN DEBUG & DIAGNOSTICS PANEL -->
-    <div id="task-draw-debug-panel" class="glass-card" style="margin-bottom: 16px; border: 1px dashed rgba(212, 175, 55, 0.5); font-size: 0.78rem; background: rgba(10, 16, 30, 0.95);">
-      <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="const b = document.getElementById('debug-content-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-        <strong style="color: var(--gold-primary);">🛠️ Task Draw Diagnostics</strong>
-        <span style="color: #94a3b8; font-size: 0.7rem;">[Tap to Toggle]</span>
-      </div>
-      <div id="debug-content-body" style="margin-top: 10px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
-          <div><strong>Role:</strong> <span id="dbg-role" style="color: #38bdf8;">loading...</span></div>
-          <div><strong>User UID:</strong> <span id="dbg-uid" style="color: #94a3b8;">loading...</span></div>
-          <div><strong>Pair ID:</strong> <span id="dbg-rel-id" style="color: #94a3b8;">loading...</span></div>
-          <div><strong>Active Sub:</strong> <span id="dbg-sub-name" style="color: #38bdf8;">loading...</span></div>
-          <div><strong>Live Draw ID:</strong> <span id="dbg-live-id" style="color: #f59e0b;">none</span></div>
-          <div><strong>Active View:</strong> <span id="dbg-active-view" style="color: #34d399;">none</span></div>
-        </div>
-
-        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
-          <button type="button" class="btn-ghost-gold" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" onclick="window.openAssignPickerModal ? window.openAssignPickerModal() : alert('openAssignPickerModal not ready')">Force Open Assign Modal</button>
-          <button type="button" class="btn-ghost-gold" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" onclick="window.openDeckRulesModal ? window.openDeckRulesModal() : alert('openDeckRulesModal not ready')">Force Open Rules Modal</button>
-        </div>
-
-        <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px;"><strong>Live Event Log:</strong></div>
-        <div id="dbg-event-log" style="background: rgba(0,0,0,0.6); padding: 8px; border-radius: 8px; max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.7rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);">
-          [Ready] Waiting for events...
-        </div>
-      </div>
+    <!-- Other Pair Live Index Notification (Dom Only) -->
+    <div id="other-pair-live-chip" class="other-pair-chip" style="display: none;">
+      <span id="other-pair-text">Maya has #3 live</span>
+      <span style="font-weight: 700; font-size: 0.75rem;">TAP TO SWITCH →</span>
     </div>
 
     <!-- MAIN VIEW CONTAINER -->
@@ -637,6 +615,34 @@
       </div>
 
     </div>
+
+    <!-- REAL-TIME ON-SCREEN DEBUG & DIAGNOSTICS PANEL (COLLAPSED BY DEFAULT) -->
+    <div id="task-draw-debug-panel" class="glass-card" style="margin-top: 20px; border: 1px dashed rgba(212, 175, 55, 0.4); font-size: 0.78rem; background: rgba(10, 16, 30, 0.9);">
+      <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="const b = document.getElementById('debug-content-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+        <strong style="color: var(--gold-primary);">🛠️ Diagnostics Console</strong>
+        <span style="color: #94a3b8; font-size: 0.7rem;">[Tap to View Details]</span>
+      </div>
+      <div id="debug-content-body" style="display: none; margin-top: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
+          <div><strong>Role:</strong> <span id="dbg-role" style="color: #38bdf8;">loading...</span></div>
+          <div><strong>User UID:</strong> <span id="dbg-uid" style="color: #94a3b8;">loading...</span></div>
+          <div><strong>Pair ID:</strong> <span id="dbg-rel-id" style="color: #94a3b8;">loading...</span></div>
+          <div><strong>Active Sub:</strong> <span id="dbg-sub-name" style="color: #38bdf8;">loading...</span></div>
+          <div><strong>Live Draw ID:</strong> <span id="dbg-live-id" style="color: #f59e0b;">none</span></div>
+          <div><strong>Active View:</strong> <span id="dbg-active-view" style="color: #34d399;">none</span></div>
+        </div>
+
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+          <button type="button" class="btn-ghost-gold" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" onclick="window.openAssignPickerModal ? window.openAssignPickerModal() : alert('openAssignPickerModal not ready')">Force Open Assign Modal</button>
+          <button type="button" class="btn-ghost-gold" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" onclick="window.openDeckRulesModal ? window.openDeckRulesModal() : alert('openDeckRulesModal not ready')">Force Open Rules Modal</button>
+        </div>
+
+        <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px;"><strong>Live Event Log:</strong></div>
+        <div id="dbg-event-log" style="background: rgba(0,0,0,0.6); padding: 8px; border-radius: 8px; max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.7rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);">
+          [Ready] Waiting for events...
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- DOM ASSIGN PICKER MODAL -->
@@ -772,6 +778,7 @@
         currentRole = myProfile?.role || 'sub';
         logDebug(`User role: ${currentRole}`);
         document.getElementById('role-subtitle').textContent = currentRole === 'dom' ? 'Dom Oversight & Feed' : 'Private Paired Deck';
+        renderUI();
 
         currentRel = await getRelationship();
         logDebug(`Relationship loaded: ${currentRel ? currentRel.id : 'NONE'}`);
@@ -791,6 +798,7 @@
 
         // Attach global subscriptions for active relationship
         attachListeners(currentRel.id);
+        renderUI();
         updateDebugPanel();
       } catch (err) {
         console.error('Task Draw init error:', err);
