@@ -928,6 +928,10 @@
       }, 1000);
     }
 
+    let metronomeInterval = null;
+    let metronomeAudioCtx = null;
+    let otherPairRelId = null;
+
     function renderDomFeed(draws) {
       const feedList = document.getElementById('dom-feed-list');
       if (!draws || draws.length === 0) {
@@ -938,7 +942,7 @@
       feedList.innerHTML = draws.map(d => {
         const card = TASK_DRAW_CARDS.find(c => c.id === d.cardId);
         return `
-          <div class="feed-item">
+          <div class="feed-item" data-draw-id="${d.id}" data-card-id="${d.cardId}" data-card-title="${card?.title || 'Card'}">
             <div style="display: flex; justify-content: space-between;">
               <span style="font-weight: 700; color: var(--gold-primary);">#${d.cardId} ${card?.title || 'Card'}</span>
               <span class="chip ${d.status === 'live' ? 'active' : ''}">${d.status}</span>
@@ -946,21 +950,53 @@
             <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">Edges: ${d.edges || 0} ${d.mood ? `· Mood: ${d.mood}` : ''}</div>
             ${d.note ? `<div style="font-size: 0.8rem; color: #94a3b8; font-style: italic; margin-top: 4px;">"${d.note}"</div>` : ''}
             <div class="quick-replies">
-              <span class="reply-pill">Good girl</span>
-              <span class="reply-pill">Again</span>
-              <span class="reply-pill">+2 edges next time</span>
+              <span class="reply-pill" data-reply="Good girl">Good girl</span>
+              <span class="reply-pill" data-reply="Again">Again</span>
+              <span class="reply-pill" data-reply="+2 edges next time">+2 edges next time</span>
             </div>
           </div>
         `;
       }).join('');
+
+      // Wire quick reply pills
+      feedList.querySelectorAll('.reply-pill').forEach(pill => {
+        pill.onclick = async (e) => {
+          e.stopPropagation();
+          const replyText = pill.dataset.reply || pill.textContent.trim();
+          const feedItem = pill.closest('.feed-item');
+          const cardTitle = feedItem?.dataset?.cardTitle || 'Task Card';
+          const cardId = feedItem?.dataset?.cardId || '';
+
+          if (!currentRel?.id || !currentUser) {
+            alert('Pairing not initialized.');
+            return;
+          }
+
+          try {
+            const { collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            await addDoc(collection(db, 'relationships', currentRel.id, 'notes'), {
+              title: `Feedback on Card #${cardId} (${cardTitle})`,
+              content: replyText,
+              type: 'dom-feedback',
+              authorUid: currentUser.uid,
+              createdAt: serverTimestamp()
+            });
+            alert(`Sent feedback "${replyText}" to ${activeSubName}!`);
+          } catch (err) {
+            alert('Failed to send reply: ' + err.message);
+          }
+        };
+      });
     }
 
     function renderOtherPairIndexChip(indexData) {
       const chip = document.getElementById('other-pair-live-chip');
-      if (indexData && indexData.status === 'live' && indexData.relationshipId !== currentRel.id) {
+      if (indexData && indexData.status === 'live' && indexData.relationshipId !== currentRel?.id) {
+        otherPairRelId = indexData.relationshipId;
         chip.style.display = 'flex';
         document.getElementById('other-pair-text').textContent = `Another sub has #${indexData.liveCardId} live`;
       } else {
+        otherPairRelId = null;
         chip.style.display = 'none';
       }
     }
@@ -1100,6 +1136,23 @@
         }
       });
 
+      // Filter & Mode Toggles
+      document.getElementById('tonight-filter-checkbox')?.addEventListener('change', (e) => {
+        isTonightFilter = e.target.checked;
+        const label = document.getElementById('tonight-chip-label');
+        if (label) label.classList.toggle('active', isTonightFilter);
+        renderIdleView();
+      });
+
+      document.getElementById('discreet-toggle-checkbox')?.addEventListener('change', (e) => {
+        isDiscreetMode = e.target.checked;
+        const label = document.getElementById('discreet-chip-label');
+        if (label) label.classList.toggle('active', isDiscreetMode);
+        if (activeDrawDoc && activeDrawDoc.status === 'drawn') {
+          renderRevealedCardView(activeDrawDoc);
+        }
+      });
+
       // Card Begin Session
       document.getElementById('btn-card-begin')?.addEventListener('click', async () => {
         if (!activeDrawDoc) return;
@@ -1148,6 +1201,60 @@
         if (!activeDrawDoc) return;
         const newEdges = (activeDrawDoc.edges || 0) + 1;
         await updateLiveDrawProgress({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, edges: newEdges });
+      });
+
+      // Metronome Toggle
+      document.getElementById('btn-toggle-metronome')?.addEventListener('click', () => {
+        const btn = document.getElementById('btn-toggle-metronome');
+        if (metronomeInterval) {
+          clearInterval(metronomeInterval);
+          metronomeInterval = null;
+          if (btn) btn.textContent = 'Start Metronome Beep';
+        } else {
+          try {
+            if (!metronomeAudioCtx) {
+              metronomeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            metronomeInterval = setInterval(() => {
+              if (metronomeAudioCtx.state === 'suspended') {
+                metronomeAudioCtx.resume();
+              }
+              const osc = metronomeAudioCtx.createOscillator();
+              const gain = metronomeAudioCtx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(800, metronomeAudioCtx.currentTime);
+              gain.gain.setValueAtTime(0.1, metronomeAudioCtx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, metronomeAudioCtx.currentTime + 0.05);
+              osc.connect(gain);
+              gain.connect(metronomeAudioCtx.destination);
+              osc.start();
+              osc.stop(metronomeAudioCtx.currentTime + 0.05);
+            }, 1000); // 60 BPM
+            if (btn) btn.textContent = 'Stop Metronome Beep';
+          } catch (e) {
+            console.error('AudioContext error:', e);
+          }
+        }
+      });
+
+      // Roll Dice
+      document.getElementById('btn-roll-dice')?.addEventListener('click', () => {
+        const d1 = Math.floor(Math.random() * 6) + 1;
+        const d2 = Math.floor(Math.random() * 6) + 1;
+        const total = d1 + d2;
+        const visual = document.getElementById('dice-visual');
+        const text = document.getElementById('dice-result-text');
+        if (visual) visual.textContent = `🎲 ${d1}  🎲 ${d2}`;
+        if (text) text.textContent = `Target: ${total} edges required!`;
+      });
+
+      // Stop Session
+      document.getElementById('btn-live-stop')?.addEventListener('click', async () => {
+        if (!activeDrawDoc) return;
+        if (confirm('Stop live session? This will cancel the draw.')) {
+          await stopDraw({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, isSafeword: false, domUid: currentRel?.domId });
+          alert('Session stopped.');
+        }
       });
 
       // Live Session Complete -> Open Aftercare
@@ -1205,8 +1312,13 @@
       const btnDomAssignOpen = document.getElementById('btn-dom-assign-open');
       if (btnDomAssignOpen) {
         btnDomAssignOpen.addEventListener('click', () => {
-          renderAssignPickerModal();
-          document.getElementById('modal-assign-picker').style.display = 'flex';
+          const modal = document.getElementById('modal-assign-picker');
+          if (modal) modal.style.display = 'flex';
+          try {
+            renderAssignPickerModal();
+          } catch (err) {
+            console.error('Assign picker render error:', err);
+          }
         });
       }
 
@@ -1221,8 +1333,13 @@
       const btnOpenDeckRules = document.getElementById('btn-open-deck-rules');
       if (btnOpenDeckRules) {
         btnOpenDeckRules.addEventListener('click', () => {
-          renderDeckRulesModal();
-          document.getElementById('modal-deck-rules').style.display = 'flex';
+          const modal = document.getElementById('modal-deck-rules');
+          if (modal) modal.style.display = 'flex';
+          try {
+            renderDeckRulesModal();
+          } catch (err) {
+            console.error('Deck rules render error:', err);
+          }
         });
       }
 
@@ -1232,6 +1349,21 @@
           document.getElementById('modal-deck-rules').style.display = 'none';
         });
       }
+
+      // Other pair switcher chip click
+      document.getElementById('other-pair-live-chip')?.addEventListener('click', async () => {
+        if (otherPairRelId && switchActiveSub) {
+          try {
+            await switchActiveSub(otherPairRelId);
+            currentRel = await getRelationship();
+            await refreshActiveSubName();
+            attachListeners(currentRel.id);
+            alert('Switched active sub session context.');
+          } catch (err) {
+            alert('Switch failed: ' + err.message);
+          }
+        }
+      });
 
       // Overlay background click to close
       document.getElementById('modal-assign-picker')?.addEventListener('click', (e) => {
