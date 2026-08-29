@@ -49,7 +49,7 @@ export function subscribeTaskDraw({
 
   if (!relationshipId) return;
 
-  // 1. Settings listener
+  // 1. Settings listener (4 segments: relationships / id / taskDraw / settings)
   const settingsRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'settings');
   const unsubSettings = onSnapshot(settingsRef, (snap) => {
     if (snap.exists()) {
@@ -66,7 +66,7 @@ export function subscribeTaskDraw({
   });
   activeUnsubscribers.push(unsubSettings);
 
-  // 2. State listener
+  // 2. State listener (4 segments: relationships / id / taskDraw / state)
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
   let currentLiveDrawId = null;
   let activeDrawUnsub = null;
@@ -77,7 +77,7 @@ export function subscribeTaskDraw({
 
     const newLiveDrawId = stateData.liveDrawId;
 
-    // Attach listener to active live draw document if liveDrawId changed
+    // Attach listener to active live draw document if liveDrawId changed (4 segments: relationships / id / taskDraws / drawId)
     if (newLiveDrawId !== currentLiveDrawId) {
       if (activeDrawUnsub) {
         activeDrawUnsub();
@@ -86,7 +86,7 @@ export function subscribeTaskDraw({
       currentLiveDrawId = newLiveDrawId;
 
       if (currentLiveDrawId) {
-        const drawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', currentLiveDrawId);
+        const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', currentLiveDrawId);
         activeDrawUnsub = onSnapshot(drawRef, (drawSnap) => {
           if (onActiveDraw) onActiveDraw(drawSnap.exists() ? { id: drawSnap.id, ...drawSnap.data() } : null);
         });
@@ -98,8 +98,8 @@ export function subscribeTaskDraw({
   activeUnsubscribers.push(unsubState);
   activeUnsubscribers.push(() => { if (activeDrawUnsub) activeDrawUnsub(); });
 
-  // 3. History listener (last 20 draws for feed)
-  const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraw', 'draws');
+  // 3. History listener (3 segments: relationships / id / taskDraws)
+  const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraws');
   const historyQuery = query(drawsCol, orderBy('startedAt', 'desc'), limit(20));
   const unsubHistory = onSnapshot(historyQuery, (snap) => {
     const draws = [];
@@ -131,7 +131,7 @@ export async function drawCardTransaction({
   source = 'rng'
 }) {
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
-  const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraw', 'draws');
+  const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraws');
   const newDrawRef = doc(drawsCol);
 
   return runTransaction(db, async (transaction) => {
@@ -198,7 +198,7 @@ export async function drawCardTransaction({
  * Begin card session (moves status from 'drawn' to 'live').
  */
 export async function startLiveSession({ relationshipId, drawId, domUid }) {
-  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', drawId);
+  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', drawId);
   const now = serverTimestamp();
   
   await updateDoc(drawRef, {
@@ -219,7 +219,7 @@ export async function startLiveSession({ relationshipId, drawId, domUid }) {
  * Increment edge count or update live session state.
  */
 export async function updateLiveDrawProgress({ relationshipId, drawId, edges }) {
-  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', drawId);
+  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', drawId);
   await updateDoc(drawRef, { edges });
 }
 
@@ -236,8 +236,8 @@ export async function redrawCardTransaction({
   maxRedrawsPerDay = 2
 }) {
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
-  const oldDrawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', oldDrawId);
-  const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraw', 'draws');
+  const oldDrawRef = doc(db, 'relationships', relationshipId, 'taskDraws', oldDrawId);
+  const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraws');
   const newDrawRef = doc(drawsCol);
 
   return runTransaction(db, async (transaction) => {
@@ -304,7 +304,7 @@ export async function redrawCardTransaction({
  * Skip card ("Not tonight"): releases live pointer without burning redraw token or appending history.
  */
 export async function skipDraw({ relationshipId, drawId, domUid }) {
-  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', drawId);
+  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', drawId);
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
   const now = serverTimestamp();
 
@@ -343,7 +343,7 @@ export async function completeDraw({
   noRepeatUntil = 8
 }) {
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
-  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', drawId);
+  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', drawId);
   const now = serverTimestamp();
 
   await runTransaction(db, async (transaction) => {
@@ -423,7 +423,7 @@ export async function completeDraw({
  * Emergency Stop / Safeword exit path.
  */
 export async function stopDraw({ relationshipId, drawId, isSafeword = false, domUid }) {
-  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'draws', drawId);
+  const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', drawId);
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
   const now = serverTimestamp();
 
