@@ -598,7 +598,10 @@
       <!-- DOM OVERVIEW FEED VIEW -->
       <div id="view-dom-feed" class="glass-card" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h2 class="serif-title" style="margin: 0; color: var(--gold-primary);">Pair Activity Feed</h2>
+          <div>
+            <h2 class="serif-title" style="margin: 0; color: var(--gold-primary);" id="feed-header-title">Pair Activity Feed</h2>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;" id="active-sub-subtitle">Active Sub: Loading...</div>
+          </div>
           <button id="btn-dom-assign-open" class="btn-ghost-gold" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">+ Assign Card</button>
         </div>
 
@@ -618,8 +621,8 @@
   <div id="modal-assign-picker" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Assign Card to Sub</h3>
-        <button id="btn-close-assign-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem;">✕</button>
+        <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Assign Card to <span id="assign-sub-name">Sub</span></h3>
+        <button id="btn-close-assign-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
       </div>
       <div id="assign-catalog-list" style="display: flex; flex-direction: column; gap: 10px;">
         <!-- Assign cards rendered dynamically -->
@@ -631,17 +634,17 @@
   <div id="modal-deck-rules" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Deck Rules for Pair</h3>
-        <button id="btn-close-rules-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem;">✕</button>
+        <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Deck Rules for <span id="rules-sub-name">Sub</span></h3>
+        <button id="btn-close-rules-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
       </div>
 
-      <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">Active Packs</div>
+      <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">Active Deck Packs</div>
       <div id="rules-pack-toggles" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
         <!-- Pack toggles -->
       </div>
 
       <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">Soft-Banned Cards (<span id="softban-count">0</span>)</div>
-      <div id="softban-list-container" style="margin-bottom: 20px;">
+      <div id="softban-list-container" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px;">
         <!-- Softban list -->
       </div>
 
@@ -652,7 +655,7 @@
   <!-- Scripts -->
   <script type="module">
     import { auth, db } from './firebase-config.js';
-    import { requireAuth, getMyProfile, getRelationship, getDomRoster, switchActiveSub } from './auth.js';
+    import { requireAuth, getMyProfile, getRelationship, getDomRoster, switchActiveSub, getUserProfile, getPartnerUid } from './auth.js';
     import { TASK_DRAW_CARDS } from './js/data/task-draw-cards.js';
     import { getEligibleCards, substituteDomName, getEmptyDeckDiagnostics, DEFAULT_TASK_DRAW_SETTINGS } from './js/modules/task-draw-engine.js';
     import {
@@ -674,14 +677,13 @@
     let myProfile = null;
     let currentRel = null;
     let currentRole = 'sub';
+    let activeSubName = 'Sub';
     let currentSettings = { ...DEFAULT_TASK_DRAW_SETTINGS };
     let currentState = {};
     let activeDrawDoc = null;
     let selectedMood = null;
     let isTonightFilter = false;
     let isDiscreetMode = false;
-    let metronomeInterval = null;
-    let metronomeAudioCtx = null;
     let liveTimerInterval = null;
 
     // DOM Elements
@@ -706,6 +708,8 @@
         return;
       }
 
+      await refreshActiveSubName();
+
       if (currentRole === 'dom') {
         setupDomRosterPicker();
       }
@@ -714,6 +718,24 @@
       attachListeners(currentRel.id);
 
       setupEventListeners();
+    }
+
+    async function refreshActiveSubName() {
+      if (!currentRel) return;
+      if (currentRole === 'dom' && currentRel.subId) {
+        const subProf = await getUserProfile(currentRel.subId);
+        activeSubName = subProf?.displayName || subProf?.name || 'Sub';
+      } else {
+        activeSubName = myProfile?.displayName || 'Sub';
+      }
+      const subtitleEl = document.getElementById('active-sub-subtitle');
+      if (subtitleEl) subtitleEl.textContent = `Active Sub: ${activeSubName}`;
+      
+      const assignSubNameEl = document.getElementById('assign-sub-name');
+      if (assignSubNameEl) assignSubNameEl.textContent = activeSubName;
+
+      const rulesSubNameEl = document.getElementById('rules-sub-name');
+      if (rulesSubNameEl) rulesSubNameEl.textContent = activeSubName;
     }
 
     function attachListeners(relId) {
@@ -741,24 +763,33 @@
     }
 
     async function setupDomRosterPicker() {
-      document.getElementById('dom-switcher-container').style.display = 'block';
+      const switcher = document.getElementById('dom-switcher-container');
       const select = document.getElementById('sub-picker-select');
+      switcher.style.display = 'block';
+
       const roster = await getDomRoster();
+      if (!roster || roster.length === 0) {
+        select.innerHTML = '<option value="">No paired sub</option>';
+        return;
+      }
 
-      select.innerHTML = roster.map(r => `
-        <option value="${r.id}" ${r.id === currentRel.id ? 'selected' : ''}>
-          ${r.subName || 'Sub'} (${r.status})
-        </option>
-      `).join('');
+      const options = await Promise.all(roster.map(async (r) => {
+        const subProf = await getUserProfile(r.subId);
+        const name = subProf?.displayName || subProf?.name || 'Sub';
+        return `<option value="${r.id}" ${r.id === currentRel?.id ? 'selected' : ''}>🌸 ${name} (${r.status})</option>`;
+      }));
 
-      select.addEventListener('change', async (e) => {
+      select.innerHTML = options.join('');
+
+      select.onchange = async (e) => {
         const newRelId = e.target.value;
         if (newRelId && newRelId !== currentRel.id) {
           await switchActiveSub(newRelId);
           currentRel = await getRelationship();
+          await refreshActiveSubName();
           attachListeners(currentRel.id);
         }
-      });
+      };
     }
 
     function renderUI() {
@@ -815,7 +846,7 @@
       btnDraw.disabled = Boolean(currentState.liveDrawId);
     }
 
-    function renderRevealedCardView(draw) {
+    async function renderRevealedCardView(draw) {
       viewCardRevealed.style.display = 'block';
       const card = TASK_DRAW_CARDS.find(c => c.id === draw.cardId);
       if (!card) return;
@@ -842,7 +873,13 @@
 
       document.getElementById('gear-text').textContent = card.gear.length > 0 ? card.gear.join(', ') : 'None';
       
-      const domName = myProfile?.domDisplayName || 'Sir';
+      let domName = 'Sir';
+      if (currentRel?.domId) {
+        const domProf = await getUserProfile(currentRel.domId);
+        if (domProf?.displayName || domProf?.name) {
+          domName = domProf.displayName || domProf.name;
+        }
+      }
       document.getElementById('card-instruction-display').textContent = substituteDomName(card.instruction, domName);
       document.getElementById('card-safety-display').textContent = `Safety: ${card.safety}`;
 
@@ -888,7 +925,7 @@
     function renderDomFeed(draws) {
       const feedList = document.getElementById('dom-feed-list');
       if (!draws || draws.length === 0) {
-        feedList.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">No draw history for this pair yet.</div>`;
+        feedList.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">No draw history for ${activeSubName} yet.</div>`;
         return;
       }
 
@@ -922,6 +959,86 @@
       }
     }
 
+    function renderAssignPickerModal() {
+      const list = document.getElementById('assign-catalog-list');
+      list.innerHTML = TASK_DRAW_CARDS.map(card => {
+        const isEligible = getEligibleCards({
+          catalog: [card],
+          packsOn: currentSettings.packsOn,
+          historyIds: currentState.lastDrawIds || [],
+          softBanIds: currentState.softBanIds || []
+        }).length > 0;
+
+        return `
+          <div class="glass-card" style="padding: 14px; margin: 0; opacity: ${isEligible ? '1' : '0.5'};">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-weight: 700; color: var(--gold-primary);">#${card.id} ${card.title}</span>
+                <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">⏱️ ${card.durationMin}m · Pack: ${card.packs.join(', ')}</div>
+              </div>
+              <button class="btn-ghost-gold btn-assign-card" data-card-id="${card.id}" ${!isEligible ? 'disabled' : ''} style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+                ${isEligible ? 'Assign' : 'Blocked'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.btn-assign-card').forEach(btn => {
+        btn.onclick = async () => {
+          const cardId = Number(btn.dataset.cardId);
+          try {
+            await assignCardTransaction({
+              relationshipId: currentRel.id,
+              subUid: currentRel.subId,
+              domUid: currentUser.uid,
+              cardId
+            });
+            document.getElementById('modal-assign-picker').style.display = 'none';
+            alert(`Assigned Card #${cardId} to ${activeSubName}!`);
+          } catch (err) {
+            alert(err.message);
+          }
+        };
+      });
+    }
+
+    function renderDeckRulesModal() {
+      const allPacks = ['home', 'dice', 'writing', 'bondage', 'short', 'long', 'public'];
+      const activePacksSet = new Set(currentSettings.packsOn || []);
+      const togglesContainer = document.getElementById('rules-pack-toggles');
+
+      togglesContainer.innerHTML = allPacks.map(p => `
+        <label style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 12px;">
+          <span style="font-size: 0.9rem; text-transform: capitalize;">${p} Pack</span>
+          <input type="checkbox" class="pack-toggle-cb" data-pack="${p}" ${activePacksSet.has(p) ? 'checked' : ''} />
+        </label>
+      `).join('');
+
+      const softBans = currentState.softBanIds || [];
+      document.getElementById('softban-count').textContent = softBans.length;
+      const softbanContainer = document.getElementById('softban-list-container');
+
+      if (softBans.length === 0) {
+        softbanContainer.innerHTML = `<span style="font-size: 0.8rem; color: #64748b;">No soft-banned cards.</span>`;
+      } else {
+        softbanContainer.innerHTML = softBans.map(id => `
+          <span class="chip" style="display: inline-flex; align-items: center; gap: 6px;">
+            #${id}
+            <button class="btn-clear-softban" data-card-id="${id}" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 0;">✕</button>
+          </span>
+        `).join('');
+
+        document.querySelectorAll('.btn-clear-softban').forEach(b => {
+          b.onclick = async () => {
+            const cardId = Number(b.dataset.cardId);
+            await clearSoftBan({ relationshipId: currentRel.id, cardId });
+            renderDeckRulesModal();
+          };
+        });
+      }
+    }
+
     function setupEventListeners() {
       // Sub Draw Button
       document.getElementById('btn-sub-draw').addEventListener('click', async () => {
@@ -931,7 +1048,7 @@
             packsOn: currentSettings.packsOn,
             historyIds: currentState.lastDrawIds || [],
             softBanIds: currentState.softBanIds || [],
-            isTonightOnly: isTonightOnly
+            isTonightOnly: isTonightFilter
           });
 
           if (eligible.length === 0) {
@@ -939,7 +1056,7 @@
               packsOn: currentSettings.packsOn,
               historyIds: currentState.lastDrawIds || [],
               softBanIds: currentState.softBanIds || [],
-              isTonightOnly: isTonightOnly
+              isTonightOnly: isTonightFilter
             });
             alert(diag);
             return;
@@ -972,7 +1089,7 @@
             packsOn: currentSettings.packsOn,
             historyIds: currentState.lastDrawIds || [],
             softBanIds: currentState.softBanIds || [],
-            isTonightOnly: isTonightOnly
+            isTonightOnly: isTonightFilter
           }).filter(c => c.id !== activeDrawDoc.cardId);
 
           if (eligible.length === 0) {
@@ -1057,6 +1174,35 @@
           alert('Safeword recorded. Session terminated.');
         }
       });
+
+      // Dom Assign Modal Controls
+      document.getElementById('btn-dom-assign-open').onclick = () => {
+        renderAssignPickerModal();
+        document.getElementById('modal-assign-picker').style.display = 'flex';
+      };
+      document.getElementById('btn-close-assign-modal').onclick = () => {
+        document.getElementById('modal-assign-picker').style.display = 'none';
+      };
+
+      // Dom Deck Rules Controls
+      document.getElementById('btn-open-deck-rules').onclick = () => {
+        renderDeckRulesModal();
+        document.getElementById('modal-deck-rules').style.display = 'flex';
+      };
+      document.getElementById('btn-close-rules-modal').onclick = () => {
+        document.getElementById('modal-deck-rules').style.display = 'none';
+      };
+
+      // Save Deck Rules
+      document.getElementById('btn-save-deck-rules').onclick = async () => {
+        const checkedPacks = Array.from(document.querySelectorAll('.pack-toggle-cb:checked')).map(cb => cb.dataset.pack);
+        await updateTaskDrawSettings({
+          relationshipId: currentRel.id,
+          newSettings: { packsOn: checkedPacks }
+        });
+        document.getElementById('modal-deck-rules').style.display = 'none';
+        alert('Deck settings updated!');
+      };
     }
 
     // Run Initialization
