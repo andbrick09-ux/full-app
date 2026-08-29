@@ -817,12 +817,21 @@
 
       select.onchange = async (e) => {
         const newRelId = e.target.value;
-        if (newRelId && newRelId !== currentRel.id) {
-          logDebug(`Switching active sub to rel: ${newRelId}`);
-          await switchActiveSub(newRelId);
-          currentRel = await getRelationship();
-          await refreshActiveSubName();
-          attachListeners(currentRel.id);
+        if (newRelId && newRelId !== currentRel?.id) {
+          try {
+            await switchActiveSub(newRelId);
+            currentRel = await getRelationship();
+            await refreshActiveSubName();
+            currentState = {};
+            activeDrawDoc = null;
+            const feedList = document.getElementById('dom-feed-list');
+            if (feedList) feedList.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">Loading ${activeSubName}'s activity feed...</div>`;
+            attachListeners(currentRel.id);
+            renderUI();
+          } catch (err) {
+            console.error('Failed to switch active sub:', err);
+            alert('Failed to switch sub: ' + err.message);
+          }
         }
       };
     }
