@@ -921,6 +921,7 @@
         <span class="chip active">⏱️ ${card.durationMin}m</span>
         ${card.edgeTarget > 0 ? `<span class="chip active">⚡ ${card.edgeTarget} edges</span>` : ''}
         <span class="chip">${card.packs[0]}</span>
+        ${card.id === 29 ? `<span class="chip active" style="border-color: var(--gold-primary); color: var(--gold-primary);">🎴 Interactive Deck of Fate Enabled</span>` : ''}
       `;
 
       document.getElementById('gear-text').textContent = card.gear.length > 0 ? card.gear.join(', ') : 'None';
