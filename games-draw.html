@@ -693,31 +693,37 @@
     const viewAftercare = document.getElementById('view-aftercare');
     const viewDomFeed = document.getElementById('view-dom-feed');
 
+    // Register Click Handlers immediately
+    setupGlobalEventListeners();
+
     // Init App
     async function init() {
-      currentUser = await requireAuth();
-      myProfile = await getMyProfile();
-      currentRole = myProfile?.role || 'sub';
-      document.getElementById('role-subtitle').textContent = currentRole === 'dom' ? 'Dom Oversight & Feed' : 'Private Paired Deck';
+      try {
+        currentUser = await requireAuth();
+        myProfile = await getMyProfile();
+        currentRole = myProfile?.role || 'sub';
+        document.getElementById('role-subtitle').textContent = currentRole === 'dom' ? 'Dom Oversight & Feed' : 'Private Paired Deck';
 
-      currentRel = await getRelationship();
+        currentRel = await getRelationship();
 
-      if (!currentRel) {
-        alert('No active pairing found. Please set up pairing on pair.html first.');
-        window.location.href = 'pair.html';
-        return;
+        if (!currentRel) {
+          alert('No active pairing found. Please set up pairing on pair.html first.');
+          window.location.href = 'pair.html';
+          return;
+        }
+
+        await refreshActiveSubName();
+
+        if (currentRole === 'dom') {
+          setupDomRosterPicker();
+        }
+
+        // Attach global subscriptions for active relationship
+        attachListeners(currentRel.id);
+      } catch (err) {
+        console.error('Task Draw init error:', err);
+        alert('Failed to initialize Task Draw: ' + err.message);
       }
-
-      await refreshActiveSubName();
-
-      if (currentRole === 'dom') {
-        setupDomRosterPicker();
-      }
-
-      // Attach global subscriptions for active relationship
-      attachListeners(currentRel.id);
-
-      setupEventListeners();
     }
 
     async function refreshActiveSubName() {
@@ -961,16 +967,27 @@
 
     function renderAssignPickerModal() {
       const list = document.getElementById('assign-catalog-list');
+      if (!list) return;
+
+      const packsOn = currentSettings?.packsOn || DEFAULT_TASK_DRAW_SETTINGS.packsOn;
+      const historyIds = currentState?.lastDrawIds || [];
+      const softBanIds = currentState?.softBanIds || [];
+
       list.innerHTML = TASK_DRAW_CARDS.map(card => {
-        const isEligible = getEligibleCards({
-          catalog: [card],
-          packsOn: currentSettings.packsOn,
-          historyIds: currentState.lastDrawIds || [],
-          softBanIds: currentState.softBanIds || []
-        }).length > 0;
+        let isEligible = false;
+        try {
+          isEligible = getEligibleCards({
+            catalog: [card],
+            packsOn,
+            historyIds,
+            softBanIds
+          }).length > 0;
+        } catch (e) {
+          console.error(e);
+        }
 
         return `
-          <div class="glass-card" style="padding: 14px; margin: 0; opacity: ${isEligible ? '1' : '0.5'};">
+          <div class="glass-card" style="padding: 14px; margin: 0; opacity: ${isEligible ? '1' : '0.6'};">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <span style="font-weight: 700; color: var(--gold-primary);">#${card.id} ${card.title}</span>
@@ -987,6 +1004,10 @@
       document.querySelectorAll('.btn-assign-card').forEach(btn => {
         btn.onclick = async () => {
           const cardId = Number(btn.dataset.cardId);
+          if (!currentRel || !currentRel.subId) {
+            alert('No active sub selected.');
+            return;
+          }
           try {
             await assignCardTransaction({
               relationshipId: currentRel.id,
@@ -997,7 +1018,7 @@
             document.getElementById('modal-assign-picker').style.display = 'none';
             alert(`Assigned Card #${cardId} to ${activeSubName}!`);
           } catch (err) {
-            alert(err.message);
+            alert('Assign failed: ' + err.message);
           }
         };
       });
@@ -1005,43 +1026,48 @@
 
     function renderDeckRulesModal() {
       const allPacks = ['home', 'dice', 'writing', 'bondage', 'short', 'long', 'public'];
-      const activePacksSet = new Set(currentSettings.packsOn || []);
+      const packsOn = currentSettings?.packsOn || DEFAULT_TASK_DRAW_SETTINGS.packsOn;
+      const activePacksSet = new Set(packsOn);
       const togglesContainer = document.getElementById('rules-pack-toggles');
+      if (!togglesContainer) return;
 
       togglesContainer.innerHTML = allPacks.map(p => `
-        <label style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 12px;">
-          <span style="font-size: 0.9rem; text-transform: capitalize;">${p} Pack</span>
-          <input type="checkbox" class="pack-toggle-cb" data-pack="${p}" ${activePacksSet.has(p) ? 'checked' : ''} />
+        <label style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
+          <span style="font-size: 0.9rem; text-transform: capitalize; color: #f8fafc;">${p} Pack</span>
+          <input type="checkbox" class="pack-toggle-cb" data-pack="${p}" ${activePacksSet.has(p) ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--gold-primary);" />
         </label>
       `).join('');
 
-      const softBans = currentState.softBanIds || [];
-      document.getElementById('softban-count').textContent = softBans.length;
+      const softBans = currentState?.softBanIds || [];
+      const softbanCountEl = document.getElementById('softban-count');
+      if (softbanCountEl) softbanCountEl.textContent = softBans.length;
+
       const softbanContainer = document.getElementById('softban-list-container');
+      if (softbanContainer) {
+        if (softBans.length === 0) {
+          softbanContainer.innerHTML = `<span style="font-size: 0.8rem; color: #64748b;">No soft-banned cards.</span>`;
+        } else {
+          softbanContainer.innerHTML = softBans.map(id => `
+            <span class="chip" style="display: inline-flex; align-items: center; gap: 6px;">
+              #${id}
+              <button class="btn-clear-softban" data-card-id="${id}" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 0;">✕</button>
+            </span>
+          `).join('');
 
-      if (softBans.length === 0) {
-        softbanContainer.innerHTML = `<span style="font-size: 0.8rem; color: #64748b;">No soft-banned cards.</span>`;
-      } else {
-        softbanContainer.innerHTML = softBans.map(id => `
-          <span class="chip" style="display: inline-flex; align-items: center; gap: 6px;">
-            #${id}
-            <button class="btn-clear-softban" data-card-id="${id}" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 0;">✕</button>
-          </span>
-        `).join('');
-
-        document.querySelectorAll('.btn-clear-softban').forEach(b => {
-          b.onclick = async () => {
-            const cardId = Number(b.dataset.cardId);
-            await clearSoftBan({ relationshipId: currentRel.id, cardId });
-            renderDeckRulesModal();
-          };
-        });
+          document.querySelectorAll('.btn-clear-softban').forEach(b => {
+            b.onclick = async () => {
+              const cardId = Number(b.dataset.cardId);
+              await clearSoftBan({ relationshipId: currentRel.id, cardId });
+              renderDeckRulesModal();
+            };
+          });
+        }
       }
     }
 
-    function setupEventListeners() {
+    function setupGlobalEventListeners() {
       // Sub Draw Button
-      document.getElementById('btn-sub-draw').addEventListener('click', async () => {
+      document.getElementById('btn-sub-draw')?.addEventListener('click', async () => {
         try {
           const eligible = getEligibleCards({
             catalog: TASK_DRAW_CARDS,
@@ -1075,13 +1101,13 @@
       });
 
       // Card Begin Session
-      document.getElementById('btn-card-begin').addEventListener('click', async () => {
+      document.getElementById('btn-card-begin')?.addEventListener('click', async () => {
         if (!activeDrawDoc) return;
         await startLiveSession({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, domUid: currentRel.domId });
       });
 
       // Card Redraw Button
-      document.getElementById('btn-card-redraw').addEventListener('click', async () => {
+      document.getElementById('btn-card-redraw')?.addEventListener('click', async () => {
         if (!activeDrawDoc) return;
         try {
           const eligible = getEligibleCards({
@@ -1112,20 +1138,20 @@
       });
 
       // Card Skip (Not Tonight)
-      document.getElementById('btn-card-skip').addEventListener('click', async () => {
+      document.getElementById('btn-card-skip')?.addEventListener('click', async () => {
         if (!activeDrawDoc) return;
         await skipDraw({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, domUid: currentRel.domId });
       });
 
       // Edge Increment
-      document.getElementById('btn-edge-increment').addEventListener('click', async () => {
+      document.getElementById('btn-edge-increment')?.addEventListener('click', async () => {
         if (!activeDrawDoc) return;
         const newEdges = (activeDrawDoc.edges || 0) + 1;
         await updateLiveDrawProgress({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, edges: newEdges });
       });
 
       // Live Session Complete -> Open Aftercare
-      document.getElementById('btn-live-complete').addEventListener('click', () => {
+      document.getElementById('btn-live-complete')?.addEventListener('click', () => {
         viewLiveSession.style.display = 'none';
         viewAftercare.style.display = 'block';
       });
@@ -1140,7 +1166,7 @@
       });
 
       // Submit Aftercare
-      document.getElementById('btn-submit-aftercare').addEventListener('click', async () => {
+      document.getElementById('btn-submit-aftercare')?.addEventListener('click', async () => {
         if (!selectedMood) {
           alert('Please select a mood option first.');
           return;
@@ -1168,7 +1194,7 @@
       });
 
       // Safeword Trigger
-      document.getElementById('btn-safeword-trigger').addEventListener('click', async () => {
+      document.getElementById('btn-safeword-trigger')?.addEventListener('click', async () => {
         if (confirm('Trigger Safeword? This will end the task immediately and alert Sir.')) {
           await stopDraw({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, isSafeword: true, domUid: currentRel.domId });
           alert('Safeword recorded. Session terminated.');
@@ -1176,33 +1202,63 @@
       });
 
       // Dom Assign Modal Controls
-      document.getElementById('btn-dom-assign-open').onclick = () => {
-        renderAssignPickerModal();
-        document.getElementById('modal-assign-picker').style.display = 'flex';
-      };
-      document.getElementById('btn-close-assign-modal').onclick = () => {
-        document.getElementById('modal-assign-picker').style.display = 'none';
-      };
+      const btnDomAssignOpen = document.getElementById('btn-dom-assign-open');
+      if (btnDomAssignOpen) {
+        btnDomAssignOpen.addEventListener('click', () => {
+          renderAssignPickerModal();
+          document.getElementById('modal-assign-picker').style.display = 'flex';
+        });
+      }
+
+      const btnCloseAssignModal = document.getElementById('btn-close-assign-modal');
+      if (btnCloseAssignModal) {
+        btnCloseAssignModal.addEventListener('click', () => {
+          document.getElementById('modal-assign-picker').style.display = 'none';
+        });
+      }
 
       // Dom Deck Rules Controls
-      document.getElementById('btn-open-deck-rules').onclick = () => {
-        renderDeckRulesModal();
-        document.getElementById('modal-deck-rules').style.display = 'flex';
-      };
-      document.getElementById('btn-close-rules-modal').onclick = () => {
-        document.getElementById('modal-deck-rules').style.display = 'none';
-      };
+      const btnOpenDeckRules = document.getElementById('btn-open-deck-rules');
+      if (btnOpenDeckRules) {
+        btnOpenDeckRules.addEventListener('click', () => {
+          renderDeckRulesModal();
+          document.getElementById('modal-deck-rules').style.display = 'flex';
+        });
+      }
+
+      const btnCloseRulesModal = document.getElementById('btn-close-rules-modal');
+      if (btnCloseRulesModal) {
+        btnCloseRulesModal.addEventListener('click', () => {
+          document.getElementById('modal-deck-rules').style.display = 'none';
+        });
+      }
+
+      // Overlay background click to close
+      document.getElementById('modal-assign-picker')?.addEventListener('click', (e) => {
+        if (e.target.id === 'modal-assign-picker') {
+          document.getElementById('modal-assign-picker').style.display = 'none';
+        }
+      });
+      document.getElementById('modal-deck-rules')?.addEventListener('click', (e) => {
+        if (e.target.id === 'modal-deck-rules') {
+          document.getElementById('modal-deck-rules').style.display = 'none';
+        }
+      });
 
       // Save Deck Rules
-      document.getElementById('btn-save-deck-rules').onclick = async () => {
-        const checkedPacks = Array.from(document.querySelectorAll('.pack-toggle-cb:checked')).map(cb => cb.dataset.pack);
-        await updateTaskDrawSettings({
-          relationshipId: currentRel.id,
-          newSettings: { packsOn: checkedPacks }
-        });
-        document.getElementById('modal-deck-rules').style.display = 'none';
-        alert('Deck settings updated!');
-      };
+      document.getElementById('btn-save-deck-rules')?.addEventListener('click', async () => {
+        try {
+          const checkedPacks = Array.from(document.querySelectorAll('.pack-toggle-cb:checked')).map(cb => cb.dataset.pack);
+          await updateTaskDrawSettings({
+            relationshipId: currentRel.id,
+            newSettings: { packsOn: checkedPacks }
+          });
+          document.getElementById('modal-deck-rules').style.display = 'none';
+          alert('Deck settings updated!');
+        } catch (err) {
+          alert('Failed to update deck settings: ' + err.message);
+        }
+      });
     }
 
     // Run Initialization
