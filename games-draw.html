@@ -765,8 +765,9 @@
     const viewAftercare = document.getElementById('view-aftercare');
     const viewDomFeed = document.getElementById('view-dom-feed');
 
-    // Register Click Handlers immediately
+    // Register Click Handlers and render default view immediately
     setupGlobalEventListeners();
+    renderUI();
 
     // Init App
     async function init() {
@@ -913,20 +914,6 @@
         renderIdleView();
       }
       updateDebugPanel();
-    }
-
-      // Sub Role View Switching
-      if (activeDrawDoc) {
-        if (activeDrawDoc.status === 'drawn') {
-          renderRevealedCardView(activeDrawDoc);
-        } else if (activeDrawDoc.status === 'live') {
-          renderLiveSessionView(activeDrawDoc);
-        } else {
-          renderIdleView();
-        }
-      } else {
-        renderIdleView();
-      }
     }
 
     function renderIdleView() {
