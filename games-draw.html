@@ -632,34 +632,6 @@
       </div>
 
     </div>
-
-    <!-- REAL-TIME ON-SCREEN DEBUG & DIAGNOSTICS PANEL (COLLAPSED BY DEFAULT) -->
-    <div id="task-draw-debug-panel" class="glass-card" style="margin-top: 20px; border: 1px dashed rgba(212, 175, 55, 0.4); font-size: 0.78rem; background: rgba(10, 16, 30, 0.9);">
-      <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="const b = document.getElementById('debug-content-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-        <strong style="color: var(--gold-primary);">🛠️ Diagnostics Console</strong>
-        <span style="color: #94a3b8; font-size: 0.7rem;">[Tap to View Details]</span>
-      </div>
-      <div id="debug-content-body" style="display: none; margin-top: 12px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
-          <div><strong>Role:</strong> <span id="dbg-role" style="color: #38bdf8;">loading...</span></div>
-          <div><strong>User UID:</strong> <span id="dbg-uid" style="color: #94a3b8;">loading...</span></div>
-          <div><strong>Pair ID:</strong> <span id="dbg-rel-id" style="color: #94a3b8;">loading...</span></div>
-          <div><strong>Active Sub:</strong> <span id="dbg-sub-name" style="color: #38bdf8;">loading...</span></div>
-          <div><strong>Live Draw ID:</strong> <span id="dbg-live-id" style="color: #f59e0b;">none</span></div>
-          <div><strong>Active View:</strong> <span id="dbg-active-view" style="color: #34d399;">none</span></div>
-        </div>
-
-        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
-          <button type="button" class="btn-ghost-gold" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" onclick="window.openAssignPickerModal ? window.openAssignPickerModal() : alert('openAssignPickerModal not ready')">Force Open Assign Modal</button>
-          <button type="button" class="btn-ghost-gold" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" onclick="window.openDeckRulesModal ? window.openDeckRulesModal() : alert('openDeckRulesModal not ready')">Force Open Rules Modal</button>
-        </div>
-
-        <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px;"><strong>Live Event Log:</strong></div>
-        <div id="dbg-event-log" style="background: rgba(0,0,0,0.6); padding: 8px; border-radius: 8px; max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.7rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);">
-          [Ready] Waiting for events...
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- DOM ASSIGN PICKER MODAL -->
@@ -731,50 +703,6 @@
     let isDiscreetMode = false;
     let liveTimerInterval = null;
 
-    // Real-time Debug Logger
-    function logDebug(msg, isError = false) {
-      console.log(`[TaskDrawDebug] ${msg}`);
-      const logEl = document.getElementById('dbg-event-log');
-      if (logEl) {
-        const time = new Date().toLocaleTimeString();
-        const line = document.createElement('div');
-        line.style.color = isError ? '#f87171' : '#cbd5e1';
-        line.textContent = `[${time}] ${msg}`;
-        logEl.appendChild(line);
-        logEl.scrollTop = logEl.scrollHeight;
-      }
-    }
-    window.logDebug = logDebug;
-
-    window.onerror = function(msg, url, line) {
-      logDebug(`UNCAUGHT ERROR: ${msg} (Line ${line})`, true);
-    };
-
-    function updateDebugPanel() {
-      const dbgRole = document.getElementById('dbg-role');
-      const dbgUid = document.getElementById('dbg-uid');
-      const dbgRelId = document.getElementById('dbg-rel-id');
-      const dbgSubName = document.getElementById('dbg-sub-name');
-      const dbgLiveId = document.getElementById('dbg-live-id');
-      const dbgActiveView = document.getElementById('dbg-active-view');
-
-      if (dbgRole) dbgRole.textContent = currentRole;
-      if (dbgUid) dbgUid.textContent = currentUser?.uid ? `${currentUser.uid.slice(0, 8)}...` : 'null';
-      if (dbgRelId) dbgRelId.textContent = currentRel?.id ? `${currentRel.id.slice(0, 8)}...` : 'null';
-      if (dbgSubName) dbgSubName.textContent = activeSubName || 'none';
-      if (dbgLiveId) dbgLiveId.textContent = currentState?.liveDrawId ? `${currentState.liveDrawId.slice(0, 8)}...` : 'none';
-
-      if (dbgActiveView) {
-        let viewName = 'none';
-        if (viewDomFeed?.style.display === 'block') viewName = 'DOM Feed';
-        else if (viewSubIdle?.style.display === 'block') viewName = 'Sub Idle';
-        else if (viewCardRevealed?.style.display === 'block') viewName = 'Card Revealed';
-        else if (viewLiveSession?.style.display === 'block') viewName = 'Live Session';
-        else if (viewAftercare?.style.display === 'block') viewName = 'Aftercare';
-        dbgActiveView.textContent = viewName;
-      }
-    }
-
     // DOM Elements
     const viewSubIdle = document.getElementById('view-sub-idle');
     const viewCardRevealed = document.getElementById('view-card-revealed');
@@ -788,21 +716,16 @@
 
     // Init App
     async function init() {
-      logDebug('Initializing Task Draw...');
       try {
         currentUser = await requireAuth();
-        logDebug(`Auth success: ${currentUser.uid}`);
         myProfile = await getMyProfile();
         currentRole = myProfile?.role || 'sub';
-        logDebug(`User role: ${currentRole}`);
         document.getElementById('role-subtitle').textContent = currentRole === 'dom' ? 'Dom Oversight & Feed' : 'Private Paired Deck';
         renderUI();
 
         currentRel = await getRelationship();
-        logDebug(`Relationship loaded: ${currentRel ? currentRel.id : 'NONE'}`);
 
         if (!currentRel) {
-          logDebug('No active relationship found. Redirecting to pair.html', true);
           alert('No active pairing found. Please set up pairing on pair.html first.');
           window.location.href = 'pair.html';
           return;
@@ -817,10 +740,8 @@
         // Attach global subscriptions for active relationship
         attachListeners(currentRel.id);
         renderUI();
-        updateDebugPanel();
       } catch (err) {
         console.error('Task Draw init error:', err);
-        logDebug(`Init failed: ${err.message}`, true);
         alert('Failed to initialize Task Draw: ' + err.message);
       }
     }
@@ -841,30 +762,24 @@
 
       const rulesSubNameEl = document.getElementById('rules-sub-name');
       if (rulesSubNameEl) rulesSubNameEl.textContent = activeSubName;
-      updateDebugPanel();
     }
 
     function attachListeners(relId) {
-      logDebug(`Subscribing to relationship: ${relId}`);
       subscribeTaskDraw({
         relationshipId: relId,
         onSettings: (settings) => {
           currentSettings = { ...DEFAULT_TASK_DRAW_SETTINGS, ...settings };
-          logDebug(`Settings updated: packsOn=[${(currentSettings.packsOn||[]).join(',')}]`);
           renderUI();
         },
         onState: (state) => {
           currentState = state || {};
-          logDebug(`State updated: liveDrawId=${currentState.liveDrawId || 'none'}`);
           renderUI();
         },
         onActiveDraw: (draw) => {
           activeDrawDoc = draw;
-          logDebug(`Active draw updated: ${draw ? `#${draw.cardId} (${draw.status})` : 'none'}`);
           renderUI();
         },
         onHistory: (draws) => {
-          logDebug(`History updated: ${draws ? draws.length : 0} items`);
           if (currentRole === 'dom') renderDomFeed(draws);
         },
         onIndex: (indexData) => {
@@ -1418,28 +1333,21 @@
 
       // Global Window Modal Handlers
       window.openAssignPickerModal = () => {
-        logDebug('Button clicked: Open Assign Card Modal');
         const modal = document.getElementById('modal-assign-picker');
         if (modal) {
           modal.classList.add('open');
           modal.style.setProperty('display', 'flex', 'important');
           modal.style.setProperty('visibility', 'visible', 'important');
           modal.style.setProperty('opacity', '1', 'important');
-          logDebug('modal-assign-picker display set to flex & open class added');
-        } else {
-          logDebug('ERROR: modal-assign-picker not found in DOM', true);
         }
         try {
           renderAssignPickerModal();
-          logDebug('Catalog list generated in Assign Modal');
         } catch (err) {
-          logDebug(`Assign picker render error: ${err.message}`, true);
           console.error('Assign picker render error:', err);
         }
       };
 
       window.closeAssignModal = () => {
-        logDebug('Close Assign Modal clicked');
         const modal = document.getElementById('modal-assign-picker');
         if (modal) {
           modal.classList.remove('open');
@@ -1448,28 +1356,21 @@
       };
 
       window.openDeckRulesModal = () => {
-        logDebug('Button clicked: Open Deck Rules Modal');
         const modal = document.getElementById('modal-deck-rules');
         if (modal) {
           modal.classList.add('open');
           modal.style.setProperty('display', 'flex', 'important');
           modal.style.setProperty('visibility', 'visible', 'important');
           modal.style.setProperty('opacity', '1', 'important');
-          logDebug('modal-deck-rules display set to flex & open class added');
-        } else {
-          logDebug('ERROR: modal-deck-rules not found in DOM', true);
         }
         try {
           renderDeckRulesModal();
-          logDebug('Deck Rules modal rendered');
         } catch (err) {
-          logDebug(`Deck rules render error: ${err.message}`, true);
           console.error('Deck rules render error:', err);
         }
       };
 
       window.closeDeckRulesModal = () => {
-        logDebug('Close Deck Rules Modal clicked');
         const modal = document.getElementById('modal-deck-rules');
         if (modal) {
           modal.classList.remove('open');
