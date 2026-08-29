@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#070b14"/>
+  <title>Dom Sub Hub — Task Draw</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,1,0&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="apple-touch-icon" href="icon-512.png"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="nav.css"/>
+  <style>
+    :root {
+      --navy-bg: #070b14;
+      --navy-card: rgba(16, 24, 42, 0.85);
+      --gold-primary: #D4AF37;
+      --gold-light: #f3e5ab;
+      --gold-hairline: rgba(212, 175, 55, 0.35);
+      --glass-border: rgba(212, 175, 55, 0.2);
+      --danger-border: rgba(220, 38, 38, 0.5);
+    }
+
+    body {
+      background: var(--navy-bg);
+      color: #f1f5f9;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding-bottom: 90px;
+    }
+
+    .brand-title {
+      font-family: 'Great Vibes', cursive;
+      color: var(--gold-primary);
+      font-size: 2.2rem;
+      text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+      margin: 0;
+    }
+
+    .serif-title {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Container & Layout */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .glass-card {
+      background: var(--navy-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-top: 10px;
+    }
+
+    .sub-picker-select {
+      background: var(--navy-card);
+      color: var(--gold-primary);
+      border: 1px solid var(--gold-hairline);
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Pack Chips */
+    .chips-flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .chip {
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+    }
+
+    .chip.active {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.12);
+    }
+
+    .chip.disabled {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+
+    .chip-button {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Primary Draw Orb Button */
+    .draw-orb-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 0;
+    }
+
+    .draw-orb-btn {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #D4AF37 0%, #AA771C 100%);
+      border: none;
+      color: #070b14;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
+
+    .draw-orb-btn:active {
+      transform: scale(0.94);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .draw-orb-btn:disabled {
+      background: #334155;
+      color: #64748b;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* Buttons */
+    .btn-gold {
+      background: linear-gradient(135deg, #D4AF37 0%, #AA771C 100%);
+      color: #070b14;
+      font-weight: 700;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: filter 0.2s ease;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-ghost-gold {
+      background: transparent;
+      color: var(--gold-primary);
+      border: 1px dashed var(--gold-primary);
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-outline-danger {
+      background: transparent;
+      color: #f87171;
+      border: 1px solid var(--danger-border);
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .button-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Revealed Card Header */
+    .card-number-badge {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--gold-primary);
+      line-height: 1;
+      opacity: 0.9;
+    }
+
+    .card-title-lg {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin: 8px 0;
+    }
+
+    .instruction-body {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 3px solid var(--gold-primary);
+      margin: 16px 0;
+    }
+
+    .gear-line {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .gear-tag {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    /* Live Session Ring & Widgets */
+    .timer-ring-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .timer-display {
+      font-size: 2.8rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--gold-primary);
+      letter-spacing: 2px;
+    }
+
+    .edge-counter-btn {
+      background: rgba(212, 175, 55, 0.15);
+      border: 2px solid var(--gold-primary);
+      color: var(--gold-primary);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0;
+    }
+
+    /* Mood Picker */
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .mood-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+    }
+
+    .mood-btn.selected {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold-primary);
+      font-weight: 700;
+    }
+
+    /* Dom Feed Items */
+    .feed-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 0;
+    }
+
+    .feed-item:last-child {
+      border-bottom: none;
+    }
+
+    .quick-replies {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .reply-pill {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 14px;
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid var(--gold-hairline);
+      color: var(--gold-primary);
+      cursor: pointer;
+    }
+
+    /* Modal Sheet */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .modal-sheet {
+      background: #0d1322;
+      border-top: 1px solid var(--gold-hairline);
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      max-width: 480px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .other-pair-chip {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .textarea-dark {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: #fff;
+      padding: 12px;
+      box-sizing: border-box;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+  </style>
+</head>
+<body data-nav="more">
+
+  <div class="app-container">
+
+    <!-- Header -->
+    <div class="header-bar">
+      <div>
+        <h1 class="brand-title">Task Draw</h1>
+        <div id="role-subtitle" style="font-size: 0.75rem; color: #94a3b8;">Private Paired Deck</div>
+      </div>
+      
+      <!-- Dom Context Switcher (Shown if Dom) -->
+      <div id="dom-switcher-container" style="display: none;">
+        <select id="sub-picker-select" class="sub-picker-select">
+          <option value="">Loading roster...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Other Pair Live Index Notification (Dom Only) -->
+    <div id="other-pair-live-chip" class="other-pair-chip" style="display: none;">
+      <span id="other-pair-text">Maya has #3 live</span>
+      <span style="font-weight: 700; font-size: 0.75rem;">TAP TO SWITCH →</span>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <div id="main-view">
+
+      <!-- SUB VIEW: IDLE SCREEN -->
+      <div id="view-sub-idle" class="glass-card" style="display: none;">
+        <div class="stats-row">
+          <div class="stat-box">
+            <div id="stat-done-count" class="stat-number">0</div>
+            <div class="stat-label">Done</div>
+          </div>
+          <div class="stat-box">
+            <div id="stat-open-count" class="stat-number">0</div>
+            <div class="stat-label">Open / Live</div>
+          </div>
+          <div class="stat-box">
+            <div id="stat-redraws-left" class="stat-number">2</div>
+            <div class="stat-label">Redraws Left</div>
+          </div>
+        </div>
+
+        <!-- Session & Pack Chips -->
+        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">Active Deck Packs</div>
+        <div id="pack-chips-container" class="chips-flex">
+          <!-- Chips injected dynamically -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <label class="chip chip-button" id="tonight-chip-label">
+            <input type="checkbox" id="tonight-filter-checkbox" style="display: none;"/>
+            🌙 Tonight / Short (<25m)
+          </label>
+          
+          <label class="chip chip-button" id="discreet-chip-label">
+            <input type="checkbox" id="discreet-toggle-checkbox" style="display: none;"/>
+            🔒 Discreet Mode
+          </label>
+        </div>
+
+        <!-- Primary Draw Button -->
+        <div class="draw-orb-container">
+          <button id="btn-sub-draw" class="draw-orb-btn">
+            Draw
+          </button>
+        </div>
+      </div>
+
+      <!-- REVEALED CARD SCREEN (SUB) -->
+      <div id="view-card-revealed" class="glass-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div id="card-number-display" class="card-number-badge">#03</div>
+          <div class="chips-flex" id="card-pills-container">
+            <!-- Pills injected dynamically -->
+          </div>
+        </div>
+
+        <h2 id="card-title-display" class="card-title-lg serif-title">Card Title</h2>
+        
+        <div id="gear-line-display" class="gear-line">
+          <span class="material-symbols-rounded" style="font-size: 18px; color: var(--gold-primary);">construction</span>
+          <span>Gear: <span id="gear-text" class="gear-tag">None</span></span>
+        </div>
+
+        <div id="card-instruction-display" class="instruction-body">
+          Instruction text rendering here...
+        </div>
+
+        <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 16px;" id="card-safety-display">
+          Safety note...
+        </div>
+
+        <div class="button-stack">
+          <button id="btn-card-begin" class="btn-gold">Begin Session</button>
+          <button id="btn-card-redraw" class="btn-ghost-gold">Redraw Card (<span id="redraw-count-label">2</span> left)</button>
+          <button id="btn-card-skip" class="btn-outline-danger" style="border-color: rgba(255,255,255,0.2); color: #94a3b8;">Not Tonight</button>
+        </div>
+      </div>
+
+      <!-- LIVE SESSION SCREEN (SUB) -->
+      <div id="view-live-session" class="glass-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span class="chip active">LIVE SESSION</span>
+          <button id="btn-safeword-trigger" style="background: none; border: none; color: #f87171; font-weight: 700; cursor: pointer; font-size: 0.8rem;">SAFEWORD</button>
+        </div>
+
+        <h3 id="live-card-title" class="serif-title" style="margin: 4px 0 16px 0; color: var(--gold-primary);">Card Title</h3>
+
+        <!-- Timer / Clock Container -->
+        <div id="live-timer-container" class="timer-ring-container" style="display: none;">
+          <div id="live-timer-digits" class="timer-display">15:00</div>
+          <div id="live-hands-off-ring" style="font-size: 0.85rem; color: #f59e0b; margin-top: 8px; display: none;">
+            🖐️ Hands-off Rest: <span id="hands-off-seconds">15</span>s
+          </div>
+        </div>
+
+        <!-- Metronome Widget (Card 14 PaceMaker) -->
+        <div id="live-metronome-widget" style="display: none; text-align: center; margin: 20px 0;">
+          <div style="font-size: 0.8rem; color: #94a3b8;">PaceMaker BPM</div>
+          <div id="metronome-bpm-display" style="font-size: 2.5rem; font-weight: 700; color: var(--gold-primary);">60 BPM</div>
+          <button id="btn-toggle-metronome" class="btn-ghost-gold" style="width: auto; margin-top: 10px;">Start Metronome Beep</button>
+        </div>
+
+        <!-- Dice Widget (Cards 20, 24) -->
+        <div id="live-dice-widget" style="display: none; text-align: center; margin: 20px 0;">
+          <div style="font-size: 3rem; margin-bottom: 10px;" id="dice-visual">🎲 🎲</div>
+          <button id="btn-roll-dice" class="btn-ghost-gold">Roll Dice Target</button>
+          <div id="dice-result-text" style="margin-top: 8px; color: var(--gold-light); font-weight: 600;"></div>
+        </div>
+
+        <!-- Hidden Goal Widget (Card 26) -->
+        <div id="live-hidden-goal-widget" style="display: none; margin: 16px 0;">
+          <div id="hidden-goal-locked-box" style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; text-align: center; color: #cbd5e1;">
+            🔒 Complete <span id="hidden-goal-target-needed">5</span> edges to unlock Sir's secret goal.
+          </div>
+          <div id="hidden-goal-unlocked-box" class="instruction-body" style="display: none; border-color: #3b82f6;">
+            🔓 <strong>Unlocked Goal:</strong> <span id="hidden-goal-text">Do 5 additional slow edges.</span>
+          </div>
+        </div>
+
+        <!-- Edge Increment Counter Button -->
+        <button id="btn-edge-increment" class="edge-counter-btn">
+          <span>I Edged ⚡</span>
+          <span id="edge-count-badge" style="background: var(--gold-primary); color: #070b14; padding: 4px 14px; border-radius: 20px; font-size: 1.1rem;">0</span>
+        </button>
+
+        <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 20px; line-height: 1.4;" id="live-one-line-rule">
+          Rule: Keep stroke pace controlled.
+        </div>
+
+        <div class="button-stack">
+          <button id="btn-live-complete" class="btn-gold">I Am Done / Complete</button>
+          <button id="btn-live-stop" class="btn-outline-danger">Stop Session</button>
+        </div>
+      </div>
+
+      <!-- AFTERCARE & NOTE SCREEN (SUB) -->
+      <div id="view-aftercare" class="glass-card" style="display: none;">
+        <h2 class="serif-title" style="color: var(--gold-primary); margin-top: 0;">Completion & Aftercare</h2>
+        
+        <div style="font-size: 0.85rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 16px;" id="aftercare-text-content">
+          Untie bindings, rest flat for 2 minutes, hydrate.
+        </div>
+
+        <div style="font-size: 0.85rem; font-weight: 600; color: #94a3b8; margin-bottom: 8px;">How do you feel? (Required)</div>
+        <div class="mood-grid">
+          <button class="mood-btn" data-mood="loved">😍 Loved</button>
+          <button class="mood-btn" data-mood="fine">😊 Fine</button>
+          <button class="mood-btn" data-mood="hard">🥵 Hard</button>
+          <button class="mood-btn" data-mood="skip_next">⛔ Skip Next</button>
+        </div>
+
+        <div style="font-size: 0.85rem; font-weight: 600; color: #94a3b8; margin: 12px 0 6px 0;">Optional Note for Sir</div>
+        <textarea id="aftercare-note-input" class="textarea-dark" placeholder="Share your experience or attachments..."></textarea>
+
+        <div class="button-stack" style="margin-top: 20px;">
+          <button id="btn-submit-aftercare" class="btn-gold">Send to Sir & Finish</button>
+        </div>
+      </div>
+
+      <!-- DOM OVERVIEW FEED VIEW -->
+      <div id="view-dom-feed" class="glass-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="serif-title" style="margin: 0; color: var(--gold-primary);">Pair Activity Feed</h2>
+          <button id="btn-dom-assign-open" class="btn-ghost-gold" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">+ Assign Card</button>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button id="btn-open-deck-rules" class="chip chip-button" style="border-color: var(--gold-hairline); color: var(--gold-primary);">⚙️ Deck Rules</button>
+        </div>
+
+        <div id="dom-feed-list">
+          <div style="text-align: center; color: #64748b; padding: 20px;">Loading pair feed...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DOM ASSIGN PICKER MODAL -->
+  <div id="modal-assign-picker" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Assign Card to Sub</h3>
+        <button id="btn-close-assign-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem;">✕</button>
+      </div>
+      <div id="assign-catalog-list" style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Assign cards rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- DOM DECK RULES MODAL -->
+  <div id="modal-deck-rules" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Deck Rules for Pair</h3>
+        <button id="btn-close-rules-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem;">✕</button>
+      </div>
+
+      <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">Active Packs</div>
+      <div id="rules-pack-toggles" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        <!-- Pack toggles -->
+      </div>
+
+      <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">Soft-Banned Cards (<span id="softban-count">0</span>)</div>
+      <div id="softban-list-container" style="margin-bottom: 20px;">
+        <!-- Softban list -->
+      </div>
+
+      <button id="btn-save-deck-rules" class="btn-gold">Save Settings</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { requireAuth, getMyProfile, getRelationship, getDomRoster, switchActiveSub } from './auth.js';
+    import { TASK_DRAW_CARDS } from './js/data/task-draw-cards.js';
+    import { getEligibleCards, substituteDomName, getEmptyDeckDiagnostics, DEFAULT_TASK_DRAW_SETTINGS } from './js/modules/task-draw-engine.js';
+    import {
+      subscribeTaskDraw,
+      drawCardTransaction,
+      startLiveSession,
+      updateLiveDrawProgress,
+      redrawCardTransaction,
+      skipDraw,
+      completeDraw,
+      stopDraw,
+      assignCardTransaction,
+      updateTaskDrawSettings,
+      clearSoftBan
+    } from './task-draw-adapter.js';
+
+    // State Variables
+    let currentUser = null;
+    let myProfile = null;
+    let currentRel = null;
+    let currentRole = 'sub';
+    let currentSettings = { ...DEFAULT_TASK_DRAW_SETTINGS };
+    let currentState = {};
+    let activeDrawDoc = null;
+    let selectedMood = null;
+    let isTonightFilter = false;
+    let isDiscreetMode = false;
+    let metronomeInterval = null;
+    let metronomeAudioCtx = null;
+    let liveTimerInterval = null;
+
+    // DOM Elements
+    const viewSubIdle = document.getElementById('view-sub-idle');
+    const viewCardRevealed = document.getElementById('view-card-revealed');
+    const viewLiveSession = document.getElementById('view-live-session');
+    const viewAftercare = document.getElementById('view-aftercare');
+    const viewDomFeed = document.getElementById('view-dom-feed');
+
+    // Init App
+    async function init() {
+      currentUser = await requireAuth();
+      myProfile = await getMyProfile();
+      currentRole = myProfile?.role || 'sub';
+      document.getElementById('role-subtitle').textContent = currentRole === 'dom' ? 'Dom Oversight & Feed' : 'Private Paired Deck';
+
+      currentRel = await getRelationship();
+
+      if (!currentRel) {
+        alert('No active pairing found. Please set up pairing on pair.html first.');
+        window.location.href = 'pair.html';
+        return;
+      }
+
+      if (currentRole === 'dom') {
+        setupDomRosterPicker();
+      }
+
+      // Attach global subscriptions for active relationship
+      attachListeners(currentRel.id);
+
+      setupEventListeners();
+    }
+
+    function attachListeners(relId) {
+      subscribeTaskDraw({
+        relationshipId: relId,
+        onSettings: (settings) => {
+          currentSettings = { ...DEFAULT_TASK_DRAW_SETTINGS, ...settings };
+          renderUI();
+        },
+        onState: (state) => {
+          currentState = state || {};
+          renderUI();
+        },
+        onActiveDraw: (draw) => {
+          activeDrawDoc = draw;
+          renderUI();
+        },
+        onHistory: (draws) => {
+          if (currentRole === 'dom') renderDomFeed(draws);
+        },
+        onIndex: (indexData) => {
+          renderOtherPairIndexChip(indexData);
+        }
+      });
+    }
+
+    async function setupDomRosterPicker() {
+      document.getElementById('dom-switcher-container').style.display = 'block';
+      const select = document.getElementById('sub-picker-select');
+      const roster = await getDomRoster();
+
+      select.innerHTML = roster.map(r => `
+        <option value="${r.id}" ${r.id === currentRel.id ? 'selected' : ''}>
+          ${r.subName || 'Sub'} (${r.status})
+        </option>
+      `).join('');
+
+      select.addEventListener('change', async (e) => {
+        const newRelId = e.target.value;
+        if (newRelId && newRelId !== currentRel.id) {
+          await switchActiveSub(newRelId);
+          currentRel = await getRelationship();
+          attachListeners(currentRel.id);
+        }
+      });
+    }
+
+    function renderUI() {
+      // Hide all main views
+      viewSubIdle.style.display = 'none';
+      viewCardRevealed.style.display = 'none';
+      viewLiveSession.style.display = 'none';
+      viewAftercare.style.display = 'none';
+      viewDomFeed.style.display = 'none';
+
+      if (currentRole === 'dom') {
+        viewDomFeed.style.display = 'block';
+        return;
+      }
+
+      // Sub Role View Switching
+      if (activeDrawDoc) {
+        if (activeDrawDoc.status === 'drawn') {
+          renderRevealedCardView(activeDrawDoc);
+        } else if (activeDrawDoc.status === 'live') {
+          renderLiveSessionView(activeDrawDoc);
+        } else {
+          renderIdleView();
+        }
+      } else {
+        renderIdleView();
+      }
+    }
+
+    function renderIdleView() {
+      viewSubIdle.style.display = 'block';
+      
+      const lastDraws = currentState.lastDrawIds || [];
+      const softBans = currentState.softBanIds || [];
+      const redrawsUsed = currentState.redrawsUsedToday || 0;
+      const redrawsLeft = Math.max(0, (currentSettings.redrawsPerDay || 2) - redrawsUsed);
+
+      document.getElementById('stat-done-count').textContent = lastDraws.length;
+      document.getElementById('stat-open-count').textContent = currentState.liveDrawId ? 1 : 0;
+      document.getElementById('stat-redraws-left').textContent = redrawsLeft;
+
+      // Render pack chips
+      const chipsContainer = document.getElementById('pack-chips-container');
+      const allPacks = ['home', 'dice', 'writing', 'bondage', 'short', 'long', 'public'];
+      const activePacksSet = new Set(currentSettings.packsOn || []);
+
+      chipsContainer.innerHTML = allPacks.map(p => `
+        <span class="chip ${activePacksSet.has(p) ? 'active' : 'disabled'}">
+          ${p}
+        </span>
+      `).join('');
+
+      const btnDraw = document.getElementById('btn-sub-draw');
+      btnDraw.disabled = Boolean(currentState.liveDrawId);
+    }
+
+    function renderRevealedCardView(draw) {
+      viewCardRevealed.style.display = 'block';
+      const card = TASK_DRAW_CARDS.find(c => c.id === draw.cardId);
+      if (!card) return;
+
+      document.getElementById('card-number-display').textContent = `#${String(card.id).padStart(2, '0')}`;
+      
+      // Mask card title if discreet mode is on
+      const titleEl = document.getElementById('card-title-display');
+      if (isDiscreetMode) {
+        titleEl.textContent = '🔒 Task Card (Tap to reveal)';
+        titleEl.onclick = () => { titleEl.textContent = card.title; };
+      } else {
+        titleEl.textContent = card.title;
+        titleEl.onclick = null;
+      }
+
+      // Render Pills
+      const pillsContainer = document.getElementById('card-pills-container');
+      pillsContainer.innerHTML = `
+        <span class="chip active">⏱️ ${card.durationMin}m</span>
+        ${card.edgeTarget > 0 ? `<span class="chip active">⚡ ${card.edgeTarget} edges</span>` : ''}
+        <span class="chip">${card.packs[0]}</span>
+      `;
+
+      document.getElementById('gear-text').textContent = card.gear.length > 0 ? card.gear.join(', ') : 'None';
+      
+      const domName = myProfile?.domDisplayName || 'Sir';
+      document.getElementById('card-instruction-display').textContent = substituteDomName(card.instruction, domName);
+      document.getElementById('card-safety-display').textContent = `Safety: ${card.safety}`;
+
+      const redrawsUsed = currentState.redrawsUsedToday || 0;
+      const redrawsLeft = Math.max(0, (currentSettings.redrawsPerDay || 2) - redrawsUsed);
+      document.getElementById('redraw-count-label').textContent = redrawsLeft;
+      document.getElementById('btn-card-redraw').disabled = redrawsLeft <= 0;
+    }
+
+    function renderLiveSessionView(draw) {
+      viewLiveSession.style.display = 'block';
+      const card = TASK_DRAW_CARDS.find(c => c.id === draw.cardId);
+      if (!card) return;
+
+      document.getElementById('live-card-title').textContent = `#${card.id} ${card.title}`;
+      document.getElementById('edge-count-badge').textContent = draw.edges || 0;
+
+      // Configure Widgets
+      document.getElementById('live-timer-container').style.display = (card.session === 'timer' || card.session === 'metronome') ? 'flex' : 'none';
+      document.getElementById('live-metronome-widget').style.display = card.session === 'metronome' ? 'block' : 'none';
+      document.getElementById('live-dice-widget').style.display = card.session === 'dice' ? 'block' : 'none';
+      document.getElementById('live-hidden-goal-widget').style.display = card.session === 'hidden-goal' ? 'block' : 'none';
+
+      if (card.session === 'timer' && !liveTimerInterval) {
+        startLiveTimer(card.durationMin);
+      }
+    }
+
+    function startLiveTimer(durationMin) {
+      clearInterval(liveTimerInterval);
+      const startTime = Date.now();
+      const targetEndTime = startTime + durationMin * 60 * 1000;
+
+      liveTimerInterval = setInterval(() => {
+        const remaining = Math.max(0, targetEndTime - Date.now());
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        document.getElementById('live-timer-digits').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        if (remaining <= 0) clearInterval(liveTimerInterval);
+      }, 1000);
+    }
+
+    function renderDomFeed(draws) {
+      const feedList = document.getElementById('dom-feed-list');
+      if (!draws || draws.length === 0) {
+        feedList.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">No draw history for this pair yet.</div>`;
+        return;
+      }
+
+      feedList.innerHTML = draws.map(d => {
+        const card = TASK_DRAW_CARDS.find(c => c.id === d.cardId);
+        return `
+          <div class="feed-item">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-weight: 700; color: var(--gold-primary);">#${d.cardId} ${card?.title || 'Card'}</span>
+              <span class="chip ${d.status === 'live' ? 'active' : ''}">${d.status}</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">Edges: ${d.edges || 0} ${d.mood ? `· Mood: ${d.mood}` : ''}</div>
+            ${d.note ? `<div style="font-size: 0.8rem; color: #94a3b8; font-style: italic; margin-top: 4px;">"${d.note}"</div>` : ''}
+            <div class="quick-replies">
+              <span class="reply-pill">Good girl</span>
+              <span class="reply-pill">Again</span>
+              <span class="reply-pill">+2 edges next time</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderOtherPairIndexChip(indexData) {
+      const chip = document.getElementById('other-pair-live-chip');
+      if (indexData && indexData.status === 'live' && indexData.relationshipId !== currentRel.id) {
+        chip.style.display = 'flex';
+        document.getElementById('other-pair-text').textContent = `Another sub has #${indexData.liveCardId} live`;
+      } else {
+        chip.style.display = 'none';
+      }
+    }
+
+    function setupEventListeners() {
+      // Sub Draw Button
+      document.getElementById('btn-sub-draw').addEventListener('click', async () => {
+        try {
+          const eligible = getEligibleCards({
+            catalog: TASK_DRAW_CARDS,
+            packsOn: currentSettings.packsOn,
+            historyIds: currentState.lastDrawIds || [],
+            softBanIds: currentState.softBanIds || [],
+            isTonightOnly: isTonightOnly
+          });
+
+          if (eligible.length === 0) {
+            const diag = getEmptyDeckDiagnostics({
+              packsOn: currentSettings.packsOn,
+              historyIds: currentState.lastDrawIds || [],
+              softBanIds: currentState.softBanIds || [],
+              isTonightOnly: isTonightOnly
+            });
+            alert(diag);
+            return;
+          }
+
+          const pickedCard = eligible[Math.floor(Math.random() * eligible.length)];
+          await drawCardTransaction({
+            relationshipId: currentRel.id,
+            subUid: currentUser.uid,
+            domUid: currentRel.domId,
+            cardId: pickedCard.id
+          });
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      // Card Begin Session
+      document.getElementById('btn-card-begin').addEventListener('click', async () => {
+        if (!activeDrawDoc) return;
+        await startLiveSession({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, domUid: currentRel.domId });
+      });
+
+      // Card Redraw Button
+      document.getElementById('btn-card-redraw').addEventListener('click', async () => {
+        if (!activeDrawDoc) return;
+        try {
+          const eligible = getEligibleCards({
+            catalog: TASK_DRAW_CARDS,
+            packsOn: currentSettings.packsOn,
+            historyIds: currentState.lastDrawIds || [],
+            softBanIds: currentState.softBanIds || [],
+            isTonightOnly: isTonightOnly
+          }).filter(c => c.id !== activeDrawDoc.cardId);
+
+          if (eligible.length === 0) {
+            alert('No alternate eligible cards available for redraw.');
+            return;
+          }
+
+          const newCard = eligible[Math.floor(Math.random() * eligible.length)];
+          await redrawCardTransaction({
+            relationshipId: currentRel.id,
+            subUid: currentUser.uid,
+            domUid: currentRel.domId,
+            oldDrawId: activeDrawDoc.id,
+            newCardId: newCard.id,
+            maxRedrawsPerDay: currentSettings.redrawsPerDay || 2
+          });
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      // Card Skip (Not Tonight)
+      document.getElementById('btn-card-skip').addEventListener('click', async () => {
+        if (!activeDrawDoc) return;
+        await skipDraw({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, domUid: currentRel.domId });
+      });
+
+      // Edge Increment
+      document.getElementById('btn-edge-increment').addEventListener('click', async () => {
+        if (!activeDrawDoc) return;
+        const newEdges = (activeDrawDoc.edges || 0) + 1;
+        await updateLiveDrawProgress({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, edges: newEdges });
+      });
+
+      // Live Session Complete -> Open Aftercare
+      document.getElementById('btn-live-complete').addEventListener('click', () => {
+        viewLiveSession.style.display = 'none';
+        viewAftercare.style.display = 'block';
+      });
+
+      // Mood Picker
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedMood = btn.dataset.mood;
+        });
+      });
+
+      // Submit Aftercare
+      document.getElementById('btn-submit-aftercare').addEventListener('click', async () => {
+        if (!selectedMood) {
+          alert('Please select a mood option first.');
+          return;
+        }
+
+        const card = TASK_DRAW_CARDS.find(c => c.id === activeDrawDoc.cardId);
+        const noteText = document.getElementById('aftercare-note-input').value;
+
+        await completeDraw({
+          relationshipId: currentRel.id,
+          drawId: activeDrawDoc.id,
+          subUid: currentUser.uid,
+          domUid: currentRel.domId,
+          cardId: activeDrawDoc.cardId,
+          cardTitle: card?.title || 'Task Card',
+          mood: selectedMood,
+          noteText,
+          skipNext: selectedMood === 'skip_next',
+          noRepeatUntil: currentSettings.noRepeatUntil || 8
+        });
+
+        alert('Completion recorded for Sir!');
+        selectedMood = null;
+        renderUI();
+      });
+
+      // Safeword Trigger
+      document.getElementById('btn-safeword-trigger').addEventListener('click', async () => {
+        if (confirm('Trigger Safeword? This will end the task immediately and alert Sir.')) {
+          await stopDraw({ relationshipId: currentRel.id, drawId: activeDrawDoc.id, isSafeword: true, domUid: currentRel.domId });
+          alert('Safeword recorded. Session terminated.');
+        }
+      });
+    }
+
+    // Run Initialization
+    init();
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>

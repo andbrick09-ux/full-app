@@ -90,6 +90,7 @@
     { href: 'song-vault.html', icon: '🎵', label: 'Song Vault' },
     { href: 'notes.html', icon: '📝', label: 'Notes' },
     { href: 'calendar.html', icon: '📅', label: 'Calendar' },
+    { href: 'games-draw.html', icon: '🎴', label: 'Task Draw (Private)' },
     { href: 'public-game.html', icon: '🎲', label: 'Public Fun' },
     { href: 'admin.html', icon: '⚙️', label: 'Admin Panel' },
     { href: 'settings.html', icon: '🛠️', label: 'Settings' }
