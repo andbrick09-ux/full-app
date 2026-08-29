@@ -128,7 +128,8 @@ export async function drawCardTransaction({
   domUid,
   cardId,
   catalogVersion = 1,
-  source = 'rng'
+  source = 'rng',
+  allowOverride = false
 }) {
   const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
   const drawsCol = collection(db, 'relationships', relationshipId, 'taskDraws');
@@ -138,8 +139,14 @@ export async function drawCardTransaction({
     const stateSnap = await transaction.get(stateRef);
     const stateData = stateSnap.exists() ? stateSnap.data() : {};
 
-    if (stateData.liveDrawId) {
+    if (stateData.liveDrawId && !allowOverride) {
       throw new Error('A card is already live for this pair.');
+    } else if (stateData.liveDrawId && allowOverride) {
+      const oldDrawRef = doc(db, 'relationships', relationshipId, 'taskDraws', stateData.liveDrawId);
+      transaction.update(oldDrawRef, {
+        status: 'replaced',
+        endedAt: serverTimestamp()
+      });
     }
 
     const todayKey = getTodayDateKey();
@@ -191,6 +198,62 @@ export async function drawCardTransaction({
     }
 
     return newDrawRef.id;
+  });
+}
+
+/**
+ * Assign card (Dom action): force assigns a card and replaces existing active card if any.
+ */
+export async function assignCardTransaction({
+  relationshipId,
+  subUid,
+  domUid,
+  cardId
+}) {
+  return drawCardTransaction({
+    relationshipId,
+    subUid,
+    domUid,
+    cardId,
+    source: 'assign',
+    allowOverride: true
+  });
+}
+
+/**
+ * Unassign active card (Dom action): clears live pointer and marks current draw as 'unassigned'.
+ */
+export async function unassignCardTransaction({ relationshipId, domUid }) {
+  const stateRef = doc(db, 'relationships', relationshipId, 'taskDraw', 'state');
+  const now = serverTimestamp();
+
+  return runTransaction(db, async (transaction) => {
+    const stateSnap = await transaction.get(stateRef);
+    const stateData = stateSnap.exists() ? stateSnap.data() : {};
+    const liveDrawId = stateData.liveDrawId;
+
+    if (liveDrawId) {
+      const drawRef = doc(db, 'relationships', relationshipId, 'taskDraws', liveDrawId);
+      transaction.update(drawRef, {
+        status: 'unassigned',
+        endedAt: now
+      });
+    }
+
+    transaction.set(stateRef, {
+      liveDrawId: null
+    }, { merge: true });
+
+    if (domUid) {
+      const indexRef = doc(db, 'users', domUid, 'taskDrawIndex', relationshipId);
+      transaction.set(indexRef, {
+        liveDrawId: null,
+        status: 'idle',
+        updatedAt: now
+      }, { merge: true });
+    }
+
+    return true;
   });
 }
 

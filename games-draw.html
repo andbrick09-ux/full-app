@@ -624,8 +624,9 @@
           <button id="btn-dom-assign-open" class="btn-ghost-gold" onclick="window.openAssignPickerModal ? window.openAssignPickerModal() : null" style="width: auto; padding: 6px 14px; font-size: 0.8rem; cursor: pointer;">+ Assign Card</button>
         </div>
 
-        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
           <button id="btn-open-deck-rules" class="chip chip-button" onclick="window.openDeckRulesModal ? window.openDeckRulesModal() : null" style="border-color: var(--gold-hairline); color: var(--gold-primary); cursor: pointer;">⚙️ Deck Rules</button>
+          <button id="btn-dom-unassign-card" class="chip chip-button" style="display: none; border-color: rgba(248, 113, 113, 0.5); color: #f87171; cursor: pointer;">🚫 Unassign Active Card</button>
         </div>
 
         <div id="dom-feed-list">
@@ -687,6 +688,7 @@
       completeDraw,
       stopDraw,
       assignCardTransaction,
+      unassignCardTransaction,
       updateTaskDrawSettings,
       clearSoftBan
     } from './task-draw-adapter.js';
@@ -956,6 +958,11 @@
     let otherPairRelId = null;
 
     function renderDomFeed(draws) {
+      const unassignBtn = document.getElementById('btn-dom-unassign-card');
+      if (unassignBtn) {
+        unassignBtn.style.display = currentState?.liveDrawId ? 'inline-flex' : 'none';
+      }
+
       const feedList = document.getElementById('dom-feed-list');
       if (!draws || draws.length === 0) {
         feedList.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">No draw history for ${activeSubName} yet.</div>`;
@@ -1045,21 +1052,53 @@
           console.error(e);
         }
 
+        const substitutedInstruction = substituteDomName(card.instruction, 'Sir');
+        const gearText = card.gear ? card.gear.join(', ') : 'None';
+
         return `
-          <div class="glass-card" style="padding: 14px; margin: 0; opacity: ${isEligible ? '1' : '0.6'};">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="glass-card" style="padding: 14px; margin: 0; opacity: ${isEligible ? '1' : '0.75'};">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
               <div>
                 <span style="font-weight: 700; color: var(--gold-primary);">#${card.id} ${card.title}</span>
                 <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">⏱️ ${card.durationMin}m · Pack: ${card.packs.join(', ')}</div>
               </div>
-              <button class="btn-ghost-gold btn-assign-card" data-card-id="${card.id}" ${!isEligible ? 'disabled' : ''} style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-                ${isEligible ? 'Assign' : 'Blocked'}
+              <button class="btn-ghost-gold btn-assign-card" data-card-id="${card.id}" style="width: auto; padding: 6px 14px; font-size: 0.8rem; cursor: pointer;">
+                ${isEligible ? 'Assign' : 'Force Assign'}
               </button>
+            </div>
+
+            <!-- Details Toggle -->
+            <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+              <button type="button" class="btn-toggle-card-details" data-target="details-card-${card.id}" style="background: none; border: none; color: #38bdf8; font-size: 0.75rem; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;">
+                <span>▶ Tap for Details</span>
+              </button>
+
+              <div id="details-card-${card.id}" class="assign-card-details-box" style="display: none; margin-top: 8px; font-size: 0.8rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="margin-bottom: 6px; line-height: 1.4;"><strong>Instruction:</strong> ${substitutedInstruction}</div>
+                <div style="margin-bottom: 4px; color: var(--gold-light);">🛠️ <strong>Gear:</strong> ${gearText}</div>
+                ${card.safety ? `<div style="margin-bottom: 4px; color: #f87171;">⚠️ <strong>Safety:</strong> ${card.safety}</div>` : ''}
+                ${card.oneLineRule ? `<div style="color: #94a3b8; font-style: italic;">📋 <strong>Rule:</strong> ${card.oneLineRule}</div>` : ''}
+              </div>
             </div>
           </div>
         `;
       }).join('');
 
+      // Wire details toggle buttons
+      document.querySelectorAll('.btn-toggle-card-details').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const targetId = btn.dataset.target;
+          const box = document.getElementById(targetId);
+          if (box) {
+            const isHidden = box.style.display === 'none';
+            box.style.display = isHidden ? 'block' : 'none';
+            btn.querySelector('span').textContent = isHidden ? '▼ Hide Details' : '▶ Tap for Details';
+          }
+        };
+      });
+
+      // Wire assign buttons
       document.querySelectorAll('.btn-assign-card').forEach(btn => {
         btn.onclick = async () => {
           const cardId = Number(btn.dataset.cardId);
@@ -1074,7 +1113,7 @@
               domUid: currentUser.uid,
               cardId
             });
-            document.getElementById('modal-assign-picker').style.display = 'none';
+            window.closeAssignModal();
             alert(`Assigned Card #${cardId} to ${activeSubName}!`);
           } catch (err) {
             alert('Assign failed: ' + err.message);
@@ -1413,6 +1452,26 @@
           window.closeDeckRulesModal();
         });
       }
+
+      // Dom Unassign Active Card Handler
+      document.getElementById('btn-dom-unassign-card')?.addEventListener('click', async () => {
+        if (!currentRel || !currentUser) return;
+        if (!currentState?.liveDrawId) {
+          alert('No active card to unassign.');
+          return;
+        }
+        if (confirm(`Unassign active card from ${activeSubName}? This will cancel the active card session.`)) {
+          try {
+            await unassignCardTransaction({
+              relationshipId: currentRel.id,
+              domUid: currentUser.uid
+            });
+            alert(`Unassigned card from ${activeSubName}!`);
+          } catch (err) {
+            alert('Unassign failed: ' + err.message);
+          }
+        }
+      });
 
       // Other pair switcher chip click
       document.getElementById('other-pair-live-chip')?.addEventListener('click', async () => {
