@@ -512,25 +512,7 @@ export async function stopDraw({ relationshipId, drawId, isSafeword = false, dom
   }
 }
 
-/**
- * Dom Assign card to active sub.
- */
-export async function assignCardTransaction({
-  relationshipId,
-  subUid,
-  domUid,
-  cardId,
-  catalogVersion = 1
-}) {
-  return drawCardTransaction({
-    relationshipId,
-    subUid,
-    domUid,
-    cardId,
-    catalogVersion,
-    source: 'assign'
-  });
-}
+
 
 /**
  * Update deck settings (Dom only).
