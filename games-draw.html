@@ -829,7 +829,6 @@
 
       if (currentRole === 'dom') {
         viewDomFeed.style.display = 'block';
-        updateDebugPanel();
         return;
       }
 
@@ -845,7 +844,6 @@
       } else {
         renderIdleView();
       }
-      updateDebugPanel();
     }
 
     function renderIdleView() {
