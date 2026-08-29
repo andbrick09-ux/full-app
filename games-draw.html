@@ -360,6 +360,10 @@
       cursor: pointer;
     }
 
+    body.modal-open {
+      overflow: hidden !important;
+    }
+
     /* Modal Sheet */
     .modal-overlay {
       position: fixed !important;
@@ -1374,11 +1378,11 @@
       window.openAssignPickerModal = () => {
         const modal = document.getElementById('modal-assign-picker');
         if (modal) {
+          document.body.classList.add('modal-open');
           modal.classList.add('open');
           modal.style.setProperty('display', 'flex', 'important');
           modal.style.setProperty('visibility', 'visible', 'important');
           modal.style.setProperty('opacity', '1', 'important');
-          modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         try {
           renderAssignPickerModal();
@@ -1388,6 +1392,7 @@
       };
 
       window.closeAssignModal = () => {
+        document.body.classList.remove('modal-open');
         const modal = document.getElementById('modal-assign-picker');
         if (modal) {
           modal.classList.remove('open');
@@ -1398,11 +1403,11 @@
       window.openDeckRulesModal = () => {
         const modal = document.getElementById('modal-deck-rules');
         if (modal) {
+          document.body.classList.add('modal-open');
           modal.classList.add('open');
           modal.style.setProperty('display', 'flex', 'important');
           modal.style.setProperty('visibility', 'visible', 'important');
           modal.style.setProperty('opacity', '1', 'important');
-          modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         try {
           renderDeckRulesModal();
@@ -1412,6 +1417,7 @@
       };
 
       window.closeDeckRulesModal = () => {
+        document.body.classList.remove('modal-open');
         const modal = document.getElementById('modal-deck-rules');
         if (modal) {
           modal.classList.remove('open');
