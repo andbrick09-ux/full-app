@@ -571,13 +571,18 @@
           <div id="dice-result-text" style="margin-top: 8px; color: var(--gold-light); font-weight: 600;"></div>
         </div>
 
-        <!-- Hidden Goal Widget (Card 26) -->
-        <div id="live-hidden-goal-widget" style="display: none; margin: 16px 0;">
-          <div id="hidden-goal-locked-box" style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; text-align: center; color: #cbd5e1;">
-            🔒 Complete <span id="hidden-goal-target-needed">5</span> edges to unlock Sir's secret goal.
+        <!-- Deck of Fate Widget (Card 29) -->
+        <div id="live-deck-of-fate-widget" style="display: none; text-align: center; margin: 20px 0; background: rgba(0,0,0,0.4); padding: 16px; border-radius: 16px; border: 1px solid var(--gold-hairline);">
+          <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px;">🎴 In-App Deck of Fate Card Drawer</div>
+          <div id="fate-card-display" style="font-size: 2.2rem; font-weight: 700; color: #ffffff; min-height: 48px; margin: 8px 0;">🃏 Press to Draw Card</div>
+          <div id="fate-card-rule-text" style="font-size: 0.85rem; color: var(--gold-primary); font-weight: 600; margin-bottom: 12px;">Draw a card to reveal suit requirements</div>
+          <button id="btn-draw-fate-card" type="button" class="btn-ghost-gold" style="width: auto; padding: 8px 18px; cursor: pointer;">Draw Fate Card</button>
+          
+          <div style="margin-top: 14px; display: flex; justify-content: center; gap: 16px; font-size: 0.8rem; color: #cbd5e1;">
+            <div>Kings Drawn: <strong id="fate-kings-count" style="color: #f59e0b;">0/2</strong></div>
           </div>
-          <div id="hidden-goal-unlocked-box" class="instruction-body" style="display: none; border-color: #3b82f6;">
-            🔓 <strong>Unlocked Goal:</strong> <span id="hidden-goal-text">Do 5 additional slow edges.</span>
+          <div id="fate-kings-unlocked-banner" style="display: none; margin-top: 10px; padding: 10px; background: rgba(212, 175, 55, 0.2); border: 1px solid var(--gold-primary); border-radius: 10px; color: var(--gold-light); font-weight: 700;">
+            👑 2 KINGS DRAWN! Cum Permission Unlocked!
           </div>
         </div>
 
@@ -949,6 +954,8 @@
       document.getElementById('live-metronome-widget').style.display = card.session === 'metronome' ? 'block' : 'none';
       document.getElementById('live-dice-widget').style.display = card.session === 'dice' ? 'block' : 'none';
       document.getElementById('live-hidden-goal-widget').style.display = card.session === 'hidden-goal' ? 'block' : 'none';
+      const fateWidget = document.getElementById('live-deck-of-fate-widget');
+      if (fateWidget) fateWidget.style.display = (card.id === 29 || card.session === 'cards') ? 'block' : 'none';
 
       if (card.session === 'timer' && !liveTimerInterval) {
         startLiveTimer(card.durationMin);
@@ -1324,6 +1331,54 @@
         const text = document.getElementById('dice-result-text');
         if (visual) visual.textContent = `🎲 ${d1}  🎲 ${d2}`;
         if (text) text.textContent = `Target: ${total} edges required!`;
+      });
+
+      // Draw Fate Card (Card 29 Deck of Fate)
+      let fateKingsCount = 0;
+      document.getElementById('btn-draw-fate-card')?.addEventListener('click', () => {
+        const suits = [
+          { symbol: '♥️', name: 'Hearts', color: '#f87171', type: 'edge' },
+          { symbol: '♦️', name: 'Diamonds', color: '#f87171', type: 'edge' },
+          { symbol: '♠️', name: 'Spades', color: '#38bdf8', type: 'posture' },
+          { symbol: '♣️', name: 'Clubs', color: '#38bdf8', type: 'posture' }
+        ];
+        const values = [
+          { label: '2', num: 2 }, { label: '3', num: 3 }, { label: '4', num: 4 },
+          { label: '5', num: 5 }, { label: '6', num: 6 }, { label: '7', num: 7 },
+          { label: '8', num: 8 }, { label: '9', num: 9 }, { label: '10', num: 10 },
+          { label: 'Jack', num: 5 }, { label: 'Queen', num: 8 }, { label: 'King', num: 10, isKing: true }, { label: 'Ace', num: 11 }
+        ];
+
+        const suit = suits[Math.floor(Math.random() * suits.length)];
+        const val = values[Math.floor(Math.random() * values.length)];
+
+        const displayEl = document.getElementById('fate-card-display');
+        const ruleEl = document.getElementById('fate-card-rule-text');
+        const kingsEl = document.getElementById('fate-kings-count');
+        const banner = document.getElementById('fate-kings-unlocked-banner');
+
+        if (displayEl) {
+          displayEl.style.color = suit.color;
+          displayEl.textContent = `${suit.symbol} ${val.label} of ${suit.name}`;
+        }
+
+        if (val.isKing) {
+          fateKingsCount++;
+          if (kingsEl) kingsEl.textContent = `${fateKingsCount}/2`;
+          if (fateKingsCount >= 2 && banner) {
+            banner.style.display = 'block';
+          }
+        }
+
+        if (ruleEl) {
+          if (suit.type === 'edge') {
+            ruleEl.style.color = '#f87171';
+            ruleEl.textContent = `🔥 ${suit.symbol} ${suit.name}: Perform ${val.num} edges now!`;
+          } else {
+            ruleEl.style.color = '#38bdf8';
+            ruleEl.textContent = `🧘 ${suit.symbol} ${suit.name}: Hold posture for ${val.num * 5} seconds!`;
+          }
+        }
       });
 
       // Stop Session
