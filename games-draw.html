@@ -602,11 +602,11 @@
             <h2 class="serif-title" style="margin: 0; color: var(--gold-primary);" id="feed-header-title">Pair Activity Feed</h2>
             <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;" id="active-sub-subtitle">Active Sub: Loading...</div>
           </div>
-          <button id="btn-dom-assign-open" class="btn-ghost-gold" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">+ Assign Card</button>
+          <button id="btn-dom-assign-open" class="btn-ghost-gold" onclick="window.openAssignPickerModal ? window.openAssignPickerModal() : null" style="width: auto; padding: 6px 14px; font-size: 0.8rem; cursor: pointer;">+ Assign Card</button>
         </div>
 
         <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-          <button id="btn-open-deck-rules" class="chip chip-button" style="border-color: var(--gold-hairline); color: var(--gold-primary);">⚙️ Deck Rules</button>
+          <button id="btn-open-deck-rules" class="chip chip-button" onclick="window.openDeckRulesModal ? window.openDeckRulesModal() : null" style="border-color: var(--gold-hairline); color: var(--gold-primary); cursor: pointer;">⚙️ Deck Rules</button>
         </div>
 
         <div id="dom-feed-list">
@@ -618,11 +618,11 @@
   </div>
 
   <!-- DOM ASSIGN PICKER MODAL -->
-  <div id="modal-assign-picker" class="modal-overlay">
+  <div id="modal-assign-picker" class="modal-overlay" style="z-index: 9999;">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Assign Card to <span id="assign-sub-name">Sub</span></h3>
-        <button id="btn-close-assign-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
+        <button id="btn-close-assign-modal" onclick="window.closeAssignModal ? window.closeAssignModal() : null" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
       </div>
       <div id="assign-catalog-list" style="display: flex; flex-direction: column; gap: 10px;">
         <!-- Assign cards rendered dynamically -->
@@ -631,11 +631,11 @@
   </div>
 
   <!-- DOM DECK RULES MODAL -->
-  <div id="modal-deck-rules" class="modal-overlay">
+  <div id="modal-deck-rules" class="modal-overlay" style="z-index: 9999;">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 class="serif-title" style="margin: 0; color: var(--gold-primary);">Deck Rules for <span id="rules-sub-name">Sub</span></h3>
-        <button id="btn-close-rules-modal" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
+        <button id="btn-close-rules-modal" onclick="window.closeDeckRulesModal ? window.closeDeckRulesModal() : null" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
       </div>
 
       <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">Active Deck Packs</div>
@@ -1308,45 +1308,76 @@
         }
       });
 
+      // Global Window Modal Handlers
+      window.openAssignPickerModal = () => {
+        const modal = document.getElementById('modal-assign-picker');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.style.visibility = 'visible';
+          modal.style.opacity = '1';
+        }
+        try {
+          renderAssignPickerModal();
+        } catch (err) {
+          console.error('Assign picker render error:', err);
+        }
+      };
+
+      window.closeAssignModal = () => {
+        const modal = document.getElementById('modal-assign-picker');
+        if (modal) modal.style.display = 'none';
+      };
+
+      window.openDeckRulesModal = () => {
+        const modal = document.getElementById('modal-deck-rules');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.style.visibility = 'visible';
+          modal.style.opacity = '1';
+        }
+        try {
+          renderDeckRulesModal();
+        } catch (err) {
+          console.error('Deck rules render error:', err);
+        }
+      };
+
+      window.closeDeckRulesModal = () => {
+        const modal = document.getElementById('modal-deck-rules');
+        if (modal) modal.style.display = 'none';
+      };
+
       // Dom Assign Modal Controls
       const btnDomAssignOpen = document.getElementById('btn-dom-assign-open');
       if (btnDomAssignOpen) {
-        btnDomAssignOpen.addEventListener('click', () => {
-          const modal = document.getElementById('modal-assign-picker');
-          if (modal) modal.style.display = 'flex';
-          try {
-            renderAssignPickerModal();
-          } catch (err) {
-            console.error('Assign picker render error:', err);
-          }
+        btnDomAssignOpen.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.openAssignPickerModal();
         });
       }
 
       const btnCloseAssignModal = document.getElementById('btn-close-assign-modal');
       if (btnCloseAssignModal) {
-        btnCloseAssignModal.addEventListener('click', () => {
-          document.getElementById('modal-assign-picker').style.display = 'none';
+        btnCloseAssignModal.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.closeAssignModal();
         });
       }
 
       // Dom Deck Rules Controls
       const btnOpenDeckRules = document.getElementById('btn-open-deck-rules');
       if (btnOpenDeckRules) {
-        btnOpenDeckRules.addEventListener('click', () => {
-          const modal = document.getElementById('modal-deck-rules');
-          if (modal) modal.style.display = 'flex';
-          try {
-            renderDeckRulesModal();
-          } catch (err) {
-            console.error('Deck rules render error:', err);
-          }
+        btnOpenDeckRules.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.openDeckRulesModal();
         });
       }
 
       const btnCloseRulesModal = document.getElementById('btn-close-rules-modal');
       if (btnCloseRulesModal) {
-        btnCloseRulesModal.addEventListener('click', () => {
-          document.getElementById('modal-deck-rules').style.display = 'none';
+        btnCloseRulesModal.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.closeDeckRulesModal();
         });
       }
 
